@@ -3,16 +3,38 @@ entries:
   common:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-07-05T10:47:22.023110204Z"
+    created: "2023-07-05T17:29:49.37632638Z"
     description: A Library Helm Chart for grouping common logic between stakewise
       charts. This chart is not deployable by itself.
-    digest: 461b1cef1abcffbff175fe8cb035ed04691be82a52df37d641de02644a717f98
+    digest: c0227c0533b8d0532533d83b7d5c58977d29075d25ec3f0a0436f21406635d5f
     name: common
     type: library
     urls:
     - https://nethermindeth.github.io/helm-charts/charts/common-1.0.0.tgz
     version: 1.0.0
   execution-beacon:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2023-07-05T17:29:49.379652317Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: Execution and Beacon
+    digest: 9e64729442f22368d476ab13191bba30c4f58786b99501d95c0dfce8cc865448
+    home: https://www.ethereum.org/
+    keywords:
+    - ethereum
+    - blockchain
+    - nethermind
+    - prysm
+    - p2p
+    kubeVersion: ^1.23.0-0
+    name: execution-beacon
+    type: application
+    urls:
+    - https://nethermindeth.github.io/helm-charts/charts/execution-beacon-0.0.7.tgz
+    version: 0.0.7
   - apiVersion: v2
     appVersion: 0.0.1
     created: "2023-07-05T10:47:22.026733385Z"
@@ -148,14 +170,14 @@ entries:
   mev-boost:
   - apiVersion: v2
     appVersion: v1.5.0
-    created: "2023-07-05T10:47:22.027534648Z"
+    created: "2023-07-05T17:29:49.38036399Z"
     dependencies:
     - name: common
       repository: file://../common
       version: 1.0.0
     description: mev-boost allows proof-of-stake Ethereum consensus clients to outsource
       block construction
-    digest: 6f540f61ee3dd266c19a19803bb4e4f88b842698c32643a28417122a6a86f683
+    digest: 3781e1632fad7c4c6aa43c37dca200e0b6fe75d6081666059dfc162d4a9241b6
     home: https://boost.flashbots.net/
     keywords:
     - ethereum
@@ -169,13 +191,13 @@ entries:
   posmoni:
   - apiVersion: v2
     appVersion: v0.0.1
-    created: "2023-07-05T10:47:22.028428817Z"
+    created: "2023-07-05T17:29:49.381022056Z"
     dependencies:
     - name: common
       repository: file://../common
       version: 1.0.0
     description: A Helm chart for installing and configuring Posmoni
-    digest: 0996657c5048328d3634c84d209f91fd7ae11dbe6a1846ee648a99af7d849ebd
+    digest: e019d601c3b3f5755d1dc0d2ad743c5433d18aa11cd967aa4c8343ac2359bf92
     home: https://nethermind.io/
     keywords:
     - ethereum
@@ -187,13 +209,13 @@ entries:
   validator-ejector:
   - apiVersion: v2
     appVersion: v0.0.1
-    created: "2023-07-05T10:47:22.029650712Z"
+    created: "2023-07-05T17:29:49.381972253Z"
     dependencies:
     - name: common
       repository: file://../common
       version: 1.0.0
     description: A Helm chart for installing and configuring Lido's validator-ejector
-    digest: e088b860029e09bf712c4cf138aa0f23109a38f78728ffb4845157f0aa07d553
+    digest: b58d0b955f0c71570aacfa88a11748178750a45e0c8af6ab9c5fd59607ef57b9
     home: https://nethermind.io/
     keywords:
     - ethereum
@@ -208,7 +230,7 @@ entries:
   validator-kapi:
   - apiVersion: v2
     appVersion: v0.0.1
-    created: "2023-07-05T10:47:22.037205698Z"
+    created: "2023-07-05T17:29:49.389132079Z"
     dependencies:
     - name: common
       repository: file://../common
@@ -218,7 +240,7 @@ entries:
       repository: https://charts.bitnami.com/bitnami/
       version: 12.2.6
     description: A Helm chart for installing and configuring Lido's validator-kapi
-    digest: cf96db0854438c7485e48b4d6286f5c882f6832c85d5930214887ca7fe6d1b2d
+    digest: f80ea83c958dd3ed4a562c8cde6b8488b54f0b294bfdff9c1a7199c5b3f75c76
     home: https://nethermind.io/
     keywords:
     - ethereum
@@ -233,9 +255,9 @@ entries:
   validators:
   - apiVersion: v2
     appVersion: v0.0.1
-    created: "2023-07-05T10:47:22.039350665Z"
+    created: "2023-07-05T17:29:49.391100579Z"
     description: A Helm chart for installing validators with the web3signer.
-    digest: d7b10b4b835d6023a0b714ab3ef4738af59625d61389b637decd4e0bd0ed1ad7
+    digest: f86c66eac236b180a92c8451a7e462e3f257f12730728b63da6e9bb4952e9bd8
     keywords:
     - ethereum
     - blockchain
@@ -269,13 +291,13 @@ entries:
   web3signer:
   - apiVersion: v2
     appVersion: v23.3.1
-    created: "2023-07-05T10:47:22.040458851Z"
+    created: "2023-07-05T17:29:49.392102581Z"
     dependencies:
     - name: common
       repository: file://../common
       version: 1.0.0
     description: A Helm chart for installing and configuring Web3signer
-    digest: 3658cdeb9039619971ad0d975a58e55e5a2608a3f37467f020111f5eab7ddf4a
+    digest: d3465b5b3cf974084c88600f8dae8a50713a911f03d9e225d56eeea0ad99a9bb
     keywords:
     - web3signer
     - ethereum
@@ -310,4 +332,4 @@ entries:
     urls:
     - https://nethermindeth.github.io/helm-charts/charts/web3signer-eso-0.0.1.tgz
     version: 0.0.1
-generated: "2023-07-05T10:47:22.022578163Z"
+generated: "2023-07-05T17:29:49.375784825Z"
