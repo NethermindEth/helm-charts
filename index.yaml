@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  aztec-prover:
+  - apiVersion: v2
+    created: "2024-09-17T15:48:38.850030474Z"
+    description: A Helm chart for Kubernetes
+    digest: 61d70bdd862becd9a1aeb9df6ab7bfe27d738c8dbf11c565096c75fd1b4547b7
+    maintainers:
+    - name: 0xDones
+    name: aztec-prover
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/aztec-prover-0.1.1/aztec-prover-0.1.1.tgz
+    version: 0.1.1
+generated: "2024-09-17T15:48:38.850040703Z"
