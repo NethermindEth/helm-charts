@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "common.names.fullname" $ }}-init-config-script
+  name: {{ include "erpc.initConfigScriptName" . }}
   labels:
-    {{- include "common.labels.standard" $ | nindent 4 }}
+    {{- include "erpc.labels" . | nindent 4 }}
 data:
   init.sh: |
     #!/bin/bash
@@ -18,9 +18,9 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "common.names.fullname" $ }}-config-template
+  name: {{ include "erpc.configTemplateName" . }}
   labels:
-    {{- include "common.labels.standard" $ | nindent 4 }}
+    {{- include "erpc.labels" . | nindent 4 }}
 data:
   erpc.yaml: |
     logLevel: {{ .Values.erpc.config.logLevel }}
@@ -42,8 +42,10 @@ data:
     {{- end }}
     server:
       {{- toYaml .Values.erpc.config.server | nindent 6 }}
+      httpPort: {{ .Values.service.port }}
     metrics:
       {{- toYaml .Values.erpc.config.metrics | nindent 6 }}
+      port: {{ .Values.service.metricsPort }}
     projects:
       {{- range $i, $project := .Values.erpc.config.projects }}
       - id: {{ $project.id }}

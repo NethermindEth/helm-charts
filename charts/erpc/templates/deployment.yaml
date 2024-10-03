@@ -1,25 +1,35 @@
----
-apiVersion: {{ include "common.capabilities.deployment.apiVersion" $ }}
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ include "common.names.fullname" $ }}"
-  {{- with $.Values.global.namespaceOverride }}
-  namespace: {{ . }}
-  {{- end }}
+  name: {{ include "erpc.fullname" . }}
+  labels:
+    {{- include "erpc.labels" . | nindent 4 }}
 spec:
-  serviceName: "{{ include "common.names.fullname" $ }}"
-  replicas: {{ .Values.erpc.replicaCount }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" $ | nindent 6 }}
-      app: erpc
+      {{- include "erpc.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
-        {{- include "common.labels.matchLabels" $ | nindent 8 }}
-        app: erpc
+        {{- include "erpc.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
-      serviceAccountName: {{ include "common.names.serviceAccountName" $ }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "erpc.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init-erpc-config
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
@@ -52,28 +62,54 @@ spec:
             - name: erpc-config-init-script
               mountPath: /scripts
       containers:
-        - name: erpc
-          image: "{{ .Values.erpc.image.repository }}:{{ .Values.erpc.image.tag }}"
-          imagePullPolicy: {{ .Values.erpc.image.pullPolicy }}
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - /root/erpc-server
-          resources:
-            {{- toYaml .Values.erpc.resources | nindent 12 }}
           ports:
-            - name: http-jsonrpc
-              containerPort: {{ .Values.erpc.config.server.httpPort }}
-            - name: http-metrics
-              containerPort: {{ .Values.erpc.config.metrics.port }}
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+            - name: metrics
+              containerPort: {{ .Values.service.metricsPort }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: erpc-config
               mountPath: /root/erpc.yaml
               subPath: erpc.yaml
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
       volumes:
         - name: erpc-config
           emptyDir: {}
         - name: erpc-config-template
           configMap:
-            name: {{ include "common.names.fullname" $ }}-config-template
+            name: {{ include "erpc.configTemplateName" . }}
         - name: erpc-config-init-script
           configMap:
-            name: {{ include "common.names.fullname" $ }}-init-config-script
+            name: {{ include "erpc.initConfigScriptName" . }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
