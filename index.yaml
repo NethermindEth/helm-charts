@@ -35,4 +35,22 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/aztec-prover-0.1.1/aztec-prover-0.1.1.tgz
     version: 0.1.1
-generated: "2024-09-17T19:06:08.081512758Z"
+  erpc:
+  - apiVersion: v2
+    appVersion: 0.0.24
+    created: "2024-10-04T13:54:14.92723522Z"
+    description: A Helm chart to deploy eRPC instances
+    digest: aeb34da946011d6b69b404afb4f2197653193dc39d2bb4c4fb8491e91f3f666b
+    home: https://docs.erpc.cloud
+    keywords:
+    - rpcs
+    - erpc
+    maintainers:
+    - name: cbermudez97
+    - name: AntiD2ta
+    name: erpc
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/erpc-1.0.0/erpc-1.0.0.tgz
+    version: 1.0.0
+generated: "2024-10-04T13:54:14.9272515Z"
