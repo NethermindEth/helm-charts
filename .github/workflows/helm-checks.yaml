@@ -12,7 +12,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pre-commit
+      - name: Install pre-commit binaries
+        run: |
+          pip install pre-commit
+
+      - name: Install pre-commit config and hooks
         run: |
           make install-pre-commit
 
