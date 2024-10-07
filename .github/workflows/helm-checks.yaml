@@ -21,6 +21,10 @@ jobs:
         run: |
           go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
 
+      - name: Install pre-commit binaries
+        run: |
+          pip install pre-commit
+
       - name: Run pre-commit
         run: |
           make install-pre-commit

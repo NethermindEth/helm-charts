@@ -3,8 +3,8 @@ name: Check CODEOWNERS
 on: pull_request
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+  check-codeowners:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
