@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -22,14 +22,16 @@ jobs:
           go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
 
       - name: Run pre-commit
-        uses: pre-commit/action@v3.0.1
+        run: |
+          make install-pre-commit
+          make pre-commit
 
   chart-testing:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
