@@ -12,8 +12,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pre-commit
+        run: |
+          make install-pre-commit
+
       - name: Run pre-commit
-        uses: pre-commit/action@v3.0.1
+        run: |
+          make pre-commit
 
   chart-testing:
     runs-on: ubuntu-latest
