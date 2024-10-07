@@ -13,5 +13,10 @@ install-pre-commit: ## Install pre-commit hooks
 pre-commit: ## Run pre-commit hooks
 	@pre-commit run --all-files
 
+pre-commit-ci: ## Run pre-commit hooks without helm-docs
+	@pre-commit install --config .pre-commit-ci-config.yaml
+	@pre-commit install-hooks --config .pre-commit-ci-config.yaml
+	@pre-commit run --all-files --config .pre-commit-ci-config.yaml
+
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

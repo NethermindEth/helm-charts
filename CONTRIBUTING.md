@@ -42,7 +42,13 @@ The following is the list of types that can be used:
 Before making any commits, we strongly recommend running our **pre-commit hooks** over your code. This will run linters and static checks to ensure your code is formatted correctly and you have no syntax errors. To install pre-commit hooks, run the following command:
 
 ```
-pre-commit install
+make install-pre-commit
+```
+
+To run pre-commit hooks after you have installed them, and without making any commits, run the following command:
+
+```
+make pre-commit
 ```
 
 The same pre-commit hooks will be run over your code after you push your commits; it is not mandatory to run them locally. However, relying on the CI for the pre-commit check could be an ineffective process, requiring you to push more commits than intended for any likely fix.
