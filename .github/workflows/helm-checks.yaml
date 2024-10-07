@@ -12,17 +12,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pre-commit binaries
-        run: |
-          pip install pre-commit
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.23
 
-      - name: Install pre-commit config and hooks
+      - name: Install helm-docs
         run: |
-          make install-pre-commit
+          go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
 
       - name: Run pre-commit
-        run: |
-          make pre-commit
+        uses: pre-commit/action@v3.0.1
 
   chart-testing:
     runs-on: ubuntu-latest
