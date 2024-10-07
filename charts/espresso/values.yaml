@@ -38,7 +38,11 @@ nodes:
     volumeMount: true
     resources:
       requests:
+        cpu: "2000m"
         memory: "16000Mi"
+      limits:
+        cpu: "4000m"
+        memory: "32000Mi"
     # Secrets to be used by the node.
     # The secret key must be the same as the one in the Secret resource or ExternalSecret resource.
     secrets:
@@ -74,7 +78,11 @@ nodes:
     volumeMount: false
     resources:
       requests:
+        cpu: "2000m"
         memory: "16000Mi"
+      limits:
+        cpu: "4000m"
+        memory: "32000Mi"
     # Secrets to be used by the node.
     # The secret key must be the same as the one in the Secret resource or ExternalSecret resource.
     secrets:
@@ -292,3 +300,6 @@ rbac:
       - "get"
       - "list"
       - "watch"
+
+# -- Log format for the Sequencer containers. Custom label for Promtail.
+logFormat: "espresso"

@@ -41,10 +41,14 @@ A Helm chart for Espresso Sequencer nodes.
 | keystoreCLI.image.tag | string | `"v0.1.1"` |  |
 | keystoreCLI.projectId | string | `""` |  |
 | keystoreCLI.pv | object | `{"secretId":""}` | Secret ID of the Secret containing the Sequencer's private keys |
+| logFormat | string | `"espresso"` | Log format for the Sequencer containers. Custom label for Promtail. |
 | nameOverride | string | `""` | Provide a name to substitute for the name of the chart |
 | nodes.da.command | list | `["sequencer","--","storage-sql","--","http","--","catchup","--","status","--","query"]` | Command to be used to start the node |
 | nodes.da.nodeName | string | `""` | Node name to identify the node in the Espresso's Node Validator Dashboard. The node index will be appended to the node name. |
 | nodes.da.replicaCount | int | `0` |  |
+| nodes.da.resources.limits.cpu | string | `"4000m"` |  |
+| nodes.da.resources.limits.memory | string | `"32000Mi"` |  |
+| nodes.da.resources.requests.cpu | string | `"2000m"` |  |
 | nodes.da.resources.requests.memory | string | `"16000Mi"` |  |
 | nodes.da.secrets.data | list | `[]` |  |
 | nodes.da.secrets.postgresSecretKey | string | `""` | Postgres secret key. Must match the secret key in the Secret resource or ExternalSecret resource for the postgres related secrets. |
@@ -54,6 +58,9 @@ A Helm chart for Espresso Sequencer nodes.
 | nodes.normal.command | list | `["sequencer","--","http","--","catchup","--","status"]` | Command to be used to start the node |
 | nodes.normal.nodeName | string | `""` | Node name to identify the node in the Espresso's Node Validator Dashboard. The node index will be appended to the node name. |
 | nodes.normal.replicaCount | int | `1` |  |
+| nodes.normal.resources.limits.cpu | string | `"4000m"` |  |
+| nodes.normal.resources.limits.memory | string | `"32000Mi"` |  |
+| nodes.normal.resources.requests.cpu | string | `"2000m"` |  |
 | nodes.normal.resources.requests.memory | string | `"16000Mi"` |  |
 | nodes.normal.secrets.data | list | `[]` |  |
 | nodes.normal.secrets.sequencerSecretKey | string | `""` | Sequencer secret key. Must match the secret key in the Secret resource or ExternalSecret resource for the node type. |

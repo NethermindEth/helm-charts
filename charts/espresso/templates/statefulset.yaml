@@ -19,6 +19,7 @@ spec:
       labels:
         {{- include "espresso.labels" $ | nindent 8 }}
         type: {{ $type }}
+        logformat: {{ $.Values.logFormat }}
     spec:
       serviceAccountName: {{ include "espresso.serviceAccountName" $ }}
       {{- if $.Values.externalSecrets.enabled }}
