@@ -68,12 +68,3 @@ Create the name of the service account to use
 {{- define "erpc.configTemplateName" -}}
 {{- printf "%s-config-template" (include "erpc.fullname" .) -}}
 {{- end -}}
-
-{{/*
-Create a formatted image string with repository and tag
-*/}}
-{{- define "espresso.build_image_name" -}}
-{{- $repository := index . 0 -}}
-{{- $tag := index . 1 -}}
-{{- printf "%s:%s" $repository $tag | quote -}}
-{{- end -}}
