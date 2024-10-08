@@ -18,7 +18,8 @@ jobs:
 
       - name: Run pre-commit
         run: |
-          make pre-commit-ci
+          make install-pre-commit
+          make pre-commit
 
   chart-testing:
     runs-on: ubuntu-latest
