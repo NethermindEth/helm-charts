@@ -70,4 +70,22 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/erpc-1.0.0/erpc-1.0.0.tgz
     version: 1.0.0
-generated: "2024-10-08T11:12:58.142103087Z"
+  espresso:
+  - apiVersion: v2
+    appVersion: 20240925-patch1
+    created: "2024-10-08T11:42:59.143252886Z"
+    description: A Helm chart for Espresso Sequencer nodes.
+    digest: 8143793f35e5790849336c02070e68f579e64474f707f8c6c8e1ea074db05060
+    home: https://docs.espressosys.com/sequencer
+    keywords:
+    - espresso
+    - sequencer
+    maintainers:
+    - email: miguel@nethermind.io
+      name: AntiD2ta
+    name: espresso
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/espresso-1.0.0/espresso-1.0.0.tgz
+    version: 1.0.0
+generated: "2024-10-08T11:42:59.143272162Z"
