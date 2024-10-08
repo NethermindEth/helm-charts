@@ -14,16 +14,6 @@ repos:
     hooks:
       - id: helmlint
 
-  - repo: https://github.com/norwoodj/helm-docs
-    rev: v1.14.2
-    hooks:
-      - id: helm-docs
-        files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
-        args:
-          - --chart-search-root=.
-          - --template-files=./.github/helm-docs/_templates.gotmpl
-          - --template-files=README.md.gotmpl
-
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v1.17.0
     hooks:

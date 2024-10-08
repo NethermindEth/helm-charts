@@ -18,6 +18,7 @@ jobs:
 
       - name: Run pre-commit
         run: |
+          make install-pre-commit
           make pre-commit-ci
 
   chart-testing:
