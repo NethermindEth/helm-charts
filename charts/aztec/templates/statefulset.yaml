@@ -41,8 +41,8 @@ spec:
           {{- with .Values.command }}
           command: {{- . | toYaml | nindent 12 }}
           {{- end }}
-          {{- with include "aztec-prover.config" . | fromYaml }}
-          args: {{- .args | toYaml | nindent 12 }}
+          {{- with .Values.args }}
+          args: {{- . | toYaml | nindent 12 }}
           {{- end }}
           ports:
             - name: http
@@ -60,6 +60,7 @@ spec:
             {{- with .Values.envFrom }}
               {{- tpl (toYaml .) $ | nindent 12 }}
             {{- end }}
+          env: {{ .Values.env | toYaml | nindent 12 }}
             {{- if or .Values.persistence.enabled .Values.volumeMounts }}
           volumeMounts:
             {{- if .Values.persistence.enabled }}

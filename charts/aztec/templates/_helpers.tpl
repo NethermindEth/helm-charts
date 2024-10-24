@@ -60,11 +60,3 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{- define "aztec-prover.config" -}}
-{{- if .Values.proverNode.enabled }}
-{{- .Values.proverNode | toYaml }}
-{{- else if .Values.proverAgent.enabled }}
-{{- .Values.proverAgent | toYaml }}
-{{- end }}
-{{- end }}
