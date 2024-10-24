@@ -6,6 +6,6 @@ metadata:
   labels:
     {{- include "aztec-prover.labels" . | nindent 4 }}
 data:
-  {{- with include "aztec-prover.config" . | fromYaml }}
-  {{- .env | toYaml | nindent 2 }}
+  {{- with .Values.config }}
+  {{- . | toYaml | nindent 2 }}
   {{- end }}

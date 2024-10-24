@@ -1,0 +1,15 @@
+####################################
+# Aztec prover agent values
+####################################
+replicaCount: 1
+config:
+  AZTEC_NODE_URL: "http://aztec-prover-node:8080"
+  PROVER_AGENT_CONCURRENCY: "1"
+  PROVER_REAL_PROOFS: "true"
+  LOG_LEVEL: info
+  LOG_JSON: ""
+  OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: ""
+
+args:
+  - "start"
+  - "--prover"
