@@ -1,6 +1,6 @@
-# aztec-prover
+# aztec
 
-![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Aztec Prover Node and Prover Agent Helm Chart
 
@@ -10,7 +10,7 @@ Aztec Prover Node and Prover Agent Helm Chart
 
 ```bash
 helm repo add nethermind https://nethermindeth.github.io/helm-charts
-helm install aztec-prover nethermind/aztec-prover
+helm install aztec nethermind/aztec
 ```
 
 ## Maintainers
@@ -24,10 +24,21 @@ helm install aztec-prover nethermind/aztec-prover
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
-| autoscaling.enabled | bool | `false` |  |
-| autoscaling.maxReplicas | int | `100` |  |
-| autoscaling.minReplicas | int | `1` |  |
-| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| args[0] | string | `"start"` |  |
+| args[1] | string | `"--prover-node"` |  |
+| args[2] | string | `"--archiver"` |  |
+| command | list | `[]` |  |
+| config.AZTEC_PORT | string | `"8080"` |  |
+| config.DATA_DIRECTORY | string | `"/data"` |  |
+| config.ETHEREUM_HOST | string | `""` |  |
+| config.L1_CHAIN_ID | string | `""` |  |
+| config.LOG_JSON | string | `""` |  |
+| config.LOG_LEVEL | string | `"info"` |  |
+| config.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT | string | `""` |  |
+| config.PROVER_AGENT_ENABLED | string | `"false"` |  |
+| config.PROVER_COORDINATION_NODE_URL | string | `""` |  |
+| config.PROVER_REAL_PROOFS | string | `"true"` |  |
+| env | list | `[]` |  |
 | envFrom | list | `[]` |  |
 | extraObjects | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
@@ -54,17 +65,6 @@ helm install aztec-prover nethermind/aztec-prover
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
-| proverAgent.args[0] | string | `"start"` |  |
-| proverAgent.args[1] | string | `"--prover"` |  |
-| proverAgent.enabled | bool | `false` |  |
-| proverAgent.env | object | `{}` |  |
-| proverAgent.name | string | `"agent"` |  |
-| proverNode.args[0] | string | `"start"` |  |
-| proverNode.args[1] | string | `"--prover-node"` |  |
-| proverNode.args[2] | string | `"--archiver"` |  |
-| proverNode.enabled | bool | `true` |  |
-| proverNode.env | object | `{}` |  |
-| proverNode.name | string | `"node"` |  |
 | readinessProbe.httpGet.path | string | `"/status"` |  |
 | readinessProbe.httpGet.port | string | `"http"` |  |
 | replicaCount | int | `1` |  |
