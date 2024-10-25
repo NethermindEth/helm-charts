@@ -1,0 +1,6 @@
+{{- if and .Values.deployment.enabled .Values.statefulSet.enabled }}
+{{- fail "Only one of 'deployment.enabled' or 'statefulSet.enabled' can be true" }}
+{{- end }}
+{{- if and .Values.statefulSet.enabled .Values.deployment.autoscaling.enabled }}
+{{- fail "Autoscaling can only be enabled for deployment" }}
+{{- end }}
