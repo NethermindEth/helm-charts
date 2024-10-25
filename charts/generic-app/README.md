@@ -87,6 +87,7 @@ statefulSet:
 | deployment.enabled | bool | `true` |  |
 | env | list | `[]` |  |
 | envFrom | list | `[]` |  |
+| extraObjects | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"nginx"` |  |
