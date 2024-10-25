@@ -1,7 +1,6 @@
-# Default values for generic-deployment.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
+############################################
+# Generic App
+############################################
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 
@@ -19,11 +18,51 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+deployment:
+  enabled: true
+  # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+statefulSet:
+  enabled: false
+  persistence:
+    enabled: false
+    storageClassName: ""
+    mountPath: /data
+    accessModes:
+      - ReadWriteOnce
+    size: 50Gi
+
 command: []
 args: []
 
 # This is for setting container environment variables
 env: []
+  # - name: MY_ENV_VAR
+  #   value: my-env-var-value
+  # - name: SECRET
+  #   valueFrom:
+  #     secretKeyRef:
+  #       key: SECRET
+  #       name: secret-name
+
+envFrom:
+  []
+  # - secretRef:
+  #     name: '{{ include "generic-app.fullname" . }}'
+  # - configMapRef:
+  #     name: '{{ include "generic-app.fullname" . }}'
+
+configMap:
+  enabled: false
+  data: {}
+    # ENV_1: value1
+    # ENV_2: value2
 
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
@@ -63,6 +102,10 @@ service:
   ports:
     http: 80
     metrics: 9090
+  extraPorts: []
+  # - name: extra-port
+  #   port: 8080
+  #   protocol: TCP
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -102,14 +145,6 @@ readinessProbe:
   httpGet:
     path: /
     port: http
-
-# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
 volumes: []

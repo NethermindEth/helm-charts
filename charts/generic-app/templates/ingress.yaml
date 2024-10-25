@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "generic-deployment.fullname" . }}
+  name: {{ include "generic-app.fullname" . }}
   labels:
-    {{- include "generic-deployment.labels" . | nindent 4 }}
+    {{- include "generic-app.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -35,7 +35,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: {{ include "generic-deployment.fullname" $ }}
+                name: {{ include "generic-app.fullname" $ }}
                 port:
                   number: {{ $.Values.service.ports.http }}
           {{- end }}

@@ -1,0 +1,74 @@
+{{- template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "extra.installation" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+## Examples
+
+### Extra Ports
+
+This will create both service and container ports configuration.
+
+```yaml
+service:
+  extraPorts:
+    - name: ws
+      port: 1234
+      protocol: TCP
+```
+
+### Environment Variables
+
+#### From ConfigMap
+
+Mounting a ConfigMap as environment variables is the simplest way to use a ConfigMap in a Pod.
+
+```yaml
+envFrom:
+  - configMapRef:
+      name: '{{ include "generic-app.fullname" . }}'
+
+configMap:
+  enabled: true
+  data:
+    VAR_1: value1
+    VAR_2: value2
+```
+
+#### From env
+
+```yaml
+env:
+  - name: MY_ENV_VAR
+    value: my-env-var-value
+```
+
+### Sts Persistence
+
+```yaml
+statefulSet:
+  enabled: true
+  persistence:
+    enabled: true
+    storageClassName: ""
+    mountPath: /data
+    accessModes:
+      - ReadWriteOnce
+    size: 50Gi
+```
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
