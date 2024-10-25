@@ -64,6 +64,14 @@ configMap:
     # ENV_1: value1
     # ENV_2: value2
 
+extraObjects: []
+# - apiVersion: v1
+#   kind: Secret
+#   metadata:
+#     name: '{{ include "generic-app.fullname" . }}'
+#   stringData:
+#     SOME_SECRET: "<secret val>"
+
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
   # Specifies whether a service account should be created
