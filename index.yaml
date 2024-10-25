@@ -1,5 +1,18 @@
 apiVersion: v1
 entries:
+  aztec:
+  - apiVersion: v2
+    created: "2024-10-25T08:17:00.106002647Z"
+    description: Aztec Prover Node and Prover Agent Helm Chart
+    digest: b71551da1c59f4208328d17779e492b19bab876872784d2d757aa7367531c0f4
+    home: https://nethermindeth.github.io/helm-charts
+    maintainers:
+    - name: 0xDones
+    name: aztec
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/aztec-0.0.1/aztec-0.0.1.tgz
+    version: 0.0.1
   aztec-prover:
   - apiVersion: v2
     created: "2024-09-17T19:06:08.081478513Z"
@@ -88,4 +101,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/espresso-1.0.0/espresso-1.0.0.tgz
     version: 1.0.0
-generated: "2024-10-08T11:42:59.143272162Z"
+generated: "2024-10-25T08:17:00.332379398Z"
