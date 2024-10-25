@@ -34,7 +34,7 @@ Mounting a ConfigMap as environment variables is the simplest way to use a Confi
 ```yaml
 envFrom:
   - configMapRef:
-      name: '{{ include "generic-app.fullname" . }}'
+      name: {{`'{{ include "generic-app.fullname" . }}'`}}
 
 configMap:
   enabled: true
