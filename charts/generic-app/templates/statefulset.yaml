@@ -31,7 +31,12 @@ spec:
       serviceAccountName: {{ include "generic-app.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        {{- toYaml .Values.initContainers | nindent 8 }}
       containers:
+        {{- with .Values.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name: {{ .Release.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -46,9 +51,6 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.service.ports.http }}
-              protocol: TCP
-            - name: metrics
-              containerPort: {{ .Values.service.ports.metrics }}
               protocol: TCP
             {{- range $idx, $extraPort := .Values.service.extraPorts }}
             - name: {{ $extraPort.name }}

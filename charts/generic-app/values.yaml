@@ -1,8 +1,10 @@
 ############################################
 # Generic App
 ############################################
-# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
-replicaCount: 1
+
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
@@ -14,10 +16,11 @@ image:
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
-# This is to override the chart name.
-nameOverride: ""
-fullnameOverride: ""
 
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# -- Enable Deployment
 deployment:
   enabled: true
   # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
@@ -28,16 +31,19 @@ deployment:
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
 
+# -- Enable StatefulSet
 statefulSet:
   enabled: false
+  # -- Enable PVC for StatefulSet
   persistence:
     enabled: false
     storageClassName: ""
     mountPath: /data
     accessModes:
       - ReadWriteOnce
-    size: 50Gi
+    size: 10Gi
 
+# -- Command and args for the container
 command: []
 args: []
 
@@ -51,6 +57,7 @@ env: []
   #       key: SECRET
   #       name: secret-name
 
+# -- envFrom configuration
 envFrom:
   []
   # - secretRef:
@@ -58,12 +65,37 @@ envFrom:
   # - configMapRef:
   #     name: '{{ include "generic-app.fullname" . }}'
 
+# -- ConfigMap configuration, if enabled configMap will be created and mounted as environment variables
 configMap:
   enabled: false
   data: {}
     # ENV_1: value1
     # ENV_2: value2
 
+# -- Init containers
+initContainers: []
+  # - name: my-init-container
+  #   image: busybox
+  #   command: ['sh', '-c', 'echo "Hello, World!"']
+  #   resources: {}
+  #     # limits:
+  #     #   cpu: 100m
+  #     #   memory: 128Mi
+  #     # requests:
+  #     #   cpu: 100m
+  #     #   memory: 128Mi
+
+# -- Sidecar containers
+extraContainers: []
+  # - name: my-sidecar
+  #   image: "busybox"
+  #   imagePullPolicy: IfNotPresent
+  #   ports:
+  #     - name: http
+  #       containerPort: 80
+  #       protocol: TCP
+
+# -- Extra Kubernetes resources to be created
 extraObjects: []
 # - apiVersion: v1
 #   kind: Secret
@@ -109,13 +141,13 @@ service:
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   ports:
     http: 80
-    metrics: 9090
   extraPorts: []
-  # - name: extra-port
-  #   port: 8080
+  # - name: metrics
+  #   port: 9090
   #   protocol: TCP
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+# -- For now all traffic is routed to the `http` port
 ingress:
   enabled: false
   className: ""
@@ -145,14 +177,14 @@ resources: {}
   #   memory: 128Mi
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-livenessProbe:
-  httpGet:
-    path: /
-    port: http
-readinessProbe:
-  httpGet:
-    path: /
-    port: http
+livenessProbe: null
+  # httpGet:
+  #   path: /
+  #   port: http
+readinessProbe: null
+  # httpGet:
+  #   path: /
+  #   port: http
 
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -172,3 +204,27 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+serviceMonitor:
+  # -- If true, a ServiceMonitor CRD is created for a prometheus operator. https://github.com/coreos/prometheus-operator
+  enabled: false
+  # -- Port name
+  port: metrics
+  # -- Path to scrape
+  path: /metrics
+  # -- Alternative namespace for ServiceMonitor
+  namespace: null
+  # -- Additional ServiceMonitor labels
+  labels: {}
+  # -- Additional ServiceMonitor annotations
+  annotations: {}
+  # -- ServiceMonitor scrape interval
+  interval: 1m
+  # -- ServiceMonitor scheme
+  scheme: http
+  # -- ServiceMonitor TLS configuration
+  tlsConfig: {}
+  # -- ServiceMonitor scrape timeout
+  scrapeTimeout: 30s
+  # -- ServiceMonitor relabelings
+  relabelings: []

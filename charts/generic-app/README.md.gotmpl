@@ -11,17 +11,52 @@
 
 {{ template "chart.maintainersSection" . }}
 
-## Examples
+## Usage
 
-### Extra Ports
+### Name Override
 
-This will create both service and container ports configuration.
+Always use the `nameOverride` to set the name of the resources.
+
+```yaml
+nameOverride: "my-app"
+```
+
+### Init Containers or Sidecars
+
+```yaml
+initContainers:
+  - name: my-init-container
+    image: busybox
+    command: ['sh', '-c', 'echo "Hello, World!"']
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+extraContainers:
+  - name: my-sidecar
+    image: "busybox"
+    imagePullPolicy: IfNotPresent
+    ports:
+      - name: http
+        containerPort: 80
+        protocol: TCP
+```
+
+### Container and Service Ports
+
+This will create both service and container ports configuration. Only http port is required. It will be the default port for the Ingress resource.
 
 ```yaml
 service:
+  ports:
+    http: 80
   extraPorts:
-    - name: ws
-      port: 1234
+    - name: metrics
+      port: 9090
       protocol: TCP
 ```
 
