@@ -19,6 +19,8 @@ helm install generic-app nethermind/generic-app
 
 ## Usage
 
+Check `values.deploy.yaml` or `values.sts.yaml` for example configuration options.
+
 ### Name Override
 
 Always use the `nameOverride` to set the name of the resources.
