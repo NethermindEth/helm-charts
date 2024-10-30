@@ -1,0 +1,29 @@
+nameOverride: "example-sts"
+
+service:
+  extraPorts:
+  - name: metrics
+    port: 9090
+    protocol: TCP
+
+deployment:
+  enabled: false
+
+statefulSet:
+  enabled: true
+  persistence:
+    enabled: true
+    storageClassName: ""
+    mountPath: /data
+    accessModes:
+      - ReadWriteOnce
+    size: 50Gi
+
+extraContainers:
+  - name: my-sidecar
+    image: "busybox"
+    imagePullPolicy: IfNotPresent
+    ports:
+      - name: http
+        containerPort: 80
+        protocol: TCP

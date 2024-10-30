@@ -1,0 +1,31 @@
+nameOverride: "example-deploy"
+
+service:
+  extraPorts:
+  - name: metrics
+    port: 9090
+    protocol: TCP
+
+deployment:
+  enabled: true
+
+statefulSet:
+  enabled: false
+
+envFrom:
+  - configMapRef:
+      name: '{{ include "generic-app.fullname" . }}'
+
+configMap:
+  enabled: true
+  data:
+    DB_HOST: localhost
+    DB_PORT: "5432"
+
+env:
+  - name: SIMPLE_ENV_VAR
+    value: my-env-var-value
+
+serviceMonitor:
+  enabled: true
+  port: metrics

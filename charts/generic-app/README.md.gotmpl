@@ -1,0 +1,111 @@
+{{- template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "extra.installation" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+## Usage
+
+Check `values.deploy.yaml` or `values.sts.yaml` for example configuration options.
+
+### Name Override
+
+Always use the `nameOverride` to set the name of the resources.
+
+```yaml
+nameOverride: "my-app"
+```
+
+### Init Containers or Sidecars
+
+```yaml
+initContainers:
+  - name: my-init-container
+    image: busybox
+    command: ['sh', '-c', 'echo "Hello, World!"']
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+extraContainers:
+  - name: my-sidecar
+    image: "busybox"
+    imagePullPolicy: IfNotPresent
+    ports:
+      - name: http
+        containerPort: 80
+        protocol: TCP
+```
+
+### Container and Service Ports
+
+This will create both service and container ports configuration. Only http port is required. It will be the default port for the Ingress resource.
+
+```yaml
+service:
+  ports:
+    http: 80
+  extraPorts:
+    - name: metrics
+      port: 9090
+      protocol: TCP
+```
+
+### Environment Variables
+
+#### From ConfigMap
+
+Mounting a ConfigMap as environment variables is the simplest way to use a ConfigMap in a Pod.
+
+```yaml
+envFrom:
+  - configMapRef:
+      name: {{`'{{ include "generic-app.fullname" . }}'`}}
+
+configMap:
+  enabled: true
+  data:
+    VAR_1: value1
+    VAR_2: value2
+```
+
+#### From env
+
+```yaml
+env:
+  - name: MY_ENV_VAR
+    value: my-env-var-value
+```
+
+### Sts Persistence
+
+```yaml
+statefulSet:
+  enabled: true
+  persistence:
+    enabled: true
+    storageClassName: ""
+    mountPath: /data
+    accessModes:
+      - ReadWriteOnce
+    size: 50Gi
+```
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
