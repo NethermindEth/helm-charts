@@ -17,17 +17,52 @@ helm install generic-app nethermind/generic-app
 | ---- | ------ | --- |
 | 0xDones |  |  |
 
-## Examples
+## Usage
 
-### Extra Ports
+### Name Override
 
-This will create both service and container ports configuration.
+Always use the `nameOverride` to set the name of the resources.
+
+```yaml
+nameOverride: "my-app"
+```
+
+### Init Containers or Sidecars
+
+```yaml
+initContainers:
+  - name: my-init-container
+    image: busybox
+    command: ['sh', '-c', 'echo "Hello, World!"']
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+extraContainers:
+  - name: my-sidecar
+    image: "busybox"
+    imagePullPolicy: IfNotPresent
+    ports:
+      - name: http
+        containerPort: 80
+        protocol: TCP
+```
+
+### Container and Service Ports
+
+This will create both service and container ports configuration. Only http port is required. It will be the default port for the Ingress resource.
 
 ```yaml
 service:
+  ports:
+    http: 80
   extraPorts:
-    - name: ws
-      port: 1234
+    - name: metrics
+      port: 9090
       protocol: TCP
 ```
 
@@ -77,55 +112,50 @@ statefulSet:
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | args | list | `[]` |  |
-| command | list | `[]` |  |
-| configMap.data | object | `{}` |  |
-| configMap.enabled | bool | `false` |  |
-| deployment.autoscaling.enabled | bool | `false` |  |
-| deployment.autoscaling.maxReplicas | int | `100` |  |
-| deployment.autoscaling.minReplicas | int | `1` |  |
-| deployment.autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| deployment.enabled | bool | `true` |  |
+| command | list | `[]` | Command and args for the container |
+| configMap | object | `{"data":{},"enabled":false}` | ConfigMap configuration, if enabled configMap will be created and mounted as environment variables |
+| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":true}` | Enable Deployment |
 | env | list | `[]` |  |
-| envFrom | list | `[]` |  |
-| extraObjects | list | `[]` |  |
+| envFrom | list | `[]` | envFrom configuration |
+| extraContainers | list | `[]` | Sidecar containers |
+| extraObjects | list | `[]` | Extra Kubernetes resources to be created |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"nginx"` |  |
 | image.tag | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.className | string | `""` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths[0].path | string | `"/"` |  |
-| ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
-| ingress.tls | list | `[]` |  |
-| livenessProbe.httpGet.path | string | `"/"` |  |
-| livenessProbe.httpGet.port | string | `"http"` |  |
+| ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}],"tls":[]}` | For now all traffic is routed to the `http` port |
+| initContainers | list | `[]` | Init containers |
+| livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
-| readinessProbe.httpGet.path | string | `"/"` |  |
-| readinessProbe.httpGet.port | string | `"http"` |  |
+| readinessProbe | string | `nil` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
 | service.extraPorts | list | `[]` |  |
 | service.ports.http | int | `80` |  |
-| service.ports.metrics | int | `9090` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automount | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
-| statefulSet.enabled | bool | `false` |  |
-| statefulSet.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
-| statefulSet.persistence.enabled | bool | `false` |  |
-| statefulSet.persistence.mountPath | string | `"/data"` |  |
-| statefulSet.persistence.size | string | `"50Gi"` |  |
-| statefulSet.persistence.storageClassName | string | `""` |  |
+| serviceMonitor.annotations | object | `{}` | Additional ServiceMonitor annotations |
+| serviceMonitor.enabled | bool | `false` | If true, a ServiceMonitor CRD is created for a prometheus operator. https://github.com/coreos/prometheus-operator |
+| serviceMonitor.interval | string | `"1m"` | ServiceMonitor scrape interval |
+| serviceMonitor.labels | object | `{}` | Additional ServiceMonitor labels |
+| serviceMonitor.namespace | string | `nil` | Alternative namespace for ServiceMonitor |
+| serviceMonitor.path | string | `"/metrics"` | Path to scrape |
+| serviceMonitor.port | string | `"metrics"` | Port name |
+| serviceMonitor.relabelings | list | `[]` | ServiceMonitor relabelings |
+| serviceMonitor.scheme | string | `"http"` | ServiceMonitor scheme |
+| serviceMonitor.scrapeTimeout | string | `"30s"` | ServiceMonitor scrape timeout |
+| serviceMonitor.tlsConfig | object | `{}` | ServiceMonitor TLS configuration |
+| statefulSet | object | `{"enabled":false,"persistence":{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}}` | Enable StatefulSet |
+| statefulSet.persistence | object | `{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
 | tolerations | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |
