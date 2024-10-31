@@ -11,10 +11,6 @@ spec:
       port: {{ .Values.service.ports.http }}
       targetPort: http
       protocol: TCP
-    - name: metrics
-      port: {{ .Values.service.ports.metrics }}
-      targetPort: metrics
-      protocol: TCP
     {{- range $idx, $extraPort := .Values.service.extraPorts }}
     - name: {{ $extraPort.name }}
       port: {{ $extraPort.port }}

@@ -1,0 +1,44 @@
+generic-app:
+  statefulSet:
+    enabled: false
+
+  nameOverride: "generic-deployment"
+
+  image:
+    repository: nginx
+    # This sets the pull policy for images.
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+
+  replicaCount: 1
+  deployment:
+    enabled: true
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+
+  service:
+    extraPorts: []
+    # - name: metrics
+    #   port: 9090
+    #   protocol: TCP
+
+  envFrom: []
+    # - configMapRef:
+    #     name: '{{ include "generic-app.fullname" . }}'
+
+  configMap:
+    enabled: false
+    data: {}
+      # DB_HOST: localhost
+      # DB_PORT: "5432"
+
+  env: []
+    # - name: SIMPLE_ENV_VAR
+    #   value: my-env-var-value
+
+  serviceMonitor:
+    enabled: false

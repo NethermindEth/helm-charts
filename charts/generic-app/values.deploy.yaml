@@ -8,6 +8,11 @@ service:
 
 deployment:
   enabled: true
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
 
 statefulSet:
   enabled: false
