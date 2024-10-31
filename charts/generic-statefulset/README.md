@@ -36,6 +36,10 @@ Check [generic-app Chart](../generic-app/README.md) for example configuration op
 | generic-app.deployment.enabled | bool | `false` |  |
 | generic-app.env | list | `[]` |  |
 | generic-app.envFrom | list | `[]` |  |
+| generic-app.image.pullPolicy | string | `"IfNotPresent"` |  |
+| generic-app.image.repository | string | `"nginx"` |  |
+| generic-app.image.tag | string | `"latest"` |  |
+| generic-app.imagePullSecrets | list | `[]` |  |
 | generic-app.nameOverride | string | `"generic-statefulset"` |  |
 | generic-app.replicaCount | int | `1` |  |
 | generic-app.service.extraPorts | list | `[]` |  |

@@ -43,6 +43,7 @@ Check [generic-app Chart](../generic-app/README.md) for example configuration op
 | generic-app.image.pullPolicy | string | `"IfNotPresent"` |  |
 | generic-app.image.repository | string | `"nginx"` |  |
 | generic-app.image.tag | string | `"latest"` |  |
+| generic-app.imagePullSecrets | list | `[]` |  |
 | generic-app.nameOverride | string | `"generic-deployment"` |  |
 | generic-app.replicaCount | int | `1` |  |
 | generic-app.service.extraPorts | list | `[]` |  |
