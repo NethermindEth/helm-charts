@@ -1,29 +1,46 @@
-nameOverride: "example-sts"
-
-service:
-  extraPorts:
-  - name: metrics
-    port: 9090
-    protocol: TCP
-
 deployment:
   enabled: false
 
+nameOverride: "generic-statefulset"
+
+image:
+  repository: nginx
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+imagePullSecrets: []
+
+replicaCount: 1
 statefulSet:
   enabled: true
   persistence:
-    enabled: true
+    enabled: false
     storageClassName: ""
     mountPath: /data
     accessModes:
       - ReadWriteOnce
-    size: 50Gi
+    size: 10Gi
 
-extraContainers:
-  - name: my-sidecar
-    image: "busybox"
-    imagePullPolicy: IfNotPresent
-    ports:
-      - name: http
-        containerPort: 80
-        protocol: TCP
+service:
+  extraPorts: []
+  # - name: metrics
+  #   port: 9090
+  #   protocol: TCP
+
+envFrom: []
+  # - configMapRef:
+  #     name: '{{ include "generic-app.fullname" . }}'
+
+configMap:
+  enabled: false
+  data: {}
+    # DB_HOST: localhost
+    # DB_PORT: "5432"
+
+env: []
+  # - name: SIMPLE_ENV_VAR
+  #   value: my-env-var-value
+
+serviceMonitor:
+  enabled: false
