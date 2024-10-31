@@ -1,0 +1,39 @@
+generic-app:
+  deployment:
+    enabled: false
+
+  nameOverride: "generic-statefulset"
+
+  replicaCount: 1
+  statefulSet:
+    enabled: true
+    persistence:
+      enabled: false
+      storageClassName: ""
+      mountPath: /data
+      accessModes:
+        - ReadWriteOnce
+      size: 10Gi
+
+  service:
+    extraPorts: []
+    # - name: metrics
+    #   port: 9090
+    #   protocol: TCP
+
+  envFrom: []
+    # - configMapRef:
+    #     name: '{{ include "generic-app.fullname" . }}'
+
+  configMap:
+    enabled: false
+    data: {}
+      # DB_HOST: localhost
+      # DB_PORT: "5432"
+
+  env: []
+    # - name: SIMPLE_ENV_VAR
+    #   value: my-env-var-value
+
+  serviceMonitor:
+    enabled: false
