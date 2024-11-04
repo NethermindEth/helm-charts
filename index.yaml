@@ -101,4 +101,48 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/espresso-1.0.0/espresso-1.0.0.tgz
     version: 1.0.0
-generated: "2024-10-25T08:17:00.332379398Z"
+  generic-app:
+  - apiVersion: v2
+    created: "2024-11-04T16:04:56.532741103Z"
+    description: A Generic App Helm chart for Kubernetes
+    digest: 1ebff8b282292438c55147093424f4a957d49319261856698e2b9534a318ba1d
+    maintainers:
+    - name: 0xDones
+    name: generic-app
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-app-0.1.0/generic-app-0.1.0.tgz
+    version: 0.1.0
+  generic-deployment:
+  - apiVersion: v2
+    created: "2024-11-04T16:04:56.636516711Z"
+    dependencies:
+    - name: generic-app
+      repository: file://../generic-app
+      version: 0.1.0
+    description: A Generic Deployment Helm chart for Kubernetes
+    digest: 2ba9f6165c11ddce3abe11684020fec311324b66cc8b48d0740a1104c30086f6
+    maintainers:
+    - name: 0xDones
+    name: generic-deployment
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-deployment-0.1.0/generic-deployment-0.1.0.tgz
+    version: 0.1.0
+  generic-statefulset:
+  - apiVersion: v2
+    created: "2024-11-04T16:04:56.75260058Z"
+    dependencies:
+    - name: generic-app
+      repository: file://../generic-app
+      version: 0.1.0
+    description: A Generic Statefulset Helm chart for Kubernetes
+    digest: 1c9f914fa2b246cf49aa9f6ea3d4c6fdb5d494f5819704653e33fe3d7340d2a7
+    maintainers:
+    - name: 0xDones
+    name: generic-statefulset
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-11-04T16:04:56.752615448Z"
