@@ -1,11 +1,18 @@
 
 # execution-beacon
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
 
 Execution and Beacon
 
 **Homepage:** <https://www.ethereum.org/>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| 0xDones |  |  |
+| matilote |  |  |
 
 ## Requirements
 
@@ -125,6 +132,7 @@ Kubernetes: `^1.23.0-0`
 | fullnameOverride | string | `""` |  |
 | global.JWTSecret | string | `""` |  |
 | global.affinity | object | `{}` |  |
+| global.envFrom | list | `[]` |  |
 | global.ethsider.bindAddr | int | `3000` |  |
 | global.ethsider.enabled | bool | `true` |  |
 | global.ethsider.livenessProbe.enabled | bool | `false` |  |

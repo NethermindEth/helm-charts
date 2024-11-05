@@ -100,6 +100,8 @@ global:
       kind: SecretStore
     data: []
 
+  envFrom: []
+
   ethsider:
     enabled: true
     repository: "nethermindeth/ethsider"

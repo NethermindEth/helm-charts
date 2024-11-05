@@ -1,6 +1,6 @@
 apiVersion: v2
 name: execution-beacon
-version: 1.0.0
+version: 1.0.1
 appVersion: 0.0.1
 kubeVersion: "^1.23.0-0"
 description: Execution and Beacon
@@ -12,6 +12,9 @@ keywords:
   - prysm
   - p2p
 home: https://www.ethereum.org/
+maintainers:
+  - name: 0xDones
+  - name: matilote
 
 dependencies:
   - name: common
