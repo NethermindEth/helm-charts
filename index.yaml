@@ -48,6 +48,18 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/aztec-prover-0.1.1/aztec-prover-0.1.1.tgz
     version: 0.1.1
+  common:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-11-05T17:08:05.71655342Z"
+    description: A Library Helm Chart for grouping common logic between stakewise
+      charts. This chart is not deployable by itself.
+    digest: 2fdc142cd39222f6e55cf8a295f3bbb15c5dd070a83f0c252b5ba771968849cd
+    name: common
+    type: library
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/common-1.0.0/common-1.0.0.tgz
+    version: 1.0.0
   erpc:
   - apiVersion: v2
     appVersion: 0.0.24
@@ -101,6 +113,29 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/espresso-1.0.0/espresso-1.0.0.tgz
     version: 1.0.0
+  execution-beacon:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2024-11-05T17:08:05.83056115Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: Execution and Beacon
+    digest: e863caeb7d1280a0b249fc4b3d17dda2797a4b1867c8874327fdbaa93e1cb1dd
+    home: https://www.ethereum.org/
+    keywords:
+    - ethereum
+    - blockchain
+    - nethermind
+    - prysm
+    - p2p
+    kubeVersion: ^1.23.0-0
+    name: execution-beacon
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/execution-beacon-1.0.0/execution-beacon-1.0.0.tgz
+    version: 1.0.0
   generic-app:
   - apiVersion: v2
     created: "2024-11-04T16:04:56.532741103Z"
@@ -145,4 +180,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
-generated: "2024-11-04T16:04:56.752615448Z"
+generated: "2024-11-05T17:08:05.830584483Z"
