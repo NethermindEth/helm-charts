@@ -3,3 +3,6 @@ appVersion: "0.3.1"
 description: OVH DNS cert-manager ACME webhook
 name: cert-manager-webhook-ovh
 version: "0.3.1"
+home: https://nethermindeth.github.io/helm-charts
+maintainers:
+  - name: nm-sam
