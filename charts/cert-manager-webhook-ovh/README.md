@@ -17,6 +17,7 @@ For additional details about the source code and implementation, please refer to
 | ---- | ------ | --- |
 | AntiD2ta | <miguel@nethermind.io> |  |
 
+
 ## Values
 
 | Key | Type | Default | Description |
