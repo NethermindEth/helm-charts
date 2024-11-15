@@ -5,6 +5,14 @@
 
 OVH DNS cert-manager ACME webhook
 
+**Homepage:** <https://nethermindeth.github.io/helm-charts>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| nm-sam |  |  |
+
 ## Values
 
 | Key | Type | Default | Description |
