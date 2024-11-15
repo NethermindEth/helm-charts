@@ -5,6 +5,12 @@
 
 OVH DNS cert-manager ACME webhook
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| AntiD2ta | <miguel@nethermind.io> |  |
+
 ## Values
 
 | Key | Type | Default | Description |
