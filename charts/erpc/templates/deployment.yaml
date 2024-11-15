@@ -89,7 +89,6 @@ spec:
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
       volumes:
         - name: erpc-config
           emptyDir: {}
@@ -99,6 +98,7 @@ spec:
         - name: erpc-config-init-script
           configMap:
             name: {{ include "erpc.initConfigScriptName" . }}
+      {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
