@@ -5,17 +5,6 @@
 
 OVH DNS cert-manager ACME webhook
 
-This Helm chart enables seamless integration of cert-manager with OVH DNS Zone for managing DNS-01 challenges, leveraging the resources provided by the [cert-manager-webhook-ovh](https://github.com/baarde/cert-manager-webhook-ovh) project.  
-
-The chart is designed to simplify deployment and configuration while maintaining compatibility with the webhook implementation provided in the repository. It allows users to install and manage the webhook in a Kubernetes environment using an online Helm chart.  
-
-For additional details about the source code and implementation, please refer to the [cert-manager-webhook-ovh GitHub repository](https://github.com/baarde/cert-manager-webhook-ovh).
-
-## Maintainers
-| Name | Email | Url |
-| ---- | ------ | --- |
-| AntiD2ta | <miguel@nethermind.io> |  |
-
 ## Values
 
 | Key | Type | Default | Description |
