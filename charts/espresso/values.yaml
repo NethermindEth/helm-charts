@@ -103,7 +103,7 @@ nodes:
 # -- Sequencer node configuration for the container.
 nodes_config:
   # Required parameters
-  ESPRESSO_SEQUENCER_L1_PROVIDER: ""   # JSON-RPC endpoint for Sepolia testnet
+  ESPRESSO_SEQUENCER_L1_PROVIDER: "http://localhost:8545"   # JSON-RPC endpoint for Sepolia testnet
   ESPRESSO_SEQUENCER_ORCHESTRATOR_URL: https://orchestrator-7BEFB0C9FFC.decaf.testnet.espresso.network
   ESPRESSO_SEQUENCER_CDN_ENDPOINT: "cdn.decaf.testnet.espresso.network:1737"
   ESPRESSO_STATE_RELAY_SERVER_URL: https://state-relay.decaf.testnet.espresso.network
