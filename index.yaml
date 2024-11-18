@@ -62,6 +62,23 @@ entries:
     version: 1.0.0
   erpc:
   - apiVersion: v2
+    appVersion: 0.0.27
+    created: "2024-11-18T15:57:42.340358801Z"
+    description: A Helm chart to deploy eRPC instances
+    digest: 0aac2d78f91bb2381559132dcc2840b2371fa065fc79a535cd41f35f8f2e30aa
+    home: https://docs.erpc.cloud
+    keywords:
+    - rpcs
+    - erpc
+    maintainers:
+    - name: cbermudez97
+    - name: AntiD2ta
+    name: erpc
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/erpc-1.0.2/erpc-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
     appVersion: 0.0.24
     created: "2024-10-08T11:12:58.142086506Z"
     description: A Helm chart to deploy eRPC instances
@@ -114,6 +131,30 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/espresso-1.0.0/espresso-1.0.0.tgz
     version: 1.0.0
   execution-beacon:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2024-11-18T15:57:42.637625912Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: Execution and Beacon
+    digest: 42a972c0c516df6f4165bf9e41cdc45cae1bb3ff618d825c41ebb8e711b0c240
+    home: https://www.ethereum.org/
+    keywords:
+    - ethereum
+    - blockchain
+    - nethermind
+    - prysm
+    - p2p
+    maintainers:
+    - name: 0xDones
+    - name: matilote
+    name: execution-beacon
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/execution-beacon-1.0.2/execution-beacon-1.0.2.tgz
+    version: 1.0.2
   - apiVersion: v2
     appVersion: 0.0.1
     created: "2024-11-05T17:55:34.112235807Z"
@@ -205,4 +246,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
-generated: "2024-11-05T17:55:34.112257458Z"
+generated: "2024-11-18T15:57:42.637665907Z"
