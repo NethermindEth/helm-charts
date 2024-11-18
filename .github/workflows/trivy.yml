@@ -25,13 +25,21 @@ jobs:
 
       - name: Package Local Dependencies
         run: |
-          # Package local charts that are dependencies
+          # Package and move dependencies to their respective charts directories
           cd charts
-          for dir in common generic-app; do
-            if [ -d "$dir" ] && [ -f "$dir/Chart.yaml" ]; then
-              helm package "$dir"
-            fi
+          for chart in execution-beacon generic-deployment generic-statefulset; do
+            mkdir -p "$chart/charts"
           done
+          # Package and move common chart
+          if [ -d "common" ] && [ -f "common/Chart.yaml" ]; then
+            helm package common -d execution-beacon/charts/
+          fi
+          # Package and move generic-app chart
+          if [ -d "generic-app" ] && [ -f "generic-app/Chart.yaml" ]; then
+            helm package generic-app
+            mv generic-app-*.tgz generic-deployment/charts/
+            cp generic-deployment/charts/generic-app-*.tgz generic-statefulset/charts/
+          fi
           cd ..
 
       - name: Update Helm Dependencies
@@ -52,6 +60,7 @@ jobs:
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
           skip-dirs: 'charts/*/charts'
+          skip-files: '*.tgz'
           hide-progress: false
           scanners: 'config'
           timeout: '10m'
