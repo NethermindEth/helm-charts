@@ -23,6 +23,17 @@ jobs:
         with:
           version: v3.12.1
 
+      - name: Package Local Dependencies
+        run: |
+          # Package local charts that are dependencies
+          cd charts
+          for dir in common generic-app; do
+            if [ -d "$dir" ] && [ -f "$dir/Chart.yaml" ]; then
+              helm package "$dir"
+            fi
+          done
+          cd ..
+
       - name: Update Helm Dependencies
         run: |
           for dir in charts/*/; do
