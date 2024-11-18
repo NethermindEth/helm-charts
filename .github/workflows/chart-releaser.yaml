@@ -29,14 +29,20 @@ jobs:
 
       - name: Helm Dependencies
         run: |
-          for dir in charts/*; do
-            helm dependency update "$dir";
+          for dir in charts/*/; do
+            if [ -f "${dir}Chart.yaml" ]; then
+              helm dependency update "$dir"
+            fi
           done
-      #     helm repo add bitnami https://charts.bitnami.com/bitnami
-      #     helm repo add ethereum-helm-charts https://ethpandaops.github.io/ethereum-helm-charts
-      #     helm repo add prometheus-charts https://prometheus-community.github.io/helm-charts
-      #     helm repo add grafana https://grafana.github.io/helm-charts
-      #     helm repo add external-secrets https://charts.external-secrets.io
+
+      - name: Package Helm Charts
+        run: |
+          mkdir -p .cr-release-packages
+          for dir in charts/*/; do
+            if [ -f "${dir}Chart.yaml" ]; then
+              helm package "$dir" --destination .cr-release-packages/
+            fi
+          done
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
@@ -52,5 +58,7 @@ jobs:
         run: |
           helm registry login nethermind.jfrog.io --username ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }} --password ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_CONTRIBUTOR }}
           for chart in .cr-release-packages/*.tgz; do
-            helm push "$chart" oci://nethermind.jfrog.io/angkor-helmoci-local
+            if [ -f "$chart" ]; then
+              helm push "$chart" oci://nethermind.jfrog.io/angkor-helmoci-local
+            fi
           done
