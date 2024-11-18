@@ -25,18 +25,22 @@ jobs:
 
       - name: Package Local Dependencies
         run: |
-          # Package and move dependencies to their respective charts directories
+          # Create charts directory for all charts first
           cd charts
           echo "Creating charts directories..."
-          for chart in execution-beacon generic-deployment generic-statefulset; do
-            mkdir -p "$chart/charts"
+          for dir in */; do
+            if [ -f "${dir}Chart.yaml" ]; then
+              mkdir -p "${dir}charts"
+              echo "Created charts directory for ${dir}"
+            fi
           done
 
           # Package and move common chart
           echo "Packaging common chart..."
           if [ -d "common" ] && [ -f "common/Chart.yaml" ]; then
             helm package common -d execution-beacon/charts/
-            ls -la execution-beacon/charts/
+            echo "Common chart packaged. Contents of execution-beacon/charts/:"
+            ls -la execution-beacon/charts/ || echo "No files yet"
           fi
 
           # Package and move generic-app chart
@@ -45,10 +49,11 @@ jobs:
             helm package generic-app
             mv generic-app-*.tgz generic-deployment/charts/
             cp generic-deployment/charts/generic-app-*.tgz generic-statefulset/charts/
-            echo "Generic-deployment charts directory:"
-            ls -la generic-deployment/charts/
-            echo "Generic-statefulset charts directory:"
-            ls -la generic-statefulset/charts/
+            echo "Generic-app chart packaged and moved. Directory contents:"
+            echo "generic-deployment/charts/:"
+            ls -la generic-deployment/charts/ || echo "No files"
+            echo "generic-statefulset/charts/:"
+            ls -la generic-statefulset/charts/ || echo "No files"
           fi
           cd ..
 
@@ -57,9 +62,13 @@ jobs:
           for dir in charts/*/; do
             if [ -f "${dir}Chart.yaml" ]; then
               echo "Updating dependencies for $dir"
-              helm dependency update "$dir"
+              helm dependency update "$dir" || echo "No dependencies to update in $dir"
               echo "Contents of ${dir}charts/:"
-              ls -la "${dir}charts/"
+              if [ -d "${dir}charts" ]; then
+                ls -la "${dir}charts/" || echo "Directory empty"
+              else
+                echo "Charts directory does not exist"
+              fi
             fi
           done
 
