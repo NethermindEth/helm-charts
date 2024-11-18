@@ -55,6 +55,15 @@ jobs:
             echo "generic-statefulset/charts/:"
             ls -la generic-statefulset/charts/ || echo "No files"
           fi
+
+          # Build dependencies for each chart
+          echo "Building dependencies for each chart..."
+          for dir in */; do
+            if [ -f "${dir}Chart.yaml" ]; then
+              echo "Building dependencies for ${dir}"
+              helm dependency build "${dir}" || echo "No dependencies to build in ${dir}"
+            fi
+          done
           cd ..
 
       - name: Update Helm Dependencies
