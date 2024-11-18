@@ -27,18 +27,28 @@ jobs:
         run: |
           # Package and move dependencies to their respective charts directories
           cd charts
+          echo "Creating charts directories..."
           for chart in execution-beacon generic-deployment generic-statefulset; do
             mkdir -p "$chart/charts"
           done
+
           # Package and move common chart
+          echo "Packaging common chart..."
           if [ -d "common" ] && [ -f "common/Chart.yaml" ]; then
             helm package common -d execution-beacon/charts/
+            ls -la execution-beacon/charts/
           fi
+
           # Package and move generic-app chart
+          echo "Packaging generic-app chart..."
           if [ -d "generic-app" ] && [ -f "generic-app/Chart.yaml" ]; then
             helm package generic-app
             mv generic-app-*.tgz generic-deployment/charts/
             cp generic-deployment/charts/generic-app-*.tgz generic-statefulset/charts/
+            echo "Generic-deployment charts directory:"
+            ls -la generic-deployment/charts/
+            echo "Generic-statefulset charts directory:"
+            ls -la generic-statefulset/charts/
           fi
           cd ..
 
@@ -46,7 +56,10 @@ jobs:
         run: |
           for dir in charts/*/; do
             if [ -f "${dir}Chart.yaml" ]; then
+              echo "Updating dependencies for $dir"
               helm dependency update "$dir"
+              echo "Contents of ${dir}charts/:"
+              ls -la "${dir}charts/"
             fi
           done
 
