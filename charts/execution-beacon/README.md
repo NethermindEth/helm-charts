@@ -16,8 +16,6 @@ Execution and Beacon
 
 ## Requirements
 
-Kubernetes: `^1.23.0-0`
-
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../common | common | 1.0.0 |
