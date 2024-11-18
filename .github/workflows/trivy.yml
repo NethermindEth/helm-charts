@@ -50,14 +50,15 @@ jobs:
       - name: Run Trivy
         uses: aquasecurity/trivy-action@5681af892cd0f4997658e2bacc62bd0a894cf564 #v0.27.0
         with:
-          scan-type: 'config'
-          scan-ref: '${{ github.workspace }}/.trivy-charts'
+          scan-type: 'fs'
+          scan-ref: '${{ github.workspace }}/charts'
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
           hide-progress: false
-          scanners: 'config'
+          scanners: 'config,secret'
+          helm-values: true
           timeout: '10m'
 
       - name: Upload Trivy scan results
