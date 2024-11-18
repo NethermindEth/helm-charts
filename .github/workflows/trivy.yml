@@ -23,6 +23,19 @@ jobs:
         with:
           version: v3.12.1
 
+      - name: Update Chart Dependencies
+        working-directory: ${{ github.workspace }}
+        run: |
+          # Create charts directories and update dependencies
+          cd charts
+          for chart in */; do
+            if [ -f "$chart/Chart.yaml" ]; then
+              echo "Processing $chart"
+              mkdir -p "$chart/charts"
+              helm dependency update "$chart"
+            fi
+          done
+
       - name: Run Trivy
         uses: aquasecurity/trivy-action@5681af892cd0f4997658e2bacc62bd0a894cf564 #v0.27.0
         with:
