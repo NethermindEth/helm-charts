@@ -25,6 +25,11 @@ jobs:
 
       - name: Package Local Dependencies
         run: |
+          # Clean up any previous attempts
+          rm -rf .helm-repo
+          find charts -name "charts" -type d -exec rm -rf {} +
+          helm repo remove local-repo 2>/dev/null || true
+
           # Create a local helm repository
           mkdir -p .helm-repo
 
@@ -37,16 +42,16 @@ jobs:
             fi
           done
 
-          # Package all charts first
-          echo "Packaging all charts..."
-          for dir in */; do
-            if [ -f "${dir}Chart.yaml" ]; then
+          # First package charts without dependencies
+          echo "Packaging base charts..."
+          for dir in common generic-app; do
+            if [ -d "$dir" ] && [ -f "${dir}Chart.yaml" ]; then
               echo "Packaging ${dir}"
               helm package "${dir}" -d ../.helm-repo/
             fi
           done
 
-          # Create helm repository index
+          # Create initial helm repository index
           cd ../.helm-repo
           helm repo index .
           cd ../charts
@@ -55,8 +60,30 @@ jobs:
           helm repo add local-repo file://$PWD/../.helm-repo
           helm repo update
 
-          # Now update dependencies using the local repo
-          echo "Updating dependencies for each chart..."
+          # Update dependencies for charts that need them
+          echo "Updating dependencies for dependent charts..."
+          for dir in execution-beacon generic-deployment generic-statefulset; do
+            if [ -d "$dir" ] && [ -f "${dir}Chart.yaml" ]; then
+              echo "Updating dependencies for ${dir}"
+              helm dependency update "${dir}"
+            fi
+          done
+
+          # Now package all remaining charts
+          echo "Packaging remaining charts..."
+          for dir in */; do
+            if [ -f "${dir}Chart.yaml" ] && [ "$dir" != "common/" ] && [ "$dir" != "generic-app/" ]; then
+              echo "Packaging ${dir}"
+              helm package "${dir}" -d ../.helm-repo/
+            fi
+          done
+
+          cd ../.helm-repo
+          helm repo index .
+          cd ../charts
+
+          # Final dependency update for all charts
+          echo "Final dependency update..."
           for dir in */; do
             if [ -f "${dir}Chart.yaml" ]; then
               echo "Updating dependencies for ${dir}"
