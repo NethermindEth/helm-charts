@@ -58,7 +58,6 @@ jobs:
           severity: 'CRITICAL,HIGH'
           hide-progress: false
           scanners: 'misconfig,secret'
-          helm-values: true
           timeout: '10m'
           version: 'v0.57.0'
 
