@@ -25,7 +25,9 @@ jobs:
 
       - name: Package Local Dependencies
         run: |
-          # Create charts directory for all charts first
+          # Create a local helm repository
+          mkdir -p .helm-repo
+
           cd charts
           echo "Creating charts directories..."
           for dir in */; do
@@ -35,51 +37,35 @@ jobs:
             fi
           done
 
-          # Package and move common chart
-          echo "Packaging common chart..."
-          if [ -d "common" ] && [ -f "common/Chart.yaml" ]; then
-            helm package common -d execution-beacon/charts/
-            echo "Common chart packaged. Contents of execution-beacon/charts/:"
-            ls -la execution-beacon/charts/ || echo "No files yet"
-          fi
-
-          # Package and move generic-app chart
-          echo "Packaging generic-app chart..."
-          if [ -d "generic-app" ] && [ -f "generic-app/Chart.yaml" ]; then
-            helm package generic-app
-            mv generic-app-*.tgz generic-deployment/charts/
-            cp generic-deployment/charts/generic-app-*.tgz generic-statefulset/charts/
-            echo "Generic-app chart packaged and moved. Directory contents:"
-            echo "generic-deployment/charts/:"
-            ls -la generic-deployment/charts/ || echo "No files"
-            echo "generic-statefulset/charts/:"
-            ls -la generic-statefulset/charts/ || echo "No files"
-          fi
-
-          # Build dependencies for each chart
-          echo "Building dependencies for each chart..."
+          # Package all charts first
+          echo "Packaging all charts..."
           for dir in */; do
             if [ -f "${dir}Chart.yaml" ]; then
-              echo "Building dependencies for ${dir}"
-              helm dependency build "${dir}" || echo "No dependencies to build in ${dir}"
+              echo "Packaging ${dir}"
+              helm package "${dir}" -d ../.helm-repo/
+            fi
+          done
+
+          # Create helm repository index
+          cd ../.helm-repo
+          helm repo index .
+          cd ../charts
+
+          # Add the local repo
+          helm repo add local-repo file://$PWD/../.helm-repo
+          helm repo update
+
+          # Now update dependencies using the local repo
+          echo "Updating dependencies for each chart..."
+          for dir in */; do
+            if [ -f "${dir}Chart.yaml" ]; then
+              echo "Updating dependencies for ${dir}"
+              helm dependency update "${dir}" || echo "No dependencies to build in ${dir}"
+              echo "Contents of ${dir}charts/:"
+              ls -la "${dir}charts/" || echo "Directory empty"
             fi
           done
           cd ..
-
-      - name: Update Helm Dependencies
-        run: |
-          for dir in charts/*/; do
-            if [ -f "${dir}Chart.yaml" ]; then
-              echo "Updating dependencies for $dir"
-              helm dependency update "$dir" || echo "No dependencies to update in $dir"
-              echo "Contents of ${dir}charts/:"
-              if [ -d "${dir}charts" ]; then
-                ls -la "${dir}charts/" || echo "Directory empty"
-              else
-                echo "Charts directory does not exist"
-              fi
-            fi
-          done
 
       - name: Run Trivy
         uses: aquasecurity/trivy-action@5681af892cd0f4997658e2bacc62bd0a894cf564 #v0.27.0
