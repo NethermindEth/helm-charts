@@ -24,15 +24,19 @@ jobs:
           version: v3.12.1
 
       - name: Update Chart Dependencies
-        working-directory: ${{ github.workspace }}
         run: |
-          # Create charts directories and update dependencies
-          cd charts
-          for chart in */; do
-            if [ -f "$chart/Chart.yaml" ]; then
-              echo "Processing $chart"
-              mkdir -p "$chart/charts"
-              helm dependency update "$chart"
+          for dir in charts/*/; do
+            if [ -f "${dir}Chart.yaml" ]; then
+              helm dependency update "$dir"
+            fi
+          done
+
+      - name: Package Charts
+        run: |
+          mkdir -p .trivy-charts
+          for dir in charts/*/; do
+            if [ -f "${dir}Chart.yaml" ]; then
+              helm package "$dir" -d .trivy-charts/
             fi
           done
 
@@ -40,12 +44,11 @@ jobs:
         uses: aquasecurity/trivy-action@5681af892cd0f4997658e2bacc62bd0a894cf564 #v0.27.0
         with:
           scan-type: 'config'
-          scan-ref: './charts'
+          scan-ref: '.trivy-charts'
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
-          skip-dirs: 'charts/*/charts'
           hide-progress: false
           scanners: 'config'
           timeout: '10m'
