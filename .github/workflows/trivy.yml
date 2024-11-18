@@ -33,18 +33,25 @@ jobs:
 
       - name: Package Charts
         run: |
-          mkdir -p .trivy-charts
+          WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
+          TRIVY_CHARTS_DIR="${WORKSPACE}/.trivy-charts"
+
+          mkdir -p "$TRIVY_CHARTS_DIR"
           for dir in charts/*/; do
             if [ -f "${dir}Chart.yaml" ]; then
-              helm package "$dir" -d .trivy-charts/
+              echo "Packaging ${dir} to ${TRIVY_CHARTS_DIR}"
+              helm package "$dir" -d "$TRIVY_CHARTS_DIR"
             fi
           done
+
+          echo "Contents of ${TRIVY_CHARTS_DIR}:"
+          ls -la "$TRIVY_CHARTS_DIR"
 
       - name: Run Trivy
         uses: aquasecurity/trivy-action@5681af892cd0f4997658e2bacc62bd0a894cf564 #v0.27.0
         with:
           scan-type: 'config'
-          scan-ref: '.trivy-charts'
+          scan-ref: '${{ github.workspace }}/.trivy-charts'
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
