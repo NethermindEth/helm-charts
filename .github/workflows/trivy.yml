@@ -23,55 +23,6 @@ jobs:
         with:
           version: v3.12.1
 
-      - name: Package Local Dependencies
-        working-directory: ${{ github.workspace }}
-        run: |
-          # 1. Setup and cleanup
-          echo "Setting up environment..."
-          rm -rf .helm-repo
-          mkdir -p .helm-repo
-          helm repo remove local-repo 2>/dev/null || true
-
-          if [ ! -d "charts" ]; then
-            echo "Error: charts directory not found"
-            exit 1
-          fi
-
-          # 2. Identify and package base charts (charts with no dependencies)
-          echo "Identifying and packaging base charts..."
-          cd charts
-          for chart in */; do
-            if [ -f "$chart/Chart.yaml" ]; then
-              if ! grep -q "^dependencies:" "$chart/Chart.yaml"; then
-                echo "Packaging base chart: $chart"
-                helm package "$chart" -d ../.helm-repo/
-              fi
-            fi
-          done
-
-          # 3. Setup local repository
-          echo "Setting up local repository..."
-          cd ../.helm-repo
-          helm repo index .
-          helm repo add local-repo file://$PWD
-          helm repo update
-          cd ../charts
-
-          # 4. Process charts with dependencies
-          echo "Processing charts with dependencies..."
-          for chart in */; do
-            if [ -f "$chart/Chart.yaml" ]; then
-              if grep -q "^dependencies:" "$chart/Chart.yaml"; then
-                echo "Processing dependent chart: $chart"
-                mkdir -p "$chart/charts"
-                helm dependency update "$chart"
-                helm package "$chart" -d ../.helm-repo/
-              fi
-            fi
-          done
-
-          cd ..
-
       - name: Run Trivy
         uses: aquasecurity/trivy-action@5681af892cd0f4997658e2bacc62bd0a894cf564 #v0.27.0
         with:
@@ -82,7 +33,6 @@ jobs:
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
           skip-dirs: 'charts/*/charts'
-          skip-files: '*.tgz'
           hide-progress: false
           scanners: 'config'
           timeout: '10m'
