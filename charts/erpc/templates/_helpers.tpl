@@ -61,10 +61,6 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{- define "erpc.initConfigScriptName" -}}
-{{- printf "%s-init-config-script" (include "erpc.fullname" .) -}}
-{{- end -}}
-
-{{- define "erpc.configTemplateName" -}}
-{{- printf "%s-config-template" (include "erpc.fullname" .) -}}
+{{- define "erpc.configName" -}}
+{{- printf "%s-config" (include "erpc.fullname" .) -}}
 {{- end -}}
