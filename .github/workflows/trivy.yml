@@ -63,6 +63,8 @@ jobs:
           timeout: '10m'
           version: 'v0.57.0'
         env:
+          TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
+          TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_CONTRIBUTOR }}
           TRIVY_DB_REPOSITORY: mirror.gcr.io/aquasec/trivy-db:2
           TRIVY_CHECKS_BUNDLE_REPOSITORY: nethermind.jfrog.io/angkor-oci-local-staging/trivy-checks:latest
 
