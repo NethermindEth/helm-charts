@@ -19,8 +19,8 @@ jobs:
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 #v3.3.0
         with:
           registry: nethermind.jfrog.io
-          username: ${{ secrets.JFROG_USERNAME }}
-          password: ${{ secrets.JFROG_PASSWORD }}
+          username: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
+          password: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_CONTRIBUTOR }}
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
