@@ -1,9 +1,9 @@
 
 # erpc
 
-![Version: 1.0.4](https://img.shields.io/badge/Version-1.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.27](https://img.shields.io/badge/AppVersion-0.0.27-informational?style=flat-square)
+![Version: 1.0.5](https://img.shields.io/badge/Version-1.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.27](https://img.shields.io/badge/AppVersion-0.0.27-informational?style=flat-square)
 
-A Helm chart to deploy eRPC instances
+A Helm chart for deploying Erpc
 
 **Homepage:** <https://docs.erpc.cloud>
 
@@ -66,6 +66,7 @@ A Helm chart to deploy eRPC instances
 | podSecurityContext.runAsGroup | int | `1000` |  |
 | podSecurityContext.runAsNonRoot | bool | `true` |  |
 | podSecurityContext.runAsUser | int | `1000` |  |
+| podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | readinessProbe.httpGet.path | string | `"/metrics"` |  |
 | readinessProbe.httpGet.port | string | `"metrics"` |  |
 | replicaCount | int | `1` |  |
@@ -76,6 +77,7 @@ A Helm chart to deploy eRPC instances
 | securityContext.runAsGroup | int | `1000` |  |
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
+| securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | service.metricsPort | int | `9000` |  |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
