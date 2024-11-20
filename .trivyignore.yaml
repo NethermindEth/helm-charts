@@ -4,7 +4,7 @@ misconfigurations:
   # Ignore false positive for ConfigMap containing the word "secret" in auth configuration
   - id: AVD-KSV-0109
     paths:
-      - "charts/erpc/templates/configmap.yaml"
+      - "erpc/templates/configmap.yaml"
     comment: "ConfigMap uses environment variable substitution for secrets, not actual values"
 
 secrets: []
