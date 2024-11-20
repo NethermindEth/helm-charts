@@ -73,6 +73,18 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/aztec-prover-0.1.1/aztec-prover-0.1.1.tgz
     version: 0.1.1
   cert-manager-webhook-ovh:
+  - apiVersion: v2
+    appVersion: 0.3.1
+    created: "2024-11-20T20:02:07.946735037Z"
+    description: A Helm chart for deploying Ovh DNS cert-manager webhook
+    digest: 82641b4c6ea4673b8f1bbe75373206f63b4774ef025f8d10557380dc5abdf4e2
+    home: https://nethermindeth.github.io/helm-charts
+    maintainers:
+    - name: nm-sam
+    name: cert-manager-webhook-ovh
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/cert-manager-webhook-ovh-1.0.1/cert-manager-webhook-ovh-1.0.1.tgz
+    version: 1.0.1
   - apiVersion: v1
     appVersion: 0.3.1
     created: "2024-11-20T19:51:37.787124419Z"
@@ -482,4 +494,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
-generated: "2024-11-20T19:51:38.491457286Z"
+generated: "2024-11-20T20:02:07.946841627Z"
