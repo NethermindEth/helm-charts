@@ -1,5 +1,35 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+# Default security settings for the pod
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+# Default security settings for containers
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+
+# Security settings for init containers
+initContainerSecurityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+
 global:
   replicaCount: 1
 
@@ -240,14 +270,6 @@ global:
     replicaToNodePort: {}
     #  "0": 32345
     #  "3": 32348
-
-  ## Pod Security Context
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-  ##
-  securityContext:
-    runAsNonRoot: true
-    fsGroup: 1001
-    runAsUser: 1001
 
 execution:
   client: nethermind

@@ -127,17 +127,31 @@ statefulSet:
 | image.tag | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}],"tls":[]}` | For now all traffic is routed to the `http` port |
+| initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
+| initContainerSecurityContext.runAsGroup | int | `1000` |  |
+| initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
+| initContainerSecurityContext.runAsUser | int | `1000` |  |
 | initContainers | list | `[]` | Init containers |
 | livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
+| podSecurityContext.fsGroup | int | `1000` |  |
+| podSecurityContext.runAsGroup | int | `1000` |  |
+| podSecurityContext.runAsNonRoot | bool | `true` |  |
+| podSecurityContext.runAsUser | int | `1000` |  |
 | readinessProbe | string | `nil` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | `{}` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| securityContext.runAsGroup | int | `1000` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.runAsUser | int | `1000` |  |
 | service.extraPorts | list | `[]` |  |
 | service.ports.http | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |

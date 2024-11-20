@@ -34,6 +34,12 @@ A Helm chart for Espresso Sequencer nodes.
 | ingress.labels | object | `{}` |  |
 | ingress.routePrefix | string | `"/"` | Route Prefix. Can skip it if any item of path has the path defined. |
 | ingress.tls | list | `[]` | TLS configuration for Ingress Secret must be manually created in the namespace  |
+| initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
+| initContainerSecurityContext.runAsGroup | int | `1000` |  |
+| initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
+| initContainerSecurityContext.runAsUser | int | `1000` |  |
 | initImage | object | `{"pullPolicy":"IfNotPresent","repository":"bitnami/kubectl","tag":"1.28"}` | Init image is used to manage which secrets the pod should use. |
 | keystoreCLI.db | object | `{"host":"","secretId":"","user":""}` | Postgres DB credentials |
 | keystoreCLI.image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -66,7 +72,24 @@ A Helm chart for Espresso Sequencer nodes.
 | nodes.normal.secrets.sequencerSecretKey | string | `""` | Sequencer secret key. Must match the secret key in the Secret resource or ExternalSecret resource for the node type. |
 | nodes.normal.sqlStorage | bool | `false` | Normal nodes won't use SQL storage, keep it false |
 | nodes.normal.volumeMount | bool | `true` |  |
-| nodes_config | object | `{"ESPRESSO_SEQUENCER_API_PORT":80,"ESPRESSO_SEQUENCER_CDN_ENDPOINT":"cdn.decaf.testnet.espresso.network:1737","ESPRESSO_SEQUENCER_GENESIS_FILE":"/genesis/decaf.toml","ESPRESSO_SEQUENCER_IDENTITY_COMPANY_NAME":"Nethermind","ESPRESSO_SEQUENCER_IDENTITY_COMPANY_WEBSITE":"https://nethermind.io","ESPRESSO_SEQUENCER_L1_PROVIDER":"http://localhost:8545","ESPRESSO_SEQUENCER_LIBP2P_ADVERTISE_ADDRESS":"0.0.0.0:31000","ESPRESSO_SEQUENCER_LIBP2P_BIND_ADDRESS":"0.0.0.0:31000","ESPRESSO_SEQUENCER_ORCHESTRATOR_URL":"https://orchestrator-7BEFB0C9FFC.decaf.testnet.espresso.network","ESPRESSO_SEQUENCER_STATE_PEERS":"https://query.decaf.testnet.espresso.network","ESPRESSO_SEQUENCER_STORAGE_PATH":"/mount/sequencer/store/","ESPRESSO_STATE_RELAY_SERVER_URL":"https://state-relay.decaf.testnet.espresso.network","RUST_LOG":"warn,libp2p=off","RUST_LOG_FORMAT":"json"}` | Sequencer node configuration for the container. |
+| nodes_config.ESPRESSO_SEQUENCER_API_PORT | int | `80` |  |
+| nodes_config.ESPRESSO_SEQUENCER_CDN_ENDPOINT | string | `"cdn.decaf.testnet.espresso.network:1737"` |  |
+| nodes_config.ESPRESSO_SEQUENCER_GENESIS_FILE | string | `"/genesis/decaf.toml"` |  |
+| nodes_config.ESPRESSO_SEQUENCER_IDENTITY_COMPANY_NAME | string | `"Nethermind"` |  |
+| nodes_config.ESPRESSO_SEQUENCER_IDENTITY_COMPANY_WEBSITE | string | `"https://nethermind.io"` |  |
+| nodes_config.ESPRESSO_SEQUENCER_L1_PROVIDER | string | `"http://localhost:8545"` |  |
+| nodes_config.ESPRESSO_SEQUENCER_LIBP2P_ADVERTISE_ADDRESS | string | `"0.0.0.0:31000"` |  |
+| nodes_config.ESPRESSO_SEQUENCER_LIBP2P_BIND_ADDRESS | string | `"0.0.0.0:31000"` |  |
+| nodes_config.ESPRESSO_SEQUENCER_ORCHESTRATOR_URL | string | `"https://orchestrator-7BEFB0C9FFC.decaf.testnet.espresso.network"` |  |
+| nodes_config.ESPRESSO_SEQUENCER_STATE_PEERS | string | `"https://query.decaf.testnet.espresso.network"` |  |
+| nodes_config.ESPRESSO_SEQUENCER_STORAGE_PATH | string | `"/mount/sequencer/store/"` |  |
+| nodes_config.ESPRESSO_STATE_RELAY_SERVER_URL | string | `"https://state-relay.decaf.testnet.espresso.network"` |  |
+| nodes_config.RUST_LOG | string | `"warn,libp2p=off"` |  |
+| nodes_config.RUST_LOG_FORMAT | string | `"json"` |  |
+| podSecurityContext.fsGroup | int | `1000` |  |
+| podSecurityContext.runAsGroup | int | `1000` |  |
+| podSecurityContext.runAsNonRoot | bool | `true` |  |
+| podSecurityContext.runAsUser | int | `1000` |  |
 | prometheusRule.additionalLabels | object | `{}` | Additional labels for the prometheusRule |
 | prometheusRule.default | bool | `true` | Create a default set of Alerts |
 | prometheusRule.namespace | string | `""` | The namespace in which the prometheusRule will be created |
@@ -75,6 +98,12 @@ A Helm chart for Espresso Sequencer nodes.
 | rbac.create | bool | `true` |  |
 | rbac.name | string | `""` | The name of the role to use. If not set and create is true, a name is generated using the fullname template  |
 | rbac.rules | list | `[{"apiGroups":[""],"resources":["secrets"],"verbs":["create","get","list","watch","delete"]},{"apiGroups":[""],"resources":["services"],"verbs":["get","list","watch"]}]` | Required Role rules |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| securityContext.runAsGroup | int | `1000` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.runAsUser | int | `1000` |  |
 | service.annotations | object | `{}` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
