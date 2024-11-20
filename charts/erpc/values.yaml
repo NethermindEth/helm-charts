@@ -15,7 +15,6 @@ nameOverride: ""
 fullnameOverride: ""
 
 erpc:
-  # -- Erpc required secret used for the init container.
   # All keys used for configurations secrets must be defined inside this secret resource.
   secret:
     name: ""
@@ -135,12 +134,6 @@ erpc:
               #   successThresholdCount: 8
               #   successThresholdCapacity: 10
 
-# -- Init image is used to generate the erpc config file.
-initImage:
-  repository: bash
-  tag: "5.2"
-  pullPolicy: IfNotPresent
-
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -166,18 +159,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-  allowPrivilegeEscalation: false
-
-# Override security context for init containers
-initContainerSecurityContext:
-  capabilities:
-    drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1000
