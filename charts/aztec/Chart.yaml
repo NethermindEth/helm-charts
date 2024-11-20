@@ -2,7 +2,7 @@ apiVersion: v2
 name: aztec
 description: Aztec Prover Node and Prover Agent Helm Chart
 type: application
-home: https://nethermindeth.github.io/helm-charts
-version: 0.0.1
+home: hhttps://docs.aztec.network/
+version: 0.0.2
 maintainers:
   - name: 0xDones
