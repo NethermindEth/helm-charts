@@ -32,6 +32,8 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init-erpc-config
+          securityContext:
+            {{- toYaml .Values.initContainerSecurityContext | nindent 12 }}
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           {{- if .Values.erpc.config.database }}
