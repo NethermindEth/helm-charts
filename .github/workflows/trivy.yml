@@ -20,7 +20,7 @@ jobs:
         with:
           registry: nethermind.jfrog.io
           username: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
-          password: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_CONTRIBUTOR }}
+          password: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
@@ -64,7 +64,7 @@ jobs:
           version: 'v0.57.0'
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
-          TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_CONTRIBUTOR }}
+          TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
           TRIVY_DB_REPOSITORY: mirror.gcr.io/aquasec/trivy-db:2
           TRIVY_CHECKS_BUNDLE_REPOSITORY: nethermind.jfrog.io/angkor-oci-local-staging/trivy-checks:latest
 
