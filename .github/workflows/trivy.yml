@@ -90,6 +90,7 @@ jobs:
           scanners: 'misconfig,secret'
           timeout: '10m'
           trivyignores: '.trivyignore'
+          limit-severities-for-sarif: true
           skip-setup-trivy: true
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
