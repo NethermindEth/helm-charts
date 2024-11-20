@@ -2,6 +2,18 @@ apiVersion: v1
 entries:
   aztec:
   - apiVersion: v2
+    created: "2024-11-20T19:51:37.684933606Z"
+    description: A Helm chart for deploying Aztec prover node
+    digest: 07790ec38781941f7eb36156f25a6f851d781f6598b388240bfe4a459893f10c
+    home: https://docs.aztec.network/
+    maintainers:
+    - name: 0xDones
+    name: aztec
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/aztec-0.0.3/aztec-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
     created: "2024-11-20T17:08:48.240367214Z"
     description: Aztec Prover Node and Prover Agent Helm Chart
     digest: 7c9300d89c3510e198de7dc4809a8b8a3a5312a670daef8a2e85156ecaa7ea1e
@@ -60,6 +72,19 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/aztec-prover-0.1.1/aztec-prover-0.1.1.tgz
     version: 0.1.1
+  cert-manager-webhook-ovh:
+  - apiVersion: v1
+    appVersion: 0.3.1
+    created: "2024-11-20T19:51:37.787124419Z"
+    description: OVH DNS cert-manager ACME webhook
+    digest: 971a5087ba64c021c0c510449963f15c81d681130209d62395efc9a01e9533a3
+    home: https://nethermindeth.github.io/helm-charts
+    maintainers:
+    - name: nm-sam
+    name: cert-manager-webhook-ovh
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/cert-manager-webhook-ovh-1.0.0/cert-manager-webhook-ovh-1.0.0.tgz
+    version: 1.0.0
   common:
   - apiVersion: v2
     appVersion: 1.0.0
@@ -73,6 +98,23 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/common-1.0.0/common-1.0.0.tgz
     version: 1.0.0
   erpc:
+  - apiVersion: v2
+    appVersion: 0.0.27
+    created: "2024-11-20T19:51:37.88856943Z"
+    description: A Helm chart for deploying Erpc
+    digest: 760cf8a79cbace1d0b3be3b0fd81e75cf71f5aa581c4368a2b5f7aee4c5219a9
+    home: https://docs.erpc.cloud
+    keywords:
+    - rpcs
+    - erpc
+    maintainers:
+    - name: cbermudez97
+    - name: AntiD2ta
+    name: erpc
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/erpc-1.0.5/erpc-1.0.5.tgz
+    version: 1.0.5
   - apiVersion: v2
     appVersion: 0.0.27
     created: "2024-11-20T19:09:58.910937493Z"
@@ -161,6 +203,23 @@ entries:
   espresso:
   - apiVersion: v2
     appVersion: 20240925-patch1
+    created: "2024-11-20T19:51:37.992977521Z"
+    description: A Helm chart for deploying Espresso Sequencer
+    digest: 7348281c761a71806bffc559d99c36b2c8ebbe6fe993c355131257284612c437
+    home: https://docs.espressosys.com/sequencer
+    keywords:
+    - espresso
+    - sequencer
+    maintainers:
+    - email: miguel@nethermind.io
+      name: AntiD2ta
+    name: espresso
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/espresso-1.0.2/espresso-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: 20240925-patch1
     created: "2024-11-20T17:08:48.511697406Z"
     description: A Helm chart for Espresso Sequencer nodes.
     digest: 70631dd199d1c332c1c665f83a54d11a5e11206bae31401aff42b0e64532bcf1
@@ -194,6 +253,30 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/espresso-1.0.0/espresso-1.0.0.tgz
     version: 1.0.0
   execution-beacon:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2024-11-20T19:51:38.11738241Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: A Helm chart for deploying Ethereum execution and consensus clients
+    digest: c85ea4706a85b2b5138e8c679ed30bd469d240bafae178112059eb99c5a21ba1
+    home: https://www.ethereum.org/
+    keywords:
+    - ethereum
+    - blockchain
+    - nethermind
+    - prysm
+    - p2p
+    maintainers:
+    - name: 0xDones
+    - name: matilote
+    name: execution-beacon
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/execution-beacon-1.0.5/execution-beacon-1.0.5.tgz
+    version: 1.0.5
   - apiVersion: v2
     appVersion: 0.0.1
     created: "2024-11-20T17:29:52.67275247Z"
@@ -315,6 +398,18 @@ entries:
     version: 1.0.0
   generic-app:
   - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-11-20T19:51:38.21595152Z"
+    description: A Helm chart for Kubernetes generic app
+    digest: 97857d19bbe0a6c25f6402147f87443fa990c5cfeea3863094d788cc3d5c68b4
+    maintainers:
+    - name: 0xDones
+    name: generic-app
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-app-0.2.0/generic-app-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2024-11-04T16:04:56.532741103Z"
     description: A Generic App Helm chart for Kubernetes
     digest: 1ebff8b282292438c55147093424f4a957d49319261856698e2b9534a318ba1d
@@ -326,6 +421,21 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-app-0.1.0/generic-app-0.1.0.tgz
     version: 0.1.0
   generic-deployment:
+  - apiVersion: v2
+    created: "2024-11-20T19:51:38.353348455Z"
+    dependencies:
+    - name: generic-app
+      repository: file://../generic-app
+      version: 0.2.0
+    description: A Generic Deployment Helm chart for Kubernetes
+    digest: 0044f8cce5a6fd45ad75ea344984fbebb4901936984300fbc60ce52dd8d79e17
+    maintainers:
+    - name: 0xDones
+    name: generic-deployment
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-deployment-0.2.0/generic-deployment-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     created: "2024-11-04T16:04:56.636516711Z"
     dependencies:
@@ -343,6 +453,21 @@ entries:
     version: 0.1.0
   generic-statefulset:
   - apiVersion: v2
+    created: "2024-11-20T19:51:38.491383809Z"
+    dependencies:
+    - name: generic-app
+      repository: file://../generic-app
+      version: 0.2.0
+    description: A Generic Statefulset Helm chart for Kubernetes
+    digest: 070f50157cb23acef1565bebbd35ec480db553db2e852c40fd41a34f8ae5ae4e
+    maintainers:
+    - name: 0xDones
+    name: generic-statefulset
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.2.0/generic-statefulset-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2024-11-04T16:04:56.75260058Z"
     dependencies:
     - name: generic-app
@@ -357,4 +482,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
-generated: "2024-11-20T19:09:58.910975384Z"
+generated: "2024-11-20T19:51:38.491457286Z"
