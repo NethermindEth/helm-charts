@@ -1,8 +1,8 @@
 apiVersion: v2
 name: aztec
-description: Aztec Prover Node and Prover Agent Helm Chart
+description: A Helm chart for deploying Aztec prover node
 type: application
-home: hhttps://docs.aztec.network/
-version: 0.0.2
+home: https://docs.aztec.network/
+version: 0.0.3
 maintainers:
   - name: 0xDones
