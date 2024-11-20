@@ -1,8 +1,8 @@
-apiVersion: v1
+apiVersion: v2
 appVersion: "0.3.1"
-description: OVH DNS cert-manager ACME webhook
+description: A Helm chart for deploying Ovh DNS cert-manager webhook
 name: cert-manager-webhook-ovh
-version: "1.0.0"
+version: "1.0.1"
 home: https://nethermindeth.github.io/helm-charts
 maintainers:
   - name: nm-sam
