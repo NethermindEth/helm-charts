@@ -86,7 +86,6 @@ jobs:
           format: 'table'
           severity: 'CRITICAL,HIGH'
           exit-code: '1'
-          hide-progress: false
           scanners: 'misconfig,secret'
           timeout: '10m'
           trivyignores: '.trivyignore'
