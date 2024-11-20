@@ -1,0 +1,3 @@
+# Ignore false positive for ConfigMap containing the word "secret" in auth configuration
+# ConfigMap uses environment variable substitution for secrets, not actual values
+AVD-KSV-0109

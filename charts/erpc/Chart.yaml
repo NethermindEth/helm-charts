@@ -1,7 +1,7 @@
 apiVersion: v2
 name: erpc
 description: A Helm chart to deploy eRPC instances
-version: 1.0.2
+version: 1.0.4
 appVersion: "0.0.27"
 type: application
 keywords:

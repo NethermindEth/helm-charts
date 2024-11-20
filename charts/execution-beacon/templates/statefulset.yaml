@@ -44,18 +44,15 @@ spec:
     {{- if .Values.global.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.global.terminationGracePeriodSeconds }}
     {{- end }}
-      serviceAccountName: {{ include "common.names.fullname" . }}
-      priorityClassName: {{ .Values.global.priorityClassName | quote }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       initContainers:
-        {{/*
-        Container used for initialising data directory and setting right values for ports and external_ip
-        */}}
         - name: init
           image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
           imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}
           securityContext:
-            runAsNonRoot: false
-            runAsUser: 0
+            {{- toYaml .Values.initContainerSecurityContext | nindent 12 }}
           env:
             - name: POD_IP
               valueFrom:
@@ -67,8 +64,8 @@ spec:
                   fieldPath: metadata.name
             - name: POD_NAMESPACE
               valueFrom:
-                  fieldRef:
-                    fieldPath: metadata.namespace
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
@@ -88,13 +85,12 @@ spec:
               mountPath: /env
             - name: scripts-init
               mountPath: /scripts
-        {{/*
-        Container used for initialising nimbus checkpoint sync
-        */}}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
           image: "{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).repository }}:{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).tag }}"
           imagePullPolicy: {{ .Values.beacon.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.initContainerSecurityContext | nindent 12 }}
           command:
             - sh
             - -ac
@@ -121,6 +117,8 @@ spec:
         - name: execution
           image: "{{ (pluck .Values.execution.client .Values.global.image.execution | first ).repository }}:{{ (pluck .Values.execution.client .Values.global.image.execution | first ).tag }}"
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           envFrom:
           {{- with .Values.global.envFrom }}
             {{- toYaml . | nindent 12 }}
@@ -296,14 +294,14 @@ spec:
             {{- range .Values.extraFlags }}
                 {{ . }}
             {{- end }}
-            {{- if .Values.global.metrics.enabled }}
+            {{- if and .Values.global.metrics.enabled .Values.execution.metrics.enabled }}
                 --metrics
                 --metrics.addr={{ .Values.execution.metrics.host }}
                 --metrics.port={{ .Values.execution.metrics.port }}
             {{- end }}
             {{- end }}
             {{- range .Values.execution.extraFlags }}
-              {{ .  }}
+              {{ . }}
             {{- end }}
           env:
             - name: POD_IP
@@ -366,16 +364,18 @@ spec:
             {{- end }}
             - name: env-nodeport
               mountPath: /env
-          {{- with .Values.execution.resources }}
+        {{- with .Values.execution.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
-          {{- end }}
+        {{- end }}
         {{/*
         Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar
         */}}
         - name: beacon
           image: "{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).repository }}:{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).tag }}"
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           {{/*
           Configuration for Prysm beacon client
           */}}
@@ -717,6 +717,8 @@ spec:
         - name: ethsider
           image: "{{ .Values.global.ethsider.repository }}:{{ .Values.global.ethsider.tag }}"
           imagePullPolicy: {{ .Values.global.ethsider.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           env:
             - name: EXECUTION_ENDPOINT
               value: "http://localhost:{{ .Values.execution.jsonrpc.http.port }}"

@@ -1,7 +1,7 @@
 
 # erpc
 
-![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.27](https://img.shields.io/badge/AppVersion-0.0.27-informational?style=flat-square)
+![Version: 1.0.4](https://img.shields.io/badge/Version-1.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.27](https://img.shields.io/badge/AppVersion-0.0.27-informational?style=flat-square)
 
 A Helm chart to deploy eRPC instances
 
@@ -43,7 +43,7 @@ A Helm chart to deploy eRPC instances
 | erpc.config.projects[0].upstreams[0].id | string | `""` |  |
 | erpc.config.projects[0].upstreams[0].type | string | `"evm"` | Upstream type to be used. |
 | erpc.config.server | object | `{"httpHostV4":"0.0.0.0","httpHostV6":"[::]","listenV4":true,"listenV6":false}` | Erpc json-rpc server configuration. |
-| erpc.secret | object | `{"name":""}` | Erpc required secret used for the init container. All keys used for configurations secrets must be defined inside this secret resource. |
+| erpc.secret.name | string | `""` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/erpc/erpc"` |  |
@@ -56,19 +56,26 @@ A Helm chart to deploy eRPC instances
 | ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
 | ingress.tls | list | `[]` |  |
-| initImage | object | `{"pullPolicy":"IfNotPresent","repository":"bash","tag":"5.2"}` | Init image is used to generate the erpc config file. |
 | livenessProbe.httpGet.path | string | `"/metrics"` |  |
 | livenessProbe.httpGet.port | string | `"metrics"` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
+| podSecurityContext.fsGroup | int | `1000` |  |
+| podSecurityContext.runAsGroup | int | `1000` |  |
+| podSecurityContext.runAsNonRoot | bool | `true` |  |
+| podSecurityContext.runAsUser | int | `1000` |  |
 | readinessProbe.httpGet.path | string | `"/metrics"` |  |
 | readinessProbe.httpGet.port | string | `"metrics"` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | `{}` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| securityContext.runAsGroup | int | `1000` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.runAsUser | int | `1000` |  |
 | service.metricsPort | int | `9000` |  |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |

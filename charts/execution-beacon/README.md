@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
+![Version: 1.0.4](https://img.shields.io/badge/Version-1.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
 
 Execution and Beacon
 
@@ -205,9 +205,6 @@ Execution and Beacon
 | global.priorityClassName | string | `""` |  |
 | global.rbac.create | bool | `true` |  |
 | global.replicaCount | int | `1` |  |
-| global.securityContext.fsGroup | int | `1001` |  |
-| global.securityContext.runAsNonRoot | bool | `true` |  |
-| global.securityContext.runAsUser | int | `1001` |  |
 | global.service.svcHeadless | bool | `true` |  |
 | global.serviceAccount.create | bool | `true` |  |
 | global.sessionAffinity.enabled | bool | `false` |  |
@@ -219,7 +216,17 @@ Execution and Beacon
 | global.sharedPersistence.storageClassName | string | `""` |  |
 | global.terminationGracePeriodSeconds | int | `120` |  |
 | global.tolerations | list | `[]` |  |
+| initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
+| initContainerSecurityContext.runAsGroup | int | `1000` |  |
+| initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
+| initContainerSecurityContext.runAsUser | int | `1000` |  |
 | nameOverride | string | `""` |  |
+| podSecurityContext.fsGroup | int | `1000` |  |
+| podSecurityContext.runAsGroup | int | `1000` |  |
+| podSecurityContext.runAsNonRoot | bool | `true` |  |
+| podSecurityContext.runAsUser | int | `1000` |  |
 | rbac.clusterRules[0].apiGroups[0] | string | `""` |  |
 | rbac.clusterRules[0].resources[0] | string | `"nodes"` |  |
 | rbac.clusterRules[0].verbs[0] | string | `"get"` |  |
@@ -231,6 +238,12 @@ Execution and Beacon
 | rbac.rules[0].verbs[0] | string | `"get"` |  |
 | rbac.rules[0].verbs[1] | string | `"list"` |  |
 | rbac.rules[0].verbs[2] | string | `"watch"` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| securityContext.runAsGroup | int | `1000` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.runAsUser | int | `1000` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
 

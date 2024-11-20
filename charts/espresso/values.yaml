@@ -100,7 +100,7 @@ nodes:
     nodeName: ""
     # nodeName: "nethermind-sequencer-da-<region>"
 
-# -- Sequencer node configuration for the container.
+# Sequencer node configuration for the container.
 nodes_config:
   # Required parameters
   ESPRESSO_SEQUENCER_L1_PROVIDER: "http://localhost:8545"   # JSON-RPC endpoint for Sepolia testnet
@@ -303,3 +303,32 @@ rbac:
 
 # -- Log format for the Sequencer containers. Custom label for Promtail.
 logFormat: "espresso"
+
+# Default security settings for the pod
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+# Default security settings for containers
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+
+# Security settings for init containers
+initContainerSecurityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
