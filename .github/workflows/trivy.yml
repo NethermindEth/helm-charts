@@ -50,7 +50,7 @@ jobs:
           ls -la "$TRIVY_CHARTS_DIR"
 
       - name: Generate Trivy SARIF Report
-        uses: aquasecurity/trivy-action@5681af892cd0f4997658e2bacc62bd0a894cf564 #v0.27.0
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 #v0.29.0
         with:
           scan-type: 'fs'
           scan-ref: '${{ github.workspace }}/charts'
@@ -72,7 +72,7 @@ jobs:
           sarif_file: 'trivy-results.sarif'
 
       - name: Fail on High/Critical Issues
-        uses: aquasecurity/trivy-action@5681af892cd0f4997658e2bacc62bd0a894cf564 #v0.27.0
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 #v0.29.0
         with:
           scan-type: 'fs'
           scan-ref: '${{ github.workspace }}/charts'
@@ -82,8 +82,9 @@ jobs:
           hide-progress: false
           scanners: 'misconfig,secret'
           timeout: '10m'
-          version: 'v0.57.0'
+          version: 'v0.57.1'
           trivyignores: '.trivyignore'
+          skip-setup-trivy: true
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
