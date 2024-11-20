@@ -62,7 +62,7 @@ jobs:
           scanners: 'misconfig,secret'
           timeout: '10m'
           version: 'v0.57.0'
-          trivyignores: '.trivyignore.yaml'
+          trivyignores: '.trivyignore'
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
