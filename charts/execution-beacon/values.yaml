@@ -7,6 +7,8 @@ podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
 
 # Default security settings for containers
 securityContext:
@@ -18,6 +20,8 @@ securityContext:
   runAsUser: 1000
   runAsGroup: 1000
   allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault
 
 # Security settings for init containers
 initContainerSecurityContext:
@@ -29,6 +33,8 @@ initContainerSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
   allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault
 
 global:
   replicaCount: 1
