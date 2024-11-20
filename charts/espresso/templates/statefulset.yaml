@@ -22,9 +22,13 @@ spec:
         logformat: {{ $.Values.logFormat }}
     spec:
       serviceAccountName: {{ include "espresso.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       {{- if $.Values.externalSecrets.enabled }}
       initContainers:
         - name: keygen  # Generates keys for the sequencer
+          securityContext:
+            {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
           image: {{ include "espresso.build_image_name" (list $.Values.image.repository $.Values.image.tag) }}
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           command: ["keygen", "-o", "/keys", "-n", "{{ $specs.replicaCount }}"]
@@ -32,6 +36,8 @@ spec:
           - name: keys
             mountPath: /keys
         - name: keystore-cli-pv-keys  # Updates Secret Manager with private keys in the proper format
+          securityContext:
+            {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
           image: {{ include "espresso.build_image_name" (list $.Values.keystoreCLI.image.repository $.Values.keystoreCLI.image.tag) }}
           imagePullPolicy: {{ $.Values.keystoreCLI.image.pullPolicy }}
           args: ["pv-keys"]
@@ -82,6 +88,8 @@ spec:
       {{- end }}
       containers:
         - name: "sequencer-{{ $type }}"
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
           image: {{ include "espresso.build_image_name" (list $.Values.image.repository $.Values.image.tag) }}
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           command: {{ toYaml $specs.command | nindent 12 }}
