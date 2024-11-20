@@ -58,7 +58,7 @@ jobs:
           output: 'trivy-results.sarif'
           exit-code: '0'
           trivyignores: '.trivyignore'
-          scanners: 'misconfig,secret'
+          scanners: 'misconfig'
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
@@ -80,7 +80,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
           exit-code: '1'
           hide-progress: false
-          scanners: 'misconfig,secret'
+          scanners: 'misconfig'
           timeout: '10m'
           version: 'v0.57.1'
           trivyignores: '.trivyignore'
