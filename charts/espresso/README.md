@@ -1,9 +1,9 @@
 
 # espresso
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 20240925-patch1](https://img.shields.io/badge/AppVersion-20240925--patch1-informational?style=flat-square)
+![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 20240925-patch1](https://img.shields.io/badge/AppVersion-20240925--patch1-informational?style=flat-square)
 
-A Helm chart for Espresso Sequencer nodes.
+A Helm chart for deploying Espresso Sequencer
 
 **Homepage:** <https://docs.espressosys.com/sequencer>
 
@@ -90,6 +90,7 @@ A Helm chart for Espresso Sequencer nodes.
 | podSecurityContext.runAsGroup | int | `1000` |  |
 | podSecurityContext.runAsNonRoot | bool | `true` |  |
 | podSecurityContext.runAsUser | int | `1000` |  |
+| podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | prometheusRule.additionalLabels | object | `{}` | Additional labels for the prometheusRule |
 | prometheusRule.default | bool | `true` | Create a default set of Alerts |
 | prometheusRule.namespace | string | `""` | The namespace in which the prometheusRule will be created |
@@ -104,6 +105,7 @@ A Helm chart for Espresso Sequencer nodes.
 | securityContext.runAsGroup | int | `1000` |  |
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
+| securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | service.annotations | object | `{}` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |

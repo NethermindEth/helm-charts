@@ -1,10 +1,10 @@
 # aztec
 
-![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.3](https://img.shields.io/badge/Version-0.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Aztec Prover Node and Prover Agent Helm Chart
+A Helm chart for deploying Aztec prover node
 
-**Homepage:** <hhttps://docs.aztec.network/>
+**Homepage:** <https://docs.aztec.network/>
 
 ## Installation
 
@@ -59,6 +59,7 @@ helm install aztec nethermind/aztec
 | initContainerSecurityContext.runAsGroup | int | `1000` |  |
 | initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
 | initContainerSecurityContext.runAsUser | int | `1000` |  |
+| initContainerSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | livenessProbe.httpGet.path | string | `"/status"` |  |
 | livenessProbe.httpGet.port | string | `"http"` |  |
 | nameOverride | string | `""` |  |
@@ -74,6 +75,7 @@ helm install aztec nethermind/aztec
 | podSecurityContext.runAsGroup | int | `1000` |  |
 | podSecurityContext.runAsNonRoot | bool | `true` |  |
 | podSecurityContext.runAsUser | int | `1000` |  |
+| podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | readinessProbe.httpGet.path | string | `"/status"` |  |
 | readinessProbe.httpGet.port | string | `"http"` |  |
 | replicaCount | int | `1` |  |
@@ -84,6 +86,7 @@ helm install aztec nethermind/aztec
 | securityContext.runAsGroup | int | `1000` |  |
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
+| securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | service.port | int | `8080` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
