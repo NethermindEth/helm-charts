@@ -1,9 +1,9 @@
 
 # cert-manager-webhook-ovh
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![AppVersion: 0.3.1](https://img.shields.io/badge/AppVersion-0.3.1-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![AppVersion: 0.3.1](https://img.shields.io/badge/AppVersion-0.3.1-informational?style=flat-square)
 
-OVH DNS cert-manager ACME webhook
+A Helm chart for deploying Ovh DNS cert-manager webhook
 
 **Homepage:** <https://nethermindeth.github.io/helm-charts>
 
