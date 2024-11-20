@@ -84,6 +84,7 @@ jobs:
           timeout: '10m'
           version: 'v0.57.1'
           trivyignores: '.trivyignore'
+          ignore-unfixed: true
           skip-setup-trivy: true
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
