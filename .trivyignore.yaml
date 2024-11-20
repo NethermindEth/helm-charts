@@ -1,10 +1,11 @@
 vulnerabilities: []
 
 misconfigurations:
+  # Ignore false positive for ConfigMap containing the word "secret" in auth configuration
   - id: AVD-KSV-0109
     paths:
-      - "erpc/templates/configmap.yaml"
-    statement: Part of the configuration for erpc and its related to an auth policy.
+      - "charts/erpc/templates/configmap.yaml"
+    comment: "ConfigMap uses environment variable substitution for secrets, not actual values"
 
 secrets: []
 
