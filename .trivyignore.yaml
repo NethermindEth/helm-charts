@@ -1,0 +1,11 @@
+vulnerabilities: []
+
+misconfigurations:
+  - id: AVD-KSV-0109
+    paths:
+      - "erpc/templates/configmap.yaml"
+    statement: Part of the configuration for erpc and its related to an auth policy.
+
+secrets: []
+
+licenses: []
