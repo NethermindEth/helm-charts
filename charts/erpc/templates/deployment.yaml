@@ -30,39 +30,6 @@ spec:
       serviceAccountName: {{ include "erpc.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        - name: init-erpc-config
-          securityContext:
-            {{- toYaml .Values.initContainerSecurityContext | nindent 12 }}
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
-          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
-          {{- if .Values.erpc.config.database }}
-          {{- with .Values.erpc.config.database.evmJsonRpcCache }}
-          {{- if eq .driver "redis" }}
-          env:
-            - name: ERPC_REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .redis.password.secret.name }}
-                  key: {{ .redis.password.secret.key }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
-          envFrom:
-            - secretRef:
-                name: {{ .Values.erpc.secret.name }}
-          command:
-            - bash
-            - /scripts/init.sh
-            - /templates/erpc.yaml
-            - /etc/erpc/erpc.yaml
-          volumeMounts:
-            - name: erpc-config
-              mountPath: /etc/erpc
-            - name: erpc-config-template
-              mountPath: /templates
-            - name: erpc-config-init-script
-              mountPath: /scripts
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
