@@ -47,13 +47,13 @@ The following is the list of types that can be used:
 
 Before making any commits, we strongly recommend running our **pre-commit hooks** over your code. This will run linters and static checks to ensure your code is formatted correctly and you have no syntax errors. To install pre-commit hooks, run the following command:
 
-```
+```bash
 make install-pre-commit
 ```
 
 To run pre-commit hooks after you have installed them, and without making any commits, run the following command:
 
-```
+```bash
 make pre-commit
 ```
 
