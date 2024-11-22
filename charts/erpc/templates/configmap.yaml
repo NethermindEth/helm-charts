@@ -15,7 +15,8 @@ data:
       evmJsonRpcCache:
         redis:
           addr: {{ .redis.addr }}
-          password: '${ERPC_REDIS_PASSWORD}'
+          password: >-
+            {{ "${" }}ERPC_REDIS_PASSWORD{{ "}" }}
           db: {{ .redis.db }}
     {{- else if eq .driver "memory" }}
     database:
@@ -39,7 +40,8 @@ data:
           strategies:
             - type: secret
               secret:
-                value: {{ "'${" }}{{ .secretKey }}{{ "}'" }}
+                value: >-
+                  {{ "${" }}{{ .secretKey }}{{ "}" }}
         {{- end }}
         {{- end }}
         networks:

@@ -1,7 +1,7 @@
 
 # erpc
 
-![Version: 1.0.5](https://img.shields.io/badge/Version-1.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.27](https://img.shields.io/badge/AppVersion-0.0.27-informational?style=flat-square)
+![Version: 1.0.6](https://img.shields.io/badge/Version-1.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.29](https://img.shields.io/badge/AppVersion-0.0.29-informational?style=flat-square)
 
 A Helm chart for deploying Erpc
 
@@ -52,9 +52,7 @@ A Helm chart for deploying Erpc
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `false` |  |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths[0].path | string | `"/"` |  |
-| ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
+| ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
 | livenessProbe.httpGet.path | string | `"/metrics"` |  |
 | livenessProbe.httpGet.port | string | `"metrics"` |  |
@@ -74,12 +72,12 @@ A Helm chart for deploying Erpc
 | securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | securityContext.readOnlyRootFilesystem | bool | `true` |  |
-| securityContext.runAsGroup | int | `1000` |  |
-| securityContext.runAsNonRoot | bool | `true` |  |
-| securityContext.runAsUser | int | `1000` |  |
+| securityContext.runAsGroup | int | `0` |  |
+| securityContext.runAsNonRoot | bool | `false` |  |
+| securityContext.runAsUser | int | `0` |  |
 | securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | service.metricsPort | int | `9000` |  |
-| service.port | int | `80` |  |
+| service.port | int | `8080` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automount | bool | `true` |  |
