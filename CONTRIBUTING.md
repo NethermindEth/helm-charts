@@ -6,6 +6,12 @@ The Nethermind infrastructure team is responsible for maintaining the Nethermind
 
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
 
+## Pre-requisites
+
+- Helm
+- Pre-commit - <https://pre-commit.com/>
+- Docker
+
 ## Pull Request Process
 
 1. Create a new branch from `main`.
