@@ -32,7 +32,13 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
-        {{- toYaml .Values.initContainers | nindent 8 }}
+        {{- range $container := .Values.initContainers }}
+        - securityContext:
+            {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
+          {{- with $container }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
       containers:
         {{- with .Values.extraContainers }}
         {{- toYaml . | nindent 8 }}
