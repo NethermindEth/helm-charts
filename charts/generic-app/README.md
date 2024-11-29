@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -61,8 +61,9 @@ This will create both service and container ports configuration. Only http port 
 ```yaml
 service:
   ports:
-    http: 80
-  extraPorts:
+    - name: http
+      port: 8080
+      protocol: TCP
     - name: metrics
       port: 9090
       protocol: TCP
@@ -94,6 +95,29 @@ env:
     value: my-env-var-value
 ```
 
+### Config Files
+
+Mounting a ConfigMap as a file is useful when the application expects a configuration file.
+
+```yaml
+configMap:
+  enabled: true
+  data:
+    config.toml: |
+        name = "${ATTESTOR_NAME}"
+        ip = "0.0.0.0"
+
+volumes:
+  - name: config
+    configMap:
+      name: '{{ include "generic-app.fullname" . }}'
+
+volumeMounts:
+  - name: config
+    mountPath: /etc/config.toml
+    subPath: config.toml
+```
+
 ### Sts Persistence
 
 ```yaml
@@ -115,8 +139,8 @@ statefulSet:
 | affinity | object | `{}` |  |
 | args | list | `[]` |  |
 | command | list | `[]` | Command and args for the container |
-| configMap | object | `{"data":{},"enabled":false}` | ConfigMap configuration, if enabled configMap will be created and mounted as environment variables |
-| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":true}` | Enable Deployment |
+| configMap | object | `{"data":{},"enabled":false}` | ConfigMap configuration, if enabled configMap will be created but not mounted automatically. Use envFrom, env or volumeMounts to mount the configMap. |
+| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":true}` | Enable Deployment |
 | env | list | `[]` |  |
 | envFrom | list | `[]` | envFrom configuration |
 | extraContainers | list | `[]` | Sidecar containers |
@@ -127,6 +151,7 @@ statefulSet:
 | image.tag | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific","portName":"http"}]}],"tls":[]}` | For now all traffic is routed to the `http` port |
+| ingress.hosts[0].paths[0].portName | string | `"http"` | Port name as defined in the service.ports section |
 | initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
