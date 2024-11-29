@@ -37,7 +37,7 @@ spec:
               service:
                 name: {{ include "generic-app.fullname" $ }}
                 port:
-                  number: {{ $.Values.service.ports.http }}
+                  name: {{ .portName }}
           {{- end }}
     {{- end }}
 {{- end }}

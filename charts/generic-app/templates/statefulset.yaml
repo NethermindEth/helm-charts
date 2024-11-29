@@ -49,14 +49,15 @@ spec:
           args: {{- . | toYaml | nindent 12 }}
           {{- end }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.ports.http }}
-              protocol: TCP
-            {{- range $idx, $extraPort := .Values.service.extraPorts }}
-            - name: {{ $extraPort.name }}
-              containerPort: {{ $extraPort.port }}
-              protocol: {{ $extraPort.protocol }}
-            {{- end }}
+          {{- if .Values.service.ports }}
+          {{- range $idx, $port := .Values.service.ports }}
+            - name: {{ $port.name }}
+              containerPort: {{ $port.port }}
+              protocol: {{ $port.protocol }}
+          {{- end }}
+          {{- else }}
+            []
+          {{- end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
