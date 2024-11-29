@@ -181,6 +181,7 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
+          portName: http
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:

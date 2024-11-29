@@ -126,7 +126,7 @@ statefulSet:
 | image.repository | string | `"nginx"` |  |
 | image.tag | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
-| ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}],"tls":[]}` | For now all traffic is routed to the `http` port |
+| ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific","portName":"http"}]}],"tls":[]}` | For now all traffic is routed to the `http` port |
 | initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
