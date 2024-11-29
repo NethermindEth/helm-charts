@@ -445,6 +445,18 @@ entries:
   generic-app:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2024-11-29T17:09:34.119253318Z"
+    description: A Helm chart for Kubernetes generic app
+    digest: e55d85836f4f02f5a2d6eb93dcf1c5bbe8c1d6eb10fb36ae2ccb464f6220d6fe
+    maintainers:
+    - name: 0xDones
+    name: generic-app
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-app-1.0.0/generic-app-1.0.0.tgz
+    version: 1.0.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2024-11-20T19:51:38.21595152Z"
     description: A Helm chart for Kubernetes generic app
     digest: 97857d19bbe0a6c25f6402147f87443fa990c5cfeea3863094d788cc3d5c68b4
@@ -528,4 +540,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
-generated: "2024-11-22T17:13:03.415272248Z"
+generated: "2024-11-29T17:09:34.119312248Z"
