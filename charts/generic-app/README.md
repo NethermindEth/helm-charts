@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -61,8 +61,9 @@ This will create both service and container ports configuration. Only http port 
 ```yaml
 service:
   ports:
-    http: 80
-  extraPorts:
+    - name: http
+      port: 8080
+      protocol: TCP
     - name: metrics
       port: 9090
       protocol: TCP
@@ -115,8 +116,8 @@ statefulSet:
 | affinity | object | `{}` |  |
 | args | list | `[]` |  |
 | command | list | `[]` | Command and args for the container |
-| configMap | object | `{"data":{},"enabled":false}` | ConfigMap configuration, if enabled configMap will be created and mounted as environment variables |
-| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":true}` | Enable Deployment |
+| configMap | object | `{"data":{},"enabled":false}` | ConfigMap configuration, if enabled configMap will be created but not mounted automatically. Use envFrom, env or volumeMounts to mount the configMap. |
+| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":true}` | Enable Deployment |
 | env | list | `[]` |  |
 | envFrom | list | `[]` | envFrom configuration |
 | extraContainers | list | `[]` | Sidecar containers |

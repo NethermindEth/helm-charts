@@ -55,8 +55,9 @@ This will create both service and container ports configuration. Only http port 
 ```yaml
 service:
   ports:
-    http: 80
-  extraPorts:
+    - name: http
+      port: 8080
+      protocol: TCP
     - name: metrics
       port: 9090
       protocol: TCP
