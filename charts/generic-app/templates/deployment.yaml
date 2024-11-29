@@ -34,8 +34,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         {{- range $container := .Values.initContainers }}
-        - name: {{ $container.name }}
-          securityContext:
+        - securityContext:
             {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
           {{- with $container }}
           {{- toYaml . | nindent 10 }}

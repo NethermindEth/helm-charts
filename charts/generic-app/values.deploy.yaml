@@ -3,35 +3,6 @@ statefulSet:
 
 nameOverride: "generic-deployment"
 
-# Default security settings for the pod
-podSecurityContext:
-  fsGroup: 1000
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-
-# Default security settings for containers
-securityContext:
-  capabilities:
-    drop:
-    - ALL
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-  allowPrivilegeEscalation: false
-
-# Security settings for init containers
-initContainerSecurityContext:
-  capabilities:
-    drop:
-    - ALL
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-  allowPrivilegeEscalation: false
-
 image:
   repository: nginx
   # This sets the pull policy for images.
@@ -50,7 +21,7 @@ deployment:
     targetCPUUtilizationPercentage: 80
 
 service:
-  extraPorts: []
+  ports: []
   # - name: metrics
   #   port: 9090
   #   protocol: TCP
