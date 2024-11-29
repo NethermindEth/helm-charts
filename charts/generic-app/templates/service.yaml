@@ -7,15 +7,15 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - name: http
-      port: {{ .Values.service.ports.http }}
-      targetPort: http
-      protocol: TCP
-    {{- range $idx, $extraPort := .Values.service.extraPorts }}
-    - name: {{ $extraPort.name }}
-      port: {{ $extraPort.port }}
-      targetPort: {{ $extraPort.name }}
-      protocol: {{ $extraPort.protocol }}
-    {{- end }}
+  {{- if .Values.service.ports }}
+  {{- range $idx, $port := .Values.service.ports }}
+    - name: {{ $port.name }}
+      port: {{ $port.port }}
+      targetPort: {{ $port.name }}
+      protocol: {{ $port.protocol }}
+  {{- end }}
+  {{- else }}
+    []
+  {{- end }}
   selector:
     {{- include "generic-app.selectorLabels" . | nindent 4 }}
