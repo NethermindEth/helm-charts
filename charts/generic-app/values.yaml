@@ -146,6 +146,7 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
+          # -- Port name as defined in the service.ports section
           portName: http
   tls: []
   #  - secretName: chart-example-tls

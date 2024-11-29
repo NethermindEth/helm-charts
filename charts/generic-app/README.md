@@ -95,6 +95,29 @@ env:
     value: my-env-var-value
 ```
 
+### Config Files
+
+Mounting a ConfigMap as a file is useful when the application expects a configuration file.
+
+```yaml
+configMap:
+  enabled: true
+  data:
+    config.toml: |
+        name = "${ATTESTOR_NAME}"
+        ip = "0.0.0.0"
+
+volumes:
+  - name: config
+    configMap:
+      name: '{{ include "generic-app.fullname" . }}'
+
+volumeMounts:
+  - name: config
+    mountPath: /etc/config.toml
+    subPath: config.toml
+```
+
 ### Sts Persistence
 
 ```yaml
@@ -128,6 +151,7 @@ statefulSet:
 | image.tag | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific","portName":"http"}]}],"tls":[]}` | For now all traffic is routed to the `http` port |
+| ingress.hosts[0].paths[0].portName | string | `"http"` | Port name as defined in the service.ports section |
 | initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
