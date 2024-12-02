@@ -20,7 +20,6 @@ spec:
     spec:
       {{- if .Values.network.public }}
       hostNetwork: true
-      {{- include "aztec-network.publicAntiAffinity" . | nindent 6 }}
       {{- end }}
       serviceAccountName: {{ include "aztec-network.fullname" . }}-node
       initContainers:
