@@ -117,9 +117,11 @@ A Helm chart for deploying the aztec network
 | proverBroker.replicas | int | `1` |  |
 | proverBroker.resources | object | `{}` |  |
 | proverBroker.service.nodePort | int | `8084` |  |
+| proverNode.affinity | object | `{}` |  |
 | proverNode.debug | string | `"aztec:*,-aztec:avm_simulator*,-aztec:libp2p_service*,-aztec:circuits:artifact_hash,-json-rpc*,-aztec:world-state:database,-aztec:l2_block_stream*"` |  |
 | proverNode.externalHost | string | `""` |  |
 | proverNode.logLevel | string | `"debug"` |  |
+| proverNode.nodeSelector | object | `{}` |  |
 | proverNode.p2pEnabled | bool | `true` |  |
 | proverNode.proverAgent.count | int | `0` |  |
 | proverNode.proverAgent.pollIntervalMs | int | `1000` |  |
@@ -137,6 +139,7 @@ A Helm chart for deploying the aztec network
 | proverNode.service.p2pTcpPort | int | `40400` |  |
 | proverNode.service.p2pUdpPort | int | `40400` |  |
 | proverNode.storage | string | `"8Gi"` |  |
+| proverNode.tolerations | list | `[]` |  |
 | pxe.debug | string | `"aztec:*,-aztec:avm_simulator*,-aztec:libp2p_service*,-aztec:circuits:artifact_hash,-json-rpc*,-aztec:world-state:database,-aztec:l2_block_stream*"` |  |
 | pxe.logLevel | string | `"debug"` |  |
 | pxe.proverEnable | bool | `false` |  |

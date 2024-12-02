@@ -141,6 +141,9 @@ proverNode:
       memory: "2Gi"
       cpu: "200m"
   storage: "8Gi"
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
 
 pxe:
   proverEnabled: false
