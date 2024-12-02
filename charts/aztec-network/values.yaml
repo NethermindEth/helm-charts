@@ -111,6 +111,9 @@ validator:
     requests:
       memory: "2Gi"
       cpu: "200m"
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
 
 proverNode:
   externalHost: ""

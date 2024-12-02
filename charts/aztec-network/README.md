@@ -152,9 +152,11 @@ A Helm chart for deploying the aztec network
 | pxe.service.nodePort | int | `8081` |  |
 | telemetry.enabled | bool | `false` |  |
 | telemetry.otelCollectorEndpoint | string | `nil` |  |
+| validator.affinity | object | `{}` |  |
 | validator.debug | string | `"aztec:*,-aztec:avm_simulator*,-aztec:libp2p_service*,-aztec:circuits:artifact_hash,-json-rpc*,-aztec:world-state:database,-aztec:l2_block_stream*"` |  |
 | validator.dynamicBootNode | bool | `false` |  |
 | validator.logLevel | string | `"debug"` |  |
+| validator.nodeSelector | object | `{}` |  |
 | validator.p2p.enabled | string | `"true"` |  |
 | validator.replicas | int | `1` |  |
 | validator.resources.requests.cpu | string | `"200m"` |  |
@@ -168,6 +170,7 @@ A Helm chart for deploying the aztec network
 | validator.service.p2pUdpPort | int | `40400` |  |
 | validator.startupProbe.failureThreshold | int | `120` |  |
 | validator.startupProbe.periodSeconds | int | `10` |  |
+| validator.tolerations | list | `[]` |  |
 | validator.validator.disabled | bool | `false` |  |
 | validator.validator.reexecute | bool | `true` |  |
 | validator.validatorAddresses | list | `[]` |  |
