@@ -1,0 +1,8 @@
+apiVersion: v2
+name: aztec-network
+description: A Helm chart for deploying the aztec network
+type: application
+version: 0.1.1
+appVersion: "1.0.0"
+maintainers:
+  - name: 0xDones
