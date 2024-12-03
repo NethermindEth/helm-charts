@@ -55,9 +55,9 @@ validatorKeysSecret: "aztec-validator-keys"
 
 env:
   - name: P2P_UDP_ANNOUNCE_ADDR
-    value: $(NODE_EXTERNAL_IP):$(NODE_EXTERNAL_PORT)
+    value: $(EXTERNAL_NODE_IP):$(EXTERNAL_NODE_PORT)
   - name: P2P_TCP_ANNOUNCE_ADDR
-    value: $(NODE_EXTERNAL_IP):$(NODE_EXTERNAL_PORT)
+    value: $(EXTERNAL_NODE_IP):$(EXTERNAL_NODE_PORT)
   - name: VALIDATOR_PRIVATE_KEY
     value: $(PRIVATE_KEY)
   - name: SEQ_PUBLISHER_PRIVATE_KEY
@@ -132,14 +132,14 @@ resources:
   #   cpu: 100m
   #   memory: 128Mi
 
-livenessProbe:
-  httpGet:
-    path: /status
-    port: p2p-tcp
-readinessProbe:
-  httpGet:
-    path: /status
-    port: p2p-tcp
+livenessProbe: null
+  # httpGet:
+  #   path: /status
+  #   port: p2p-tcp
+readinessProbe: null
+  # httpGet:
+  #   path: /status
+  #   port: p2p-tcp
 
 persistence:
   enabled: false
