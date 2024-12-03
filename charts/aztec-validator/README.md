@@ -1,6 +1,6 @@
 # aztec-validator
 
-![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying an Aztec validator
 
@@ -30,7 +30,7 @@ helm install aztec-validator nethermind/aztec-validator
 | args[3] | string | `"--sequencer"` |  |
 | config.AZTEC_EPOCH_DURATION | string | `"32"` |  |
 | config.AZTEC_EPOCH_PROOF_CLAIM_WINDOW_IN_L2_SLOTS | string | `"13"` |  |
-| config.AZTEC_PORT | string | `"40400"` |  |
+| config.AZTEC_PORT | string | `"8080"` |  |
 | config.AZTEC_SLOT_DURATION | string | `"36"` |  |
 | config.BOOTSTRAP_NODES | string | `"enr:-Jq4QO_3szmgtG2cbEdnFDIhpGAQkc1HwfNy4-M6sG9QmQbPTmp9PMOHR3xslfR23hORiU-GpA7uM9uXw49lFcnuuvYGjWF6dGVjX25ldHdvcmsBgmlkgnY0gmlwhCIwTIOJc2VjcDI1NmsxoQKQTN17XKCwjYSSwmTc-6YzCMhd3v6Ofl8TS-WunX6LCoN0Y3CCndCDdWRwgp3Q"` |  |
 | config.COINBASE | string | `"0xbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"` |  |
@@ -107,6 +107,7 @@ helm install aztec-validator nethermind/aztec-validator
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
 | securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| service.ports.http | int | `8080` |  |
 | service.ports.p2p | int | `40400` |  |
 | service.type | string | `"NodePort"` |  |
 | serviceAccount.annotations | object | `{}` |  |

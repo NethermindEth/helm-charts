@@ -29,7 +29,7 @@ config:
   VALIDATOR_DISABLED: "false"
   DEBUG: "aztec:*,-aztec:avm_simulator*,-aztec:circuits:artifact_hash,-aztec:libp2p_service,-json-rpc*,-aztec:world-state:database,-aztec:l2_block_stream*"
   LOG_LEVEL: debug
-  AZTEC_PORT: "40400"
+  AZTEC_PORT: "8080"
   P2P_ENABLED: "true"
   L1_CHAIN_ID: "1337"
   PROVER_REAL_PROOFS: "true"
@@ -91,6 +91,7 @@ service:
   type: NodePort
   ports:
     p2p: 40400
+    http: 8080
 
 ingress:
   enabled: false
