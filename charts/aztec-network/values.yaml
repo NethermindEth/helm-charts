@@ -30,9 +30,12 @@ images:
     pullPolicy: IfNotPresent
 
 aztec:
-  slotDuration: 24 # in seconds, aka L2 slot duration. Must be a multiple of {{ ethereum.blockTime }}
-  epochDuration: 16 # how many L2 slots in an epoch
-  epochProofClaimWindow: 13 # in L2 slots
+  # in seconds, aka L2 slot duration. Must be a multiple of {{ ethereum.blockTime }}
+  slotDuration: 24
+  # how many L2 slots in an epoch
+  epochDuration: 16
+  # in L2 slots
+  epochProofClaimWindow: 13
 
 bootNode:
   externalHost: ""
@@ -56,7 +59,8 @@ bootNode:
     requests:
       memory: "2Gi"
       cpu: "200m"
-  deployContracts: true # Set to false to use manual contract addresses
+  # Set to false to use manual contract addresses
+  deployContracts: true
   startupProbe:
     periodSeconds: 10
     # Only if we fail for 20 minutes straight do we call it botched
