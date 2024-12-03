@@ -3,9 +3,9 @@
 echo "Starting init script for pod ${POD_NAME}..."
 touch /shared/env
 
-echo "Getting node external ip..."
+echo "Getting external node ip..."
 EXTERNAL_NODE_IP=$(kubectl get node $NODE_NAME -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}')
-echo "Getting op-node node port..."
+echo "Getting external node port..."
 EXTERNAL_NODE_PORT=$(kubectl get services -l "pod=${POD_NAME},type=p2p" -o jsonpath='{.items[0].spec.ports[0].nodePort}')
 
 echo "EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}"

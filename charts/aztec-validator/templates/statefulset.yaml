@@ -38,11 +38,10 @@ spec:
           command: ["sh", "-c", "/scripts/init.sh"]
           volumeMounts:
             - name: validator-keys
-              mountPath: /app/config/validation_keys
+              mountPath: /app/config/validator_keys
               readOnly: true
             - name: scripts
-              mountPath: /scripts/init.sh
-              subPath: init.sh
+              mountPath: /scripts
             - name: shared
               mountPath: /shared
           env:
@@ -78,9 +77,6 @@ spec:
               echo "Arguments: {{ join " " .Values.args }}";
               exec node --no-warnings /usr/src/yarn-project/aztec/dest/bin/index.js {{ join " " .Values.args }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.ports.http }}
-              protocol: TCP
             - name: p2p-tcp
               containerPort: {{ .Values.service.ports.p2p }}
               protocol: TCP
@@ -110,6 +106,8 @@ spec:
           volumeMounts:
             - name: shared
               mountPath: /shared
+            - name: local-data
+              mountPath: /local-data
           {{- if or .Values.persistence.enabled .Values.volumeMounts }}
             {{- if .Values.persistence.enabled }}
             - name: {{ include "aztec-validator.fullname" . }}
@@ -126,7 +124,10 @@ spec:
         - name: scripts
           configMap:
             name: {{ include "aztec-validator.fullname" . }}-scripts
+            defaultMode: 0755
         - name: shared
+          emptyDir: {}
+        - name: local-data
           emptyDir: {}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}

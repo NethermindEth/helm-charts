@@ -8,26 +8,28 @@ image:
   repository: aztecprotocol/aztec
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "698cd3d62680629a3f1bfc0f82604534cedbccf3-amd64"
+  tag: "698cd3d62680629a3f1bfc0f82604534cedbccf3-x86_64"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 args:
+  - "start"
   - "--node"
   - "--archiver"
   - "--sequencer"
 
 config:
-  ETHEREUM_HOST: ""
+  DATA_DIRECTORY: /local-data
+  ETHEREUM_HOST: "http://34.48.76.131:8545"
   P2P_TCP_LISTEN_ADDR: 0.0.0.0:40400
   P2P_UDP_LISTEN_ADDR: 0.0.0.0:40400
   COINBASE: "0xbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   VALIDATOR_DISABLED: "false"
   DEBUG: "aztec:*,-aztec:avm_simulator*,-aztec:circuits:artifact_hash,-aztec:libp2p_service,-json-rpc*,-aztec:world-state:database,-aztec:l2_block_stream*"
   LOG_LEVEL: debug
-  AZTEC_PORT: $NODE_PORT
+  AZTEC_PORT: "40400"
   P2P_ENABLED: "true"
   L1_CHAIN_ID: "1337"
   PROVER_REAL_PROOFS: "true"
@@ -49,7 +51,7 @@ config:
   OUTBOX_CONTRACT_ADDRESS: "0x1016b5aaa3270a65c315c664ecb238b6db270b64"
 
 # Secret containing the validator keys
-validatorKeysSecret: ""
+validatorKeysSecret: "aztec-validator-keys"
 
 env:
   - name: P2P_UDP_ANNOUNCE_ADDR
@@ -89,13 +91,15 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+rbac:
+  create: true
+
 podAnnotations: {}
 podLabels: {}
 
 service:
-  type: ClusterIP
+  type: NodePort
   ports:
-    http: 8080
     p2p: 40400
 
 ingress:
@@ -131,11 +135,11 @@ resources:
 livenessProbe:
   httpGet:
     path: /status
-    port: http
+    port: p2p-tcp
 readinessProbe:
   httpGet:
     path: /status
-    port: http
+    port: p2p-tcp
 
 persistence:
   enabled: false
