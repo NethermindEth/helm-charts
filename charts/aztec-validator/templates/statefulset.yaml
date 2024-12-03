@@ -78,6 +78,9 @@ spec:
               echo "P2P Data: ${P2P_TCP_ANNOUNCE_ADDR}";
               exec node --no-warnings /usr/src/yarn-project/aztec/dest/bin/index.js {{ join " " .Values.args }}
           ports:
+            - name: http
+              containerPort: {{ .Values.service.ports.http }}
+              protocol: TCP
             - name: p2p-tcp
               containerPort: {{ .Values.service.ports.p2p }}
               protocol: TCP

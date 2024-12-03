@@ -3,6 +3,6 @@ name: aztec-validator
 description: A Helm chart for deploying an Aztec validator
 type: application
 home: https://docs.aztec.network/
-version: 0.0.1
+version: 0.0.2
 maintainers:
   - name: 0xDones
