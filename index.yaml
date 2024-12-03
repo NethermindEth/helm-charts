@@ -37,6 +37,19 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/aztec-0.0.1/aztec-0.0.1.tgz
     version: 0.0.1
+  aztec-network:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-12-03T12:39:02.924668202Z"
+    description: A Helm chart for deploying the aztec network
+    digest: 4803729aa1ef67294f57aa1984324406fc72076b85d474e72e7ee670f379cad0
+    maintainers:
+    - name: 0xDones
+    name: aztec-network
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/aztec-network-0.1.1/aztec-network-0.1.1.tgz
+    version: 0.1.1
   aztec-prover:
   - apiVersion: v2
     created: "2024-09-17T19:06:08.081478513Z"
@@ -562,4 +575,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
-generated: "2024-11-29T18:28:04.37812346Z"
+generated: "2024-12-03T12:39:02.924727253Z"
