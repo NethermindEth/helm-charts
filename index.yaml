@@ -87,6 +87,18 @@ entries:
     version: 0.1.1
   aztec-validator:
   - apiVersion: v2
+    created: "2024-12-03T21:46:44.667225403Z"
+    description: A Helm chart for deploying an Aztec validator
+    digest: 2641c767d1b8b04261a53d4049d470d845e6b946f79b950afc907125f77bee54
+    home: https://docs.aztec.network/
+    maintainers:
+    - name: 0xDones
+    name: aztec-validator
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/aztec-validator-0.0.2/aztec-validator-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
     created: "2024-12-03T19:17:57.287908111Z"
     description: A Helm chart for deploying an Aztec validator
     digest: f851ddc17a92895b44e1c8b44c0358ad94da24933dca2f64d5c8d2bff9fb070c
@@ -588,4 +600,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
-generated: "2024-12-03T19:17:57.288015681Z"
+generated: "2024-12-03T21:46:44.667292298Z"
