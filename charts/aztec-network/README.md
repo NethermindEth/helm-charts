@@ -5,6 +5,12 @@
 
 A Helm chart for deploying the aztec network
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| 0xDones |  |  |
+
 ## Values
 
 | Key | Type | Default | Description |

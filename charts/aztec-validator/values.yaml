@@ -1,0 +1,202 @@
+####################################
+# Aztec prover node values
+####################################
+
+replicaCount: 1
+
+image:
+  repository: aztecprotocol/aztec
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "698cd3d62680629a3f1bfc0f82604534cedbccf3-x86_64"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+args:
+  - "start"
+  - "--node"
+  - "--archiver"
+  - "--sequencer"
+
+config:
+  DATA_DIRECTORY: /local-data
+  ETHEREUM_HOST: "http://34.48.76.131:8545"
+  P2P_TCP_LISTEN_ADDR: 0.0.0.0:40400
+  P2P_UDP_LISTEN_ADDR: 0.0.0.0:40400
+  COINBASE: "0xbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  VALIDATOR_DISABLED: "false"
+  DEBUG: "aztec:*,-aztec:avm_simulator*,-aztec:circuits:artifact_hash,-aztec:libp2p_service,-json-rpc*,-aztec:world-state:database,-aztec:l2_block_stream*"
+  LOG_LEVEL: debug
+  AZTEC_PORT: "40400"
+  P2P_ENABLED: "true"
+  L1_CHAIN_ID: "1337"
+  PROVER_REAL_PROOFS: "true"
+  PXE_PROVER_ENABLED: "true"
+  ETHEREUM_SLOT_DURATION: 6sec
+  AZTEC_SLOT_DURATION: "36"
+  AZTEC_EPOCH_DURATION: "32"
+  AZTEC_EPOCH_PROOF_CLAIM_WINDOW_IN_L2_SLOTS: "13"
+  BOOTSTRAP_NODES: "enr:-Jq4QO_3szmgtG2cbEdnFDIhpGAQkc1HwfNy4-M6sG9QmQbPTmp9PMOHR3xslfR23hORiU-GpA7uM9uXw49lFcnuuvYGjWF6dGVjX25ldHdvcmsBgmlkgnY0gmlwhCIwTIOJc2VjcDI1NmsxoQKQTN17XKCwjYSSwmTc-6YzCMhd3v6Ofl8TS-WunX6LCoN0Y3CCndCDdWRwgp3Q"
+  REGISTRY_CONTRACT_ADDRESS: "0x5fbdb2315678afecb367f032d93f642f64180aa3"
+  GOVERNANCE_PROPOSER_CONTRACT_ADDRESS: "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0"
+  FEE_JUICE_CONTRACT_ADDRESS: "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512"
+  ROLLUP_CONTRACT_ADDRESS: "0x2279b7a0a67db372996a5fab50d91eaa73d2ebe6"
+  REWARD_DISTRIBUTOR_CONTRACT_ADDRESS: "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707"
+  GOVERNANCE_CONTRACT_ADDRESS: "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9"
+  COIN_ISSUER_CONTRACT_ADDRESS: "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9"
+  FEE_JUICE_PORTAL_CONTRACT_ADDRESS: "0x0165878a594ca255338adfa4d48449f69242eb8f"
+  INBOX_CONTRACT_ADDRESS: "0xed179b78d5781f93eb169730d8ad1be7313123f4"
+  OUTBOX_CONTRACT_ADDRESS: "0x1016b5aaa3270a65c315c664ecb238b6db270b64"
+
+# Secret containing the validator keys
+validatorKeysSecret: "aztec-validator-keys"
+
+env: []
+
+
+# Extra manifests
+extraObjects: []
+# - apiVersion: v1
+#   kind: Secret
+#   metadata:
+#     name: '{{ include "aztec-prover.fullname" . }}'
+#   stringData:
+#     PROVER_PUBLISHER_PRIVATE_KEY: "<PRIVATE KEY>"
+
+envFrom:
+  []
+  # - secretRef:
+  #     name: '{{ include "aztec-prover.fullname" . }}'
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+rbac:
+  create: true
+
+podAnnotations: {}
+podLabels: {}
+
+service:
+  type: NodePort
+  ports:
+    p2p: 40400
+
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe: null
+  # httpGet:
+  #   path: /status
+  #   port: p2p-tcp
+readinessProbe: null
+  # httpGet:
+  #   path: /status
+  #   port: p2p-tcp
+
+persistence:
+  enabled: false
+  size: 50Gi
+  storageClass: ""
+  mountPath: "/data"
+  accessModes:
+    - "ReadWriteOnce"
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts:
+  []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Init container settings
+initContainer:
+  image:
+    repository: bitnami/kubectl
+    tag: 1.28
+extraInitContainers: []
+
+# Default security settings for the pod
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+# Default security settings for containers
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault
+
+# Security settings for init containers
+initContainerSecurityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault

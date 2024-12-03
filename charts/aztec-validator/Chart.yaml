@@ -1,8 +1,8 @@
 apiVersion: v2
-name: aztec
-description: A Helm chart for deploying Aztec prover node
+name: aztec-validator
+description: A Helm chart for deploying an Aztec validator
 type: application
 home: https://docs.aztec.network/
-version: 0.0.3
+version: 0.0.1
 maintainers:
   - name: 0xDones
