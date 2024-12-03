@@ -53,17 +53,7 @@ config:
 # Secret containing the validator keys
 validatorKeysSecret: "aztec-validator-keys"
 
-env:
-  - name: P2P_UDP_ANNOUNCE_ADDR
-    value: $(EXTERNAL_NODE_IP):$(EXTERNAL_NODE_PORT)
-  - name: P2P_TCP_ANNOUNCE_ADDR
-    value: $(EXTERNAL_NODE_IP):$(EXTERNAL_NODE_PORT)
-  - name: VALIDATOR_PRIVATE_KEY
-    value: $(PRIVATE_KEY)
-  - name: SEQ_PUBLISHER_PRIVATE_KEY
-    value: $(PRIVATE_KEY)
-  - name: L1_PRIVATE_KEY
-    value: $(PRIVATE_KEY)
+env: []
 
 
 # Extra manifests

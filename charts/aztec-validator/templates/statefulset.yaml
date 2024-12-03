@@ -75,6 +75,7 @@ spec:
               echo "EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}";
               echo "EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}";
               echo "Arguments: {{ join " " .Values.args }}";
+              echo "P2P Data: ${P2P_TCP_ANNOUNCE_ADDR}";
               exec node --no-warnings /usr/src/yarn-project/aztec/dest/bin/index.js {{ join " " .Values.args }}
           ports:
             - name: p2p-tcp

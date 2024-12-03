@@ -21,3 +21,11 @@ echo "VALIDATOR_INDEX=${VALIDATOR_INDEX}, reading private key from /app/config/v
 PRIVATE_KEY=$(cat "/app/config/validator_keys/${VALIDATOR_INDEX}")
 echo "export PRIVATE_KEY=${PRIVATE_KEY}" >> /shared/env
 echo "Private Key exported"
+
+echo "exporting other env variables..."
+echo "export P2P_UDP_ANNOUNCE_ADDR=${EXTERNAL_NODE_IP}:${EXTERNAL_NODE_PORT}" >> /shared/env
+echo "export P2P_TCP_ANNOUNCE_ADDR=${EXTERNAL_NODE_IP}:${EXTERNAL_NODE_PORT}" >> /shared/env
+echo "export VALIDATOR_PRIVATE_KEY=${PRIVATE_KEY}" >> /shared/env
+echo "export SEQ_PUBLISHER_PRIVATE_KEY=${PRIVATE_KEY}" >> /shared/env
+echo "export L1_PRIVATE_KEY=${PRIVATE_KEY}" >> /shared/env
+echo "Init script finished"
