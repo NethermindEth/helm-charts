@@ -4,75 +4,30 @@ kind: ConfigMap
 metadata:
   name: {{ include "erpc.configName" . }}
   labels:
-    {{- include "erpc.labels" . | nindent 4 }}
+    {{ include "erpc.labels" . | nindent 4 }}
 data:
   erpc.yaml: |
     logLevel: {{ .Values.erpc.config.logLevel }}
     {{- if .Values.erpc.config.database }}
-    {{- with .Values.erpc.config.database.evmJsonRpcCache }}
-    {{- if eq .driver "redis" }}
     database:
-      evmJsonRpcCache:
-        redis:
-          addr: {{ .redis.addr }}
-          password: >-
-            {{ "${" }}ERPC_REDIS_PASSWORD{{ "}" }}
-          db: {{ .redis.db }}
-    {{- else if eq .driver "memory" }}
-    database:
-      evmJsonRpcCache:
-        maxItems: {{ .maxItems }}
-    {{- end }}
-    {{- end }}
+      {{- toYaml .Values.erpc.config.database | nindent 6 }}
     {{- end }}
     server:
-      {{- toYaml .Values.erpc.config.server | nindent 6 }}
+      listenV4: true
+      httpHostV4: "0.0.0.0"
+      listenV6: false
+      httpHostV6: "[::]"
       httpPort: {{ .Values.service.port }}
     metrics:
-      {{- toYaml .Values.erpc.config.metrics | nindent 6 }}
+      enabled: true
+      listenV4: true
+      hostV4: "0.0.0.0"
+      listenV6: false
+      hostV6: "[::]"
       port: {{ .Values.service.metricsPort }}
     projects:
-      {{- range $i, $project := .Values.erpc.config.projects }}
-      - id: {{ $project.id }}
-        {{- with $project.auth }}
-        {{- if eq .type "secret" }}
-        auth:
-          strategies:
-            - type: secret
-              secret:
-                value: >-
-                  {{ "${" }}{{ .secretKey }}{{ "}" }}
-        {{- end }}
-        {{- end }}
-        networks:
-          {{- range $j, $network := $project.networks }}
-          {{- if eq $network.type "evm" }}
-          - architecture: evm
-            evm:
-              chainId: {{ $network.chainId }}
-            {{- if $network.failsafe }}
-            failsafe:
-              {{- toYaml $network.failsafe | nindent 14 }}
-            {{- end }}
-          {{- end }}
-          {{- end }}
-        upstreams:
-          {{- range $i, $upstream := $project.upstreams }}
-          - id: {{ $upstream.id }}
-            {{- if eq $upstream.type "evm" }}
-            type: evm
-            evm:
-              chainId: {{ $upstream.chainId }}
-            {{- end }}
-            endpoint: >-
-              {{- if $upstream.endpoint.secret.enabled }}
-              {{ "${" }}{{ $upstream.endpoint.secret.variable }}{{ "}" }}
-              {{- else }}
-              {{ $upstream.endpoint.value }}
-              {{- end }}
-            {{- if $upstream.failsafe }}
-            failsafe:
-              {{- toYaml $upstream.failsafe | nindent 14 }}
-            {{- end }}
-          {{- end }}
-      {{- end }}
+      {{- toYaml .Values.erpc.config.projects | nindent 6 }}
+    {{- if .Values.erpc.config.rateLimiters }}
+    rateLimiters:
+      {{- toYaml .Values.erpc.config.rateLimiters | nindent 6 }}
+    {{- end }}
