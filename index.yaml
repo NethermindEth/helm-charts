@@ -149,6 +149,23 @@ entries:
     version: 1.0.0
   erpc:
   - apiVersion: v2
+    appVersion: 0.0.33
+    created: "2024-12-06T11:23:43.576433458Z"
+    description: A Helm chart for deploying Erpc
+    digest: 44e97ea40f7a4922893d8c07673f16d6910500cb992b714c86c8245d0de36d8c
+    home: https://docs.erpc.cloud
+    keywords:
+    - rpcs
+    - erpc
+    maintainers:
+    - name: cbermudez97
+    - name: AntiD2ta
+    name: erpc
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/erpc-1.0.8/erpc-1.0.8.tgz
+    version: 1.0.8
+  - apiVersion: v2
     appVersion: 0.0.29
     created: "2024-11-22T17:13:03.415194392Z"
     description: A Helm chart for deploying Erpc
@@ -600,4 +617,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
-generated: "2024-12-03T21:46:44.667292298Z"
+generated: "2024-12-06T11:23:43.576527355Z"
