@@ -1,7 +1,7 @@
 
 # erpc
 
-![Version: 1.0.9](https://img.shields.io/badge/Version-1.0.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.33](https://img.shields.io/badge/AppVersion-0.0.33-informational?style=flat-square)
+![Version: 1.0.10](https://img.shields.io/badge/Version-1.0.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.33](https://img.shields.io/badge/AppVersion-0.0.33-informational?style=flat-square)
 
 A Helm chart for deploying Erpc
 
@@ -69,7 +69,7 @@ A Helm chart for deploying Erpc
 | serviceMonitor.labels | object | `{}` | Additional ServiceMonitor labels |
 | serviceMonitor.namespace | string | `nil` | Alternative namespace for ServiceMonitor |
 | serviceMonitor.path | string | `"/metrics"` | Path to scrape |
-| serviceMonitor.port | int | `9000` | Port name |
+| serviceMonitor.port | int | `9000` | Port number |
 | serviceMonitor.relabelings | list | `[]` | ServiceMonitor relabelings |
 | serviceMonitor.scheme | string | `"http"` | ServiceMonitor scheme |
 | serviceMonitor.scrapeTimeout | string | `"30s"` | ServiceMonitor scrape timeout |
