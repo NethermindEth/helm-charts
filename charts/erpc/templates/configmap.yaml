@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "erpc.configName" . }}
   labels:
-    {{ include "erpc.labels" . | nindent 4 }}
+    {{- include "erpc.labels" . | nindent 4 }}
 data:
   erpc.yaml: |
     logLevel: {{ .Values.erpc.config.logLevel }}
@@ -24,7 +24,7 @@ data:
       hostV4: "0.0.0.0"
       listenV6: false
       hostV6: "[::]"
-      port: {{ .Values.service.metricsPort }}
+      port: {{ .Values.serviceMonitor.port }}
     projects:
       {{- toYaml .Values.erpc.config.projects | nindent 6 }}
     {{- if .Values.erpc.config.rateLimiters }}

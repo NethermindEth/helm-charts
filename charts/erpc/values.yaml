@@ -74,7 +74,30 @@ securityContext:
 service:
   type: ClusterIP
   port: 8080
-  metricsPort: 9000
+
+serviceMonitor:
+  # -- If true, a ServiceMonitor CRD is created for a prometheus operator. https://github.com/coreos/prometheus-operator
+  enabled: false
+  # -- Port name
+  port: 9000
+  # -- Path to scrape
+  path: /metrics
+  # -- Alternative namespace for ServiceMonitor
+  namespace: null
+  # -- Additional ServiceMonitor labels
+  labels: {}
+  # -- Additional ServiceMonitor annotations
+  annotations: {}
+  # -- ServiceMonitor scrape interval
+  interval: 1m
+  # -- ServiceMonitor scheme
+  scheme: http
+  # -- ServiceMonitor TLS configuration
+  tlsConfig: {}
+  # -- ServiceMonitor scrape timeout
+  scrapeTimeout: 30s
+  # -- ServiceMonitor relabelings
+  relabelings: []
 
 # -- Ingress for the erpc rpc endpoint.
 ingress:
