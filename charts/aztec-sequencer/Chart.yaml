@@ -1,8 +1,8 @@
 apiVersion: v2
-name: aztec-validator
-description: A Helm chart for deploying an Aztec validator
+name: aztec-sequencer
+description: A Helm chart for deploying an Aztec sequencer
 type: application
 home: https://docs.aztec.network/
-version: 0.0.2
+version: 0.0.1
 maintainers:
   - name: 0xDones
