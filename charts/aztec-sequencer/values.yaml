@@ -1,5 +1,5 @@
 ####################################
-# Aztec prover node values
+# Aztec Network
 ####################################
 
 replicaCount: 1
@@ -89,6 +89,7 @@ podLabels: {}
 
 service:
   type: NodePort
+  internalServiceType: ClusterIP
   ports:
     p2p: 40400
     http: 8080

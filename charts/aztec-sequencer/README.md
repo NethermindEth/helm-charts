@@ -1,8 +1,8 @@
-# aztec-validator
+# aztec-sequencer
 
-![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-A Helm chart for deploying an Aztec validator
+A Helm chart for deploying an Aztec sequencer
 
 **Homepage:** <https://docs.aztec.network/>
 
@@ -10,7 +10,7 @@ A Helm chart for deploying an Aztec validator
 
 ```bash
 helm repo add nethermind https://nethermindeth.github.io/helm-charts
-helm install aztec-validator nethermind/aztec-validator
+helm install aztec-sequencer nethermind/aztec-sequencer
 ```
 
 ## Maintainers
@@ -107,6 +107,7 @@ helm install aztec-validator nethermind/aztec-validator
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
 | securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| service.internalServiceType | string | `"ClusterIP"` |  |
 | service.ports.http | int | `8080` |  |
 | service.ports.p2p | int | `40400` |  |
 | service.type | string | `"NodePort"` |  |

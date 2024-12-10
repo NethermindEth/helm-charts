@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "aztec-validator.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.internalServiceType }}
   ports:
     - port: {{ .Values.service.ports.http }}
       targetPort: http
