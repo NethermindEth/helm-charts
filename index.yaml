@@ -85,6 +85,19 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/aztec-prover-0.1.1/aztec-prover-0.1.1.tgz
     version: 0.1.1
+  aztec-sequencer:
+  - apiVersion: v2
+    created: "2024-12-10T16:18:50.899323699Z"
+    description: A Helm chart for deploying an Aztec sequencer
+    digest: f151a1cf67d061773fcc340d9438452db2e9d6098252f506d8ad70c6b65383fe
+    home: https://docs.aztec.network/
+    maintainers:
+    - name: 0xDones
+    name: aztec-sequencer
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/aztec-sequencer-0.0.1/aztec-sequencer-0.0.1.tgz
+    version: 0.0.1
   aztec-validator:
   - apiVersion: v2
     created: "2024-12-03T21:46:44.667225403Z"
@@ -651,4 +664,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
-generated: "2024-12-10T14:38:25.37648956Z"
+generated: "2024-12-10T16:18:50.899414629Z"
