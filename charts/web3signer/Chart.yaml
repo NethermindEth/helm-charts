@@ -12,6 +12,10 @@ keywords:
   - slashing
   - database
 
+maintainers:
+  - name: aivarasko
+  - name: matilote
+
 dependencies:
   - name: common
     repository: file://../common

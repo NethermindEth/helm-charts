@@ -5,6 +5,13 @@
 
 A Helm chart for Web3Signer
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| aivarasko |  |  |
+| matilote |  |  |
+
 ## Requirements
 
 | Repository | Name | Version |
