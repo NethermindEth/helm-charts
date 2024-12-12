@@ -1,0 +1,15 @@
+scan:
+  skip-dirs:
+    - "charts/*/charts"
+    - "charts/*/templates/tests"
+
+misconfigurations:
+  - id: AVD-KSV-0109
+    paths:
+      - "**/templates/configmap.yaml"
+    statement: "ConfigMap uses environment variable substitution for secrets, not actual values"
+
+  - id: KSV014
+    paths:
+      - "web3signer/templates/statefulset.yaml"
+    statement: "Container requires write access to filesystem for web3signer"
