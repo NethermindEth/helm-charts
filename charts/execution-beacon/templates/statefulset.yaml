@@ -95,7 +95,11 @@ spec:
             - sh
             - -ac
             - >
+              {{- if eq .Values.global.network "gnosis" }}
+              exec /home/user/nimbus_beacon_node
+              {{- else }}
               exec /home/user/nimbus-eth2/build/nimbus_beacon_node
+              {{- end }}
               trustedNodeSync
               --backfill=false
               --network={{ .Values.global.network }}
@@ -557,7 +561,11 @@ spec:
               {{- if .Values.global.p2pNodePort.enabled }}
               . /env/init-nodeport;
               {{- end }}
+              {{- if eq .Values.global.network "gnosis" }}
+              exec /home/user/nimbus_beacon_node
+              {{- else }}
               exec /home/user/nimbus-eth2/build/nimbus_beacon_node
+              {{- end }}
               --network={{ .Values.global.network }}
               --data-dir=/data/beacon
             {{- if .Values.global.externalSecrets.enabled }}
