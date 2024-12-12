@@ -63,14 +63,16 @@ jobs:
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '0'
-          trivyignores: '.trivyignore'
+          trivyignores: '.trivyignore.yaml'
           scanners: 'misconfig,secret'
           skip-setup-trivy: true
+          severity: 'CRITICAL,HIGH,MEDIUM,LOW'
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
           TRIVY_DB_REPOSITORY: mirror.gcr.io/aquasec/trivy-db:2
           TRIVY_CHECKS_BUNDLE_REPOSITORY: nethermind.jfrog.io/angkor-oci-local-staging/trivy-checks:latest
+          TRIVY_DEBUG: true
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@5618c9fc1e675841ca52c1c6b1304f5255a905a0 #v2.19.0
@@ -88,7 +90,7 @@ jobs:
           exit-code: '1'
           scanners: 'misconfig,secret'
           timeout: '10m'
-          trivyignores: '.trivyignore'
+          trivyignores: '.trivyignore.yaml'
           limit-severities-for-sarif: true
           skip-setup-trivy: true
         env:
@@ -96,3 +98,4 @@ jobs:
           TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
           TRIVY_DB_REPOSITORY: mirror.gcr.io/aquasec/trivy-db:2
           TRIVY_CHECKS_BUNDLE_REPOSITORY: nethermind.jfrog.io/angkor-oci-local-staging/trivy-checks:latest
+          TRIVY_DEBUG: true
