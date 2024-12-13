@@ -51,13 +51,6 @@ cliImage:
 
 enableReloader: false
 
-externalSecrets:
-  enabled: true
-  secretStoreRef:
-    name: secretStoreName
-    kind: secretStoreKind
-  data: []
-
 ## Flyawy image is used to apply database migrations
 ##
 flywayImage:
