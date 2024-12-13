@@ -27,6 +27,8 @@ A Helm chart for Web3Signer
 | cliImage.repository | string | `"nethermindeth/keystores-cli"` |  |
 | cliImage.tag | string | `"v1.0.11"` |  |
 | enableReloader | bool | `false` |  |
+| env | list | `[]` |  |
+| envFrom | list | `[]` | envFrom configuration |
 | externalSecrets.data | list | `[]` |  |
 | externalSecrets.enabled | bool | `true` |  |
 | externalSecrets.secretStoreRef.kind | string | `"secretStoreKind"` |  |
@@ -63,11 +65,6 @@ A Helm chart for Web3Signer
 | pruningInterval | int | `24` |  |
 | replicaCount | int | `3` |  |
 | resources | object | `{}` |  |
-| secrets.dbKeystoreUrl | string | `""` |  |
-| secrets.dbPassword | string | `""` |  |
-| secrets.dbUrl | string | `""` |  |
-| secrets.dbUsername | string | `""` |  |
-| secrets.decryptionKey | string | `""` |  |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |

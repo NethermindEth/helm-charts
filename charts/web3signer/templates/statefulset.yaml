@@ -50,14 +50,6 @@ spec:
             - >
               mkdir -p /data/web3signer /data/keystore;
               chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/web3signer
-          envFrom:
-            {{- if .Values.externalSecrets.enabled }}
-            - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
-            {{- else }}
-            - secretRef:
-                name: {{ include "common.names.fullname" . }}
-            {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -71,14 +63,8 @@ spec:
             - -password=$(ESO_DB_PASSWORD)
             - -url=$(ESO_DB_URL)
             - migrate
-          envFrom:
-            {{- if .Values.externalSecrets.enabled }}
-            - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
-            {{- else }}
-            - secretRef:
-                name: {{ include "common.names.fullname" . }}
-            {{- end }}
+          envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
+          env: {{- toYaml .Values.env | nindent 12 }}
           volumeMounts:
             - name: migrations
               mountPath: /flyway/sql
@@ -87,14 +73,8 @@ spec:
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
             {{- toYaml .Values.global.securityContext | nindent 12 }}
-          envFrom:
-            {{- if .Values.externalSecrets.enabled }}
-            - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
-            {{- else }}
-            - secretRef:
-                name: {{ include "common.names.fullname" . }}
-            {{- end }}
+          envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
+          env: {{- toYaml .Values.env | nindent 12 }}
           args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY"]
           volumeMounts:
             - name: data
@@ -121,14 +101,8 @@ spec:
           env:
             - name: JAVA_OPTS
               value: {{ .Values.web3signerJavaOpts | quote }}
-          envFrom:
-            {{- if .Values.externalSecrets.enabled }}
-            - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
-            {{- else }}
-            - secretRef:
-                name: {{ include "common.names.fullname" . }}
-            {{- end }}
+          envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
+          env: {{- toYaml .Values.env | nindent 12 }}
           ports:
             - name: http
               containerPort: {{ .Values.httpPort }}
@@ -167,14 +141,8 @@ spec:
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
             {{- toYaml .Values.global.securityContext | nindent 12 }}
-          envFrom:
-            {{- if .Values.externalSecrets.enabled }}
-            - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
-            {{- else }}
-            - secretRef:
-                name: {{ include "common.names.fullname" . }}
-            {{- end }}
+          envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
+          env: {{- toYaml .Values.env | nindent 12 }}
           args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY", "--refresh-frequency", "60"]
           volumeMounts:
             - name: data
