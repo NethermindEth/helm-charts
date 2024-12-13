@@ -1,7 +1,7 @@
 
 # web3signer
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.12.0](https://img.shields.io/badge/AppVersion-24.12.0-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.12.0](https://img.shields.io/badge/AppVersion-24.12.0-informational?style=flat-square)
 
 A Helm chart for Web3Signer
 
@@ -27,6 +27,8 @@ A Helm chart for Web3Signer
 | cliImage.repository | string | `"nethermindeth/keystores-cli"` |  |
 | cliImage.tag | string | `"v1.0.11"` |  |
 | enableReloader | bool | `false` |  |
+| env | list | `[]` |  |
+| envFrom | list | `[]` | envFrom configuration |
 | externalSecrets.data | list | `[]` |  |
 | externalSecrets.enabled | bool | `true` |  |
 | externalSecrets.secretStoreRef.kind | string | `"secretStoreKind"` |  |
@@ -63,11 +65,6 @@ A Helm chart for Web3Signer
 | pruningInterval | int | `24` |  |
 | replicaCount | int | `3` |  |
 | resources | object | `{}` |  |
-| secrets.dbKeystoreUrl | string | `""` |  |
-| secrets.dbPassword | string | `""` |  |
-| secrets.dbUrl | string | `""` |  |
-| secrets.dbUsername | string | `""` |  |
-| secrets.decryptionKey | string | `""` |  |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |

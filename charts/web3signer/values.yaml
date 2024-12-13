@@ -159,6 +159,24 @@ tolerations: {}
 ##
 affinity: {}
 
+# This is for setting container environment variables
+env: []
+  # - name: MY_ENV_VAR
+  #   value: my-env-var-value
+  # - name: SECRET
+  #   valueFrom:
+  #     secretKeyRef:
+  #       key: SECRET
+  #       name: secret-name
+
+# -- envFrom configuration
+envFrom:
+  []
+  # - secretRef:
+  #     name: '{{ include "common.names.fullname" . }}'
+  # - configMapRef:
+  #     name: '{{ include "common.names.fullname" . }}'
+
 ## Prometheus Service Monitor
 ## ref: https://github.com/coreos/prometheus-operator
 ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
@@ -188,10 +206,3 @@ serviceMonitor:
   ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
   ##
   additionalLabels: {}
-
-secrets:
-  decryptionKey: ""
-  dbKeystoreUrl: ""
-  dbUrl: ""
-  dbUsername: ""
-  dbPassword: ""
