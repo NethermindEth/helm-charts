@@ -59,9 +59,9 @@ spec:
           securityContext:
             {{- toYaml .Values.global.securityContext | nindent 12 }}
           args:
-            - -user=$(ESO_DB_USERNAME)
-            - -password=$(ESO_DB_PASSWORD)
-            - -url=$(ESO_DB_URL)
+            - -user=$(DB_USERNAME)
+            - -password=$(DB_PASSWORD)
+            - -url=$(DB_URL)
             - migrate
           envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
           env: {{- toYaml .Values.env | nindent 12 }}
@@ -75,7 +75,7 @@ spec:
             {{- toYaml .Values.global.securityContext | nindent 12 }}
           envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
           env: {{- toYaml .Values.env | nindent 12 }}
-          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY"]
+          args: ["sync-web3signer-keys", "--db-url", $(DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "DECRYPTION_KEY"]
           volumeMounts:
             - name: data
               mountPath: /data
@@ -95,9 +95,9 @@ spec:
             - --logging={{ .Values.loggingLevel }}
             - --idle-connection-timeout-seconds={{ .Values.idleTimeout }}
             - eth2
-            - --slashing-protection-db-url=$(ESO_DB_URL)
-            - --slashing-protection-db-username=$(ESO_DB_USERNAME)
-            - --slashing-protection-db-password=$(ESO_DB_PASSWORD)
+            - --slashing-protection-db-url=$(DB_URL)
+            - --slashing-protection-db-username=$(DB_USERNAME)
+            - --slashing-protection-db-password=$(DB_PASSWORD)
           env:
             - name: JAVA_OPTS
               value: {{ .Values.web3signerJavaOpts | quote }}
@@ -143,7 +143,7 @@ spec:
             {{- toYaml .Values.global.securityContext | nindent 12 }}
           envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
           env: {{- toYaml .Values.env | nindent 12 }}
-          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY", "--refresh-frequency", "60"]
+          args: ["sync-web3signer-keys", "--db-url", $(DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "DECRYPTION_KEY", "--refresh-frequency", "60"]
           volumeMounts:
             - name: data
               mountPath: /data
