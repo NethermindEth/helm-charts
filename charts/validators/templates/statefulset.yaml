@@ -101,8 +101,8 @@ spec:
             - "--no-proposal-builder-enabled"
             {{- end }}
         - name: prepare
-          image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
-          imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
+          image: "{{ $root.Values.initImage.repository }}:{{ $root.Values.initImage.tag }}"
+          imagePullPolicy: {{ $root.Values.initImage.pullPolicy }}
           securityContext:
             {{- toYaml $root.Values.global.securityContext | nindent 12 }}
           volumeMounts:
