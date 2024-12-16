@@ -48,7 +48,6 @@ A Helm chart for installing validators with the web3signer.
 | flags.teku[2] | string | `"--data-base-path=/data"` |  |
 | fullnameOverride | string | `""` |  |
 | global.imagePullSecrets | list | `[]` |  |
-| global.label | string | `""` |  |
 | global.network | string | `"mainnet"` |  |
 | graffiti | string | `""` |  |
 | image.lighthouse.repository | string | `"sigp/lighthouse"` |  |
