@@ -246,11 +246,11 @@ config:
 
 # -- Kubernetes secrets names
 secrets:
-  enabled: true
+  enabled: false
   # -- validators keys
   validatorKeys: "validator-keys"
   # -- charon enr private key
-  enrPrivateKey: "charon-enr-private-key"
+  enrPrivateKey: ""
   # -- charon cluster lock
   clusterlock: ""
 
