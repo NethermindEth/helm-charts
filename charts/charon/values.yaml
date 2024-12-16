@@ -306,6 +306,7 @@ livenessProbe:
   httpGet:
     path: /livez
     port: monitoring
+
 # -- Configure readiness probes
 readinessProbe:
   initialDelaySeconds: 10
