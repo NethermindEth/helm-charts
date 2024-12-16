@@ -301,7 +301,6 @@ serviceMonitor:
 
 # -- Configure liveness probes
 livenessProbe:
-  enabled: true
   initialDelaySeconds: 60
   periodSeconds: 120
   httpGet:
@@ -309,7 +308,6 @@ livenessProbe:
     port: monitoring
 # -- Configure readiness probes
 readinessProbe:
-  enabled: true
   initialDelaySeconds: 10
   periodSeconds: 10
   httpGet:
