@@ -1,7 +1,7 @@
 
 # web3signer
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.12.0](https://img.shields.io/badge/AppVersion-24.12.0-informational?style=flat-square)
+![Version: 1.0.3](https://img.shields.io/badge/Version-1.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.12.0](https://img.shields.io/badge/AppVersion-24.12.0-informational?style=flat-square)
 
 A Helm chart for Web3Signer
 
@@ -29,10 +29,6 @@ A Helm chart for Web3Signer
 | enableReloader | bool | `false` |  |
 | env | list | `[]` |  |
 | envFrom | list | `[]` | envFrom configuration |
-| externalSecrets.data | list | `[]` |  |
-| externalSecrets.enabled | bool | `true` |  |
-| externalSecrets.secretStoreRef.kind | string | `"secretStoreKind"` |  |
-| externalSecrets.secretStoreRef.name | string | `"secretStoreName"` |  |
 | flywayImage.pullPolicy | string | `"IfNotPresent"` |  |
 | flywayImage.repository | string | `"flyway/flyway"` |  |
 | flywayImage.tag | string | `"11.1.0"` |  |
