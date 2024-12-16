@@ -1,8 +1,9 @@
 
+
 Charon
 ===========
 
-![Version: 0.3.5](https://img.shields.io/badge/Version-0.3.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
+![Version: 0.3.6](https://img.shields.io/badge/Version-0.3.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
 
 Charon is an open-source Ethereum Distributed validator middleware written in golang.
 
@@ -19,7 +20,7 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | affinity | object | `{}` | Affinity for pod assignment # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity # # Example: # affinity: #   podAntiAffinity: #     requiredDuringSchedulingIgnoredDuringExecution: #     - labelSelector: #         matchExpressions: #         - key: app.kubernetes.io/name #           operator: In #           values: #           - charon #       topologyKey: kubernetes.io/hostname # |
 | centralMonitoring | object | `{"enabled":false,"promEndpoint":"https://vm.monitoring.gcp.obol.tech/write","token":""}` | Central Monitoring |
 | centralMonitoring.enabled | bool | `false` | Specifies whether central monitoring should be enabled |
-| centralMonitoring.promEndpoint | string | `"https://vm.monitoring.gcp.obol.tech/write"` | https endpoint to obol central prometheus  |
+| centralMonitoring.promEndpoint | string | `"https://vm.monitoring.gcp.obol.tech/write"` | https endpoint to obol central prometheus |
 | centralMonitoring.token | string | `""` | The authentication token to the central prometheus |
 | config.LockFile | string | `"/charon/cluster-lock/cluster-lock.json"` | The path to the cluster lock file defining distributed validator cluster. (default ".charon/cluster-lock.json") |
 | config.beaconNodeEndpoints | string | `""` | Comma separated list of one or more beacon node endpoint URLs. |
@@ -39,7 +40,6 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | config.p2pDenylist | string | `""` | Comma-separated list of CIDR subnets for disallowing certain peer connections. Example: 192.168.0.0/16 would disallow connections to peers on your local network. The default is to accept all connections. |
 | config.p2pDisableReuseport | string | `""` | Disables TCP port reuse for outgoing libp2p connections. |
 | config.p2pExternalHostname | string | `""` | The DNS hostname advertised by libp2p. This may be used to advertise an external DNS. |
-| config.p2pExternalIp | string | `""` | The IP address advertised by libp2p. This may be used to advertise an external IP. |
 | config.p2pRelays | string | `"https://0.relay.obol.tech/enr"` | Comma-separated list of libp2p relay URLs or multiaddrs. (default [https://0.relay.obol.tech/enr]) |
 | config.p2pTcpAddress | string | `"0.0.0.0"` | Comma-separated list of listening TCP addresses (ip and port) for libP2P traffic. Empty default doesn't bind to local port therefore only supports outgoing connections. |
 | config.privateKeyFile | string | `"/charon/charon-enr-private-key/charon-enr-private-key"` | The path to the charon enr private key file. (default ".charon/charon-enr-private-key") |
@@ -56,15 +56,21 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | extraVolumes | list | `[]` | Additional volumes |
 | fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources |
 | httpPort | int | `3600` | HTTP Port |
-| image | object | `{"pullPolicy":"IfNotPresent","repository":"obolnetwork/charon","tag":"v1.1.1"}` | Charon image ropsitory, pull policy, and tag version |
+| image | object | `{"pullPolicy":"IfNotPresent","repository":"obolnetwork/charon","tag":"v1.2.0"}` | Charon image ropsitory, pull policy, and tag version |
 | imagePullSecrets | list | `[]` | Credentials to fetch images from private registry # ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/ |
 | initContainers | list | `[]` | Additional init containers |
+| initImage.pullPolicy | string | `"IfNotPresent"` |  |
+| initImage.repository | string | `"bitnami/kubectl"` |  |
+| initImage.tag | string | `"1.30.3"` |  |
 | jaegerPort | int | `6831` | Jaeger Port |
-| livenessProbe | object | `{"httpGet":{"path":"/livez","port":"monitoring"},"initialDelaySeconds":60,"periodSeconds":120}` | Configure liveness probes |
+| livenessProbe | object | `{"enabled":true,"httpGet":{"path":"/livez","port":"monitoring"},"initialDelaySeconds":60,"periodSeconds":120}` | Configure liveness probes |
 | monitoringPort | int | `3620` | Monitoring Port |
 | nameOverride | string | `""` | Provide a name in place of lighthouse for `app:` labels |
 | nodeSelector | object | `{}` | Node labels for pod assignment # ref: https://kubernetes.io/docs/user-guide/node-selection/ |
-| p2pPort | int | `3610` | Engine Port (Auth Port) |
+| p2pPort.annotations | object | `{}` |  |
+| p2pPort.nodePort | int | `32000` |  |
+| p2pPort.port | int | `3610` |  |
+| p2pPort.type | string | `"NodePort"` |  |
 | podAnnotations | object | `{}` | Pod annotations |
 | podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":1}` | Enable and configure pod disruption budget # ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb |
 | priorityClassName | string | `""` | Used to assign priority to pods # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/ |
@@ -75,9 +81,9 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | rbac.name | string | `""` | The name of the cluster role to use. If not set and create is true, a name is generated using the fullname template |
 | rbac.rules | list | `[{"apiGroups":[""],"resources":["services"],"verbs":["get","list","watch"]}]` | Required Role rules |
 | rbac.rules[0] | object | `{"apiGroups":[""],"resources":["services"],"verbs":["get","list","watch"]}` | Required to get information about the serices nodePort. |
-| readinessProbe | object | `{"httpGet":{"path":"/readyz","port":"monitoring"},"initialDelaySeconds":10,"periodSeconds":10}` | Configure readiness probes |
+| readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":"monitoring"},"initialDelaySeconds":10,"periodSeconds":10}` | Configure readiness probes |
 | resources | object | `{}` | Pod resources limits and requests |
-| secrets | object | `{"clusterlock":"cluster-lock","enrPrivateKey":"charon-enr-private-key","validatorKeys":"validator-keys"}` | Kubernetes secrets names |
+| secrets | object | `{"clusterlock":"cluster-lock","enabled":true,"enrPrivateKey":"charon-enr-private-key","validatorKeys":"validator-keys"}` | Kubernetes secrets names |
 | secrets.clusterlock | string | `"cluster-lock"` | charon cluster lock |
 | secrets.enrPrivateKey | string | `"charon-enr-private-key"` | charon enr private key |
 | secrets.validatorKeys | string | `"validator-keys"` | validators keys |
