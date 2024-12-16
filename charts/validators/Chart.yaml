@@ -30,3 +30,8 @@ keywords:
   - prysm
   - teku
   - validators
+
+maintainers:
+  - name: aivarasko
+  - name: matilote
+  
