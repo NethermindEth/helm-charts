@@ -138,10 +138,14 @@ spec:
           {{- if .Values.extraVolumeMounts -}}
             {{ toYaml .Values.extraVolumeMounts | nindent 12 }}
           {{- end }}
+          {{- if .Values.secrets.enrPrivateKey }}
             - mountPath: /charon/charon-enr-private-key
               name: charon-enr-private-key
+          {{- end }}
+          {{- if .Values.secrets.clusterlock }}
             - mountPath: /charon/cluster-lock
               name: cluster-lock
+          {{- end }}
       {{- if .Values.extraContainers }}
         {{ tpl (toYaml .Values.extraContainers | nindent 8) $ }}
       {{- end }}
