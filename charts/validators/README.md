@@ -5,6 +5,13 @@
 
 A Helm chart for installing validators with the web3signer.
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| aivarasko |  |  |
+| matilote |  |  |
+
 ## Values
 
 | Key | Type | Default | Description |
