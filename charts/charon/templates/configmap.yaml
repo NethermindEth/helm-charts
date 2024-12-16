@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "release.name" . }}
+  labels:
+  {{- include "charon.labels" . | nindent 4 }}
+data:
+  CHARON_BEACON_NODE_ENDPOINTS: {{ .Values.config.beaconNodeEndpoints | quote }}
+  {{- if .Values.config.builderApi }}
+  CHARON_BUILDER_API: {{ .Values.config.builderApi  | quote }}
+  {{- end }}
+  {{- if .Values.config.featureSet }}
+  CHARON_FEATURE_SET: {{ .Values.config.featureSet }}
+  {{- end }}
+  {{- if .Values.config.featureSetDisable }}
+  CHARON_FEATURE_SET_DISABLE: {{ .Values.config.featureSetDisable }}
+  {{- end }}
+  {{- if .Values.config.featureSetEnable }}
+  CHARON_FEATURE_SET_ENABLE: {{ .Values.config.featureSetEnable }}
+  {{- end }}
+  {{- if .Values.config.jaegerAddress }}
+  CHARON_JAEGER_ADDRESS: {{ .Values.config.jaegerAddress }}
+  {{- end }}
+  {{- if .Values.config.jaegerService }}
+  CHARON_JAEGER_SERVICE: {{ .Values.config.jaegerService }}
+  {{- end }}
+  {{- if .Values.config.LockFile }}
+  CHARON_LOCK_FILE: {{ .Values.config.LockFile | quote }}
+  {{- end }}
+  {{- if .Values.config.logFormat }}
+  CHARON_LOG_FORMAT: {{ .Values.config.logFormat }}
+  {{- end }}
+  {{- if .Values.config.logLevel }}
+  CHARON_LOG_LEVEL: {{ .Values.config.logLevel }}
+  {{- end }}
+  {{- if .Values.config.lokiAddresses }}
+  CHARON_LOKI_ADDRESSES: {{ .Values.config.lokiAddresses | quote }}
+  {{- end }}
+  {{- if .Values.config.lokiService }}
+  CHARON_LOKI_SERVICE: {{ .Values.config.lokiService }}
+  {{- end }}
+  {{- if .Values.config.monitoringAddress }}
+  CHARON_MONITORING_ADDRESS: {{ .Values.config.monitoringAddress }}:{{ .Values.monitoringPort }}
+  {{- end }}
+  {{- if .Values.config.noVerify }}
+  CHARON_NO_VERIFY: {{ .Values.config.noVerify | quote }}
+  {{- end }}
+  {{- if .Values.config.p2pAllowlist }}
+  CHARON_P2P_ALLOWLIST: {{ .Values.config.p2pAllowlist | quote }}
+  {{- end }}
+  {{- if .Values.config.p2pDenylist }}
+  CHARON_P2P_DENYLIST: {{ .Values.config.p2pDenylist | quote }}
+  {{- end }}
+  {{- if .Values.config.p2pDisableReuseport }}
+  CHARON_P2P_DISABLE_REUSEPORT: {{ .Values.config.p2pDisableReuseport | quote }}
+  {{- end }}
+  CHARON_P2P_EXTERNAL_HOSTNAME: {{ .Values.config.p2pExternalHostname | quote }}
+  {{- if .Values.config.p2pExternalIp }}
+  CHARON_P2P_EXTERNAL_IP: {{ .Values.config.p2pExternalIp | quote }}
+  {{- end }}
+  {{- if .Values.config.p2pRelays }}
+  CHARON_P2P_RELAYS: {{ .Values.config.p2pRelays | quote }}
+  {{- end }}
+  {{- if .Values.config.privateKeyFile }}
+  CHARON_PRIVATE_KEY_FILE: {{ .Values.config.privateKeyFile | quote }}
+  {{- end }}
+  {{- if .Values.config.simnetBeaconMock }}
+  CHARON_SIMNET_BEACON_MOCK: {{ .Values.config.simnetBeaconMock }}
+  {{- end }}
+  {{- if .Values.config.simnetValidatorKeysDir }}
+  CHARON_SIMNET_VALIDATOR_KEYS_DIR: {{ .Values.config.simnetValidatorKeysDir }}
+  {{- end }}
+  {{- if .Values.config.simnetValidatorMock }}
+  CHARON_SIMNET_VALIDATOR_MOCK: {{ .Values.config.simnetValidatorMock }}
+  {{- end }}
+  {{- if .Values.config.syntheticBlockProposals }}
+  CHARON_SYNTHETIC_BLOCK_PROPOSALS: {{ .Values.config.syntheticBlockProposals }}
+  {{- end }}
+  {{- if .Values.config.validatorApiAddress }}
+  CHARON_VALIDATOR_API_ADDRESS: {{ .Values.config.validatorApiAddress }}:{{ .Values.httpPort }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "release.name" . }}-init
+  labels:
+  {{- include "charon.labels" . | nindent 4 }}
+data:
+  init.sh: |
+    #!/bin/sh
+    echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+  {{- if eq .Values.p2pPort.type "LoadBalancer" }}
+      until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer to get an IP" && sleep 10; done;
+      export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}');
+  {{- else if eq .Values.p2pPort.type "NodePort" }}
+      export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
+  {{- end }}
+      echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
+      cat /env/init-nodeport;

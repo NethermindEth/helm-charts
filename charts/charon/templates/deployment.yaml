@@ -1,0 +1,177 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "release.name" . }}
+  labels:
+    {{- include "charon.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "charon.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "charon.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with concat .Values.imagePullSecrets }}
+        imagePullSecrets:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if or .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ include "charon.serviceAccountName" . }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+      {{- if .Values.initContainers }}
+        {{- tpl (toYaml .Values.initContainers | nindent 8) $ }}
+      {{- end }}
+        - name: init
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command: ['/bin/sh', '/scripts/init.sh']
+          volumeMounts:
+            - name: env-nodeport
+              mountPath: /env
+            - name: scripts-init
+              mountPath: /scripts
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              {{- if ne .Values.p2pPort.type "ClusterIP" }}
+              . /env/init-nodeport
+              {{- end }}
+              exec charon run \
+              {{- if eq .Values.p2pPort.type "ClusterIP" }}
+              --p2p-tcp-address={{ .Values.config.p2pTcpAddress }}:{{ .Values.p2pPort.port }}
+              {{- else }}
+              --p2p-tcp-address={{ .Values.config.p2pTcpAddress }}:{{ .Values.p2pPort.nodePort }} \
+              --p2p-external-ip=$EXTERNAL_IP
+              {{- end }}
+          env:
+          - name: KUBERNETES_CLUSTER_DOMAIN
+            value: {{ .Values.kubernetesClusterDomain }}
+        {{- if .Values.extraEnv }}
+          {{- toYaml .Values.extraEnv | nindent 10 }}
+        {{- end }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "release.name" . }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.httpPort }}
+              name: validator-api
+              protocol: TCP
+            - containerPort: {{ .Values.p2pPort.port }}
+              name: p2p-tcp
+              protocol: TCP
+            - containerPort: {{ .Values.p2pPort.port }}
+              name: p2p-udp
+              protocol: UDP
+            - containerPort: {{ .Values.monitoringPort }}
+              name: monitoring
+              protocol: TCP
+          {{- if .Values.extraPorts -}}
+            {{ toYaml .Values.extraPorts | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: env-nodeport
+              mountPath: /env
+          {{- if .Values.extraVolumeMounts -}}
+            {{ toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- end }}
+            - mountPath: /charon/charon-enr-private-key
+              name: charon-enr-private-key
+            - mountPath: /charon/cluster-lock
+              name: cluster-lock
+      {{- if .Values.extraContainers }}
+        {{ tpl (toYaml .Values.extraContainers | nindent 8) $ }}
+      {{- end }}
+      volumes:
+      {{- if .Values.extraVolumes -}}
+        {{ toYaml .Values.extraVolumes | nindent 8 }}
+      {{- end }}
+        - name: env-nodeport
+          emptyDir: {}
+        - name: scripts-init
+          configMap:
+            name: {{ include "release.name" . }}-init
+      {{- if .Values.secrets.enabled }}
+        - name: charon-enr-private-key
+          projected:
+            sources:
+            - secret:
+                name: {{ .Values.secrets.enrPrivateKey }}
+        - name: cluster-lock
+          projected:
+            sources:
+            - secret:
+                name: {{ .Values.secrets.clusterlock }}
+      {{- else }}
+        - name: cluster-lock
+          emptyDir: {}
+        - name: charon-enr-private-key
+          emptyDir: {}
+      {{- end }}
