@@ -78,7 +78,8 @@ spec:
             {{- with $root.Values.env }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
+          envFrom:
+            {{- toYaml $root.Values.envFrom | nindent 12 }}
           args:
             - "sync-validator-keys"
             - "--db-url"
