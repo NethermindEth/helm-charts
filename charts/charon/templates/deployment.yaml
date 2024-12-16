@@ -154,20 +154,21 @@ spec:
         - name: scripts-init
           configMap:
             name: {{ include "release.name" . }}-init
-      {{- if .Values.secrets.enabled }}
         - name: charon-enr-private-key
+          {{- if .Values.secrets.enrPrivateKey }}
           projected:
             sources:
             - secret:
                 name: {{ .Values.secrets.enrPrivateKey }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
         - name: cluster-lock
+          {{- if .Values.secrets.clusterlock }}
           projected:
             sources:
             - secret:
                 name: {{ .Values.secrets.clusterlock }}
-      {{- else }}
-        - name: cluster-lock
+          {{- else }}
           emptyDir: {}
-        - name: charon-enr-private-key
-          emptyDir: {}
-      {{- end }}
+          {{- end }}

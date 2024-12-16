@@ -252,7 +252,7 @@ secrets:
   # -- charon enr private key
   enrPrivateKey: "charon-enr-private-key"
   # -- charon cluster lock
-  clusterlock: "cluster-lock"
+  clusterlock: ""
 
 # -- Additional init containers
 initContainers: []
