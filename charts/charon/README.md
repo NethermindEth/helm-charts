@@ -3,7 +3,7 @@
 Charon
 ===========
 
-![Version: 0.3.8](https://img.shields.io/badge/Version-0.3.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
+![Version: 0.3.11](https://img.shields.io/badge/Version-0.3.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
 
 Charon is an open-source Ethereum Distributed validator middleware written in golang.
 
@@ -83,9 +83,9 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | rbac.rules[0] | object | `{"apiGroups":[""],"resources":["services"],"verbs":["get","list","watch"]}` | Required to get information about the serices nodePort. |
 | readinessProbe | object | `{"httpGet":{"path":"/readyz","port":"monitoring"},"initialDelaySeconds":10,"periodSeconds":10}` | Configure readiness probes |
 | resources | object | `{}` | Pod resources limits and requests |
-| secrets | object | `{"clusterlock":"cluster-lock","enabled":true,"enrPrivateKey":"charon-enr-private-key","validatorKeys":"validator-keys"}` | Kubernetes secrets names |
-| secrets.clusterlock | string | `"cluster-lock"` | charon cluster lock |
-| secrets.enrPrivateKey | string | `"charon-enr-private-key"` | charon enr private key |
+| secrets | object | `{"clusterlock":"","enabled":false,"enrPrivateKey":"","validatorKeys":"validator-keys"}` | Kubernetes secrets names |
+| secrets.clusterlock | string | `""` | charon cluster lock |
+| secrets.enrPrivateKey | string | `""` | charon enr private key |
 | secrets.validatorKeys | string | `"validator-keys"` | validators keys |
 | securityContext | object | See `values.yaml` | The security context for pods |
 | service.type | string | `"ClusterIP"` | Service type |

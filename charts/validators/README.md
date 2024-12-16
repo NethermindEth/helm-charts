@@ -1,7 +1,7 @@
 
 # validators
 
-![Version: 0.0.8](https://img.shields.io/badge/Version-0.0.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.8](https://img.shields.io/badge/AppVersion-v0.0.8-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.8](https://img.shields.io/badge/AppVersion-v0.0.8-informational?style=flat-square)
 
 A Helm chart for installing validators with the web3signer.
 
@@ -13,15 +13,13 @@ A Helm chart for installing validators with the web3signer.
 | beaconChainRpcEndpoints | list | `[]` |  |
 | beaconChainRpcEndpointsRandomized | list | `[]` |  |
 | cliImage.pullPolicy | string | `"IfNotPresent"` |  |
-| cliImage.repository | string | `"238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli"` |  |
-| cliImage.tag | string | `"v0.0.2"` |  |
+| cliImage.repository | string | `"nethermindeth/keystores-cli"` |  |
+| cliImage.tag | string | `"v1.0.11"` |  |
 | dvt.enabled | bool | `false` |  |
 | enableBuilder | bool | `false` |  |
 | enabled | bool | `true` |  |
-| externalSecrets.data | list | `[]` |  |
-| externalSecrets.enabled | bool | `true` |  |
-| externalSecrets.secretStoreRef.kind | string | `"secretStoreKind"` |  |
-| externalSecrets.secretStoreRef.name | string | `"secretStoreName"` |  |
+| env | list | `[]` |  |
+| envFrom | list | `[]` | envFrom configuration |
 | extraFlags.lighthouse | list | `[]` |  |
 | extraFlags.lodestar | list | `[]` |  |
 | extraFlags.nimbus | list | `[]` |  |
@@ -54,22 +52,20 @@ A Helm chart for installing validators with the web3signer.
 | global.owner | string | `""` |  |
 | graffiti | string | `""` |  |
 | image.lighthouse.repository | string | `"sigp/lighthouse"` |  |
-| image.lighthouse.tag | string | `"v4.4.1"` |  |
+| image.lighthouse.tag | string | `"v6.0.1"` |  |
 | image.lodestar.repository | string | `"chainsafe/lodestar"` |  |
-| image.lodestar.tag | string | `"v1.11.0"` |  |
+| image.lodestar.tag | string | `"v1.23.1"` |  |
 | image.nimbus.repository | string | `"statusim/nimbus-validator-client"` |  |
-| image.nimbus.tag | string | `"multiarch-v23.9.0"` |  |
+| image.nimbus.tag | string | `"multiarch-v23.11.0"` |  |
 | image.prysm.repository | string | `"gcr.io/prysmaticlabs/prysm/validator"` |  |
-| image.prysm.tag | string | `"v4.0.8"` |  |
-| image.prysmGnosis.repository | string | `"ghcr.io/gnosischain/gbc-prysm-validator"` |  |
-| image.prysmGnosis.tag | string | `"v2.1.2-gbc"` |  |
+| image.prysm.tag | string | `"v5.1.2"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.teku.repository | string | `"consensys/teku"` |  |
-| image.teku.tag | string | `"23.9.0"` |  |
+| image.teku.tag | string | `"23.12.0"` |  |
 | imagePullSecrets | list | `[]` |  |
-| initImageBusybox.pullPolicy | string | `"IfNotPresent"` |  |
-| initImageBusybox.repository | string | `"busybox"` |  |
-| initImageBusybox.tag | string | `"1.36.1"` |  |
+| initImage.pullPolicy | string | `"IfNotPresent"` |  |
+| initImage.repository | string | `"busybox"` |  |
+| initImage.tag | string | `"1.37.0"` |  |
 | livenessProbe.lighthouse.failureThreshold | int | `3` |  |
 | livenessProbe.lighthouse.httpGet.path | string | `"/metrics"` |  |
 | livenessProbe.lighthouse.httpGet.port | string | `"metrics"` |  |

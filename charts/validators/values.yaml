@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 global:
-  owner: ""
+  label: ""
   imagePullSecrets: []
   network: mainnet
 
@@ -25,6 +25,24 @@ securityContext:
   fsGroup: 1001
   runAsUser: 1001
 
+# This is for setting container environment variables
+env: []
+  # - name: MY_ENV_VAR
+  #   value: my-env-var-value
+  # - name: SECRET
+  #   valueFrom:
+  #     secretKeyRef:
+  #       key: SECRET
+  #       name: secret-name
+
+# -- envFrom configuration
+envFrom:
+  []
+  # - secretRef:
+  #     name: '{{ include "common.names.fullname" . }}'
+  # - configMapRef:
+  #     name: '{{ include "common.names.fullname" . }}'
+
 ## RBAC configuration.
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
 ##
@@ -41,26 +59,19 @@ rbac:
       - "get"
       - "patch"
 
-## Init image is used to chown data volume, initialise genesis, etc.
+## Init image is used to chown data volume, etc.
 ##
-initImageBusybox:
-  repository: "busybox"
-  tag: "1.36.1"
+initImage:
+  repository: busybox
+  tag: "1.37.0"
   pullPolicy: IfNotPresent
 
-## CLI image is used to fetch public keys.
+## CLI image is used to fetch private keys.
 ##
 cliImage:
-  repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
-  tag: "v0.0.2"
+  repository: nethermindeth/keystores-cli
+  tag: "v1.0.11"
   pullPolicy: IfNotPresent
-
-externalSecrets:
-  enabled: true
-  secretStoreRef:
-    name: secretStoreName
-    kind: secretStoreKind
-  data: []
 
 ## Configuration for validators
 ## ref: https://lighthouse-book.sigmaprime.io/validator-management.html
@@ -119,22 +130,19 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v4.0.8"
-  prysmGnosis:
-    repository: "ghcr.io/gnosischain/gbc-prysm-validator"
-    tag: "v2.1.2-gbc"
+    tag: "v5.1.2"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v4.4.1"
+    tag: "v6.0.1"
   teku:
     repository: "consensys/teku"
-    tag: "23.9.0"
+    tag: "23.12.0"
   nimbus:
     repository: "statusim/nimbus-validator-client"
-    tag: "multiarch-v23.9.0"
+    tag: "multiarch-v23.11.0"
   lodestar:
     repository: "chainsafe/lodestar"
-    tag: "v1.11.0"
+    tag: "v1.23.1"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/

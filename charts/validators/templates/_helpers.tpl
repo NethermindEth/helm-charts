@@ -24,19 +24,6 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Extract the last part of a string after the hyphen ("-"). Defining the validators owner.
-*/}}
-{{- define "validators.ownership" -}}
-{{- $fullname := .Values.fullnameOverride }}
-{{- if not $fullname }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
-{{- $fullname = printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- $parts := split "-" $fullname }}
-{{- index $parts (sub (len $parts) 1) }}
-{{- end }}
-
-{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "validators.chart" -}}
@@ -126,7 +113,7 @@ Validator graffiti
 {{- end }}
 
 {{- define "web3signer" -}}
-{{- if $.Values.web3signerEndpoint }}{{ $.Values.web3signerEndpoint }}{{- else }}http://{{ $.Values.global.owner }}-web3signer:6174
+{{- if $.Values.web3signerEndpoint }}{{ $.Values.web3signerEndpoint }}{{- else }}http://{{ $.Values.global.label }}-web3signer:6174
 {{- end }}
 {{- end }}
 
