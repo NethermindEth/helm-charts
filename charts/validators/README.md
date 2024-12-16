@@ -1,7 +1,7 @@
 
 # validators
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.8](https://img.shields.io/badge/AppVersion-v0.0.8-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.8](https://img.shields.io/badge/AppVersion-v0.0.8-informational?style=flat-square)
 
 A Helm chart for installing validators with the web3signer.
 
@@ -48,8 +48,8 @@ A Helm chart for installing validators with the web3signer.
 | flags.teku[2] | string | `"--data-base-path=/data"` |  |
 | fullnameOverride | string | `""` |  |
 | global.imagePullSecrets | list | `[]` |  |
+| global.label | string | `""` |  |
 | global.network | string | `"mainnet"` |  |
-| global.owner | string | `""` |  |
 | graffiti | string | `""` |  |
 | image.lighthouse.repository | string | `"sigp/lighthouse"` |  |
 | image.lighthouse.tag | string | `"v6.0.1"` |  |
