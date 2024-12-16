@@ -1,0 +1,3 @@
+{{- if not .Values.web3signerEndpoint }}
+{{- fail "web3signerEndpoint must be set" }}
+{{- end }}
