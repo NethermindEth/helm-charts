@@ -101,8 +101,8 @@ spec:
           env:
             - name: JAVA_OPTS
               value: {{ .Values.web3signerJavaOpts | quote }}
-            {{- if .Values.env }}
-            {{- toYaml .Values.env | nindent 12 }}
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
           envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
           ports:
