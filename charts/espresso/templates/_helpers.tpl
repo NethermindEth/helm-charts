@@ -47,7 +47,7 @@ Selector labels
 */}}
 {{- define "espresso.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "espresso.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+project: {{ .Release.Name }}
 {{- end }}
 
 {{/*
