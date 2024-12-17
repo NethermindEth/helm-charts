@@ -502,6 +502,23 @@ entries:
   espresso:
   - apiVersion: v2
     appVersion: 20240925-patch1
+    created: "2024-12-17T21:25:49.053170138Z"
+    description: A Helm chart for deploying Espresso Sequencer
+    digest: 50b867345966f5e75e1c90bc39071d2ac6ca1e4cf628d4e197552cf559c88af3
+    home: https://docs.espressosys.com/sequencer
+    keywords:
+    - espresso
+    - sequencer
+    maintainers:
+    - email: miguel@nethermind.io
+      name: AntiD2ta
+    name: espresso
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/espresso-1.0.3/espresso-1.0.3.tgz
+    version: 1.0.3
+  - apiVersion: v2
+    appVersion: 20240925-patch1
     created: "2024-11-20T19:51:37.992977521Z"
     description: A Helm chart for deploying Espresso Sequencer
     digest: 7348281c761a71806bffc559d99c36b2c8ebbe6fe993c355131257284612c437
@@ -842,6 +859,26 @@ entries:
   validators:
   - apiVersion: v2
     appVersion: v0.0.8
+    created: "2024-12-17T21:25:49.188177555Z"
+    description: A Helm chart for installing validators with the web3signer.
+    digest: b88400057e4b6ec94e5a31341239bf7b94058bce3e49735e6f56fc5b691b1813
+    keywords:
+    - ethereum
+    - blockchain
+    - lighthouse
+    - prysm
+    - teku
+    - validators
+    maintainers:
+    - name: aivarasko
+    - name: matilote
+    name: validators
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/validators-1.0.6/validators-1.0.6.tgz
+    version: 1.0.6
+  - apiVersion: v2
+    appVersion: v0.0.8
     created: "2024-12-16T17:16:36.581483766Z"
     description: A Helm chart for installing validators with the web3signer.
     digest: ffaa591bf7fb2093419b42c47fd96968b5853c2c85ca734bbfda720bef7114d5
@@ -1090,4 +1127,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2024-12-16T17:16:36.581606286Z"
+generated: "2024-12-17T21:25:49.188302738Z"
