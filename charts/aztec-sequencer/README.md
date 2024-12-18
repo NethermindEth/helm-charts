@@ -59,6 +59,7 @@ helm install aztec-sequencer nethermind/aztec-sequencer
 | env | list | `[]` |  |
 | envFrom | list | `[]` |  |
 | extraInitContainers | list | `[]` |  |
+| extraInitScript | string | `"echo \"Running extra init script\"\necho 'test -z \"$PEER_ID_PRIVATE_KEY\" && export PEER_ID_PRIVATE_KEY=$(cat /var/lib/aztec/p2p-private-key)' >> /shared/env\necho \"Done\"\n"` |  |
 | extraObjects | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
