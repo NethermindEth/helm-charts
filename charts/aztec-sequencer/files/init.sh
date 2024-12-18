@@ -28,4 +28,5 @@ echo "export P2P_TCP_ANNOUNCE_ADDR=${EXTERNAL_NODE_IP}:${EXTERNAL_NODE_PORT}" >>
 echo "export VALIDATOR_PRIVATE_KEY=${PRIVATE_KEY}" >> /shared/env
 echo "export SEQ_PUBLISHER_PRIVATE_KEY=${PRIVATE_KEY}" >> /shared/env
 echo "export L1_PRIVATE_KEY=${PRIVATE_KEY}" >> /shared/env
+echo 'test -z "$PEER_ID_PRIVATE_KEY" && export PEER_ID_PRIVATE_KEY=$(cat /var/lib/aztec/p2p-private-key)' >> /shared/env
 echo "Init script finished"
