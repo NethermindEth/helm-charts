@@ -19,3 +19,4 @@ metadata:
 data:
   init.sh: |-
     {{- .Files.Get "files/init.sh" | nindent 4 }}
+    {{- .Values.extraInitScript | nindent 4 }}
