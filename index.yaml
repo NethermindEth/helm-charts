@@ -87,6 +87,18 @@ entries:
     version: 0.1.1
   aztec-sequencer:
   - apiVersion: v2
+    created: "2024-12-18T21:22:53.862874779Z"
+    description: A Helm chart for deploying an Aztec sequencer
+    digest: 94228112c0e33820c252f00bdae816bf860c5dfcedb55b20e59069b73b5ab490
+    home: https://docs.aztec.network/
+    maintainers:
+    - name: 0xDones
+    name: aztec-sequencer
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/aztec-sequencer-0.0.2/aztec-sequencer-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
     created: "2024-12-10T16:18:50.899323699Z"
     description: A Helm chart for deploying an Aztec sequencer
     digest: f151a1cf67d061773fcc340d9438452db2e9d6098252f506d8ad70c6b65383fe
@@ -1127,4 +1139,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2024-12-17T21:25:49.188302738Z"
+generated: "2024-12-18T21:22:53.862984994Z"
