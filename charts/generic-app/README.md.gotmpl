@@ -63,6 +63,27 @@ service:
       protocol: TCP
 ```
 
+### Ingress
+
+```yaml
+ingress:
+  enabled: true
+  className: "kong"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          # -- Port name as defined in the service.ports section
+          portName: http
+  tls:
+    - secretName: chart-example-local-tls
+      hosts:
+        - chart-example.local
+```
+
 ### Environment Variables
 
 #### From ConfigMap
