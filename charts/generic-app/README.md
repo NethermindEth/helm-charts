@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.3](https://img.shields.io/badge/Version-1.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -67,6 +67,27 @@ service:
     - name: metrics
       port: 9090
       protocol: TCP
+```
+
+### Ingress
+
+```yaml
+ingress:
+  enabled: true
+  className: "kong"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          # -- Port name as defined in the service.ports section
+          portName: http
+  tls:
+    - secretName: chart-example-local-tls
+      hosts:
+        - chart-example.local
 ```
 
 ### Environment Variables
