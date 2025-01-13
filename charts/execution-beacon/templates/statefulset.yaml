@@ -368,6 +368,9 @@ spec:
             {{- end }}
             - name: env-nodeport
               mountPath: /env
+          {{- with .Values.execution.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         {{- with .Values.execution.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
@@ -493,7 +496,7 @@ spec:
             {{- range .Values.beacon.extraFlags }}
               {{ . | quote }}
             {{- end }}
-           {{/*
+          {{/*
           Configuration for Lighthouse beacon client
           */}}
           {{- else if eq .Values.beacon.client "lighthouse" }}
@@ -717,6 +720,9 @@ spec:
           {{- end }}
             - name: env-nodeport
               mountPath: /env
+          {{- with .Values.beacon.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         {{- with .Values.beacon.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
@@ -779,6 +785,9 @@ spec:
       {{- end }}
         - name: env-nodeport
           emptyDir: {}
+      {{- with .Values.global.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
   volumeClaimTemplates:
     {{- if .Values.global.sharedPersistence.enabled }}
     - apiVersion: v1
