@@ -8,3 +8,14 @@ metadata:
     {{- include "generic-app.labels" . | nindent 4 }}
 data: {{- .Values.configMap.data | toYaml | nindent 2 }}
 {{- end }}
+
+{{- range .Values.extraConfigMaps }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "generic-app.labels" $ | nindent 4 }}
+data: {{- .data | toYaml | nindent 2 }}
+{{- end }}

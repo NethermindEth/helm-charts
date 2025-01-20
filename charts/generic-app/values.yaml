@@ -22,7 +22,7 @@ replicaCount: 1
 
 # -- Enable Deployment
 deployment:
-  enabled: true
+  enabled: false
   # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
   autoscaling:
     enabled: false
@@ -60,17 +60,26 @@ env: []
 # -- envFrom configuration
 envFrom:
   []
-  # - secretRef:
-  #     name: '{{ include "generic-app.fullname" . }}'
   # - configMapRef:
-  #     name: '{{ include "generic-app.fullname" . }}'
+  #     name: my-configmap
+  # - secretRef:
+  #     name: 'my-secret'
 
-# -- ConfigMap configuration, if enabled configMap will be created but not mounted automatically. Use envFrom, env or volumeMounts to mount the configMap.
+# -- ConfigMap configuration, if enabled configMap will be created mounted automatically as env.
 configMap:
   enabled: false
   data: {}
     # ENV_1: value1
     # ENV_2: value2
+
+# -- Extra ConfigMaps, they need to be configured using volumes and volumeMounts
+extraConfigMaps: []
+  # - name: my-configmap
+  #   data:
+  #     config.yaml: |
+  #       db_host: localhost
+  #       db_user: db_user
+
 
 # -- Init containers
 initContainers: []

@@ -1,6 +1,3 @@
-deployment:
-  enabled: false
-
 nameOverride: "generic-statefulset"
 
 image:

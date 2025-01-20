@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.0.3](https://img.shields.io/badge/Version-1.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.3](https://img.shields.io/badge/Version-1.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -90,17 +90,13 @@ ingress:
         - chart-example.local
 ```
 
-### Environment Variables
+### Application Configuration
 
-#### From ConfigMap
+#### ConfigMaps
 
-Mounting a ConfigMap as environment variables is the simplest way to use a ConfigMap in a Pod.
+With the configuration below, the configMap will be automatically mounted as environment variables. If you need config files, check the next section.
 
 ```yaml
-envFrom:
-  - configMapRef:
-      name: '{{ include "generic-app.fullname" . }}'
-
 configMap:
   enabled: true
   data:
@@ -108,7 +104,7 @@ configMap:
     VAR_2: value2
 ```
 
-#### From env
+#### Environment Variables
 
 ```yaml
 env:
@@ -121,22 +117,23 @@ env:
 Mounting a ConfigMap as a file is useful when the application expects a configuration file.
 
 ```yaml
-configMap:
-  enabled: true
-  data:
-    config.toml: |
-        name = "${ATTESTOR_NAME}"
-        ip = "0.0.0.0"
+extraConfigMaps:
+  - name: my-configmap
+    data:
+      config.yaml: |
+        db_host: localhost
+        db_user: db_user
 
 volumes:
-  - name: config
+  - name: my-configmap
     configMap:
-      name: '{{ include "generic-app.fullname" . }}'
+        name: my-configmap
 
 volumeMounts:
-  - name: config
-    mountPath: /etc/config.toml
-    subPath: config.toml
+  - name: my-configmap
+    mountPath: /etc/config/config.yaml
+    subPath: config.yaml
+    readOnly: true
 ```
 
 ### Sts Persistence
@@ -160,10 +157,11 @@ statefulSet:
 | affinity | object | `{}` |  |
 | args | list | `[]` |  |
 | command | list | `[]` | Command and args for the container |
-| configMap | object | `{"data":{},"enabled":false}` | ConfigMap configuration, if enabled configMap will be created but not mounted automatically. Use envFrom, env or volumeMounts to mount the configMap. |
-| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":true}` | Enable Deployment |
+| configMap | object | `{"data":{},"enabled":false}` | ConfigMap configuration, if enabled configMap will be created mounted automatically as env. |
+| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":false}` | Enable Deployment |
 | env | list | `[]` |  |
 | envFrom | list | `[]` | envFrom configuration |
+| extraConfigMaps | list | `[]` | Extra ConfigMaps, they need to be configured using volumes and volumeMounts |
 | extraContainers | list | `[]` | Sidecar containers |
 | extraObjects | list | `[]` | Extra Kubernetes resources to be created |
 | fullnameOverride | string | `""` |  |
