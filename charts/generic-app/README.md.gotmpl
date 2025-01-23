@@ -120,12 +120,12 @@ Mounting a ConfigMap as a file is useful when the application expects a configur
 
 ```yaml
 configMaps:
-  - name: my-configmap
+  - name: example-app-config
     data:
       config.yaml: |
         db_host: localhost
         db_user: db_user
-  - name: single-file
+  - name: example-app-single-file
     data:
       config.json: |
         {
@@ -133,20 +133,20 @@ configMaps:
         }
 
 volumes:
-  - name: my-configmap
+  - name: example-app-config
     configMap:
-      name: my-configmap
-  - name: single-file
+      name: example-app-config
+  - name: example-app-single-file
     configMap:
-      name: single-file
+      name: example-app-single-file
 
 volumeMounts:
   # Mounting a ConfigMap as a directory
-  - name: my-configmap
+  - name: example-app-config
     mountPath: /etc/config
     readOnly: true
   # Mounting a single file from a ConfigMap
-  - name: single-file
+  - name: example-app-single-file
     mountPath: /etc/single-file/config.json
     subPath: config.json
     readOnly: true
