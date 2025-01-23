@@ -1,6 +1,7 @@
-# lodestar
 
-![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+# lodestar-vc
+
+![Version: 0.1.4](https://img.shields.io/badge/Version-0.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
 
@@ -11,7 +12,7 @@ A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
 | matilote |  |  |
 | aivarasko |  |  |
 | stdevMac |  |  |
-| refl3ction |  |  |
+| 0xDones |  |  |
 
 ## Values
 
@@ -31,7 +32,7 @@ A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"chainsafe/lodestar"` |  |
-| image.tag | string | `"v1.19.0"` |  |
+| image.tag | string | `"v1.25.0"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
@@ -48,8 +49,6 @@ A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
 | readinessProbe | string | `nil` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| secrets | object | `{"validatorKeys":"validator-keys"}` | Kubernetes secrets names |
-| secrets.validatorKeys | string | `"validator-keys"` | validators keys |
 | securityContext | object | `{}` |  |
 | service.ports.http | int | `9596` |  |
 | service.ports.metrics | int | `5064` |  |
