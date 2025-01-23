@@ -44,10 +44,7 @@ statefulSet:
     size: 10Gi
 
 # -- Command and args for the container
-command:
-  - /bin/sh
-  - -c
-  - sleep infinity
+command: []
 args: []
 
 # -- config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration.

@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -126,12 +126,12 @@ Mounting a ConfigMap as a file is useful when the application expects a configur
 
 ```yaml
 configMaps:
-  - name: my-configmap
+  - name: example-app-config
     data:
       config.yaml: |
         db_host: localhost
         db_user: db_user
-  - name: single-file
+  - name: example-app-single-file
     data:
       config.json: |
         {
@@ -139,20 +139,20 @@ configMaps:
         }
 
 volumes:
-  - name: my-configmap
+  - name: example-app-config
     configMap:
-      name: my-configmap
-  - name: single-file
+      name: example-app-config
+  - name: example-app-single-file
     configMap:
-      name: single-file
+      name: example-app-single-file
 
 volumeMounts:
   # Mounting a ConfigMap as a directory
-  - name: my-configmap
+  - name: example-app-config
     mountPath: /etc/config
     readOnly: true
   # Mounting a single file from a ConfigMap
-  - name: single-file
+  - name: example-app-single-file
     mountPath: /etc/single-file/config.json
     subPath: config.json
     readOnly: true
@@ -178,7 +178,7 @@ statefulSet:
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | args | list | `[]` |  |
-| command | list | `["/bin/sh","-c","sleep infinity"]` | Command and args for the container |
+| command | list | `[]` | Command and args for the container |
 | config | object | `{}` | config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration. |
 | configMaps | list | `[]` | Extra ConfigMaps, they need to be configured using volumes and volumeMounts |
 | deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":false}` | Enable Deployment |
