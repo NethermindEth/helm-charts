@@ -21,6 +21,9 @@ helm install generic-app nethermind/generic-app
 
 Check `values.deploy.yaml` or `values.sts.yaml` for example configuration options.
 
+- `values.deploy.yaml` is for configuring a Deployment resource.
+- `values.sts.yaml` is for configuring a StatefulSet resource.
+
 ### Name Override
 
 Always use the `nameOverride` to set the name of the resources.
@@ -92,24 +95,29 @@ ingress:
 
 ### Application Configuration
 
-#### ConfigMaps
+#### Environment Variables
 
-With the configuration below, the configMap will be automatically mounted as environment variables. If you need config files, check the next section.
+There are different ways to expose environment variables to the application inside the container.
+
+This is the most simple way to set environment variables. No further configuration is needed. A ConfigMap will be created named `{{ .Release.Name }}-env-cm`.
 
 ```yaml
-configMap:
-  enabled: true
-  data:
-    VAR_1: value1
-    VAR_2: value2
+config:
+  VAR_1: value1
+  VAR_2: value2
 ```
 
-#### Environment Variables
+This uses the container `env` field to set environment variables. Ref: [Kubernetes Docs](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
 
 ```yaml
 env:
   - name: MY_ENV_VAR
     value: my-env-var-value
+  - name: SECRET
+    valueFrom:
+      secretKeyRef:
+        key: SECRET
+        name: secret-name
 ```
 
 ### Config Files
@@ -117,22 +125,36 @@ env:
 Mounting a ConfigMap as a file is useful when the application expects a configuration file.
 
 ```yaml
-extraConfigMaps:
+configMaps:
   - name: my-configmap
     data:
       config.yaml: |
         db_host: localhost
         db_user: db_user
+  - name: single-file
+    data:
+      config.json: |
+        {
+          "key": "value"
+        }
 
 volumes:
   - name: my-configmap
     configMap:
-        name: my-configmap
+      name: my-configmap
+  - name: single-file
+    configMap:
+      name: single-file
 
 volumeMounts:
+  # Mounting a ConfigMap as a directory
   - name: my-configmap
-    mountPath: /etc/config/config.yaml
-    subPath: config.yaml
+    mountPath: /etc/config
+    readOnly: true
+  # Mounting a single file from a ConfigMap
+  - name: single-file
+    mountPath: /etc/single-file/config.json
+    subPath: config.json
     readOnly: true
 ```
 
@@ -156,18 +178,18 @@ statefulSet:
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | args | list | `[]` |  |
-| command | list | `[]` | Command and args for the container |
-| configMap | object | `{"data":{},"enabled":false}` | ConfigMap configuration, if enabled configMap will be created mounted automatically as env. |
+| command | list | `["/bin/sh","-c","sleep infinity"]` | Command and args for the container |
+| config | object | `{}` | config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration. |
+| configMaps | list | `[]` | Extra ConfigMaps, they need to be configured using volumes and volumeMounts |
 | deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":false}` | Enable Deployment |
-| env | list | `[]` |  |
+| env | list | `[]` | This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/ |
 | envFrom | list | `[]` | envFrom configuration |
-| extraConfigMaps | list | `[]` | Extra ConfigMaps, they need to be configured using volumes and volumeMounts |
 | extraContainers | list | `[]` | Sidecar containers |
 | extraObjects | list | `[]` | Extra Kubernetes resources to be created |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"nginx"` |  |
-| image.tag | string | `""` |  |
+| image.repository | string | `"alpine"` |  |
+| image.tag | string | `"latest"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific","portName":"http"}]}],"tls":[]}` | For now all traffic is routed to the `http` port |
 | ingress.hosts[0].paths[0].portName | string | `"http"` | Port name as defined in the service.ports section |

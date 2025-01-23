@@ -1,15 +1,12 @@
-{{- if .Values.configMap.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "generic-app.fullname" . }}
+  name: {{ include "generic-app.fullname" . }}-env-cm
   labels:
     {{- include "generic-app.labels" . | nindent 4 }}
-data: {{- .Values.configMap.data | toYaml | nindent 2 }}
-{{- end }}
-
-{{- range .Values.extraConfigMaps }}
+data: {{- .Values.config | toYaml | nindent 2 }}
+{{- range .Values.configMaps }}
 ---
 apiVersion: v1
 kind: ConfigMap
