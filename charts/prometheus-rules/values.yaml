@@ -1,0 +1,11 @@
+defaultAlertLabels: {}
+
+spec:
+  groups:
+  - name: ./example.rules
+    rules:
+    - alert: ExampleAlert
+      expr: Vector(1)
+      for: 5m
+      labels:
+        severity: warning
