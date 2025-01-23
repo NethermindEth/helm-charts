@@ -2,6 +2,10 @@ scan:
   skip-dirs:
     - "charts/*/charts"
     - "charts/*/templates/tests"
+  helm:
+    set:
+      - web3signerEndpoint="http://example.com"
+      - config.beaconNodeEndpoints="http://example.com"
 
 misconfigurations:
   - id: AVD-KSV-0109
