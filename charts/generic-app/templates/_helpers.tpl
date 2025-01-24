@@ -60,3 +60,7 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "configmap.hash" -}}
+{{- .Values.config | toJson | sha256sum }}
+{{- end }}
