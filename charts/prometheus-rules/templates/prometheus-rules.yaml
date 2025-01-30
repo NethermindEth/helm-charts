@@ -21,7 +21,10 @@ spec:
       {{- with .record }}
       record: {{ . }}
       {{- end }}
-      annotations: {{- .annotations | toYaml | nindent 8 }}
+      {{- with .annotations }}
+      annotations:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
       labels:
         {{- $defaultLabels := $.Values.defaultAlertLabels | default (dict) }}
         {{- $customLabels := .labels | default (dict) }}
