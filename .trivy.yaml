@@ -1,4 +1,4 @@
-scan:
+misconfiguration:
   helm:
     set:
       - web3signerEndpoint="http://example.com"
