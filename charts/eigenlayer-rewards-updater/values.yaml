@@ -11,9 +11,7 @@ network: holesky
 # -- The version of the rewards updater.
 version: ""
 
-
 cronJob:
-
 
   name: rewards-updater
   enabled: true
@@ -35,19 +33,14 @@ cronJob:
     # -- The Ethereum network to target.
     network: ""
 
-
     # -- Fully qualified URL to an Ethereum RPC node.
     rpc_url: "https://ethereum-holesky-rpc.publicnode.com"
-
-
 
     # -- An Ethereum account private key, in hexidecimal form.
     private_key: ""
 
-
     # -- The base URL of where rewards data is stored.
     proof_store_base_url: "https://eigenlabs-rewards-testnet-holesky.s3.amazonaws.com"
-
 
     # -- The contract address of the target rewards coordinator contract used to post reward proofs.
     rewards_coordinator_address: ""
