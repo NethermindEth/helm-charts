@@ -1,0 +1,53 @@
+# Default values for eigenlayer-rewards-updater.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- The target environment to deploy to.
+environment: testnet
+
+# -- The Ethereum network to target.
+network: holesky
+
+# -- The version of the rewards updater.
+version: ""
+
+
+cronJob:
+
+
+  name: rewards-updater
+  enabled: true
+
+  # -- The cron schedule to run the rewards updater.
+  schedule: "*/15 * * * *"    # Runs every 15 minutes looking for new roots to post
+
+  image:
+    repository: public.ecr.aws/z6g0f8n7/eigenlayer-rewards-updater
+    tag: latest
+    pullPolicy: Always
+
+  config: |
+    debug: true
+
+    # -- The target environment to deploy to.
+    environment: ""
+
+    # -- The Ethereum network to target.
+    network: ""
+
+
+    # -- Fully qualified URL to an Ethereum RPC node.
+    rpc_url: "https://ethereum-holesky-rpc.publicnode.com"
+
+
+
+    # -- An Ethereum account private key, in hexidecimal form.
+    private_key: ""
+
+
+    # -- The base URL of where rewards data is stored.
+    proof_store_base_url: "https://eigenlabs-rewards-testnet-holesky.s3.amazonaws.com"
+
+
+    # -- The contract address of the target rewards coordinator contract used to post reward proofs.
+    rewards_coordinator_address: ""
