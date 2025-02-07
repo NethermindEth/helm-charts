@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "release.name" . }}
+  labels:
+    {{- include "esd.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "esd.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "esd.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with concat .Values.imagePullSecrets }}
+        imagePullSecrets:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if or .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ include "esd.serviceAccountName" . }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          args:
+            - --base-dir
+            - /configs
+          env:
+          - name: KUBERNETES_CLUSTER_DOMAIN
+            value: {{ .Values.kubernetesClusterDomain }}
+        {{- if .Values.extraEnv }}
+          {{- toYaml .Values.extraEnv | nindent 10 }}
+        {{- end }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "release.name" . }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.extraVolumeMounts -}}
+            {{ toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: configs
+              mountPath: /configs
+            - name: scripts
+              mountPath: /scripts
+      {{- if .Values.extraContainers }}
+        {{ tpl (toYaml .Values.extraContainers | nindent 8) $ }}
+      {{- end }}
+      volumes:
+      {{- if .Values.extraVolumes -}}
+        {{ toYaml .Values.extraVolumes | nindent 8 }}
+      {{- end }}
+        - name: configs
+          configMap:
+            name: {{ include "release.name" . }}
+            defaultMode: 0755
+        - name: scripts
+          configMap:
+            name: {{ include "release.name" . }}-scripts
+            defaultMode: 0755
