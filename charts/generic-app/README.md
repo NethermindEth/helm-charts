@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.1.2](https://img.shields.io/badge/Version-1.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.3](https://img.shields.io/badge/Version-1.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -181,7 +181,7 @@ statefulSet:
 | command | list | `[]` | Command and args for the container |
 | config | object | `{}` | config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration. |
 | configMaps | list | `[]` | Extra ConfigMaps, they need to be configured using volumes and volumeMounts |
-| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":false}` | Enable Deployment |
+| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"disabled":false,"enabled":false}` | Enable Deployment |
 | env | list | `[]` | This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/ |
 | envFrom | list | `[]` | envFrom configuration |
 | extraContainers | list | `[]` | Sidecar containers |
