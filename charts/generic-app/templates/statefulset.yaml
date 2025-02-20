@@ -14,10 +14,11 @@ spec:
   serviceName: {{ include "generic-app.fullname" . }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        configmap-hash: {{ include "configmap.hash" . }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "generic-app.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
@@ -70,7 +71,12 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "generic-app.fullname" . }}-env-cm
+            {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           env: {{- toYaml .Values.env | nindent 12 }}
           {{- if or .Values.volumeMounts .Values.statefulSet.persistence.enabled }}
           volumeMounts:

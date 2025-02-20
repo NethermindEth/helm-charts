@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ include "lodestar.fullname" . }}"
+  labels:
+    {{- include "lodestar.labels" . | nindent 4 }}
+data:
+  run.sh: |
+    #!/bin/sh
+
+    echo "Starting validator client with pre-imported keys..."
+
+    exec node /usr/app/packages/cli/bin/lodestar validator \
+        --dataDir="/keystoresDir" \
+        --network="$NETWORK" \
+        --metrics={{ .Values.config.metricsEnabled }} \
+        --metrics.address="0.0.0.0" \
+        --metrics.port={{ .Values.service.ports.metrics }} \
+        --beaconNodes="$BEACON_NODE_ADDRESS" \
+        --builder="$BUILDER_API_ENABLED" \
+        --builder.selection="$BUILDER_SELECTION" \
+        --distributed {{ .Values.config.extraArgs | default "" }}

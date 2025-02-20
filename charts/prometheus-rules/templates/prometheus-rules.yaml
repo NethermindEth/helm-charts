@@ -1,0 +1,36 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "prometheus-rules.fullname" . }}
+  labels:
+    {{- include "prometheus-rules.labels" . | nindent 4 }}
+spec:
+  groups:
+  {{- range .Values.spec.groups }}
+  - name: {{ .name }}
+    rules:
+    {{- range .rules }}
+    - expr: {{ .expr }}
+      {{- with .for }}
+      for: {{ . }}
+      {{- end }}
+      {{- with .alert }}
+      alert: {{ . }}
+      {{- end }}
+      {{- with .record }}
+      record: {{ . }}
+      {{- end }}
+      {{- with .annotations }}
+      annotations:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- $defaultLabels := $.Values.defaultAlertLabels | default (dict) }}
+        {{- $customLabels := .labels | default (dict) }}
+        {{- $labels := merge $defaultLabels $customLabels }}
+        {{- with $labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    {{- end }}
+  {{- end }}

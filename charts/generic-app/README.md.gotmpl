@@ -15,6 +15,9 @@
 
 Check `values.deploy.yaml` or `values.sts.yaml` for example configuration options.
 
+- `values.deploy.yaml` is for configuring a Deployment resource.
+- `values.sts.yaml` is for configuring a StatefulSet resource.
+
 ### Name Override
 
 Always use the `nameOverride` to set the name of the resources.
@@ -84,30 +87,31 @@ ingress:
         - chart-example.local
 ```
 
-### Environment Variables
+### Application Configuration
 
-#### From ConfigMap
+#### Environment Variables
 
-Mounting a ConfigMap as environment variables is the simplest way to use a ConfigMap in a Pod.
+There are different ways to expose environment variables to the application inside the container.
+
+This is the most simple way to set environment variables. No further configuration is needed. A ConfigMap will be created named `{{`{{ .Release.Name }}`}}-env-cm`.
 
 ```yaml
-envFrom:
-  - configMapRef:
-      name: {{`'{{ include "generic-app.fullname" . }}'`}}
-
-configMap:
-  enabled: true
-  data:
-    VAR_1: value1
-    VAR_2: value2
+config:
+  VAR_1: value1
+  VAR_2: value2
 ```
 
-#### From env
+This uses the container `env` field to set environment variables. Ref: [Kubernetes Docs](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
 
 ```yaml
 env:
   - name: MY_ENV_VAR
     value: my-env-var-value
+  - name: SECRET
+    valueFrom:
+      secretKeyRef:
+        key: SECRET
+        name: secret-name
 ```
 
 ### Config Files
@@ -115,22 +119,37 @@ env:
 Mounting a ConfigMap as a file is useful when the application expects a configuration file.
 
 ```yaml
-configMap:
-  enabled: true
-  data:
-    config.toml: |
-        name = "${ATTESTOR_NAME}"
-        ip = "0.0.0.0"
+configMaps:
+  - name: example-app-config
+    data:
+      config.yaml: |
+        db_host: localhost
+        db_user: db_user
+  - name: example-app-single-file
+    data:
+      config.json: |
+        {
+          "key": "value"
+        }
 
 volumes:
-  - name: config
+  - name: example-app-config
     configMap:
-      name: {{`'{{ include "generic-app.fullname" . }}'`}}
+      name: example-app-config
+  - name: example-app-single-file
+    configMap:
+      name: example-app-single-file
 
 volumeMounts:
-  - name: config
-    mountPath: /etc/config.toml
-    subPath: config.toml
+  # Mounting a ConfigMap as a directory
+  - name: example-app-config
+    mountPath: /etc/config
+    readOnly: true
+  # Mounting a single file from a ConfigMap
+  - name: example-app-single-file
+    mountPath: /etc/single-file/config.json
+    subPath: config.json
+    readOnly: true
 ```
 
 ### Sts Persistence

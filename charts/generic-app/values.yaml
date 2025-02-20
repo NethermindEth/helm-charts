@@ -8,11 +8,11 @@ fullnameOverride: ""
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: nginx
+  repository: alpine
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "latest"
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -22,7 +22,7 @@ replicaCount: 1
 
 # -- Enable Deployment
 deployment:
-  enabled: true
+  enabled: false
   # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
   autoscaling:
     enabled: false
@@ -47,7 +47,20 @@ statefulSet:
 command: []
 args: []
 
-# This is for setting container environment variables
+# -- config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration.
+config: {}
+  # ENV_1: value1
+  # ENV_2: value2
+
+# -- Extra ConfigMaps, they need to be configured using volumes and volumeMounts
+configMaps: []
+  # - name: my-configmap
+  #   data:
+  #     config.yaml: |
+  #       db_host: localhost
+  #       db_user: db_user
+
+# -- This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
 env: []
   # - name: MY_ENV_VAR
   #   value: my-env-var-value
@@ -60,17 +73,10 @@ env: []
 # -- envFrom configuration
 envFrom:
   []
-  # - secretRef:
-  #     name: '{{ include "generic-app.fullname" . }}'
   # - configMapRef:
-  #     name: '{{ include "generic-app.fullname" . }}'
-
-# -- ConfigMap configuration, if enabled configMap will be created but not mounted automatically. Use envFrom, env or volumeMounts to mount the configMap.
-configMap:
-  enabled: false
-  data: {}
-    # ENV_1: value1
-    # ENV_2: value2
+  #     name: my-configmap
+  # - secretRef:
+  #     name: my-secret
 
 # -- Init containers
 initContainers: []
