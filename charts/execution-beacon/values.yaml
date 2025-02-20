@@ -14,7 +14,7 @@ podSecurityContext:
 securityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1000
@@ -27,7 +27,7 @@ securityContext:
 initContainerSecurityContext:
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1000
@@ -277,6 +277,10 @@ global:
     #  "0": 32345
     #  "3": 32348
 
+  ## Additional volumes to create
+  ##
+  volumes: []
+
 execution:
   client: nethermind
 
@@ -397,6 +401,10 @@ execution:
   ##
   extraFlags: []
   resources: {}
+
+  ## Additional volumes to mount into the execution node
+  ##
+  volumeMounts: []
 
 beacon:
   client: nimbus
@@ -532,6 +540,10 @@ beacon:
   ##
   extraFlags: []
   resources: {}
+
+  ## Additional volumes to mount into the beacon node
+  ##
+  volumeMounts: []
 
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/

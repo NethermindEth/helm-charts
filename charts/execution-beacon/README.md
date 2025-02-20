@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.7](https://img.shields.io/badge/Version-1.0.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
+![Version: 1.0.8](https://img.shields.io/badge/Version-1.0.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -77,6 +77,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.targetPeers | int | `50` |  |
 | beacon.targetPeersMin | int | `40` |  |
 | beacon.totalDifficultyOverride | string | `""` |  |
+| beacon.volumeMounts | list | `[]` |  |
 | execution.client | string | `"nethermind"` |  |
 | execution.extraFlags | list | `[]` |  |
 | execution.healthchecks.enabled | bool | `true` |  |
@@ -127,6 +128,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.resources | object | `{}` |  |
 | execution.targetPeers | int | `50` |  |
 | execution.terminalTotalDifficulty | string | `""` |  |
+| execution.volumeMounts | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | global.JWTSecret | string | `""` |  |
 | global.affinity | object | `{}` |  |
@@ -216,6 +218,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | global.sharedPersistence.storageClassName | string | `""` |  |
 | global.terminationGracePeriodSeconds | int | `120` |  |
 | global.tolerations | list | `[]` |  |
+| global.volumes | list | `[]` |  |
 | initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
