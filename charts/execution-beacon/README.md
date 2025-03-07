@@ -29,14 +29,14 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.checkPointSync.trustedSourceUrl | string | `""` |  |
 | beacon.checkPointSync.url | string | `"https://mainnet-checkpoint-sync.attestant.io"` |  |
 | beacon.client | string | `"nimbus"` |  |
+| beacon.env | list | `[]` |  |
+| beacon.envFrom | list | `[]` |  |
 | beacon.extraFlags | list | `[]` |  |
 | beacon.grpc.enabled | bool | `true` |  |
 | beacon.grpc.host | string | `"0.0.0.0"` |  |
 | beacon.grpc.port | int | `4000` |  |
 | beacon.grpc.portName | string | `"rpc"` |  |
 | beacon.initChownData | bool | `true` |  |
-| beacon.javaOpts.enabled | bool | `true` |  |
-| beacon.javaOpts.maxHeapSize | string | `"-Xmx3g"` |  |
 | beacon.metrics.annotations | object | `{}` |  |
 | beacon.metrics.categories[0] | string | `"JVM"` |  |
 | beacon.metrics.categories[10] | string | `"REMOTE_VALIDATOR"` |  |
@@ -79,6 +79,8 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.totalDifficultyOverride | string | `""` |  |
 | beacon.volumeMounts | list | `[]` |  |
 | execution.client | string | `"nethermind"` |  |
+| execution.env | list | `[]` |  |
+| execution.envFrom | list | `[]` |  |
 | execution.extraFlags | list | `[]` |  |
 | execution.healthchecks.enabled | bool | `true` |  |
 | execution.healthchecks.lowStorageSpaceShutdownThreshold | int | `0` |  |
@@ -86,8 +88,6 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.healthchecks.pollingInterval | int | `5` |  |
 | execution.healthchecks.slug | string | `"/health"` |  |
 | execution.initChownData | bool | `true` |  |
-| execution.javaOpts.enabled | bool | `false` |  |
-| execution.javaOpts.maxHeapSize | string | `""` |  |
 | execution.jsonrpc.enabled | bool | `true` |  |
 | execution.jsonrpc.engine.corsOrigins[0] | string | `"*"` |  |
 | execution.jsonrpc.engine.hostAllowList[0] | string | `"*"` |  |
@@ -132,6 +132,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | fullnameOverride | string | `""` |  |
 | global.JWTSecret | string | `""` |  |
 | global.affinity | object | `{}` |  |
+| global.env | list | `[]` |  |
 | global.envFrom | list | `[]` |  |
 | global.ethsider.bindAddr | int | `3000` |  |
 | global.ethsider.enabled | bool | `true` |  |
