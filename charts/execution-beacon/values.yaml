@@ -136,6 +136,12 @@ global:
       kind: SecretStore
     data: []
 
+  ## Additional env to add into the execution and beacon containers
+  ##
+  env: []
+
+  ## Additional envFrom to add into the execution and beacon containers
+  ##
   envFrom: []
 
   ethsider:
@@ -378,16 +384,6 @@ execution:
       corsOrigins:
         - "*"
 
-  ## Besu specific setting
-  javaOpts:
-    enabled: false
-    # This option is used to set java specific values for heap size and should be used if you experience out of memory errors.
-    # The Xmx option stands for the maximum memory allocation pool for a Java Virtual Machine ( JVM ).
-    # https://besu.hyperledger.org/en/stable/public-networks/how-to/configure-jvm/manage-memory/
-    # Example for kubernetes resources at 8Gi memory:
-    # maxHeapSize: "-Xmx3g"
-    maxHeapSize: ""
-
   # Nethermind HealthChecks module
   healthchecks:
     enabled: true
@@ -402,9 +398,17 @@ execution:
   extraFlags: []
   resources: {}
 
-  ## Additional volumes to mount into the execution node
+  ## Additional volumes to mount into the execution container
   ##
   volumeMounts: []
+
+  ## Additional env to add into the execution container
+  ##
+  env: []
+
+  ## Additional envFrom to add into the execution container
+  ##
+  envFrom: []
 
 beacon:
   client: nimbus
@@ -488,16 +492,6 @@ beacon:
   # Lighthouse specific setting
   proposerOnly: false
 
-  ## Teku specific setting
-  javaOpts:
-    enabled: true
-    # This option is used to set java specific values for heap size and should be used if you experience out of memory errors.
-    # The Xmx option stands for the maximum memory allocation pool for a Java Virtual Machine ( JVM ).
-    # https://besu.hyperledger.org/en/stable/public-networks/how-to/configure-jvm/manage-memory/
-    # Example for kubernetes resources at 8Gi memory:
-    # maxHeapSize: "-Xmx3g"
-    maxHeapSize: "-Xmx3g"
-
   ## MEV Boost endpoint
   ##
   builderEndpoint: ""
@@ -541,9 +535,17 @@ beacon:
   extraFlags: []
   resources: {}
 
-  ## Additional volumes to mount into the beacon node
+  ## Additional volumes to mount into the beacon container
   ##
   volumeMounts: []
+
+  ## Additional env to add into the beacon container
+  ##
+  env: []
+
+  ## Additional envFrom to add into the beacon container
+  ##
+  envFrom: []
 
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/

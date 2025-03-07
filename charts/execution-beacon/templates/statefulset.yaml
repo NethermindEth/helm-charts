@@ -127,6 +127,9 @@ spec:
           {{- with .Values.global.envFrom }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.execution.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- if .Values.global.externalSecrets.enabled }}
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
@@ -316,9 +319,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          {{- if .Values.execution.javaOpts.enabled }}
-            - name: BESU_OPTS
-              value: {{ .Values.execution.javaOpts.maxHeapSize }}
+          {{- with .Values.global.env }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.execution.env }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
             {{- if eq .Values.execution.client "erigon" }}
@@ -383,6 +388,17 @@ spec:
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          envFrom:
+          {{- with .Values.global.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.beacon.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.global.externalSecrets.enabled }}
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
           {{/*
           Configuration for Prysm beacon client
           */}}
@@ -672,9 +688,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-          {{- if and (eq .Values.beacon.client "teku") .Values.beacon.javaOpts.enabled }}
-            - name: JAVA_OPTS
-              value: {{ .Values.beacon.javaOpts.maxHeapSize }}
+          {{- with .Values.global.env }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.beacon.env }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
           {{- if and (eq .Values.beacon.client "prysm") .Values.beacon.grpc.enabled }}
