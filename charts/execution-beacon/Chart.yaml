@@ -2,7 +2,7 @@ apiVersion: v2
 name: execution-beacon
 description: A Helm chart for deploying Ethereum execution and consensus clients
 type: application
-version: 1.0.8
+version: 1.0.9
 appVersion: 0.0.1
 keywords:
   - ethereum
