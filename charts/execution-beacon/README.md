@@ -57,6 +57,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.metrics.port | int | `9090` |  |
 | beacon.metrics.prometheusRule.enabled | bool | `true` |  |
 | beacon.metrics.serviceMonitor.enabled | bool | `true` |  |
+| beacon.metrics.svcAnnotations | object | `{}` |  |
 | beacon.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | beacon.persistence.annotations | object | `{}` |  |
 | beacon.persistence.enabled | bool | `true` |  |
@@ -119,6 +120,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.metrics.port | int | `8008` |  |
 | execution.metrics.prometheusRule.enabled | bool | `true` |  |
 | execution.metrics.serviceMonitor.enabled | bool | `true` |  |
+| execution.metrics.svcAnnotations | object | `{}` |  |
 | execution.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | execution.persistence.annotations | object | `{}` |  |
 | execution.persistence.enabled | bool | `true` |  |

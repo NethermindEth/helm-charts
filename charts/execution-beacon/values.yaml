@@ -332,6 +332,8 @@ execution:
       ##
       enabled: true
 
+    svcAnnotations: {}
+
     ## Custom PrometheusRule to be defined
     ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
     ##
@@ -466,6 +468,8 @@ beacon:
       ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
       ##
       enabled: true
+
+    svcAnnotations: {}
 
     ## Custom PrometheusRule to be defined
     ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
