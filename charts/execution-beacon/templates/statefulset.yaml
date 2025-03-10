@@ -95,7 +95,7 @@ spec:
             - sh
             - -ac
             - >
-              {{- if eq .Values.global.network "gnosis" }}
+              {{- if or (eq .Values.global.network "gnosis") (eq .Values.global.network "chiado") }}
               exec /home/user/nimbus_beacon_node
               {{- else }}
               exec /home/user/nimbus-eth2/build/nimbus_beacon_node
@@ -123,6 +123,7 @@ spec:
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if or .Values.global.envFrom .Values.execution.envFrom .Values.global.externalSecrets.enabled }}
           envFrom:
           {{- with .Values.global.envFrom }}
             {{- toYaml . | nindent 12 }}
@@ -133,6 +134,7 @@ spec:
           {{- if .Values.global.externalSecrets.enabled }}
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
           {{- end }}
           command:
             - sh
@@ -388,6 +390,7 @@ spec:
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if or .Values.global.envFrom .Values.beacon.envFrom .Values.global.externalSecrets.enabled }}
           envFrom:
           {{- with .Values.global.envFrom }}
             {{- toYaml . | nindent 12 }}
@@ -398,6 +401,7 @@ spec:
           {{- if .Values.global.externalSecrets.enabled }}
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
           {{- end }}
           {{/*
           Configuration for Prysm beacon client

@@ -11,16 +11,14 @@ metadata:
     beacon: {{ .Values.beacon.client }}
   {{- $executionMetricsAnnotationsEnabled := and .Values.execution.metrics.enabled .Values.execution.metrics.svcAnnotations }}
   {{- $beaconMetricsAnnotationsEnabled := and .Values.beacon.metrics.enabled .Values.beacon.metrics.svcAnnotations }}
-  {{- if and $executionMetricsAnnotationsEnabled $beaconMetricsAnnotationsEnabled }}
+  {{- if or $executionMetricsAnnotationsEnabled $beaconMetricsAnnotationsEnabled }}
   annotations:
-    {{- $metricsAnnotations := merge .Values.execution.metrics.svcAnnotations .Values.beacon.metrics.svcAnnotations }}
-    {{- toYaml $metricsAnnotations | nindent 4 | trim }}
-  {{- else if $executionMetricsAnnotationsEnabled }}
-  annotations:
-    {{ toYaml .Values.execution.metrics.svcAnnotations | nindent 4 | trim }}
-  {{- else if $beaconMetricsAnnotationsEnabled }}
-  annotations:
-    {{ toYaml .Values.beacon.metrics.svcAnnotations | nindent 4 | trim }}
+  {{- with .Values.execution.metrics.svcAnnotations }}
+    {{- toYaml . | nindent 4 | trim }}
+  {{- end }}
+  {{- with .Values.beacon.metrics.svcAnnotations }}
+    {{- toYaml . | nindent 4 | trim }}
+  {{- end }}
   {{- end }}
 spec:
 {{- if .Values.global.sessionAffinity.enabled }}
