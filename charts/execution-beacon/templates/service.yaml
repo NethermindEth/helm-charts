@@ -9,13 +9,17 @@ metadata:
     type: api
     execution: {{ .Values.execution.client }}
     beacon: {{ .Values.beacon.client }}
-{{- if and .Values.execution.metrics.enabled .Values.execution.metrics.svcAnnotations }}
+  {{- $executionMetricsAnnotationsEnabled := and .Values.execution.metrics.enabled .Values.execution.metrics.svcAnnotations }}
+  {{- $beaconMetricsAnnotationsEnabled := and .Values.beacon.metrics.enabled .Values.beacon.metrics.svcAnnotations }}
+  {{- if or $executionMetricsAnnotationsEnabled $beaconMetricsAnnotationsEnabled }}
   annotations:
-    {{ toYaml .Values.execution.metrics.svcAnnotations | nindent 4 | trim }}
-{{- else }}
-  annotations:
-      {{ toYaml .Values.beacon.metrics.svcAnnotations | nindent 4 | trim }}
-{{- end }}
+  {{- with .Values.execution.metrics.svcAnnotations }}
+    {{- toYaml . | nindent 4 | trim }}
+  {{- end }}
+  {{- with .Values.beacon.metrics.svcAnnotations }}
+    {{- toYaml . | nindent 4 | trim }}
+  {{- end }}
+  {{- end }}
 spec:
 {{- if .Values.global.sessionAffinity.enabled }}
   sessionAffinity: ClientIP

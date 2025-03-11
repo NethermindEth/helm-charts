@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.9](https://img.shields.io/badge/Version-1.0.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
+![Version: 1.0.10](https://img.shields.io/badge/Version-1.0.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -57,6 +57,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.metrics.port | int | `9090` |  |
 | beacon.metrics.prometheusRule.enabled | bool | `true` |  |
 | beacon.metrics.serviceMonitor.enabled | bool | `true` |  |
+| beacon.metrics.svcAnnotations | object | `{}` |  |
 | beacon.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | beacon.persistence.annotations | object | `{}` |  |
 | beacon.persistence.enabled | bool | `true` |  |
@@ -119,6 +120,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.metrics.port | int | `8008` |  |
 | execution.metrics.prometheusRule.enabled | bool | `true` |  |
 | execution.metrics.serviceMonitor.enabled | bool | `true` |  |
+| execution.metrics.svcAnnotations | object | `{}` |  |
 | execution.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | execution.persistence.annotations | object | `{}` |  |
 | execution.persistence.enabled | bool | `true` |  |
