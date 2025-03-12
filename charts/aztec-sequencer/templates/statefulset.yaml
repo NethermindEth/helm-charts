@@ -44,6 +44,9 @@ spec:
               mountPath: /scripts
             - name: shared
               mountPath: /shared
+            {{- with .Values.initContainer.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           env:
             - name: NODE_NAME
               valueFrom:

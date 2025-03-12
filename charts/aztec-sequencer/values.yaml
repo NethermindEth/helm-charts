@@ -55,8 +55,7 @@ validatorKeysSecret: "aztec-validator-keys"
 
 # Additional commands to setup environment variables before starting the app
 extraInitScript: |
-  echo "Running extra init script"
-  echo 'test -z "$PEER_ID_PRIVATE_KEY" && export PEER_ID_PRIVATE_KEY=$(cat /var/lib/aztec/p2p-private-key)' >> /shared/env
+  echo "Running extra init commands..."
   echo "Done"
 
 env: []
@@ -172,6 +171,9 @@ initContainer:
   image:
     repository: bitnami/kubectl
     tag: 1.28
+  volumeMounts: []
+
+# Extra init containers
 extraInitContainers: []
 
 # Default security settings for the pod

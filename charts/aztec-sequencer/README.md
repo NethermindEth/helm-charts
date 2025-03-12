@@ -1,6 +1,6 @@
 # aztec-sequencer
 
-![Version: 0.0.3](https://img.shields.io/badge/Version-0.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.4](https://img.shields.io/badge/Version-0.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying an Aztec sequencer
 
@@ -59,7 +59,7 @@ helm install aztec-sequencer nethermind/aztec-sequencer
 | env | list | `[]` |  |
 | envFrom | list | `[]` |  |
 | extraInitContainers | list | `[]` |  |
-| extraInitScript | string | `"echo \"Running extra init script\"\necho 'test -z \"$PEER_ID_PRIVATE_KEY\" && export PEER_ID_PRIVATE_KEY=$(cat /var/lib/aztec/p2p-private-key)' >> /shared/env\necho \"Done\"\n"` |  |
+| extraInitScript | string | `"echo \"Running extra init commands...\"\necho \"Done\"\n"` |  |
 | extraObjects | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -75,6 +75,7 @@ helm install aztec-sequencer nethermind/aztec-sequencer
 | ingress.tls | list | `[]` |  |
 | initContainer.image.repository | string | `"bitnami/kubectl"` |  |
 | initContainer.image.tag | float | `1.28` |  |
+| initContainer.volumeMounts | list | `[]` |  |
 | initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
