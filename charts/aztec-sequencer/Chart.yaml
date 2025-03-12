@@ -3,6 +3,6 @@ name: aztec-sequencer
 description: A Helm chart for deploying an Aztec sequencer
 type: application
 home: https://docs.aztec.network/
-version: 0.0.3
+version: 0.0.4
 maintainers:
   - name: 0xDones
