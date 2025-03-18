@@ -101,6 +101,7 @@ spec:
         - name: scripts
           configMap:
             name: {{ include "generic-app-p2p.fullname" . }}-scripts
+            defaultMode: 0777
         - name: shared
           emptyDir: {}
       {{- with .Values.volumes }}
