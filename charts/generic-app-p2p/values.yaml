@@ -20,16 +20,14 @@ imagePullSecrets: []
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 
-# -- Enable StatefulSet
-statefulSet:
-  # -- Enable PVC for StatefulSet
-  persistence:
-    enabled: false
-    storageClassName: ""
-    mountPath: /data
-    accessModes:
-      - ReadWriteOnce
-    size: 10Gi
+# -- Enable PVC for StatefulSet
+persistence:
+  enabled: false
+  storageClassName: ""
+  mountPath: /data
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
 
 # -- Command and args for the container
 command: []

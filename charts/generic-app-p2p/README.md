@@ -202,6 +202,7 @@ statefulSet:
 | p2p.enabled | bool | `false` |  |
 | p2p.port | int | `30300` | Port name |
 | p2p.serviceType | string | `"NodePort"` |  |
+| persistence | object | `{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext.fsGroup | int | `1000` |  |
@@ -238,8 +239,6 @@ statefulSet:
 | serviceMonitor.scheme | string | `"http"` | ServiceMonitor scheme |
 | serviceMonitor.scrapeTimeout | string | `"30s"` | ServiceMonitor scrape timeout |
 | serviceMonitor.tlsConfig | object | `{}` | ServiceMonitor TLS configuration |
-| statefulSet | object | `{"persistence":{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}}` | Enable StatefulSet |
-| statefulSet.persistence | object | `{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
 | tolerations | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |

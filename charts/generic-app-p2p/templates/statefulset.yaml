@@ -90,9 +90,9 @@ spec:
           volumeMounts:
             - name: shared
               mountPath: /shared
-            {{- if .Values.statefulSet.persistence.enabled }}
+            {{- if .Values.persistence.enabled }}
             - name: data
-              mountPath: {{ .Values.statefulSet.persistence.mountPath }}
+              mountPath: {{ .Values.persistence.mountPath }}
             {{- end }}
             {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -118,7 +118,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-  {{- if .Values.statefulSet.persistence.enabled }}
+  {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -127,9 +127,9 @@ spec:
         labels:
           {{- include "generic-app-p2p.labels" . | nindent 10 }}
       spec:
-        storageClassName: {{ .Values.statefulSet.persistence.storageClassName | quote }}
-        accessModes: {{- .Values.statefulSet.persistence.accessModes | toYaml | nindent 10 }}
+        storageClassName: {{ .Values.persistence.storageClassName | quote }}
+        accessModes: {{- .Values.persistence.accessModes | toYaml | nindent 10 }}
         resources:
           requests:
-            storage: {{ .Values.statefulSet.persistence.size }}
+            storage: {{ .Values.persistence.size }}
     {{- end }}
