@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "generic-app-p2p.fullname" . }}
+  labels:
+    {{- include "generic-app-p2p.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  {{- if .Values.service.ports }}
+  {{- range $idx, $port := .Values.service.ports }}
+    - name: {{ $port.name }}
+      port: {{ $port.port }}
+      targetPort: {{ $port.name }}
+      protocol: {{ $port.protocol }}
+  {{- end }}
+  {{- else }}
+    []
+  {{- end }}
+  selector:
+    {{- include "generic-app-p2p.selectorLabels" . | nindent 4 }}

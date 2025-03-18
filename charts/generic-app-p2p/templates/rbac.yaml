@@ -1,0 +1,25 @@
+{{- if .Values.p2p.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "generic-app-p2p.fullname" . }}
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "services"]
+    verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "generic-app-p2p.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "generic-app-p2p.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "generic-app-p2p.fullname" . }}
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

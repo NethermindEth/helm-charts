@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "generic-app-p2p.fullname" . }}-env-cm
+  labels:
+    {{- include "generic-app-p2p.labels" . | nindent 4 }}
+data: {{- .Values.config | toYaml | nindent 2 }}
+{{- range .Values.configMaps }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "generic-app-p2p.labels" $ | nindent 4 }}
+data: {{- .data | toYaml | nindent 2 }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "generic-app-p2p.fullname" . }}-scripts
+  labels:
+    {{- include "generic-app-p2p.labels" . | nindent 4 }}
+data:
+  init.sh: |
+    {{ .Values.initScript | nindent 4 }}
+    {{ .Values.extraInitScript | nindent 4 }}

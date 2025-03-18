@@ -1,0 +1,171 @@
+{{- template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "extra.installation" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+## Usage
+
+Check `values.deploy.yaml` for example configuration options.
+
+### Name Override
+
+Always use the `nameOverride` to set the name of the resources.
+
+```yaml
+nameOverride: "my-app"
+```
+
+### Init Containers or Sidecars
+
+```yaml
+initContainers:
+  - name: my-init-container
+    image: busybox
+    command: ['sh', '-c', 'echo "Hello, World!"']
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+extraContainers:
+  - name: my-sidecar
+    image: "busybox"
+    imagePullPolicy: IfNotPresent
+    ports:
+      - name: http
+        containerPort: 80
+        protocol: TCP
+```
+
+### Container and Service Ports
+
+This will create both service and container ports configuration. Only http port is required. It will be the default port for the Ingress resource.
+
+```yaml
+service:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      protocol: TCP
+```
+
+### Ingress
+
+```yaml
+ingress:
+  enabled: true
+  className: "kong"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          # -- Port name as defined in the service.ports section
+          portName: http
+  tls:
+    - secretName: chart-example-local-tls
+      hosts:
+        - chart-example.local
+```
+
+### Application Configuration
+
+#### Environment Variables
+
+There are different ways to expose environment variables to the application inside the container.
+
+This is the most simple way to set environment variables. No further configuration is needed. A ConfigMap will be created named `{{`{{ .Release.Name }}`}}-env-cm`.
+
+```yaml
+config:
+  VAR_1: value1
+  VAR_2: value2
+```
+
+This uses the container `env` field to set environment variables. Ref: [Kubernetes Docs](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
+
+```yaml
+env:
+  - name: MY_ENV_VAR
+    value: my-env-var-value
+  - name: SECRET
+    valueFrom:
+      secretKeyRef:
+        key: SECRET
+        name: secret-name
+```
+
+### Config Files
+
+Mounting a ConfigMap as a file is useful when the application expects a configuration file.
+
+```yaml
+configMaps:
+  - name: example-app-config
+    data:
+      config.yaml: |
+        db_host: localhost
+        db_user: db_user
+  - name: example-app-single-file
+    data:
+      config.json: |
+        {
+          "key": "value"
+        }
+
+volumes:
+  - name: example-app-config
+    configMap:
+      name: example-app-config
+  - name: example-app-single-file
+    configMap:
+      name: example-app-single-file
+
+volumeMounts:
+  # Mounting a ConfigMap as a directory
+  - name: example-app-config
+    mountPath: /etc/config
+    readOnly: true
+  # Mounting a single file from a ConfigMap
+  - name: example-app-single-file
+    mountPath: /etc/single-file/config.json
+    subPath: config.json
+    readOnly: true
+```
+
+### Sts Persistence
+
+```yaml
+statefulSet:
+  persistence:
+    enabled: true
+    storageClassName: ""
+    mountPath: /data
+    accessModes:
+      - ReadWriteOnce
+    size: 50Gi
+```
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
