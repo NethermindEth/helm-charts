@@ -20,3 +20,28 @@ spec:
   {{- end }}
   selector:
     {{- include "generic-app-p2p.selectorLabels" . | nindent 4 }}
+{{- range $i := until (int .Values.replicaCount) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "generic-app-p2p.fullname" $ }}-{{ $i }}
+  labels:
+    {{- include "generic-app-p2p.labels" $ | nindent 4 }}
+spec:
+  type: {{ $.Values.service.type }}
+  ports:
+  {{- if $.Values.service.ports }}
+  {{- range $idx, $port := $.Values.service.ports }}
+    - name: {{ $port.name }}
+      port: {{ $port.port }}
+      targetPort: {{ $port.name }}
+      protocol: {{ $port.protocol }}
+  {{- end }}
+  {{- else }}
+    []
+  {{- end }}
+  selector:
+    statefulset.kubernetes.io/pod-name: {{ include "generic-app-p2p.fullname" $ }}-{{ $i }}
+    {{- include "generic-app-p2p.selectorLabels" $ | nindent 4 }}
+{{- end }}
