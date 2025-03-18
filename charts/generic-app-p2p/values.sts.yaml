@@ -1,0 +1,41 @@
+nameOverride: "generic-statefulset"
+
+image:
+  repository: alpine
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+imagePullSecrets: []
+
+replicaCount: 1
+statefulSet:
+  persistence:
+    enabled: false
+    storageClassName: ""
+    mountPath: /data
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+
+command: []
+args: []
+
+# -- config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration.
+config: {}
+  # ENV_1: value1
+  # ENV_2: value2
+
+service:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+
+p2p:
+  enabled: false
+  port: 30300
+  serviceType: NodePort
+
+serviceMonitor:
+  enabled: false
