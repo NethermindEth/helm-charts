@@ -161,7 +161,6 @@ service:
 # Creates the NodePort service
 p2p:
   enabled: false
-  # -- Port name
   port: 30300
   serviceType: NodePort
 
