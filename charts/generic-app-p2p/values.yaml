@@ -84,10 +84,10 @@ initScript: |
   echo "export REPLICA_INDEX=${REPLICA_INDEX}" >> /shared/env
   echo "export EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}" >> /shared/env
   echo "export EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}" >> /shared/env
-  exit 0
 
-# -- extraInitScript for running additional commands before starting the application
-extraInitScript: ""
+# -- extraInitScript for running additional after the initScript commands
+extraInitScript: |
+  exit 0
 
 # -- Init containers
 initContainers:
