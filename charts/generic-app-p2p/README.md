@@ -1,6 +1,6 @@
 # generic-app-p2p
 
-![Version: 0.0.3](https://img.shields.io/badge/Version-0.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.4](https://img.shields.io/badge/Version-0.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic apps (P2P)
 
@@ -180,7 +180,7 @@ statefulSet:
 | env | list | `[]` | This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/ |
 | envFrom | list | `[]` | envFrom configuration |
 | extraContainers | list | `[]` | Sidecar containers |
-| extraInitScript | string | `""` | extraInitScript for running additional commands before starting the application |
+| extraInitScript | string | `"exit 0\n"` | extraInitScript for running additional after the initScript commands |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"alpine"` |  |
@@ -195,7 +195,7 @@ statefulSet:
 | initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
 | initContainerSecurityContext.runAsUser | int | `1000` |  |
 | initContainers | list | `[{"command":["sh","-c","/scripts/init.sh"],"env":[{"name":"NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}}],"image":"bitnami/kubectl:1.28","name":"init","volumeMounts":[{"mountPath":"/scripts","name":"scripts"},{"mountPath":"/shared","name":"shared"}]}]` | Init containers |
-| initScript | string | `"#!/usr/bin/env bash\necho \"Starting init script for pod ${POD_NAME}...\"\ntouch /shared/env\n\necho \"Getting external node ip...\"\nEXTERNAL_NODE_IP=$(kubectl get node $NODE_NAME -o jsonpath='{.status.addresses[?(@.type==\"ExternalIP\")].address}')\necho \"Getting external node port...\"\nEXTERNAL_NODE_PORT=$(kubectl get services -l \"pod=${POD_NAME},type=p2p\" -o jsonpath='{.items[0].spec.ports[0].nodePort}')\n\nREPLICA_INDEX=$(echo $POD_NAME | awk -F'-' '{print $NF}')\n\necho \"REPLICA_INDEX=${REPLICA_INDEX}\"\necho \"EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\"\necho \"EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\"\n\necho \"export REPLICA_INDEX=${REPLICA_INDEX}\" >> /shared/env\necho \"export EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\" >> /shared/env\necho \"export EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\" >> /shared/env\nexit 0\n"` | InitScript for the pod (Used to get external node ip and port) |
+| initScript | string | `"#!/usr/bin/env bash\necho \"Starting init script for pod ${POD_NAME}...\"\ntouch /shared/env\n\necho \"Getting external node ip...\"\nEXTERNAL_NODE_IP=$(kubectl get node $NODE_NAME -o jsonpath='{.status.addresses[?(@.type==\"ExternalIP\")].address}')\necho \"Getting external node port...\"\nEXTERNAL_NODE_PORT=$(kubectl get services -l \"pod=${POD_NAME},type=p2p\" -o jsonpath='{.items[0].spec.ports[0].nodePort}')\n\nREPLICA_INDEX=$(echo $POD_NAME | awk -F'-' '{print $NF}')\n\necho \"REPLICA_INDEX=${REPLICA_INDEX}\"\necho \"EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\"\necho \"EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\"\n\necho \"export REPLICA_INDEX=${REPLICA_INDEX}\" >> /shared/env\necho \"export EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\" >> /shared/env\necho \"export EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\" >> /shared/env\n"` | InitScript for the pod (Used to get external node ip and port) |
 | livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
