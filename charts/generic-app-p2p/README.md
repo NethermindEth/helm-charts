@@ -1,6 +1,6 @@
 # generic-app-p2p
 
-![Version: 0.0.4](https://img.shields.io/badge/Version-0.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.5](https://img.shields.io/badge/Version-0.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic apps (P2P)
 
@@ -56,7 +56,11 @@ extraContainers:
 
 ### Container and Service Ports
 
-This will create both service and container ports configuration. Only http port is required. It will be the default port for the Ingress resource.
+This will create both service and container ports configuration.
+
+- The `p2p.port` will be added to the container ports regardless of the `p2p.enabled` value.
+- The p2p service will only be created if `p2p.enabled` is set to `true`.
+- If `p2p.enabled: false`, the `rbac` roles won't be created. For this reason, remember to set `initScript: ""` or override the content otherwise the init container will fail due to the lack of permissions.
 
 ```yaml
 service:
@@ -67,6 +71,11 @@ service:
     - name: metrics
       port: 9090
       protocol: TCP
+
+p2p:
+  enabled: false
+  port: 30300
+  serviceType: NodePort
 ```
 
 ### Ingress
@@ -158,14 +167,13 @@ volumeMounts:
 ### Sts Persistence
 
 ```yaml
-statefulSet:
-  persistence:
-    enabled: true
-    storageClassName: ""
-    mountPath: /data
-    accessModes:
-      - ReadWriteOnce
-    size: 50Gi
+persistence:
+  enabled: true
+  storageClassName: ""
+  mountPath: /data
+  accessModes:
+    - ReadWriteOnce
+  size: 50Gi
 ```
 
 ## Values
@@ -200,7 +208,7 @@ statefulSet:
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | p2p.enabled | bool | `false` |  |
-| p2p.port | int | `30300` | Port name |
+| p2p.port | int | `30300` |  |
 | p2p.serviceType | string | `"NodePort"` |  |
 | persistence | object | `{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
 | podAnnotations | object | `{}` |  |
