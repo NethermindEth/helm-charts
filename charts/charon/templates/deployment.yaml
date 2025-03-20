@@ -4,6 +4,9 @@ metadata:
   name: {{ include "release.name" . }}
   labels:
     {{- include "charon.labels" . | nindent 4 }}
+  annotations:
+    trivy.security.devops.aqua.com/KSV014: "This container requires write access to filesystem"
+    trivy.security.devops.aqua.com/KSV118: "Custom security context is not required for this deployment"
 spec:
   replicas: 1
   selector:
