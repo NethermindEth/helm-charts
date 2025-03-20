@@ -227,7 +227,7 @@ extraFlags:
 
 ## Web3Signer Endpoint
 ##
-web3signerEndpoint: ""
+web3signerEndpoint: "test"
 
 ## List of Beacon Chain node addresses
 ##
