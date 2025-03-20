@@ -20,20 +20,7 @@ args:
   - "--archiver"
   - "--sequencer"
 
-config:
-  DATA_DIRECTORY: /local-data
-  ETHEREUM_HOST: ""
-  P2P_TCP_LISTEN_ADDR: 0.0.0.0:40400
-  P2P_UDP_LISTEN_ADDR: 0.0.0.0:40400
-  COINBASE: "0xbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-  VALIDATOR_DISABLED: "false"
-  DEBUG: "aztec:*,-aztec:avm_simulator*,-aztec:circuits:artifact_hash,-aztec:libp2p_service,-json-rpc*,-aztec:world-state:database,-aztec:l2_block_stream*"
-  LOG_LEVEL: debug
-  AZTEC_PORT: "8080"
-  P2P_ENABLED: "true"
-  L1_CHAIN_ID: "1337"
-  PROVER_REAL_PROOFS: "true"
-  PXE_PROVER_ENABLED: "true"
+config: {}
 
 # Secret containing the validator keys
 validatorKeysSecret: "aztec-validator-keys"

@@ -1,6 +1,6 @@
 # aztec-sequencer
 
-![Version: 0.0.5](https://img.shields.io/badge/Version-0.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.6](https://img.shields.io/badge/Version-0.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying an Aztec sequencer
 
@@ -28,19 +28,7 @@ helm install aztec-sequencer nethermind/aztec-sequencer
 | args[1] | string | `"--node"` |  |
 | args[2] | string | `"--archiver"` |  |
 | args[3] | string | `"--sequencer"` |  |
-| config.AZTEC_PORT | string | `"8080"` |  |
-| config.COINBASE | string | `"0xbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"` |  |
-| config.DATA_DIRECTORY | string | `"/local-data"` |  |
-| config.DEBUG | string | `"aztec:*,-aztec:avm_simulator*,-aztec:circuits:artifact_hash,-aztec:libp2p_service,-json-rpc*,-aztec:world-state:database,-aztec:l2_block_stream*"` |  |
-| config.ETHEREUM_HOST | string | `""` |  |
-| config.L1_CHAIN_ID | string | `"1337"` |  |
-| config.LOG_LEVEL | string | `"debug"` |  |
-| config.P2P_ENABLED | string | `"true"` |  |
-| config.P2P_TCP_LISTEN_ADDR | string | `"0.0.0.0:40400"` |  |
-| config.P2P_UDP_LISTEN_ADDR | string | `"0.0.0.0:40400"` |  |
-| config.PROVER_REAL_PROOFS | string | `"true"` |  |
-| config.PXE_PROVER_ENABLED | string | `"true"` |  |
-| config.VALIDATOR_DISABLED | string | `"false"` |  |
+| config | object | `{}` |  |
 | env | list | `[]` |  |
 | envFrom | list | `[]` |  |
 | extraInitContainers | list | `[]` |  |
