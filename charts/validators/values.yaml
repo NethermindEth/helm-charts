@@ -227,7 +227,7 @@ extraFlags:
 
 ## Web3Signer Endpoint
 ##
-web3signerEndpoint: ""
+web3signerEndpoint: "http://test-web3signer:9000"
 
 ## List of Beacon Chain node addresses
 ##
