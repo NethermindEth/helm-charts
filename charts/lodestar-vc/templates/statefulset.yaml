@@ -5,8 +5,6 @@ metadata:
   name: {{ include "lodestar.fullname" . }}
   labels:
     {{- include "lodestar.labels" . | nindent 4 }}
-  annotations:
-    trivy.security.devops.aqua.com/KSV014: "Container requires write access for validator keys"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -33,7 +31,6 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          # trivy:ignore:AVD-KSV-0014
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:

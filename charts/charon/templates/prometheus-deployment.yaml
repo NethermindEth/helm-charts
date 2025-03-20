@@ -5,8 +5,6 @@ metadata:
   labels:
     app: {{ include "release.name" . }}-prometheus
   name: {{ include "release.name" . }}-prometheus
-  annotations:
-    trivy.security.devops.aqua.com/KSV014: "Prometheus requires write access for data collection"
 spec:
   replicas: 1
   selector:
