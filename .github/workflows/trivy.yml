@@ -86,7 +86,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: '${{ github.workspace }}/charts'
           format: 'table'
-          severity: 'CRITICAL'
+          severity: 'CRITICAL, HIGH'
           exit-code: '1'
           scanners: 'misconfig,secret'
           timeout: '10m'
