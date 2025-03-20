@@ -56,7 +56,7 @@ jobs:
           version: v0.57.1
 
       - name: Generate Trivy SARIF Report
-        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 #v0.29.0
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           scan-type: 'fs'
           scan-ref: '${{ github.workspace }}/charts'
@@ -75,7 +75,7 @@ jobs:
           TRIVY_DEBUG: true
 
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@5618c9fc1e675841ca52c1c6b1304f5255a905a0 #v2.19.0
+        uses: github/codeql-action/upload-sarif@v3.28.12
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
