@@ -1,0 +1,15 @@
+{{- if .Values.rbac.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "esd.serviceAccountName" . }}
+  labels:
+    {{- include "esd.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "esd.serviceAccountName" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "esd.serviceAccountName" . }}
+{{- end }}
