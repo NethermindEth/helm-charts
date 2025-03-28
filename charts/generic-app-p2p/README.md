@@ -1,6 +1,6 @@
 # generic-app-p2p
 
-![Version: 0.0.5](https://img.shields.io/badge/Version-0.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.6](https://img.shields.io/badge/Version-0.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic apps (P2P)
 
@@ -60,7 +60,7 @@ This will create both service and container ports configuration.
 
 - The `p2p.port` will be added to the container ports regardless of the `p2p.enabled` value.
 - The p2p service will only be created if `p2p.enabled` is set to `true`.
-- If `p2p.enabled: false`, the `rbac` roles won't be created. For this reason, remember to set `initScript: ""` or override the content otherwise the init container will fail due to the lack of permissions.
+- If `p2p.enabled: false`, the `rbac` roles won't be created. For this reason, `initScript` will be skipped.
 
 ```yaml
 service:
@@ -73,9 +73,19 @@ service:
       protocol: TCP
 
 p2p:
-  enabled: false
+  enabled: true
   port: 30300
   serviceType: NodePort
+
+extraInitScript: |
+  # The following values are available:
+  echo "export my_node_ip=${EXTERNAL_NODE_IP}" >> /shared/env
+  echo "export my_node_port=${EXTERNAL_NODE_PORT}" >> /shared/env
+  echo "export my_replica_index=${REPLICA_INDEX}" >> /shared/env
+  # When the app starts, the file `/shared/env` will be sourced automatically.
+
+command:
+  - echo "$my_node_ip" # will print the node ip
 ```
 
 ### Ingress
@@ -203,7 +213,7 @@ persistence:
 | initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
 | initContainerSecurityContext.runAsUser | int | `1000` |  |
 | initContainers | list | `[{"command":["sh","-c","/scripts/init.sh"],"env":[{"name":"NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}}],"image":"bitnami/kubectl:1.28","name":"init","volumeMounts":[{"mountPath":"/scripts","name":"scripts"},{"mountPath":"/shared","name":"shared"}]}]` | Init containers |
-| initScript | string | `"#!/usr/bin/env bash\necho \"Starting init script for pod ${POD_NAME}...\"\ntouch /shared/env\n\necho \"Getting external node ip...\"\nEXTERNAL_NODE_IP=$(kubectl get node $NODE_NAME -o jsonpath='{.status.addresses[?(@.type==\"ExternalIP\")].address}')\necho \"Getting external node port...\"\nEXTERNAL_NODE_PORT=$(kubectl get services -l \"pod=${POD_NAME},type=p2p\" -o jsonpath='{.items[0].spec.ports[0].nodePort}')\n\nREPLICA_INDEX=$(echo $POD_NAME | awk -F'-' '{print $NF}')\n\necho \"REPLICA_INDEX=${REPLICA_INDEX}\"\necho \"EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\"\necho \"EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\"\n\necho \"export REPLICA_INDEX=${REPLICA_INDEX}\" >> /shared/env\necho \"export EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\" >> /shared/env\necho \"export EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\" >> /shared/env\n"` | InitScript for the pod (Used to get external node ip and port) |
+| initScript | string | `"#!/usr/bin/env bash\necho \"Starting init script for pod ${POD_NAME}...\"\ntouch /shared/env\n\necho \"Getting external node ip and port...\"\nEXTERNAL_NODE_IP=$(kubectl get node $NODE_NAME -o jsonpath='{.status.addresses[?(@.type==\"ExternalIP\")].address}')\nEXTERNAL_NODE_PORT=$(kubectl get services -l \"pod=${POD_NAME},type=p2p\" -o jsonpath='{.items[0].spec.ports[0].nodePort}')\n\nREPLICA_INDEX=$(echo $POD_NAME | awk -F'-' '{print $NF}')\n\necho \"REPLICA_INDEX=${REPLICA_INDEX}\"\necho \"EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\"\necho \"EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\"\n\necho \"export REPLICA_INDEX=${REPLICA_INDEX}\" >> /shared/env\necho \"export EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\" >> /shared/env\necho \"export EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\" >> /shared/env\n"` | InitScript for the pod (Used to get external node ip and port) |
 | livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
