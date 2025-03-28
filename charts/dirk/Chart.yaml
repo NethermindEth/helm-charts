@@ -1,0 +1,23 @@
+apiVersion: v2
+name: dirk
+description: A Helm chart for installing and configuring large scale ETH staking infrastructure on top of the Kubernetes
+type: application
+version: 1.1.1
+appVersion: "v22.10.0"
+
+keywords:
+  - ethereum
+  - blockchain
+  - external-signer
+  - dirk
+
+home: https://github.com/attestantio/dirk
+
+dependencies:
+  - name: common
+    repository: file://../common
+    version: 1.0.0
+
+maintainers:
+  - name: matilote
+  - name: aivarasko
