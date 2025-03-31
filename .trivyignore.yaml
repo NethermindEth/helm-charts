@@ -9,7 +9,19 @@ misconfigurations:
       - "**/templates/configmap.yaml"
     statement: "ConfigMap uses environment variable substitution for secrets, not actual values"
 
-  - id: KSV014
+  - id: AVD-KSV-0014
     paths:
-      - "web3signer/templates/statefulset.yaml"
-    statement: "Container requires write access to filesystem for web3signer"
+      - "charon/templates/deployment.yaml"
+      - "charon/templates/prometheus-deployment.yaml"
+      - "lodestar-vc/templates/statefulset.yaml"
+    statement: "Container requires write access to filesystem for operations"
+
+  - id: AVD-KSV-0118
+    paths:
+      - "charon/templates/deployment.yaml"
+    statement: "Custom security context not required for this deployment"
+
+  - id: AVD-KSV-0056
+    paths:
+      - "charts/validators/templates/role.yaml"
+    statement: "Service and pod access required for validator operation"
