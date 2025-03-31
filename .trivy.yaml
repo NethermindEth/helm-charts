@@ -1,0 +1,5 @@
+misconfiguration:
+  helm:
+    set:
+      - web3signerEndpoint="http://example.com"
+      - config.beaconNodeEndpoints="http://example.com"
