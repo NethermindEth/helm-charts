@@ -24,8 +24,8 @@ A Helm chart for installing and configuring large scale ETH staking infrastructu
 | dirk.fetchKeysExtraFlags | list | `[]` |  |
 | dirk.loglevel | string | `"Debug"` |  |
 | dirk.tracing | string | `nil` |  |
-| env | list | `[]` | Additional environment variables to set in the container.  |
-| envFrom | list | `[]` | Additional environment variables to set in the container from secrets or configmaps.  |
+| env | list | `[]` | Additional environment variables to set in the container.  Dirk requires the following environment variables: `WALLET`, `KEYGEN_SEED`, `DIRK_UNLOCKER_ACCOUNT_PASSPHRASES`, `ESO_DB_KEYSTORE_URL`, `ESO_DECRYPTION_KEY`, `dirk-ca.crt` base64 encoded, `dirk-ca.key` base64 encoded  |
+| envFrom | list | `[]` | Additional environment variables to set in the container from secrets or configmaps.  Dirk requires the following environment variables: `WALLET`, `KEYGEN_SEED`, `DIRK_UNLOCKER_ACCOUNT_PASSPHRASES`, `ESO_DB_KEYSTORE_URL`, `ESO_DECRYPTION_KEY`, `dirk-ca.crt` base64 encoded, `dirk-ca.key` base64 encoded  |
 | fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources  |
 | global.podSecurityContext | object | `{"fsGroup":10000,"runAsNonRoot":true,"runAsUser":10000}` | Pod Security Context ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/  |
 | global.securityContext.capabilities.drop[0] | string | `"ALL"` |  |

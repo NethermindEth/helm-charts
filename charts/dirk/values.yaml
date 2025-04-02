@@ -46,9 +46,15 @@ cliImage:
 
 # -- Additional environment variables to set in the container.
 #
+# Dirk requires the following environment variables:
+# `WALLET`, `KEYGEN_SEED`, `DIRK_UNLOCKER_ACCOUNT_PASSPHRASES`, `ESO_DB_KEYSTORE_URL`, `ESO_DECRYPTION_KEY`, `dirk-ca.crt` base64 encoded, `dirk-ca.key` base64 encoded
+#
 env: []
 
 # -- Additional environment variables to set in the container from secrets or configmaps.
+#
+# Dirk requires the following environment variables:
+# `WALLET`, `KEYGEN_SEED`, `DIRK_UNLOCKER_ACCOUNT_PASSPHRASES`, `ESO_DB_KEYSTORE_URL`, `ESO_DECRYPTION_KEY`, `dirk-ca.crt` base64 encoded, `dirk-ca.key` base64 encoded
 #
 envFrom: []
 
