@@ -1,16 +1,16 @@
 ---
-apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "dirk.fullname" . }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "dirk.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" . | nindent 6 }}
-  serviceName: {{ include "common.names.fullname" . }}
+      {{- include "dirk.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "dirk.fullname" . }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,7 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        {{- include "dirk.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -38,7 +38,7 @@ spec:
           whenUnsatisfiable: DoNotSchedule
           labelSelector:
             matchLabels:
-              {{- include "common.labels.matchLabels" . | nindent 14 }}
+              {{- include "dirk.selectorLabels" . | nindent 14 }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -68,7 +68,7 @@ spec:
               chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/dirk;
           envFrom:
             - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
+                name: eso-{{ include "dirk.fullname" . }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -89,9 +89,9 @@ spec:
                 - ALL
           envFrom:
             - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
+                name: eso-{{ include "dirk.fullname" . }}
             - configMapRef:
-                name: {{ include "common.names.fullname" . }}-env
+                name: {{ include "dirk.fullname" . }}-env
           args:
           - "sync-dirk-keys"
           - "--db-url-env"
@@ -120,7 +120,7 @@ spec:
                 - ALL
           envFrom:
             - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
+                name: eso-{{ include "dirk.fullname" . }}
           args: [ "--base-dir", "/data/dirk" ]
           ports:
             - name: http
@@ -171,9 +171,9 @@ spec:
                 - ALL
           envFrom:
             - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
+                name: eso-{{ include "dirk.fullname" . }}
             - configMapRef:
-                name: {{ include "common.names.fullname" . }}-env
+                name: {{ include "dirk.fullname" . }}-env
 #          command: [ "/bin/bash", "-c", "--" ]
 #          args: [ "while true; do sleep 30; done;" ]
           args:
@@ -199,16 +199,16 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "common.names.fullname" . }}
+            name: {{ include "dirk.fullname" . }}
         - name: scripts
           configMap:
-            name: {{ include "common.names.fullname" . }}-scripts
+            name: {{ include "dirk.fullname" . }}-scripts
   minReadySeconds: {{ .Values.minReadySeconds }}
   volumeClaimTemplates:
     - metadata:
         name: data
         labels:
-          {{- include "common.labels.statefulset" . | nindent 10 }}
+          {{- include "dirk.labels" . | nindent 10 }}
       {{- with .Values.persistence.annotations }}
         annotations:
           {{ toYaml . | nindent 10 | trim }}
