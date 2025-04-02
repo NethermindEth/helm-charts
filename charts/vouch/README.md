@@ -22,8 +22,8 @@ A Helm chart for installing and configuring large scale ETH staking infrastructu
 | cliImage.pullPolicy | string | `"IfNotPresent"` |  |
 | cliImage.repository | string | `"nethermindeth/keystores-cli"` |  |
 | cliImage.tag | string | `"v1.0.0"` |  |
-| env | list | `[]` | Additional environment variables to set in the container.  |
-| envFrom | list | `[]` | Additional environment variables to set in the container from secrets or configmaps.  |
+| env | list | `[]` | Additional environment variables to set in the container.  Vouch requires the following environment variables: `ESO_DB_KEYSTORE_URL`, `vouch-ca.crt`, `vouch-ca.key`  |
+| envFrom | list | `[]` | Additional environment variables to set in the container from secrets or configmaps.  Vouch requires the following environment variables: `ESO_DB_KEYSTORE_URL`, `vouch-ca.crt`, `vouch-ca.key`  |
 | fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources  |
 | global.serviceAccount.create | bool | `true` |  |
 | httpPort | int | `8881` | Port on which vouch HTTP listens.  |
