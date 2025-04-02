@@ -66,9 +66,14 @@ spec:
               printenv dirk-ca.key | base64 -d  > /data/dirk/certs/ca.key;
               bash /scripts/generate_cert.sh /data/dirk/certs/ ca ${HOSTNAME}.{{ include "dirk.fullname" . }};
               chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/dirk;
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.envFrom }}
           envFrom:
-            - secretRef:
-                name: eso-{{ include "dirk.fullname" . }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -87,11 +92,16 @@ spec:
             capabilities:
               drop:
                 - ALL
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           envFrom:
-            - secretRef:
-                name: eso-{{ include "dirk.fullname" . }}
             - configMapRef:
                 name: {{ include "dirk.fullname" . }}-env
+          {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           args:
           - "sync-dirk-keys"
           - "--db-url-env"
@@ -118,9 +128,14 @@ spec:
             capabilities:
               drop:
                 - ALL
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.envFrom }}
           envFrom:
-            - secretRef:
-                name: eso-{{ include "dirk.fullname" . }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           args: [ "--base-dir", "/data/dirk" ]
           ports:
             - name: http
@@ -169,11 +184,16 @@ spec:
             capabilities:
               drop:
                 - ALL
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           envFrom:
-            - secretRef:
-                name: eso-{{ include "dirk.fullname" . }}
             - configMapRef:
                 name: {{ include "dirk.fullname" . }}-env
+          {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
 #          command: [ "/bin/bash", "-c", "--" ]
 #          args: [ "while true; do sleep 30; done;" ]
           args:

@@ -20,7 +20,7 @@ global:
     fsGroup: 10000
     capabilities:
       drop:
-      - ALL
+        - ALL
 
 replicaCount: 3
 
@@ -44,13 +44,13 @@ cliImage:
   tag: "v1.0.0"
   pullPolicy: IfNotPresent
 
-externalSecrets:
-  enabled: false
-  secretStoreRef:
-    name: secretStoreRef
-    kind: SecretStore
-  dataFrom:
-    key: dirk
+# -- Additional environment variables to set in the container.
+#
+env: []
+
+# -- Additional environment variables to set in the container from secrets or configmaps.
+#
+envFrom: []
 
 dirk:
   loglevel: Debug
@@ -110,7 +110,6 @@ livenessProbe:
   periodSeconds: 90
   failureThreshold: 1
 
-
 # -- ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 #
 serviceAccount:
@@ -129,7 +128,8 @@ service:
 # -- Configure resource requests and limits.
 # ref: http://kubernetes.io/docs/user-guide/compute-resources/
 #
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following

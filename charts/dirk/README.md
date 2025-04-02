@@ -24,10 +24,8 @@ A Helm chart for installing and configuring large scale ETH staking infrastructu
 | dirk.fetchKeysExtraFlags | list | `[]` |  |
 | dirk.loglevel | string | `"Debug"` |  |
 | dirk.tracing | string | `nil` |  |
-| externalSecrets.dataFrom.key | string | `"dirk"` |  |
-| externalSecrets.enabled | bool | `false` |  |
-| externalSecrets.secretStoreRef.kind | string | `"SecretStore"` |  |
-| externalSecrets.secretStoreRef.name | string | `"secretStoreRef"` |  |
+| env | list | `[]` | Additional environment variables to set in the container.  |
+| envFrom | list | `[]` | Additional environment variables to set in the container from secrets or configmaps.  |
 | fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources  |
 | global.podSecurityContext | object | `{"fsGroup":10000,"runAsNonRoot":true,"runAsUser":10000}` | Pod Security Context ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/  |
 | global.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
