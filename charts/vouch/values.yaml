@@ -27,14 +27,14 @@ cliImage:
 # -- Additional environment variables to set in the container.
 #
 # Vouch requires the following environment variables:
-# `ESO_DB_KEYSTORE_URL`, `vouch-ca.crt`, `vouch-ca.key`
+# `ESO_DB_KEYSTORE_URL`, `vouch-ca.crt` base64 encoded, `vouch-ca.key` base64 encoded
 #
 env: []
 
 # -- Additional environment variables to set in the container from secrets or configmaps.
 #
 # Vouch requires the following environment variables:
-# `ESO_DB_KEYSTORE_URL`, `vouch-ca.crt`, `vouch-ca.key`
+# `ESO_DB_KEYSTORE_URL`, `vouch-ca.crt` base64 encoded, `vouch-ca.key` base64 encoded
 #
 envFrom: []
 
