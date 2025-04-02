@@ -2,7 +2,7 @@ apiVersion: v2
 name: vouch
 description: A Helm chart for installing and configuring large scale ETH staking infrastructure on top of the Kubernetes
 type: application
-version: 1.1.1
+version: 1.1.2
 appVersion: "1.7.6"
 
 keywords:
@@ -11,11 +11,6 @@ keywords:
   - validator
 
 home: https://github.com/attestantio/vouch
-
-dependencies:
-  - name: common
-    repository: file://../common
-    version: 1.0.0
 
 maintainers:
   - name: matilote
