@@ -705,6 +705,29 @@ entries:
     version: 1.0.0
   execution-beacon:
   - apiVersion: v2
+    created: "2025-04-04T17:32:05.474925781Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: A Helm chart for deploying Ethereum execution and consensus clients
+    digest: 08158140710892548b8a24deb491dc055e90b97d5cd67b37346abc86090410a9
+    home: https://www.ethereum.org/
+    keywords:
+    - ethereum
+    - blockchain
+    - nethermind
+    - prysm
+    - p2p
+    maintainers:
+    - name: 0xDones
+    - name: matilote
+    name: execution-beacon
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/execution-beacon-1.0.12/execution-beacon-1.0.12.tgz
+    version: 1.0.12
+  - apiVersion: v2
     appVersion: 0.0.1
     created: "2025-03-11T14:04:43.98420331Z"
     dependencies:
@@ -1671,4 +1694,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-03-28T21:11:56.50184597Z"
+generated: "2025-04-04T17:32:05.47519348Z"
