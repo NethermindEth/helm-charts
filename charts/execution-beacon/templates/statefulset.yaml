@@ -384,6 +384,9 @@ spec:
           {{- with .Values.execution.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.global.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         {{- with .Values.execution.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
@@ -759,6 +762,9 @@ spec:
             - name: env-nodeport
               mountPath: /env
           {{- with .Values.beacon.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.global.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
         {{- with .Values.beacon.resources }}

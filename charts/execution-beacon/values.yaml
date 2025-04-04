@@ -288,6 +288,10 @@ global:
   ##
   volumes: []
 
+  ## Additional volume mounts to create
+  ##
+  volumeMounts: []
+
 execution:
   client: nethermind
 
