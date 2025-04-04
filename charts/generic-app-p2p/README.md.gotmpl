@@ -54,7 +54,7 @@ This will create both service and container ports configuration.
 
 - The `p2p.port` will be added to the container ports regardless of the `p2p.enabled` value.
 - The p2p service will only be created if `p2p.enabled` is set to `true`.
-- If `p2p.enabled: false`, the `rbac` roles won't be created. For this reason, remember to set `initScript: ""` or override the content otherwise the init container will fail due to the lack of permissions.
+- If `p2p.enabled: false`, the `rbac` roles won't be created. For this reason, `initScript` will be skipped.
 
 ```yaml
 service:
@@ -67,9 +67,19 @@ service:
       protocol: TCP
 
 p2p:
-  enabled: false
+  enabled: true
   port: 30300
   serviceType: NodePort
+
+extraInitScript: |
+  # The following values are available:
+  echo "export my_node_ip=${EXTERNAL_NODE_IP}" >> /shared/env
+  echo "export my_node_port=${EXTERNAL_NODE_PORT}" >> /shared/env
+  echo "export my_replica_index=${REPLICA_INDEX}" >> /shared/env
+  # When the app starts, the file `/shared/env` will be sourced automatically.
+
+command:
+  - echo "$my_node_ip" # will print the node ip
 ```
 
 ### Ingress
