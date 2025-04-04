@@ -432,8 +432,10 @@ spec:
             - "--accept-terms-of-use"
           {{- if .Values.global.externalSecrets.enabled }}
             - "--jwt-secret=/external-secrets/JWT_SECRET"
-          {{- else }}
+          {{- else if .Values.global.JWTSecret }}
             - "--jwt-secret=/secret/jwtsecret"
+          {{- else if .Values.global.JWTSecretFile }}
+            - "--jwt-secret={{ .Values.global.JWTSecretFile }}"
           {{- end }}
           {{- if .Values.beacon.builderEndpoint }}
             - "--http-mev-relay={{ .Values.beacon.builderEndpoint }}"
@@ -479,11 +481,13 @@ spec:
               --data-beacon-path=/data/beacon/teku
               --data-path=/data/beacon
               --ee-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-              {{- if .Values.global.externalSecrets.enabled }}
+            {{- if .Values.global.externalSecrets.enabled }}
               --ee-jwt-secret-file=/external-secrets/JWT_SECRET
-              {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --ee-jwt-secret-file=/secret/jwtsecret
-              {{- end }}
+            {{- else if .Values.global.JWTSecretFile }}
+              --ee-jwt-secret-file={{ .Values.global.JWTSecretFile }}
+            {{- end }}
             {{- if .Values.beacon.builderEndpoint }}
               --builder-endpoint={{ .Values.beacon.builderEndpoint }}
             {{- end }}
@@ -561,8 +565,10 @@ spec:
               --execution-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
             {{- if .Values.global.externalSecrets.enabled }}
               --execution-jwt=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --execution-jwt=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --execution-jwt={{ .Values.global.JWTSecretFile }}
             {{- end }}
             {{- if .Values.global.p2pNodePort.enabled }}
               --discovery-port=$EXTERNAL_BEACON_PORT
@@ -599,8 +605,10 @@ spec:
               --data-dir=/data/beacon
             {{- if .Values.global.externalSecrets.enabled }}
               --jwt-secret=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --jwt-secret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --jwt-secret={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --non-interactive
             {{- if .Values.beacon.restApi.enabled }}
@@ -664,8 +672,10 @@ spec:
             {{- end }}
             {{- if .Values.global.externalSecrets.enabled }}
               --jwt-secret=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --jwt-secret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --jwt-secret={{ .Values.global.JWTSecretFile }}
             {{- end }}
             {{- if .Values.beacon.restApi.enabled }}
               --rest
