@@ -64,7 +64,7 @@ global:
         tag: "v5.3.2"
       teku:
         repository: "consensys/teku"
-        tag: "23.12.1"
+        tag: "25.4.0"
       lighthouse:
         repository: "sigp/lighthouse"
         tag: "v6.0.1"
@@ -81,6 +81,7 @@ global:
   ## openssl rand -hex 32 > token.txt
   ##
   JWTSecret: ""
+  JWTSecretFile: ""
 
   ## Credentials to fetch images from private registry
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/

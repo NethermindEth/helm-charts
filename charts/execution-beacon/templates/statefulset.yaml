@@ -168,6 +168,8 @@ spec:
               --JsonRpc.JwtSecretFile=/external-secrets/JWT_SECRET
             {{- else if .Values.global.JWTSecret }}
               --JsonRpc.JwtSecretFile=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --JsonRpc.JwtSecretFile={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
               --JsonRpc.EngineHost={{ .Values.execution.jsonrpc.host }}
@@ -201,6 +203,8 @@ spec:
               --authrpc.jwtsecret=/external-secrets/JWT_SECRET
             {{- else if .Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --authrpc.jwtsecret={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --authrpc.addr={{ .Values.execution.jsonrpc.host }}
               --authrpc.port={{ .Values.execution.jsonrpc.engine.port }}
@@ -247,6 +251,8 @@ spec:
               --engine-jwt-secret=/external-secrets/JWT_SECRET
             {{- else if .Values.global.JWTSecret }}
               --engine-jwt-secret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --engine-jwt-secret={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --engine-rpc-enabled=true
               --engine-host-allowlist={{ .Values.execution.jsonrpc.engine.hostAllowList | join "," }}
@@ -283,6 +289,8 @@ spec:
               --authrpc.jwtsecret=/external-secrets/JWT_SECRET
             {{- else if .Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --authrpc.jwtsecret={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --authrpc.addr={{ .Values.execution.jsonrpc.host }}
               --authrpc.port={{ .Values.execution.jsonrpc.engine.port }}

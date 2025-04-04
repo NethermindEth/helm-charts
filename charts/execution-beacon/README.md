@@ -133,6 +133,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.volumeMounts | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | global.JWTSecret | string | `""` |  |
+| global.JWTSecretFile | string | `""` |  |
 | global.affinity | object | `{}` |  |
 | global.env | list | `[]` |  |
 | global.envFrom | list | `[]` |  |
@@ -172,7 +173,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | global.image.beacon.prysm.repository | string | `"gcr.io/prylabs-dev/prysm/beacon-chain"` |  |
 | global.image.beacon.prysm.tag | string | `"v5.3.2"` |  |
 | global.image.beacon.teku.repository | string | `"consensys/teku"` |  |
-| global.image.beacon.teku.tag | string | `"23.12.1"` |  |
+| global.image.beacon.teku.tag | string | `"25.4.0"` |  |
 | global.image.execution.bseu.repository | string | `"hyperledger/besu"` |  |
 | global.image.execution.bseu.tag | string | `"25.3.0"` |  |
 | global.image.execution.erigon.repository | string | `"thorax/erigon"` |  |
