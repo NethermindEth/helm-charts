@@ -164,16 +164,16 @@ spec:
             {{- end }}
             {{- end }}
             {{- end }}
-            {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
             {{- if .Values.global.externalSecrets.enabled }}
               --JsonRpc.JwtSecretFile=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --JsonRpc.JwtSecretFile=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --JsonRpc.JwtSecretFile={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
               --JsonRpc.EngineHost={{ .Values.execution.jsonrpc.host }}
               --JsonRpc.EngineEnabledModules={{ .Values.execution.jsonrpc.namespaces.nethermind | join "," }}
-            {{- end }}
             {{- if and .Values.global.metrics.enabled .Values.execution.metrics.enabled }}
               --Metrics.Enabled={{ .Values.execution.metrics.enabled }}
               --Metrics.ExposePort={{ .Values.execution.metrics.port }}
@@ -199,10 +199,12 @@ spec:
               --datadir=/data/execution
               --ipcdisable
               --{{ .Values.global.network }}
-            {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
+            {{- if .Values.global.externalSecrets.enabled }}
               --authrpc.jwtsecret=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --authrpc.jwtsecret={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --authrpc.addr={{ .Values.execution.jsonrpc.host }}
               --authrpc.port={{ .Values.execution.jsonrpc.engine.port }}
@@ -245,10 +247,12 @@ spec:
               --data-path=/data/execution
               --sync-mode=X_SNAP
               --p2p-enabled=true
-            {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
+            {{- if .Values.global.externalSecrets.enabled }}
               --engine-jwt-secret=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --engine-jwt-secret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --engine-jwt-secret={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --engine-rpc-enabled=true
               --engine-host-allowlist={{ .Values.execution.jsonrpc.engine.hostAllowList | join "," }}
@@ -281,10 +285,12 @@ spec:
             {{- if .Values.execution.terminalTotalDifficulty }}
               --override.terminaltotaldifficulty={{ .Values.execution.terminalTotalDifficulty }}
             {{- end }}
-            {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
+            {{- if .Values.global.externalSecrets.enabled }}
               --authrpc.jwtsecret=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --authrpc.jwtsecret={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --authrpc.addr={{ .Values.execution.jsonrpc.host }}
               --authrpc.port={{ .Values.execution.jsonrpc.engine.port }}
@@ -378,6 +384,9 @@ spec:
           {{- with .Values.execution.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.global.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         {{- with .Values.execution.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
@@ -426,8 +435,10 @@ spec:
             - "--accept-terms-of-use"
           {{- if .Values.global.externalSecrets.enabled }}
             - "--jwt-secret=/external-secrets/JWT_SECRET"
-          {{- else }}
+          {{- else if .Values.global.JWTSecret }}
             - "--jwt-secret=/secret/jwtsecret"
+          {{- else if .Values.global.JWTSecretFile }}
+            - "--jwt-secret={{ .Values.global.JWTSecretFile }}"
           {{- end }}
           {{- if .Values.beacon.builderEndpoint }}
             - "--http-mev-relay={{ .Values.beacon.builderEndpoint }}"
@@ -473,11 +484,13 @@ spec:
               --data-beacon-path=/data/beacon/teku
               --data-path=/data/beacon
               --ee-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-              {{- if .Values.global.externalSecrets.enabled }}
+            {{- if .Values.global.externalSecrets.enabled }}
               --ee-jwt-secret-file=/external-secrets/JWT_SECRET
-              {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --ee-jwt-secret-file=/secret/jwtsecret
-              {{- end }}
+            {{- else if .Values.global.JWTSecretFile }}
+              --ee-jwt-secret-file={{ .Values.global.JWTSecretFile }}
+            {{- end }}
             {{- if .Values.beacon.builderEndpoint }}
               --builder-endpoint={{ .Values.beacon.builderEndpoint }}
             {{- end }}
@@ -555,8 +568,10 @@ spec:
               --execution-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
             {{- if .Values.global.externalSecrets.enabled }}
               --execution-jwt=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --execution-jwt=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --execution-jwt={{ .Values.global.JWTSecretFile }}
             {{- end }}
             {{- if .Values.global.p2pNodePort.enabled }}
               --discovery-port=$EXTERNAL_BEACON_PORT
@@ -593,8 +608,10 @@ spec:
               --data-dir=/data/beacon
             {{- if .Values.global.externalSecrets.enabled }}
               --jwt-secret=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --jwt-secret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --jwt-secret={{ .Values.global.JWTSecretFile }}
             {{- end }}
               --non-interactive
             {{- if .Values.beacon.restApi.enabled }}
@@ -658,8 +675,10 @@ spec:
             {{- end }}
             {{- if .Values.global.externalSecrets.enabled }}
               --jwt-secret=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else if .Values.global.JWTSecret }}
               --jwt-secret=/secret/jwtsecret
+            {{- else if .Values.global.JWTSecretFile }}
+              --jwt-secret={{ .Values.global.JWTSecretFile }}
             {{- end }}
             {{- if .Values.beacon.restApi.enabled }}
               --rest
@@ -743,6 +762,9 @@ spec:
             - name: env-nodeport
               mountPath: /env
           {{- with .Values.beacon.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.global.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
         {{- with .Values.beacon.resources }}
