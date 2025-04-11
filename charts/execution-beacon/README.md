@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.11](https://img.shields.io/badge/Version-1.0.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1](https://img.shields.io/badge/AppVersion-0.0.1-informational?style=flat-square)
+![Version: 1.0.13](https://img.shields.io/badge/Version-1.0.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -133,6 +133,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.volumeMounts | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | global.JWTSecret | string | `""` |  |
+| global.JWTSecretFile | string | `""` |  |
 | global.affinity | object | `{}` |  |
 | global.env | list | `[]` |  |
 | global.envFrom | list | `[]` |  |
@@ -164,23 +165,23 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | global.externalSecrets.secretStoreRef.kind | string | `"SecretStore"` |  |
 | global.externalSecrets.secretStoreRef.name | string | `"secretStoreRef"` |  |
 | global.image.beacon.lighthouse.repository | string | `"sigp/lighthouse"` |  |
-| global.image.beacon.lighthouse.tag | string | `"v4.5.0"` |  |
+| global.image.beacon.lighthouse.tag | string | `"v6.0.1"` |  |
 | global.image.beacon.lodestar.repository | string | `"chainsafe/lodestar"` |  |
-| global.image.beacon.lodestar.tag | string | `"v1.12.1"` |  |
+| global.image.beacon.lodestar.tag | string | `"v1.28.1"` |  |
 | global.image.beacon.nimbus.repository | string | `"statusim/nimbus-eth2"` |  |
-| global.image.beacon.nimbus.tag | string | `"multiarch-v23.11.0"` |  |
+| global.image.beacon.nimbus.tag | string | `"multiarch-v25.3.0"` |  |
 | global.image.beacon.prysm.repository | string | `"gcr.io/prylabs-dev/prysm/beacon-chain"` |  |
-| global.image.beacon.prysm.tag | string | `"v4.1.1"` |  |
+| global.image.beacon.prysm.tag | string | `"v5.3.2"` |  |
 | global.image.beacon.teku.repository | string | `"consensys/teku"` |  |
-| global.image.beacon.teku.tag | string | `"23.12.1"` |  |
+| global.image.beacon.teku.tag | string | `"25.4.0"` |  |
 | global.image.execution.bseu.repository | string | `"hyperledger/besu"` |  |
-| global.image.execution.bseu.tag | string | `"23.10.2"` |  |
+| global.image.execution.bseu.tag | string | `"25.3.0"` |  |
 | global.image.execution.erigon.repository | string | `"thorax/erigon"` |  |
-| global.image.execution.erigon.tag | string | `"v2.54.0"` |  |
+| global.image.execution.erigon.tag | string | `"v3.0.0"` |  |
 | global.image.execution.geth.repository | string | `"ethereum/client-go"` |  |
-| global.image.execution.geth.tag | string | `"v1.13.5"` |  |
+| global.image.execution.geth.tag | string | `"v1.15.7"` |  |
 | global.image.execution.nethermind.repository | string | `"nethermind/nethermind"` |  |
-| global.image.execution.nethermind.tag | string | `"1.24.0"` |  |
+| global.image.execution.nethermind.tag | string | `"1.31.4"` |  |
 | global.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | global.imagePullSecrets | list | `[]` |  |
 | global.initImage.pullPolicy | string | `"IfNotPresent"` |  |
@@ -221,6 +222,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | global.sharedPersistence.storageClassName | string | `""` |  |
 | global.terminationGracePeriodSeconds | int | `120` |  |
 | global.tolerations | list | `[]` |  |
+| global.volumeMounts | list | `[]` |  |
 | global.volumes | list | `[]` |  |
 | initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
