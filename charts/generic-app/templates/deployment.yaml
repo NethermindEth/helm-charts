@@ -7,6 +7,10 @@ metadata:
   labels:
     {{- include "generic-app.labels" . | nindent 4 }}
 spec:
+  {{- with .Values.deployment.strategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   revisionHistoryLimit: 3
   {{- if not .Values.deployment.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}

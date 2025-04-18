@@ -16,6 +16,10 @@ deployment:
     minReplicas: 1
     maxReplicas: 10
     targetCPUUtilizationPercentage: 80
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
 
 command: []
 args: []
