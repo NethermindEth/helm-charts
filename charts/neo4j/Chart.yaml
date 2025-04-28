@@ -1,0 +1,7 @@
+apiVersion: v2
+name: neo4j
+version: 5.3.0
+description: A Helm chart to deploy Neo4j database
+type: application
+maintainers:
+  - name: adityaNth
