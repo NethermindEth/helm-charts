@@ -11,6 +11,7 @@ metadata:
     {{- include "generic-app-p2p.labels" $ | nindent 4 }}
 spec:
   type: {{ $.Values.p2p.serviceType }}
+  externalTrafficPolicy: Local
   ports:
     - port: {{ $.Values.p2p.port }}
       targetPort: p2p-tcp
