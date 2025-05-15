@@ -1174,6 +1174,17 @@ entries:
     version: 0.1.0
   generic-app-p2p:
   - apiVersion: v2
+    created: "2025-05-15T11:56:34.780632652Z"
+    description: A Helm chart for Kubernetes generic apps (P2P)
+    digest: 5e5451d36393b51f7b76deaa8f13c9052737ef819cc84d38a797bfdc085c1190
+    maintainers:
+    - name: 0xDones
+    name: generic-app-p2p
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-app-p2p-0.0.10/generic-app-p2p-0.0.10.tgz
+    version: 0.0.10
+  - apiVersion: v2
     created: "2025-05-07T00:49:55.179614143Z"
     description: A Helm chart for Kubernetes generic apps (P2P)
     digest: 7a5ec4ea1184e1a97f06a752e9bc9fb4dc788e176b5723735a031e9de9b83e82
@@ -1739,4 +1750,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-05-07T00:49:55.179851256Z"
+generated: "2025-05-15T11:56:34.780978901Z"
