@@ -1,0 +1,41 @@
+nameOverride: "p2p-test"
+
+image:
+  repository: ubuntu
+  tag: latest
+  pullPolicy: IfNotPresent
+
+command:
+  - sleep infinity
+
+extraInitScript: |
+  apt update -y
+  add-apt-repository ppa:longsleep/golang-backports
+  apt update -y
+  apt install golang-go vim ca-certificates -y
+
+args: []
+
+config: {}
+
+# initContainers: []
+
+service:
+  ports:
+    - name: http
+      port: 8000
+      protocol: TCP
+
+p2p:
+  enabled: true
+  # -- Port name
+  port: 40400
+  nodePort: 40400
+  serviceType: NodePort
+
+persistence:
+  enabled: false
+
+podSecurityContext: null
+securityContext: null
+initContainerSecurityContext: null
