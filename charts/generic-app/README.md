@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.1.5](https://img.shields.io/badge/Version-1.1.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.6](https://img.shields.io/badge/Version-1.1.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -70,6 +70,10 @@ service:
     - name: metrics
       port: 9090
       protocol: TCP
+  extraContainersPorts: []
+    # - name: http
+    #   port: 8080
+    #   protocol: TCP
 ```
 
 ### Ingress
@@ -223,6 +227,9 @@ statefulSet:
 | service.ports[0].name | string | `"http"` |  |
 | service.ports[0].port | int | `8080` |  |
 | service.ports[0].protocol | string | `"TCP"` |  |
+| service.extraContainersPorts[0].name | string | `"http"` |  |
+| service.extraContainersPorts[0].port | int | `8080` |  |
+| service.extraContainersPorts[0].protocol | string | `"TCP"` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automount | bool | `true` |  |
