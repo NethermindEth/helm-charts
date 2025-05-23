@@ -7,15 +7,23 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-  {{- if .Values.service.ports }}
-  {{- range $idx, $port := .Values.service.ports }}
+    {{- $servicePorts := .Values.service.ports | default list }}
+    {{- $extraPorts := .Values.service.extraContainersPorts | default list }}
+    {{- if or (gt (len $servicePorts) 0) (gt (len $extraPorts) 0) }}
+      {{- range $port := $servicePorts }}
     - name: {{ $port.name }}
       port: {{ $port.port }}
       targetPort: {{ $port.name }}
       protocol: {{ $port.protocol }}
-  {{- end }}
-  {{- else }}
+      {{- end }}
+      {{- range $port := $extraPorts }}
+    - name: {{ $port.name }}
+      port: {{ $port.port }}
+      targetPort: {{ $port.name }}
+      protocol: {{ $port.protocol }}
+      {{- end }}
+    {{- else }}
     []
-  {{- end }}
+    {{- end }}
   selector:
     {{- include "generic-app.selectorLabels" . | nindent 4 }}
