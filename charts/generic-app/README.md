@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.1.6](https://img.shields.io/badge/Version-1.1.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.6](https://img.shields.io/badge/Version-1.1.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -16,6 +16,7 @@ helm install generic-app nethermind/generic-app
 | Name | Email | Url |
 | ---- | ------ | --- |
 | 0xDones |  |  |
+| gehlotanish |  |  |
 
 ## Usage
 
@@ -224,12 +225,10 @@ statefulSet:
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
 | securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| service.extraContainersPorts | list | `[]` |  |
 | service.ports[0].name | string | `"http"` |  |
 | service.ports[0].port | int | `8080` |  |
 | service.ports[0].protocol | string | `"TCP"` |  |
-| service.extraContainersPorts[0].name | string | `"http"` |  |
-| service.extraContainersPorts[0].port | int | `8080` |  |
-| service.extraContainersPorts[0].protocol | string | `"TCP"` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automount | bool | `true` |  |
