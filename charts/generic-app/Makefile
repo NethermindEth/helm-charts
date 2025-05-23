@@ -3,3 +3,6 @@ template-sts:
 
 template-deploy:
 	helm template generic-deploy . -f values.yaml -f values.deploy.yaml --debug > manifest.yaml
+
+template-override:
+	helm template generic-override . -f values.yaml -f values.override.yaml --debug > manifest.yaml

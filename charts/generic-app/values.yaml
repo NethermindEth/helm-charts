@@ -141,6 +141,10 @@ service:
     - name: http
       port: 8080
       protocol: TCP
+  extraContainersPorts: []
+    # - name: http
+    #   port: 8080
+    #   protocol: TCP
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 # -- For now all traffic is routed to the `http` port
