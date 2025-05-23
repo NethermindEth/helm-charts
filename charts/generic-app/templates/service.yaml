@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,21 +8,14 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    {{- $servicePorts := .Values.service.ports | default list }}
-    {{- $extraPorts := .Values.service.extraContainersPorts | default list }}
-    {{- if or (gt (len $servicePorts) 0) (gt (len $extraPorts) 0) }}
-      {{- range $port := $servicePorts }}
+    {{- $svcPorts := concat .Values.service.ports .Values.service.extraContainersPorts }}
+    {{- if $svcPorts }}
+    {{- range $port := $svcPorts }}
     - name: {{ $port.name }}
       port: {{ $port.port }}
       targetPort: {{ $port.name }}
       protocol: {{ $port.protocol }}
-      {{- end }}
-      {{- range $port := $extraPorts }}
-    - name: {{ $port.name }}
-      port: {{ $port.port }}
-      targetPort: {{ $port.name }}
-      protocol: {{ $port.protocol }}
-      {{- end }}
+    {{- end }}
     {{- else }}
     []
     {{- end }}
