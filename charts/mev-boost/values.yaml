@@ -17,7 +17,7 @@ image:
 imagePullSecrets: []
 
 config:
-  network: hoodi
+  network: mainnet
   logLevel: info
   relays:
     mainnet:
