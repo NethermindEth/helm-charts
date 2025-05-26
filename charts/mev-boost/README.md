@@ -5,6 +5,13 @@
 
 Mev Boost Helm Chart
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| 0xDones |  |  |
+| matilote |  |  |
+
 ## Values
 
 | Key | Type | Default | Description |
