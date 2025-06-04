@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.1.6](https://img.shields.io/badge/Version-1.1.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.7](https://img.shields.io/badge/Version-1.1.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -238,6 +238,7 @@ statefulSet:
 | serviceMonitor.enabled | bool | `false` | If true, a ServiceMonitor CRD is created for a prometheus operator. https://github.com/coreos/prometheus-operator |
 | serviceMonitor.interval | string | `"1m"` | ServiceMonitor scrape interval |
 | serviceMonitor.labels | object | `{}` | Additional ServiceMonitor labels |
+| serviceMonitor.metricRelabelings | list | `[]` | ServiceMonitor metricRelabelings |
 | serviceMonitor.namespace | string | `nil` | Alternative namespace for ServiceMonitor |
 | serviceMonitor.path | string | `"/metrics"` | Path to scrape |
 | serviceMonitor.port | string | `"metrics"` | Port name |

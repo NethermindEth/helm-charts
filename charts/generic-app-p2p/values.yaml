@@ -249,6 +249,8 @@ serviceMonitor:
   scrapeTimeout: 30s
   # -- ServiceMonitor relabelings
   relabelings: []
+  # -- ServiceMonitor metricRelabelings
+  metricRelabelings: []
 
 # Default security settings for the pod
 podSecurityContext:

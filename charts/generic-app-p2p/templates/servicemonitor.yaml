@@ -34,6 +34,10 @@ spec:
     relabelings:
     {{- toYaml .Values.serviceMonitor.relabelings | nindent 4 }}
     {{- end }}
+    {{- if .Values.serviceMonitor.metricRelabelings }}
+    metricRelabelings:
+    {{- toYaml .Values.serviceMonitor.metricRelabelings | nindent 4 }}
+    {{- end }}
   jobLabel: {{ include "generic-app-p2p.fullname" . }}
   selector:
     matchLabels:
