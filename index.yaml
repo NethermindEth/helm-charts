@@ -1470,6 +1470,19 @@ entries:
     version: 0.0.1
   validator-ejector:
   - apiVersion: v2
+    created: "2025-06-04T15:58:56.549210486Z"
+    description: A Helm chart for Lido Validator Ejector
+    digest: 87eb2e0425a1432716c52afd4721f709fa7e2c8324b2a88b1ef0b6450ed14f96
+    maintainers:
+    - name: 0xDones
+    - name: aivarasko
+    - name: matilote
+    name: validator-ejector
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/validator-ejector-0.1.1/validator-ejector-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     created: "2025-06-04T00:48:27.128606454Z"
     description: A Helm chart for Lido Validator Ejector
     digest: d69cd77d9c5f924deafb9f649416d1dc7ac004a0b3ad1a9a3d5525f0cee1a0e8
@@ -1813,4 +1826,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-06-04T12:55:58.133897008Z"
+generated: "2025-06-04T15:58:56.549422462Z"
