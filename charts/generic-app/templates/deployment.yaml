@@ -21,6 +21,7 @@ spec:
   template:
     metadata:
       annotations:
+        restartedAt: "{{ now | quote }}"
         configmap-hash: {{ include "configmap.hash" . }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
