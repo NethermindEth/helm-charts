@@ -1,0 +1,9 @@
+apiVersion: v2
+name: validator-ejector
+description: A Helm chart for Lido Validator Ejector
+type: application
+version: 0.1.0
+maintainers:
+  - name: 0xDones
+  - name: aivarasko
+  - name: matilote
