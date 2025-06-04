@@ -62,7 +62,9 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
           env:
-            {{- toYaml .Values.loader.env | nindent 12 }}
+            {{- with .Values.loader.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             {{- if .Values.global.secretName }}
             - name: EIP2335_PASSWORD
               valueFrom:
@@ -102,7 +104,9 @@ spec:
           args: {{- . | toYaml | nindent 12 }}
           {{- end }}
           env:
-            {{- toYaml .Values.env | nindent 12 }}
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             {{- if .Values.global.secretName }}
             - name: MESSAGES_PASSWORD
               valueFrom:
