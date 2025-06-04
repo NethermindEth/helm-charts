@@ -32,7 +32,7 @@ loader:
     ENCRYPTION: "EIP2335"
     ENCRYPT_WITH_METADATA: "false"
     BEACON_ENDPOINT: "http://localhost:5052"
-    CUSTODIAN_WEB3SIGNER_MAPPER: '{}' # '{"custodian1/second": "http://localhost:9110"}'
+    # CUSTODIAN_WEB3SIGNER_MAPPER: '{"custodian1/second": "http://localhost:9110"}'
     STORAGE_LOCATION: "/data/messages"
     FETCH_INTERVAL: "60"
     SIGNER_MAPPER: '{}'

@@ -48,7 +48,6 @@ A Helm chart for Lido Validator Ejector
 | livenessProbe.httpGet.path | string | `"/"` |  |
 | livenessProbe.httpGet.port | string | `"metrics"` |  |
 | loader.config.BEACON_ENDPOINT | string | `"http://localhost:5052"` |  |
-| loader.config.CUSTODIAN_WEB3SIGNER_MAPPER | string | `"{}"` |  |
 | loader.config.EIP2335_PASSWORD | string | `"password"` | Password to encrypt exit messages with. Needed only if you encrypt your exit messages, same value should be used in the validator ejector config |
 | loader.config.ENCRYPTION | string | `"EIP2335"` |  |
 | loader.config.ENCRYPTION_TYPE | string | `"EIP2335"` |  |
