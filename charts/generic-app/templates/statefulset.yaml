@@ -15,7 +15,9 @@ spec:
   template:
     metadata:
       annotations:
-        restartedAt: "{{ now | quote }}"
+        {{- if .Values.statefulSet.restartOnChanges }}
+        values-hash: {{ include "values.hash" . | quote }}
+        {{- end }}
         configmap-hash: {{ include "configmap.hash" . }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
