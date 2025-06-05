@@ -166,3 +166,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# -- If true, the container will be restarted when the values.yaml file changes.
+restartOnChanges: false
