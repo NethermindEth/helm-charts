@@ -30,6 +30,8 @@ deployment:
     maxReplicas: 10
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
+  # If true, the container will be restarted when the values.yaml file changes.
+  restartOnChanges: false
 
 # -- Enable StatefulSet
 statefulSet:
@@ -42,6 +44,8 @@ statefulSet:
     accessModes:
       - ReadWriteOnce
     size: 10Gi
+  # If true, the container will be restarted when the values.yaml file changes.
+  restartOnChanges: false
 
 # -- Command and args for the container
 command: []
