@@ -64,3 +64,7 @@ Create the name of the service account to use
 {{- define "erpc.configName" -}}
 {{- printf "%s-config" (include "erpc.fullname" .) -}}
 {{- end -}}
+
+{{- define "values.hash" -}}
+{{- .Values | toJson | sha256sum }}
+{{- end }}

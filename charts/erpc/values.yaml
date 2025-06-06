@@ -46,7 +46,6 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: {}
 podLabels: {}
 
 # Default security settings for the pod
@@ -166,3 +165,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# -- If true, the container will be restarted when the values.yaml file changes.
+restartOnChanges: false
