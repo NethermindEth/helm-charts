@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "release.name" . }}
+  labels:
+  {{- include "esd.labels" . | nindent 4 }}
+data:
+  esd.yaml: |
+    eth2client:
+      address: {{ .Values.config.eth2client.address | quote }}
+    slashings:
+      attester-slashed-script: {{ .Values.config.slashings.attester_slashed_script | quote }}
+      proposer-slashed-script: {{ .Values.config.slashings.proposer_slashed_script | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "release.name" . }}-scripts
+  labels:
+  {{- include "esd.labels" . | nindent 4 }}
+data:
+  slashing.sh: |
+    #!/bin/bash
+    set -euox pipefail
+    IFS=$'\n\t'
+    # Check if message is provided as an argument
+    if [ -z "$1" ]; then
+        echo "Usage: $0 <message>"
+        exit 1
+    fi
+    # Message to send
+    MESSAGE="$1" 
+    # JSON payload
+    PAYLOAD="{\"text\": \"Testing: please check http://www.google.com/?q=$MESSAGE\"}"
+    # Send the notification
+    curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "${SLACK_WEBHOOK_URL}"
