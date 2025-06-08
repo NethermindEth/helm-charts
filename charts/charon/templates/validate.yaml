@@ -1,5 +1,5 @@
-{{- if not .Values.config.beaconNodeEndpoints }}
-{{- fail ".Values.config.beaconNodeEndpoints is required" }}
+{{- if and (not .Values.config.beaconNodeEndpoints) (ne .Values.config.beaconNodeEndpoints "test") }}
+{{- fail "beaconNodeEndpoints must be non-empty or equal to 'test'" }}
 {{- end }}
 
 {{- if not .Values.secrets.validatorKeys }}
