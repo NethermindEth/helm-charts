@@ -58,15 +58,16 @@ jobs:
       - name: Generate Trivy SARIF Report
         uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 #v0.29.0
         with:
-          scan-type: 'fs'
-          scan-ref: '${{ github.workspace }}/charts'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          exit-code: '0'
-          trivyignores: '.trivyignore.yaml'
-          scanners: 'misconfig,secret'
+          scan-type: "fs"
+          scan-ref: "${{ github.workspace }}/charts"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          exit-code: "0"
+          trivyignores: ".trivyignore.yaml"
+          scanners: "misconfig,secret"
           skip-setup-trivy: true
-          severity: 'CRITICAL,HIGH,MEDIUM,LOW'
+          severity: "CRITICAL,HIGH,MEDIUM,LOW"
+          trivy-config: ".trivy.yaml"
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
@@ -78,21 +79,22 @@ jobs:
         uses: github/codeql-action/upload-sarif@5618c9fc1e675841ca52c1c6b1304f5255a905a0 #v2.19.0
         if: always()
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: "trivy-results.sarif"
 
       - name: Fail on High/Critical Issues
         uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 #v0.29.0
         with:
-          scan-type: 'fs'
-          scan-ref: '${{ github.workspace }}/charts'
-          format: 'table'
-          severity: 'CRITICAL,HIGH'
-          exit-code: '1'
-          scanners: 'misconfig,secret'
-          timeout: '10m'
-          trivyignores: '.trivyignore.yaml'
+          scan-type: "fs"
+          scan-ref: "${{ github.workspace }}/charts"
+          format: "table"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1"
+          scanners: "misconfig,secret"
+          timeout: "10m"
+          trivyignores: ".trivyignore.yaml"
           limit-severities-for-sarif: true
           skip-setup-trivy: true
+          trivy-config: ".trivy.yaml"
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
