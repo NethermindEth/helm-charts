@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.1.4](https://img.shields.io/badge/Version-1.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.8](https://img.shields.io/badge/Version-1.1.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -16,6 +16,7 @@ helm install generic-app nethermind/generic-app
 | Name | Email | Url |
 | ---- | ------ | --- |
 | 0xDones |  |  |
+| gehlotanish |  |  |
 
 ## Usage
 
@@ -70,6 +71,10 @@ service:
     - name: metrics
       port: 9090
       protocol: TCP
+  extraContainersPorts: []
+    # - name: http
+    #   port: 8080
+    #   protocol: TCP
 ```
 
 ### Ingress
@@ -181,7 +186,7 @@ statefulSet:
 | command | list | `[]` | Command and args for the container |
 | config | object | `{}` | config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration. |
 | configMaps | list | `[]` | Extra ConfigMaps, they need to be configured using volumes and volumeMounts |
-| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":false}` | Enable Deployment |
+| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":false,"restartOnChanges":false}` | Enable Deployment |
 | env | list | `[]` | This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/ |
 | envFrom | list | `[]` | envFrom configuration |
 | extraContainers | list | `[]` | Sidecar containers |
@@ -220,6 +225,7 @@ statefulSet:
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
 | securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| service.extraContainersPorts | list | `[]` |  |
 | service.ports[0].name | string | `"http"` |  |
 | service.ports[0].port | int | `8080` |  |
 | service.ports[0].protocol | string | `"TCP"` |  |
@@ -232,6 +238,7 @@ statefulSet:
 | serviceMonitor.enabled | bool | `false` | If true, a ServiceMonitor CRD is created for a prometheus operator. https://github.com/coreos/prometheus-operator |
 | serviceMonitor.interval | string | `"1m"` | ServiceMonitor scrape interval |
 | serviceMonitor.labels | object | `{}` | Additional ServiceMonitor labels |
+| serviceMonitor.metricRelabelings | list | `[]` | ServiceMonitor metricRelabelings |
 | serviceMonitor.namespace | string | `nil` | Alternative namespace for ServiceMonitor |
 | serviceMonitor.path | string | `"/metrics"` | Path to scrape |
 | serviceMonitor.port | string | `"metrics"` | Port name |
@@ -239,7 +246,7 @@ statefulSet:
 | serviceMonitor.scheme | string | `"http"` | ServiceMonitor scheme |
 | serviceMonitor.scrapeTimeout | string | `"30s"` | ServiceMonitor scrape timeout |
 | serviceMonitor.tlsConfig | object | `{}` | ServiceMonitor TLS configuration |
-| statefulSet | object | `{"enabled":false,"persistence":{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}}` | Enable StatefulSet |
+| statefulSet | object | `{"enabled":false,"persistence":{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""},"restartOnChanges":false}` | Enable StatefulSet |
 | statefulSet.persistence | object | `{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
 | tolerations | list | `[]` |  |
 | volumeMounts | list | `[]` |  |

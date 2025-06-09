@@ -1,6 +1,6 @@
 # generic-app-p2p
 
-![Version: 0.0.8](https://img.shields.io/badge/Version-0.0.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.11](https://img.shields.io/badge/Version-0.0.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic apps (P2P)
 
@@ -250,6 +250,7 @@ persistence:
 | serviceMonitor.enabled | bool | `false` | If true, a ServiceMonitor CRD is created for a prometheus operator. https://github.com/coreos/prometheus-operator |
 | serviceMonitor.interval | string | `"1m"` | ServiceMonitor scrape interval |
 | serviceMonitor.labels | object | `{}` | Additional ServiceMonitor labels |
+| serviceMonitor.metricRelabelings | list | `[]` | ServiceMonitor metricRelabelings |
 | serviceMonitor.namespace | string | `nil` | Alternative namespace for ServiceMonitor |
 | serviceMonitor.path | string | `"/metrics"` | Path to scrape |
 | serviceMonitor.port | string | `"metrics"` | Port name |

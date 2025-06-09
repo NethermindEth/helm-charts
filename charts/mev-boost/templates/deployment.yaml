@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "erpc.fullname" . }}
+  name: {{ include "mev-boost.fullname" . }}
   labels:
-    {{- include "erpc.labels" . | nindent 4 }}
+    {{- include "mev-boost.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "erpc.selectorLabels" . | nindent 6 }}
+      {{- include "mev-boost.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- with .Values.podAnnotations }}
       annotations:
-        {{- if .Values.restartOnChanges }}
-        values-hash: {{ include "values.hash" . | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
-        {{- include "erpc.labels" . | nindent 8 }}
+        {{- include "mev-boost.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -27,7 +27,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "erpc.serviceAccountName" . }}
+      serviceAccountName: {{ include "mev-boost.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -36,29 +36,24 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.erpc.config.database }}
-          {{- with .Values.erpc.config.database.evmJsonRpcCache }}
-          {{- if eq .driver "redis" }}
-          env:
-            - name: ERPC_REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .redis.password.secret.name }}
-                  key: {{ .redis.password.secret.key }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
-          envFrom:
-            - secretRef:
-                name: {{ .Values.erpc.secret.name }}
-          command:
-            - /root/erpc-server
+          args:
+            - -{{ .Values.config.network }}
+            - -relay-check
+            {{- range $relay := index .Values.config.relays .Values.config.network }}
+            - -relay
+            - "{{ $relay }}"
+            {{- end }}
+            - -addr
+            - 0.0.0.0:{{ .Values.service.port }}
+            - -loglevel
+            - {{ .Values.config.logLevel }}
+            - -json
+            {{- range .Values.extraArgs }}
+            - {{ . | quote }}
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
-              protocol: TCP
-            - name: metrics
-              containerPort: {{ .Values.serviceMonitor.port }}
               protocol: TCP
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
@@ -66,18 +61,12 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: erpc-config
-              mountPath: /root/erpc.yaml
-              subPath: erpc.yaml
           {{- with .Values.volumeMounts }}
+          volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      volumes:
-        - name: erpc-config
-          configMap:
-            name: {{ include "erpc.configName" . }}
       {{- with .Values.volumes }}
+      volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}

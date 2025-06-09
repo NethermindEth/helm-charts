@@ -160,8 +160,10 @@ service:
 # Creates the NodePort service
 p2p:
   enabled: false
-  port: 30300
   serviceType: NodePort
+  port: 30300
+  # -- Set the nodePort to a specific value, otherwise it will be randomly assigned (only works when using single replica)
+  # nodePort: 30300
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 # -- For now all traffic is routed to the `http` port
@@ -247,6 +249,8 @@ serviceMonitor:
   scrapeTimeout: 30s
   # -- ServiceMonitor relabelings
   relabelings: []
+  # -- ServiceMonitor metricRelabelings
+  metricRelabelings: []
 
 # Default security settings for the pod
 podSecurityContext:

@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "generic-app.name" -}}
+{{- define "mev-boost.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "generic-app.fullname" -}}
+{{- define "mev-boost.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,20 +26,18 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "generic-app.chart" -}}
+{{- define "mev-boost.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "generic-app.labels" -}}
-{{ include "generic-app.selectorLabels" . }}
-{{- if not .Values.statefulSet.enabled }}
-helm.sh/chart: {{ include "generic-app.chart" . }}
+{{- define "mev-boost.labels" -}}
+helm.sh/chart: {{ include "mev-boost.chart" . }}
+{{ include "mev-boost.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
@@ -47,26 +45,18 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "generic-app.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "generic-app.name" . }}
+{{- define "mev-boost.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "mev-boost.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "generic-app.serviceAccountName" -}}
+{{- define "mev-boost.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "generic-app.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "mev-boost.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
-{{- end }}
-
-{{- define "configmap.hash" -}}
-{{- .Values.config | toJson | sha256sum }}
-{{- end }}
-
-{{- define "values.hash" -}}
-{{- .Values | toJson | sha256sum }}
 {{- end }}

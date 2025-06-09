@@ -30,6 +30,8 @@ deployment:
     maxReplicas: 10
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
+  # If true, the container will be restarted when the values.yaml file changes.
+  restartOnChanges: false
 
 # -- Enable StatefulSet
 statefulSet:
@@ -42,6 +44,8 @@ statefulSet:
     accessModes:
       - ReadWriteOnce
     size: 10Gi
+  # If true, the container will be restarted when the values.yaml file changes.
+  restartOnChanges: false
 
 # -- Command and args for the container
 command: []
@@ -141,6 +145,10 @@ service:
     - name: http
       port: 8080
       protocol: TCP
+  extraContainersPorts: []
+    # - name: http
+    #   port: 8080
+    #   protocol: TCP
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 # -- For now all traffic is routed to the `http` port
@@ -226,6 +234,8 @@ serviceMonitor:
   scrapeTimeout: 30s
   # -- ServiceMonitor relabelings
   relabelings: []
+  # -- ServiceMonitor metricRelabelings
+  metricRelabelings: []
 
 # Default security settings for the pod
 podSecurityContext:

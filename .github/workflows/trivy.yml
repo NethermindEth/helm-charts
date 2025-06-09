@@ -56,7 +56,7 @@ jobs:
           version: v0.57.1
 
       - name: Generate Trivy SARIF Report
-        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 #v0.29.0
+        uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 #v0.31.0
         with:
           scan-type: 'fs'
           scan-ref: '${{ github.workspace }}/charts'
@@ -67,6 +67,7 @@ jobs:
           scanners: 'misconfig,secret'
           skip-setup-trivy: true
           severity: 'CRITICAL,HIGH,MEDIUM,LOW'
+          trivy-config: '.github/trivy-ci.yaml'
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
@@ -81,7 +82,7 @@ jobs:
           sarif_file: 'trivy-results.sarif'
 
       - name: Fail on High/Critical Issues
-        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 #v0.29.0
+        uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 #v0.31.0
         with:
           scan-type: 'fs'
           scan-ref: '${{ github.workspace }}/charts'
@@ -93,6 +94,7 @@ jobs:
           trivyignores: '.trivyignore.yaml'
           limit-severities-for-sarif: true
           skip-setup-trivy: true
+          trivy-config: '.github/trivy-ci.yaml'
         env:
           TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}

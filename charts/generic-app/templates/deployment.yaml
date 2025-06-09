@@ -7,6 +7,10 @@ metadata:
   labels:
     {{- include "generic-app.labels" . | nindent 4 }}
 spec:
+  {{- with .Values.deployment.strategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   revisionHistoryLimit: 3
   {{- if not .Values.deployment.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -17,6 +21,9 @@ spec:
   template:
     metadata:
       annotations:
+        {{- if .Values.deployment.restartOnChanges }}
+        values-hash: {{ include "values.hash" . | quote }}
+        {{- end }}
         configmap-hash: {{ include "configmap.hash" . }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
