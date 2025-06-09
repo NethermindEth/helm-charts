@@ -1,0 +1,5 @@
+misconfiguration:
+  helm:
+    set:
+      - config.beaconNodeEndpoints=http://beacon.dummy:5052
+      - web3signerEndpoint=http://signer.dummy:9000
