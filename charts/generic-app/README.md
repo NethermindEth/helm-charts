@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.1.9](https://img.shields.io/badge/Version-1.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.10](https://img.shields.io/badge/Version-1.1.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -249,6 +249,7 @@ statefulSet:
 | serviceMonitor.tlsConfig | object | `{}` | ServiceMonitor TLS configuration |
 | statefulSet | object | `{"enabled":false,"persistence":{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""},"restartOnChanges":false}` | Enable StatefulSet |
 | statefulSet.persistence | object | `{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
+| terminationGracePeriodSeconds | int | `30` | Default termination grace period for the pod |
 | tolerations | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |

@@ -270,3 +270,6 @@ initContainerSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
   allowPrivilegeEscalation: false
+
+# -- Default termination grace period for the pod
+terminationGracePeriodSeconds: 30

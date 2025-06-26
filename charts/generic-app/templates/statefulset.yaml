@@ -110,6 +110,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
   {{- if .Values.statefulSet.persistence.enabled }}
   volumeClaimTemplates:
     - apiVersion: v1
