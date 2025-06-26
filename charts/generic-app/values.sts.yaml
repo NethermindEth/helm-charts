@@ -35,3 +35,5 @@ service:
 
 serviceMonitor:
   enabled: false
+
+terminationGracePeriodSeconds: 30
