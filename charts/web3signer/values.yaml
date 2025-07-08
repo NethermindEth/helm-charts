@@ -11,13 +11,13 @@ global:
   ##
   podSecurityContext:
     runAsNonRoot: true
-    runAsUser: 10000
-    fsGroup: 10000
+    runAsUser: 1000
+    fsGroup: 1000
 
   securityContext:
     readOnlyRootFilesystem: true
     runAsNonRoot: true
-    runAsUser: 10000
+    runAsUser: 1000
     capabilities:
       drop:
       - ALL
@@ -32,7 +32,7 @@ image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "24.12.0"
+  tag: "25.4.1"
 
 ## Init image is used to chown data volume, etc.
 ##
