@@ -111,6 +111,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- with .Values.runtimeClassName }}
+      runtimeClassName: {{ . | quote }}
+      {{- end }}
   {{- if .Values.statefulSet.persistence.enabled }}
   volumeClaimTemplates:
     - apiVersion: v1
