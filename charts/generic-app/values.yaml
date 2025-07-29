@@ -273,3 +273,6 @@ initContainerSecurityContext:
 
 # -- Default termination grace period for the pod
 terminationGracePeriodSeconds: 30
+
+# -- Runtime class name for the pod (e.g., "nvidia" for GPU workloads)
+runtimeClassName: ""
