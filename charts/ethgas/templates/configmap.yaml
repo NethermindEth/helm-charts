@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ethgas.fullname" . }}
+  {{- with $.Values.namespaceOverride }}
+  namespace: {{ . }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  config.toml: |-
+    chain = "{{ .Values.ethgas.network }}"
+    
+    [pbs]
+    docker_image = "ghcr.io/commit-boost/pbs:latest"
+    with_signer = true
+    host = "0.0.0.0"
+    port = {{ .Values.service.port.pbs.http }}
+    relay_check = true
+    wait_all_registrations = true
+    timeout_get_header_ms = 950
+    timeout_get_payload_ms = 4000
+    timeout_register_validator_ms = 3000
+    skip_sigverify = false
+    min_bid_eth = 0.0
+    late_in_slot_time_ms = 2000
+    extra_validation_enabled = false
+    rpc_url = "{{ .Values.ethgas.rpc_url }}"
+    validator_registration_batch_size = "1"
+    
+    [[relays]]
+    id = "ethgas"
+    url = "{{ .Values.ethgas.relays }}"
+    enable_timing_games = true
+    target_first_request_ms = 0
+    frequency_get_header_ms = 100
+    
+    [signer]
+    host = "0.0.0.0"
+    port = {{ .Values.service.port.signer.http }}
+    
+    {{ .Values.ethgas.signer | indent 4 | trim }}
+
+    [[modules]]
+    id = "ETHGAS_COMMIT"
+    type = "commit"
+    docker_image = "ghcr.io/ethgas-developer/commitboost_ethgas_commit:latest"
+    exchange_api_base = "{{ .Values.ethgas.exchange_api_base }}"
+    entity_name = "{{ .Values.ethgas.entity_name }}"
+    overall_wait_interval_in_second = 0
+    api_wait_interval_in_ms = 0
+    registration_mode = "standard" # standard, standard-mux, ssv, skipped
+    enable_registration = true
+    enable_pricer = true
+    enable_builder = false
+    collateral_per_slot = "0"
+    builder_pubkey = "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    is_jwt_provided = false
+    eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
+    
+    [[modules]]
+    id = "ETHGAS_DEPOSIT"
+    type = "commit"
+    docker_image = "ghcr.io/ethgas-developer/commitboost_ethgas_deposit:latest"
+    block_confirmation = 12
+    exchange_api_base = "{{ .Values.ethgas.exchange_api_base }}"
+    collateral_to_be_deposited = "0.01"
+    collateral_contract = "{{ .Values.ethgas.collateral_contract }}"
+    eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
+    
+    [metrics]
+    enabled = true
+    host = "127.0.0.1"
+    start_port = {{ .Values.service.port.pbs.metrics }}
+    
+    [logs.stdout]
+    enabled = true
+    level = "info"
+    use_json = false
+    color = true
+    
+    [logs.file]
+    enabled = true
+    level = "debug"
+    use_json = true
+    dir_path = "./logs"
+    max_files = 30
