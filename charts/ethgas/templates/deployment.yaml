@@ -34,6 +34,14 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
+      - name: init-gen-jwt
+        image: ghcr.io/ethgas-developer/commitboost_gen_jwt:v1.0.0-beta.5
+        env:
+        - name: CB_MODULE_ID
+          value: ETHGAS_COMMIT
+        volumeMounts:
+        - name: env
+          mountPath: /app
       - name: init
         image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
         command: ['sh', '-c', 'printenv | grep CB_; find /app/; cat /app/.cb.env; chmod 777 -R /var/logs/commit-boost/; cat /cb-config.toml']
@@ -48,8 +56,7 @@ spec:
         - name: logs-ethgas-commit
           mountPath: /var/logs/commit-boost/logs-ethgas-commit
         - name: env
-          mountPath: /app/.cb.env
-          subPath: .cb.env
+          mountPath: /app
         - name: config
           mountPath: /cb-config.toml
           subPath: config.toml
@@ -70,9 +77,9 @@ spec:
             value: "{{ .Values.service.port.pbs.metrics }}"
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
-          envFrom:
-          - configMapRef:
-              name: {{ include "ethgas.fullname" . }}-env-vars
+#          envFrom:
+#          - configMapRef:
+#              name: {{ include "ethgas.fullname" . }}-env-vars
           volumeMounts:
           - name: config
             mountPath: /cb-config.toml
@@ -101,8 +108,7 @@ spec:
             mountPath: /cb-config.toml
             subPath: config.toml
           - name: env
-            mountPath: /app/.cb.env
-            subPath: .cb.env
+            mountPath: /app
           - name: keys
             mountPath: /keys
           - name: secrets
@@ -128,12 +134,6 @@ spec:
             value: "{{ .Values.service.port.commitboost_ethgas_commit.metrics }}"
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
-          - name: ACCESS_JWT
-            value: "-"
-          - name: REFRESH_JWT
-            value: "-"
-          - name: EOA_SIGNING_KEY
-            value: "{{ .Values.ethgas.eoa_signing_key }}"
           envFrom:
           - configMapRef:
               name: {{ include "ethgas.fullname" . }}-env-vars
@@ -142,8 +142,7 @@ spec:
             mountPath: /cb-config.toml
             subPath: config.toml
           - name: env
-            mountPath: /app/.cb.env
-            subPath: .cb.env
+            mountPath: /app
           - name: logs-ethgas-commit
             mountPath: /var/logs/commit-boost
       volumes:
@@ -151,8 +150,7 @@ spec:
           configMap:
             name: {{ include "ethgas.fullname" . }}
         - name: env
-          configMap:
-            name: {{ include "ethgas.fullname" . }}-env
+          emptyDir: {}
         - name: logs-pbs
           persistentVolumeClaim:
             claimName: {{ include "ethgas.fullname" . }}-pbs-logs

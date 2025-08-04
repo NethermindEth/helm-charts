@@ -14,9 +14,9 @@ metadata:
   name: {{ include "ethgas.fullname" . }}-env-vars
   namespace: hoodi
 data:
-  CB_JWT_ETHGAS_COMMIT: ac2zPuLpPbVouypI6ncJEjgYLwZn39wH
-  CB_JWTS: ETHGAS_COMMIT=ac2zPuLpPbVouypI6ncJEjgYLwZn39wH
-  CB_SIGNER_JWT: ac2zPuLpPbVouypI6ncJEjgYLwZn39wH
+  CB_JWT_ETHGAS_COMMIT: {{ .Values.ethgas.token }}
+  CB_JWTS: ETHGAS_COMMIT={{ .Values.ethgas.token }}
+  CB_SIGNER_JWT: {{ .Values.ethgas.token }}
 ---
 # ConfigMap for .cb.env
 apiVersion: v1
@@ -26,9 +26,9 @@ metadata:
   namespace: hoodi
 data:
   .cb.env: |
-    CB_JWT_ETHGAS_COMMIT=ac2zPuLpPbVouypI6ncJEjgYLwZn39wH
-    CB_JWTS=ETHGAS_COMMIT=ac2zPuLpPbVouypI6ncJEjgYLwZn39wH
-    CB_SIGNER_JWT=ac2zPuLpPbVouypI6ncJEjgYLwZn39wH
+    CB_JWT_ETHGAS_COMMIT={{ .Values.ethgas.token }}
+    CB_JWTS=ETHGAS_COMMIT={{ .Values.ethgas.token }}
+    CB_SIGNER_JWT={{ .Values.ethgas.token }}
 ---
 apiVersion: v1
 kind: ConfigMap
