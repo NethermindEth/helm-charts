@@ -24,7 +24,7 @@ spec:
       port: {{ .Values.service.port.signer.metrics }}
       targetPort: {{ .Values.service.port.signer.metrics }}
     - name: ethgas-commit-metrics
-      port: {{ .Values.service.port.commitboost_ethgas_commit.metrics }}
-      targetPort: {{ .Values.service.port.commitboost_ethgas_commit.metrics }}
+      port: {{ .Values.service.port.ethgas_commit.metrics }}
+      targetPort: {{ .Values.service.port.ethgas_commit.metrics }}
   selector:
     {{- include "ethgas.selectorLabels" . | nindent 4 }}

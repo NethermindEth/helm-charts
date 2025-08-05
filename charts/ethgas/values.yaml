@@ -22,7 +22,7 @@ image:
     repository: ghcr.io/commit-boost/signer
     pullPolicy: IfNotPresent
     tag: "v0.8.0"
-  commitboost_ethgas_commit:
+  ethgas_commit:
     repository: ghcr.io/ethgas-developer/commitboost_ethgas_commit
     pullPolicy: IfNotPresent
     tag: "v1.0.0-beta.5"
@@ -37,6 +37,10 @@ ethgas:
   exchange_api_base: "https://hoodi.app.ethgas.com"
   collateral_contract: "0xe8bfB84b14c383b94365a895fc8bfA36dE236dc8"
   signer:
+  dirk:
+    ca.crt:
+    dirk.crt:
+    dirk.key:
 
 # Extra arguments to pass to the ethgas binary.
 extraArgs: []
@@ -83,7 +87,7 @@ service:
     signer:
       http: 20000
       metrics: 10001
-    commitboost_ethgas_commit:
+    ethgas_commit:
       metrics: 10002
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
