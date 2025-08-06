@@ -17,7 +17,7 @@ keywords:
 maintainers:
   - name: nme-mvasylenko
 
-home: https://github.com/OffchainLabs/orbit-setup-script
+home: https://github.com/NethermindEth/orbit-setup-script
 sources:
   - https://github.com/OffchainLabs/orbit-setup-script
   - https://github.com/OffchainLabs/nitro
