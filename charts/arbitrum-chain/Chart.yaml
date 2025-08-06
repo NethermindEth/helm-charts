@@ -15,8 +15,7 @@ keywords:
   - blockscout
 
 maintainers:
-  - name: Orbit Chain Operator
-    email: operator@example.com
+  - name: nme-mvasylenko
 
 home: https://github.com/OffchainLabs/orbit-setup-script
 sources:
