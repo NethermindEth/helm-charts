@@ -5,13 +5,13 @@
 
 A self-contained Helm chart for deploying Arbitrum Orbit L2 chain with Nitro node, Blockscout explorer and token bridge
 
-**Homepage:** <https://github.com/OffchainLabs/orbit-setup-script>
+**Homepage:** <https://github.com/NethermindEth/orbit-setup-script>
 
 ## Maintainers
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Orbit Chain Operator | <operator@example.com> |  |
+| nme-mvasylenko |  |  |
 
 ## Source Code
 
