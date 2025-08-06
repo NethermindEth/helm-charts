@@ -43,7 +43,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "arbitrum-orbit-chain.fullname" . }}-secrets
                   key: BLOCKSCOUT_SECRET_KEY_BASE
-            
+
             # Chain configuration
             - name: CHAIN_TYPE
               value: "arbitrum"
@@ -59,7 +59,7 @@ spec:
               value: "http"
             - name: INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER
               value: "true"
-            
+
             # Network configuration
             - name: NETWORK
               value: ""
@@ -71,7 +71,7 @@ spec:
               value: {{ .Values.global.domain | quote }}
             - name: BLOCKSCOUT_PROTOCOL
               value: {{ .Values.global.protocol | quote }}
-            
+
             # Performance configuration
             - name: POOL_SIZE
               value: "80"
@@ -81,11 +81,11 @@ spec:
               value: "false"
             - name: PORT
               value: "4000"
-            
+
             # Redis configuration
             - name: ACCOUNT_REDIS_URL
               value: "redis://{{ include "arbitrum-orbit-chain.fullname" . }}-blockscout-redis:6379"
-            
+
             # Feature flags
             - name: DISABLE_EXCHANGE_RATES
               value: "true"
@@ -101,7 +101,7 @@ spec:
               value: "https://eth-bytecode-db.services.blockscout.com/"
             - name: MICROSERVICE_SC_VERIFIER_TYPE
               value: "eth_bytecode_db"
-            
+
             # Indexer configuration
             - name: DISABLE_INDEXER
               value: "false"
@@ -109,7 +109,7 @@ spec:
               value: "false"
             - name: DISABLE_CATCHUP_INDEXER
               value: "false"
-            
+
           resources:
             limits:
               cpu: 2000m
