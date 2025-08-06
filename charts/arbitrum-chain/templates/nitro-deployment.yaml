@@ -1,0 +1,9 @@
+# Nitro deployment replaced by nitro-statefulset.yaml for proper persistent storage and scaling
+# This file is kept for reference but the StatefulSet is used instead
+# The new StatefulSet provides:
+# - Proper persistent storage with volumeClaimTemplates
+# - Better configuration management through ConfigMaps
+# - Enhanced service discovery and scaling capabilities
+# - JWT secrets and wallet management
+# - Comprehensive probe configurations
+# - Support for all nitro chart features

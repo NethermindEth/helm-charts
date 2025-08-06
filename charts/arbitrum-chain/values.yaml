@@ -1,0 +1,412 @@
+# Global configuration
+global:
+  chainName: "BaasDev Arbitrum Orbit Chain 250806"
+  chainId: "96975958395"
+  parentChainId: "11155111"  # Sepolia
+  domain: "example.com"
+  protocol: "http"  # Use "https" for production
+
+# Service account configuration
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Nitro node configuration (self-contained, no external dependencies)
+nitro:
+  enabled: true
+  
+  # Image configuration
+  image:
+    repository: offchainlabs/nitro-node
+    tag: "v3.6.8-d6c96a5"
+    pullPolicy: Always
+
+  # Replica configuration
+  replicaCount: 1
+
+  # Update strategy
+  updateStrategy:
+    type: RollingUpdate
+
+  # Environment variables for Go runtime optimization
+  env:
+    goMemLimit:
+      enabled: true
+      multiplier: 0.9
+    goMaxProcs:
+      enabled: false
+      multiplier: 2
+
+  # Startup probe configuration
+  startupProbe:
+    enabled: true
+    failureThreshold: 2419200
+    periodSeconds: 1
+    command: ""  # Uses default curl command
+
+  # Liveness and readiness probes
+  livenessProbe: {}
+  readinessProbe: {}
+
+  # Extra arguments and environment
+  extraArgs: []
+  extraEnv: []
+  extraPorts: []
+  extraVolumes: []
+  extraVolumeMounts: []
+
+  # Lifecycle hooks
+  lifecycle: {}
+
+  # Init containers and sidecars
+  initContainers: []
+  sidecars: []
+
+  # Command override
+  commandOverride: []
+  argsOverride: []
+
+  # Persistence configuration
+  persistence:
+    enabled: true
+    size: 500Gi
+    storageClassName: ""
+    accessModes: ["ReadWriteOnce"]
+
+  # Blob persistence (optional)
+  blobPersistence:
+    enabled: false
+    size: 100Gi
+    storageClassName: ""
+    accessModes: ["ReadWriteOnce"]
+
+  # Additional volume claims
+  additionalVolumeClaims: []
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    annotations: {}
+    publishNotReadyAddresses: false
+    loadBalancerClass: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    externalTrafficPolicy: ""
+    ports:
+      http: 8449
+      ws: 8548
+      metrics: 6070
+    extraPorts: []
+
+  # Headless service
+  headlessService:
+    enabled: true
+    publishNotReadyAddresses: true
+    annotations: {}
+
+  # ServiceMonitor for Prometheus
+  serviceMonitor:
+    enabled: false
+    portName: "metrics"
+    path: "/debug/metrics/prometheus"
+    interval: "5s"
+    additionalLabels: {}
+    relabelings: []
+
+  # JWT secret for auth
+  jwtSecret:
+    enabled: false
+    value: ""
+
+  # Wallet configuration
+  wallet:
+    mountPath: "/wallet/"
+    files: {}
+
+  # Pod configuration
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroupChangePolicy: OnRootMismatch
+
+  securityContext: {}
+  priorityClassName: ""
+
+  # Node selector, affinity, tolerations
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+
+  # Resources
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+
+  # Nitro configuration - comprehensive self-contained config
+  config:
+    # Configuration file settings
+    conf:
+      env_prefix: "NITRO"
+
+    # HTTP RPC configuration
+    http:
+      addr: "0.0.0.0"
+      port: 8449
+      vhosts: "*"
+      corsdomain: "*"
+      api: ["arb", "eth", "net", "web3", "txpool", "arbdebug"]
+      rpcprefix: "/rpc"
+
+    # WebSocket configuration
+    ws:
+      addr: "0.0.0.0"
+      port: 8548
+      api: ["net", "web3", "eth", "arb"]
+      rpcprefix: "/ws"
+
+    # Metrics configuration
+    metrics: false
+    metrics-server:
+      addr: "0.0.0.0"
+      port: 6070
+
+    # Chain configuration
+    chain:
+      id: 96975958395
+      name: "My Custom Arbitrum Orbit Chain"
+      info-json: {}
+
+    # Parent chain configuration
+    parent-chain:
+      id: 11155111
+      connection:
+        url: "https://ethereum-sepolia-rpc.publicnode.com"
+      blob-client:
+        beacon-url: "https://ethereum-sepolia-beacon-api.publicnode.com"
+
+    # Persistent data location
+    persistent:
+      chain: "/home/user/data/"
+
+    # Log configuration
+    log-type: "json"
+
+    # Node behavior configuration
+    node:
+      sequencer: true
+      delayed-sequencer:
+        enable: true
+        use-merge-finality: false
+        finalize-distance: 1
+      batch-poster:
+        max-size: 90000
+        max-delay: "5m0s"
+        enable: true
+        parent-chain-wallet:
+          private-key: ""  # Set via secret
+      staker:
+        enable: false
+        strategy: "MakeNodes"
+        parent-chain-wallet:
+          private-key: ""  # Set via secret
+      dangerous:
+        no-sequencer-coordinator: true
+        disable-blob-reader: false
+
+    # Execution configuration
+    execution:
+      forwarding-target: ""
+      sequencer:
+        enable: true
+        max-tx-data-size: 85000
+        max-block-speed: "250ms"
+      caching:
+        archive: true
+
+    # Validation configuration
+    validation:
+      wasm:
+        allowed-wasm-module-roots: ["/home/user/nitro-legacy/machines", "/home/user/target/machines"]
+
+# Blockscout explorer
+blockscout:
+  enabled: true
+  
+  # Database configuration
+  postgresql:
+    enabled: true
+    storageClass: ""  # Use default storage class
+    auth:
+      database: blockscout
+      username: blockscout
+      password: ""  # Set via secret
+    primary:
+      persistence:
+        enabled: true
+        size: 100Gi
+
+  # Redis configuration  
+  redis:
+    enabled: true
+    auth:
+      enabled: false
+
+  # Backend configuration
+  backend:
+    image:
+      repository: blockscout/blockscout-arbitrum
+      tag: "6.5.0"
+    
+    replicaCount: 1
+
+  # Frontend configuration
+  frontend:
+    image:
+      repository: blockscout/frontend
+      tag: "v1.31.0"
+      
+    replicaCount: 1
+    
+    env:
+      NEXT_PUBLIC_NETWORK_NAME: "Arbitrum Local"
+      NEXT_PUBLIC_NETWORK_SHORT_NAME: "Arbitrum Local"
+      NEXT_PUBLIC_AD_BANNER_PROVIDER: "none"
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    backend:
+      port: 4000
+    frontend:
+      port: 3000
+
+# Token Bridge UI
+tokenBridge:
+  enabled: true
+  
+  image:
+    repository: offchainlabs/arb-token-bridge
+    tag: "latest"
+    pullPolicy: Always
+    
+  replicaCount: 1
+  
+  # Configuration from outputInfo.json
+  config:
+    l1ChainId: 11155111  # Sepolia
+    l2ChainId: 96975958395
+    l1Rpc: "https://ethereum-sepolia-rpc.publicnode.com"
+    l2Rpc: "http://nitro:8449"
+    
+    # Bridge contract addresses (these appear to be real deployed contract addresses)
+    l1Bridge: "0x6495661ffa6acceb439d3949c0eea0a16cb8c75c"  # Likely from Arbitrum's official bridge deployment
+    l2Bridge: "0x8D367789eDe2740Eb3C9504cf4676A1dB0Bd044a"  # Standard L2 bridge contract
+    l1Router: "0x6495661ffa6acceb439d3949c0eea0a16cb8c75c"  # Same as l1Bridge (common pattern)
+    l2Router: "0x4eaab9164527ff540aec1c085ffa9f9347eeea46"  # L2 router contract
+    l2WethGateway: "0x5c3a12e500dac7c432a6014d75f76e07e1798e0a"  # WETH gateway on L2
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  
+  hosts:
+    - host: "192.168.1.100.sslip.io"
+      paths:
+        - path: "/"
+          pathType: Prefix
+          service: blockscout-frontend
+          port: 3000
+        - path: "/api"
+          pathType: Prefix
+          service: blockscout-backend
+          port: 4000
+        - path: "/bridge"
+          pathType: Prefix
+          service: token-bridge
+          port: 3000
+        - path: "/rpc"
+          pathType: Prefix
+          service: nitro
+          port: 8449
+
+# DAS (Data Availability Server) - Optional
+das:
+  enabled: false
+  
+  image:
+    repository: offchainlabs/nitro-node
+    tag: "v3.6.8"
+    
+  service:
+    type: ClusterIP
+    ports:
+      - port: 9876
+        name: das-rpc
+      - port: 9877
+        name: das-rest
+
+# Secrets configuration
+secrets:
+  # Private keys and sensitive data
+  deployerPrivateKey: ""
+  batchPosterPrivateKey: ""
+  validatorPrivateKey: ""
+  
+  # Database credentials
+  blockscoutDbPassword: ""
+  blockscoutSecretKeyBase: ""
+
+# ConfigMaps for configuration files
+configMaps:
+  nodeConfig: true
+  orbitSetupConfig: true
+  outputInfo: true
+
+# Monitoring
+monitoring:
+  enabled: false
+  serviceMonitor:
+    enabled: false
+  prometheusRule:
+    enabled: false
+
+# Network policies
+networkPolicy:
+  enabled: false
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80

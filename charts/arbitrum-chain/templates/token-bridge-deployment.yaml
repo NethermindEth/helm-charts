@@ -1,0 +1,63 @@
+{{- if .Values.tokenBridge.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "arbitrum-orbit-chain.fullname" . }}-token-bridge
+  labels:
+    {{- include "arbitrum-orbit-chain.labels" . | nindent 4 }}
+    app.kubernetes.io/component: token-bridge
+spec:
+  replicas: {{ .Values.tokenBridge.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "arbitrum-orbit-chain.token-bridge.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "arbitrum-orbit-chain.token-bridge.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: token-bridge
+          image: "{{ .Values.tokenBridge.image.repository }}:{{ .Values.tokenBridge.image.tag }}"
+          imagePullPolicy: {{ .Values.tokenBridge.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: REACT_APP_CHAIN_ID
+              value: {{ .Values.tokenBridge.config.l2ChainId | quote }}
+            - name: REACT_APP_L1_CHAIN_ID
+              value: {{ .Values.tokenBridge.config.l1ChainId | quote }}
+            - name: REACT_APP_L1_RPC_URL
+              value: {{ .Values.tokenBridge.config.l1Rpc | quote }}
+            - name: REACT_APP_L2_RPC_URL
+              value: {{ .Values.tokenBridge.config.l2Rpc | quote }}
+            - name: REACT_APP_L1_BRIDGE_ADDRESS
+              value: {{ .Values.tokenBridge.config.l1Bridge | quote }}
+            - name: REACT_APP_L2_BRIDGE_ADDRESS
+              value: {{ .Values.tokenBridge.config.l2Bridge | quote }}
+          volumeMounts:
+            - name: output-info
+              mountPath: /app/outputInfo.json
+              subPath: outputInfo.json
+              readOnly: true
+          resources:
+            {{- toYaml .Values.tokenBridge.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: output-info
+          configMap:
+            name: {{ include "arbitrum-orbit-chain.fullname" . }}-output-info
+{{- end }}

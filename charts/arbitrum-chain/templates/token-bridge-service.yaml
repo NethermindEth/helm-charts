@@ -1,0 +1,18 @@
+{{- if .Values.tokenBridge.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "arbitrum-orbit-chain.fullname" . }}-token-bridge
+  labels:
+    {{- include "arbitrum-orbit-chain.labels" . | nindent 4 }}
+    app.kubernetes.io/component: token-bridge
+spec:
+  type: {{ .Values.tokenBridge.service.type }}
+  ports:
+    - port: {{ .Values.tokenBridge.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "arbitrum-orbit-chain.token-bridge.selectorLabels" . | nindent 4 }}
+{{- end }}

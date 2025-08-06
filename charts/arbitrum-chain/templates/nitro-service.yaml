@@ -1,0 +1,95 @@
+{{- if .Values.nitro.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "orbit-chain.fullname" . }}-nitro
+  labels:
+    {{- include "orbit-chain.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nitro
+  {{- with .Values.nitro.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.nitro.service.type }}
+  {{- if .Values.nitro.service.clusterIP }}
+  clusterIP: {{ .Values.nitro.service.clusterIP }}
+  {{- end }}
+  {{- if .Values.nitro.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.nitro.service.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.nitro.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- with .Values.nitro.service.loadBalancerSourceRanges }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.nitro.service.loadBalancerClass }}
+  loadBalancerClass: {{ .Values.nitro.service.loadBalancerClass }}
+  {{- end }}
+  {{- if .Values.nitro.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.nitro.service.externalTrafficPolicy }}
+  {{- end }}
+  {{- if .Values.nitro.service.publishNotReadyAddresses }}
+  publishNotReadyAddresses: {{ .Values.nitro.service.publishNotReadyAddresses }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.nitro.service.ports.http }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.nitro.service.ports.ws }}
+      targetPort: ws
+      protocol: TCP
+      name: ws
+    {{- if .Values.nitro.config.metrics }}
+    - port: {{ .Values.nitro.service.ports.metrics | default 6070 }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+    {{- end }}
+    {{- with .Values.nitro.service.extraPorts }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  selector:
+    {{- include "orbit-chain.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: nitro
+---
+{{- if .Values.nitro.headlessService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "orbit-chain.fullname" . }}-nitro-headless
+  labels:
+    {{- include "orbit-chain.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nitro
+  {{- with .Values.nitro.headlessService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  {{- if .Values.nitro.headlessService.publishNotReadyAddresses }}
+  publishNotReadyAddresses: {{ .Values.nitro.headlessService.publishNotReadyAddresses }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.nitro.service.ports.http }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.nitro.service.ports.ws }}
+      targetPort: ws
+      protocol: TCP
+      name: ws
+    {{- if .Values.nitro.config.metrics }}
+    - port: {{ .Values.nitro.service.ports.metrics | default 6070 }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+    {{- end }}
+  selector:
+    {{- include "orbit-chain.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: nitro
+{{- end }}
+{{- end }}

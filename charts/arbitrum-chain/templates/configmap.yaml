@@ -1,0 +1,36 @@
+{{- if .Values.configMaps.nodeConfig }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "arbitrum-orbit-chain.fullname" . }}-node-config
+  labels:
+    {{- include "arbitrum-orbit-chain.labels" . | nindent 4 }}
+data:
+  nodeConfig.json: {{ .Values.nitro.config | toPrettyJson | quote }}
+{{- end }}
+
+---
+
+{{- if .Values.configMaps.outputInfo }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "arbitrum-orbit-chain.fullname" . }}-output-info
+  labels:
+    {{- include "arbitrum-orbit-chain.labels" . | nindent 4 }}
+data:
+  outputInfo.json: |
+    {
+      "l1ChainId": {{ .Values.tokenBridge.config.l1ChainId }},
+      "l2ChainId": {{ .Values.tokenBridge.config.l2ChainId }},
+      "l1": {
+        "bridge": {{ .Values.tokenBridge.config.l1Bridge | quote }},
+        "router": {{ .Values.tokenBridge.config.l1Router | quote }}
+      },
+      "l2": {
+        "bridge": {{ .Values.tokenBridge.config.l2Bridge | quote }},
+        "router": {{ .Values.tokenBridge.config.l2Router | quote }},
+        "wethGateway": {{ .Values.tokenBridge.config.l2WethGateway | quote }}
+      }
+    }
+{{- end }}

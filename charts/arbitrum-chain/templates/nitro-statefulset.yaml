@@ -1,0 +1,204 @@
+{{- if .Values.nitro.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "orbit-chain.fullname" . }}-nitro
+  labels:
+    {{- include "orbit-chain.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nitro
+spec:
+  serviceName: {{ include "orbit-chain.fullname" . }}-nitro-headless
+  replicas: {{ .Values.nitro.replicaCount }}
+  updateStrategy:
+    type: {{ .Values.nitro.updateStrategy.type }}
+  selector:
+    matchLabels:
+      {{- include "orbit-chain.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: nitro
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/nitro-configmap.yaml") . | sha256sum }}
+        {{- with .Values.nitro.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "orbit-chain.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: nitro
+        {{- with .Values.nitro.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.nitro.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "orbit-chain.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.nitro.podSecurityContext | nindent 8 }}
+      {{- if .Values.nitro.initContainers }}
+      initContainers:
+        {{- toYaml .Values.nitro.initContainers | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: nitro
+          securityContext:
+            {{- toYaml .Values.nitro.securityContext | nindent 12 }}
+          image: "{{ .Values.nitro.image.repository }}:{{ .Values.nitro.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.nitro.image.pullPolicy }}
+          {{- if .Values.nitro.commandOverride }}
+          command:
+            {{- toYaml .Values.nitro.commandOverride | nindent 12 }}
+          {{- end }}
+          {{- if .Values.nitro.argsOverride }}
+          args:
+            {{- toYaml .Values.nitro.argsOverride | nindent 12 }}
+          {{- else }}
+          args:
+            - --config
+            - /config/config.json
+            {{- range .Values.nitro.extraArgs }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.nitro.config.http.port }}
+              protocol: TCP
+            - name: ws
+              containerPort: {{ .Values.nitro.config.ws.port }}
+              protocol: TCP
+            {{- if .Values.nitro.config.metrics }}
+            - name: metrics
+              containerPort: {{ index .Values.nitro.config "metrics-server" "port" | default 6070 }}
+              protocol: TCP
+            {{- end }}
+            {{- with .Values.nitro.extraPorts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            {{- if .Values.nitro.config.conf }}
+            {{- if .Values.nitro.config.conf.env_prefix }}
+            - name: {{ .Values.nitro.config.conf.env_prefix }}_CONF_FILE
+              value: /config/config.json
+            {{- end }}
+            {{- end }}
+            {{- with .Values.nitro.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.nitro.livenessProbe }}
+          livenessProbe:
+            {{- toYaml .Values.nitro.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.nitro.readinessProbe }}
+          readinessProbe:
+            {{- toYaml .Values.nitro.readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.nitro.startupProbe.enabled }}
+          startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  {{- if .Values.nitro.startupProbe.command }}
+                  {{ .Values.nitro.startupProbe.command }}
+                  {{- else }}
+                  curl "http://localhost:{{ .Values.nitro.config.http.port }}{{ .Values.nitro.config.http.rpcprefix }}" -H "Content-Type: application/json" \
+                           -sd "{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"eth_syncing\",\"params\":[]}" \
+                           | jq -ne "input.result == false"
+                  {{- end }}
+            failureThreshold: {{ .Values.nitro.startupProbe.failureThreshold }}
+            periodSeconds: {{ .Values.nitro.startupProbe.periodSeconds }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.nitro.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: data
+              mountPath: {{ .Values.nitro.config.persistent.chain }}
+            {{- if .Values.nitro.blobPersistence.enabled }}
+            - name: blob-data
+              mountPath: /blob-data
+            {{- end }}
+            {{- if .Values.nitro.wallet.files }}
+            - name: wallet
+              mountPath: {{ .Values.nitro.wallet.mountPath }}
+              readOnly: true
+            {{- end }}
+            {{- if .Values.nitro.jwtSecret.enabled }}
+            - name: jwt-secret
+              mountPath: /secrets
+              readOnly: true
+            {{- end }}
+            {{- with .Values.nitro.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.nitro.lifecycle }}
+          lifecycle:
+            {{- toYaml .Values.nitro.lifecycle | nindent 12 }}
+          {{- end }}
+        {{- if .Values.nitro.sidecars }}
+        {{- toYaml .Values.nitro.sidecars | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nitro.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nitro.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nitro.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nitro.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "orbit-chain.fullname" . }}-nitro-config
+        {{- if .Values.nitro.wallet.files }}
+        - name: wallet
+          secret:
+            secretName: {{ include "orbit-chain.fullname" . }}-nitro-wallet
+        {{- end }}
+        {{- if .Values.nitro.jwtSecret.enabled }}
+        - name: jwt-secret
+          secret:
+            secretName: {{ include "orbit-chain.fullname" . }}-nitro-jwt
+        {{- end }}
+        {{- with .Values.nitro.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: {{ .Values.nitro.persistence.accessModes }}
+        {{- if .Values.nitro.persistence.storageClassName }}
+        storageClassName: {{ .Values.nitro.persistence.storageClassName }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.nitro.persistence.size }}
+    {{- if .Values.nitro.blobPersistence.enabled }}
+    - metadata:
+        name: blob-data
+      spec:
+        accessModes: {{ .Values.nitro.blobPersistence.accessModes }}
+        {{- if .Values.nitro.blobPersistence.storageClassName }}
+        storageClassName: {{ .Values.nitro.blobPersistence.storageClassName }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.nitro.blobPersistence.size }}
+    {{- end }}
+    {{- with .Values.nitro.additionalVolumeClaims }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

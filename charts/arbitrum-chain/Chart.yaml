@@ -1,0 +1,25 @@
+apiVersion: v2
+name: arbitrum-orbit-chain
+description: A self-contained Helm chart for deploying Arbitrum Orbit L2 chain with Nitro node, Blockscout explorer and token bridge
+type: application
+version: 0.2.0
+appVersion: "v3.6.8"
+
+keywords:
+  - blockchain
+  - arbitrum
+  - orbit
+  - l2
+  - ethereum
+  - nitro
+  - blockscout
+
+maintainers:
+  - name: Orbit Chain Operator
+    email: operator@example.com
+
+home: https://github.com/OffchainLabs/orbit-setup-script
+sources:
+  - https://github.com/OffchainLabs/orbit-setup-script
+  - https://github.com/OffchainLabs/nitro
+  - https://github.com/blockscout/blockscout

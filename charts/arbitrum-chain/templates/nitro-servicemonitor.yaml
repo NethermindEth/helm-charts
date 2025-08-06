@@ -1,0 +1,25 @@
+{{- if and .Values.nitro.enabled .Values.nitro.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "orbit-chain.fullname" . }}-nitro
+  labels:
+    {{- include "orbit-chain.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nitro
+    {{- with .Values.nitro.serviceMonitor.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "orbit-chain.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: nitro
+  endpoints:
+    - port: {{ .Values.nitro.serviceMonitor.portName | default "metrics" }}
+      path: {{ .Values.nitro.serviceMonitor.path | default "/debug/metrics/prometheus" }}
+      interval: {{ .Values.nitro.serviceMonitor.interval | default "5s" }}
+      {{- with .Values.nitro.serviceMonitor.relabelings }}
+      relabelings:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
