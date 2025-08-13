@@ -31,6 +31,7 @@ spec:
       kind: {{ .kind | default "Service" }}
       name: {{ include "generic-app.fullname" $ }}
       port: {{ .port }}
+      weight: {{ .weight | default 1 }}
     {{- end }}
   {{- end }}
 {{- end }}
