@@ -24,7 +24,12 @@ spec:
   {{- end }}
   rules:
   {{- range .Values.HTTPRoute.rules }}
-  - matches: {{- .matches | toYaml | nindent 4 }}
+  - {{- if .matches }}
+    matches: {{- .matches | toYaml | nindent 4 }}
+    {{- end }}
+    {{- if .filters }}
+    filters: {{- .filters | toYaml | nindent 4 }}
+    {{- end }}
     backendRefs:
     {{- range .backendRefs }}
     - group: ""
