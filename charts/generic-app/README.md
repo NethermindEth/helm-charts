@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.1.8](https://img.shields.io/badge/Version-1.1.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.16](https://img.shields.io/badge/Version-1.1.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -181,6 +181,11 @@ statefulSet:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| HTTPRoute.annotations | object | `{}` |  |
+| HTTPRoute.enabled | bool | `false` |  |
+| HTTPRoute.hostnames | list | `[]` |  |
+| HTTPRoute.parentRefs | list | `[]` |  |
+| HTTPRoute.rules | list | `[]` |  |
 | affinity | object | `{}` |  |
 | args | list | `[]` |  |
 | command | list | `[]` | Command and args for the container |
@@ -218,6 +223,7 @@ statefulSet:
 | readinessProbe | string | `nil` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
+| runtimeClassName | string | `""` | Runtime class name for the pod (e.g., "nvidia" for GPU workloads) |
 | securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | securityContext.readOnlyRootFilesystem | bool | `true` |  |
@@ -225,6 +231,7 @@ statefulSet:
 | securityContext.runAsNonRoot | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |
 | securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| service.annotations | object | `{}` |  |
 | service.extraContainersPorts | list | `[]` |  |
 | service.ports[0].name | string | `"http"` |  |
 | service.ports[0].port | int | `8080` |  |
@@ -248,6 +255,7 @@ statefulSet:
 | serviceMonitor.tlsConfig | object | `{}` | ServiceMonitor TLS configuration |
 | statefulSet | object | `{"enabled":false,"persistence":{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""},"restartOnChanges":false}` | Enable StatefulSet |
 | statefulSet.persistence | object | `{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
+| terminationGracePeriodSeconds | int | `30` | Default termination grace period for the pod |
 | tolerations | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |

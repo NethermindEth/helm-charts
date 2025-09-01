@@ -138,6 +138,7 @@ podLabels: {}
 
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
+  annotations: {}
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
@@ -169,6 +170,27 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+HTTPRoute:
+  enabled: false
+  annotations: {}
+  parentRefs: []
+  # - group: gateway.networking.k8s.io
+  #   kind: Gateway
+  #   name: gateway
+  #   namespace: istio-ingress
+  hostnames: []
+  # - example.com
+  rules: []
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /
+  #   backendRefs:
+  #   - group: ''
+  #     kind: Service
+  #     name: {{ include "generic-app.fullname" $ }}
+  #     port: 1027
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -269,3 +291,9 @@ initContainerSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
   allowPrivilegeEscalation: false
+
+# -- Default termination grace period for the pod
+terminationGracePeriodSeconds: 30
+
+# -- Runtime class name for the pod (e.g., "nvidia" for GPU workloads)
+runtimeClassName: ""

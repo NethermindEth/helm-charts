@@ -26,11 +26,10 @@ spec:
         {{- . | toYaml | nindent 8 }}
       {{- end }}
       labels:
-        namespace: {{ $.Release.Namespace }}
         {{- $defaultLabels := $.Values.defaultAlertLabels | default (dict) }}
-        {{- $customLabels := .labels | default (dict) }}
-        {{- $labels := merge $defaultLabels $customLabels }}
-        {{- with $labels }}
+        {{- $labels := .labels | default (dict) }}
+        {{- $mergedLabels := merge $labels $defaultLabels }}
+        {{- with $mergedLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     {{- end }}

@@ -55,3 +55,20 @@ ingress:
 
 serviceMonitor:
   enabled: false
+
+terminationGracePeriodSeconds: 30
+
+dnsConfig: {}
+# Example:
+# dnsConfig:
+  # nameservers:
+  #   - "8.8.8.8"
+  # searches:
+  #   - "gardia.zenrocklabs.io"
+  # options:
+  #   - name: "ndots"
+  #     value: "2"
+  #   - name: "timeout"
+  #     value: "2"
+  #   - name: "attempts"
+  #     value: "5"

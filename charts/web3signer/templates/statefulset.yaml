@@ -43,16 +43,27 @@ spec:
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
-            {{- toYaml .Values.global.securityContext | nindent 12 }}
+            runAsUser: 0
+            runAsNonRoot: false
+            capabilities:
+              drop:
+              - ALL
+              add:
+              - CHOWN
+              - FOWNER
           command:
             - sh
             - -ac
             - >
               mkdir -p /data/web3signer /data/keystore;
-              chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/web3signer
+              chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/web3signer /data/keystore;
+              mkdir -p /opt/web3signer/file-uploads;
+              chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /opt/web3signer/file-uploads;
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: file-uploads
+              mountPath: /opt/web3signer/file-uploads
         - name: migrations
           image: "{{ .Values.flywayImage.repository }}:{{ .Values.flywayImage.tag }}"
           imagePullPolicy: {{ .Values.flywayImage.pullPolicy }}
@@ -137,6 +148,8 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+            - name: file-uploads
+              mountPath: /opt/web3signer/file-uploads
         {{- if .Values.enableReloader }}
         - name: fetch-keys-reloader
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
@@ -149,6 +162,8 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: file-uploads
+              mountPath: /opt/web3signer/file-uploads
         {{- end }}
       volumes:
         - name: config
@@ -161,3 +176,5 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: {{ .Values.tmpfsSize }}
+        - name: file-uploads
+          emptyDir: {}
