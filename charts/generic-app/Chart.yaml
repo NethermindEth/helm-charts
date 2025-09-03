@@ -2,7 +2,7 @@ apiVersion: v2
 name: generic-app
 description: A Helm chart for Kubernetes generic app
 type: application
-version: 1.1.16
+version: 1.1.17
 maintainers:
   - name: 0xDones
   - name: gehlotanish
