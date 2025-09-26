@@ -32,13 +32,15 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.topologySpreadConstraints.enabled }}
       topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: topology.kubernetes.io/zone
-          whenUnsatisfiable: DoNotSchedule
+        - maxSkew: {{ .Values.topologySpreadConstraints.maxSkew }}
+          topologyKey: {{ .Values.topologySpreadConstraints.topologyKey }}
+          whenUnsatisfiable: {{ .Values.topologySpreadConstraints.whenUnsatisfiable }}
           labelSelector:
             matchLabels:
               {{- include "dirk.selectorLabels" . | nindent 14 }}
+      {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
