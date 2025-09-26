@@ -161,6 +161,20 @@ tolerations: {}
 #
 affinity: {}
 
+# -- Topology spread constraints for pod assignment
+# ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+#
+topologySpreadConstraints:
+  # -- Enable topology spread constraints
+  enabled: true
+  # -- Maximum skew for topology spread
+  maxSkew: 1
+  # -- Topology key to spread across (e.g., topology.kubernetes.io/zone, kubernetes.io/hostname)
+  topologyKey: kubernetes.io/zone
+  # -- What to do when constraints cannot be satisfied
+  # Options: DoNotSchedule, ScheduleAnyway
+  whenUnsatisfiable: DoNotSchedule
+
 # -- Prometheus Service Monitor
 # ref: https://github.com/coreos/prometheus-operator
 #      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
