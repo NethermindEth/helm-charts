@@ -1,7 +1,7 @@
 
 # dirk
 
-![Version: 1.1.2](https://img.shields.io/badge/Version-1.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v22.10.0](https://img.shields.io/badge/AppVersion-v22.10.0-informational?style=flat-square)
+![Version: 1.1.3](https://img.shields.io/badge/Version-1.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v22.10.0](https://img.shields.io/badge/AppVersion-v22.10.0-informational?style=flat-square)
 
 A Helm chart for installing and configuring large scale ETH staking infrastructure on top of the Kubernetes
 
@@ -29,7 +29,6 @@ A Helm chart for installing and configuring large scale ETH staking infrastructu
 | fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources  |
 | global.podSecurityContext | object | `{"fsGroup":10000,"runAsNonRoot":true,"runAsUser":10000}` | Pod Security Context ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/  |
 | global.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| global.securityContext.fsGroup | int | `10000` |  |
 | global.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | global.securityContext.runAsNonRoot | bool | `true` |  |
 | global.securityContext.runAsUser | int | `10000` |  |
