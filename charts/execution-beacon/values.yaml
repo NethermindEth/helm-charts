@@ -54,26 +54,26 @@ global:
         tag: "v1.16.4"
       bseu:
         repository: "hyperledger/besu"
-        tag: "25.3.0"
+        tag: "25.9.0"
       erigon:
-        repository: "thorax/erigon"
-        tag: "v3.0.0"
+        repository: "erigontech/erigon"
+        tag: "v3.1.0"
     beacon:
       prysm:
         repository: "gcr.io/prylabs-dev/prysm/beacon-chain"
-        tag: "v5.3.2"
+        tag: "v6.0.5"
       teku:
         repository: "consensys/teku"
-        tag: "25.4.0"
+        tag: "25.9.3"
       lighthouse:
         repository: "sigp/lighthouse"
-        tag: "v6.0.1"
+        tag: "v7.1.0"
       nimbus:
         repository: "statusim/nimbus-eth2"
         tag: "multiarch-v25.9.2"
       lodestar:
         repository: "chainsafe/lodestar"
-        tag: "v1.28.1"
+        tag: "v1.34.1"
 
   ## JSON Web Token (JWT) authentication is used to secure the communication
   ## between the beacon node and execution client. You can generate a JWT using
@@ -317,6 +317,9 @@ execution:
   # Serves remote database interface (default: "127.0.0.1:9090")
   privateApiAddr: "127.0.0.1:9090"
 
+  # Erigon specific setting, whether to use external client or use caplin
+  externalCl: true
+
   ## Monitoring
   ## Additional settings could be made in non-global section.
   ##
@@ -373,7 +376,7 @@ execution:
         - engine
     host: "0.0.0.0"
     grpc:
-      port: 9090
+      port: 8655
     http:
       port: 8545
       corsOrigins:
@@ -454,13 +457,14 @@ beacon:
       - DISCOVERY
       - EVENTBUS
       - EXECUTOR
+      - LIBP2P
       - NETWORK
       - STORAGE
       - STORAGE_HOT_DB
       - STORAGE_FINALIZED_DB
-      - REMOTE_VALIDATOR
       - VALIDATOR
       - VALIDATOR_PERFORMANCE
+      - VALIDATOR_DUTY
 
     # List of hostnames to allow, or * to allow any host
     hostAllowList:
