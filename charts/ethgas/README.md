@@ -9,8 +9,6 @@ Mev Boost Helm Chart
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| 0xDones |  |  |
-| matilote |  |  |
 
 ## Values
 
