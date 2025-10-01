@@ -11,6 +11,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.service.type }}
+  {{- with .Values.service.clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
   ports:
     {{- $svcPorts := concat .Values.service.ports .Values.service.extraContainersPorts }}
     {{- if $svcPorts }}

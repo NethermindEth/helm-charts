@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.13](https://img.shields.io/badge/Version-1.0.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.14](https://img.shields.io/badge/Version-1.0.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -169,7 +169,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | global.image.beacon.lodestar.repository | string | `"chainsafe/lodestar"` |  |
 | global.image.beacon.lodestar.tag | string | `"v1.28.1"` |  |
 | global.image.beacon.nimbus.repository | string | `"statusim/nimbus-eth2"` |  |
-| global.image.beacon.nimbus.tag | string | `"multiarch-v25.3.0"` |  |
+| global.image.beacon.nimbus.tag | string | `"multiarch-v25.9.2"` |  |
 | global.image.beacon.prysm.repository | string | `"gcr.io/prylabs-dev/prysm/beacon-chain"` |  |
 | global.image.beacon.prysm.tag | string | `"v5.3.2"` |  |
 | global.image.beacon.teku.repository | string | `"consensys/teku"` |  |
@@ -179,14 +179,14 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | global.image.execution.erigon.repository | string | `"thorax/erigon"` |  |
 | global.image.execution.erigon.tag | string | `"v3.0.0"` |  |
 | global.image.execution.geth.repository | string | `"ethereum/client-go"` |  |
-| global.image.execution.geth.tag | string | `"v1.15.7"` |  |
+| global.image.execution.geth.tag | string | `"v1.16.4"` |  |
 | global.image.execution.nethermind.repository | string | `"nethermind/nethermind"` |  |
-| global.image.execution.nethermind.tag | string | `"1.31.4"` |  |
+| global.image.execution.nethermind.tag | string | `"1.34.0"` |  |
 | global.image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | global.imagePullSecrets | list | `[]` |  |
 | global.initImage.pullPolicy | string | `"IfNotPresent"` |  |
-| global.initImage.repository | string | `"bitnami/kubectl"` |  |
-| global.initImage.tag | string | `"1.28"` |  |
+| global.initImage.repository | string | `"bitnamilegacy/kubectl"` |  |
+| global.initImage.tag | string | `"1.32"` |  |
 | global.metrics.annotations | object | `{}` |  |
 | global.metrics.enabled | bool | `true` |  |
 | global.metrics.prometheusRule.additionalLabels | object | `{}` |  |
