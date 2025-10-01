@@ -16,8 +16,11 @@ imagePullSecrets: []
 #   - CB_JWT_ETHGAS_COMMIT: JWT token for CommitBoost authentication
 #   - CB_JWTS: JWT tokens in format "ETHGAS_COMMIT=<token>"
 #   - CB_SIGNER_JWT: JWT token for signer
-#   - ACCESS_JWT: ETHGas Exchange access token (pre-generated via API)
-#   - REFRESH_JWT: ETHGas Exchange refresh token (pre-generated via API)
+#   If useJwtAuth = true:
+#     - ACCESS_JWT: ETHGas Exchange access token
+#     - REFRESH_JWT: ETHGas Exchange refresh token
+#   If useJwtAuth = false:
+#     - EOA_SIGNING_KEY: EOA private key for transactions
 existingSecret: ""
 
 # existingDirkSecret -- Optional. Name of existing secret for Dirk TLS certificates
@@ -54,6 +57,11 @@ ethgas:
   entity_name: ""
   exchange_api_base: "https://hoodi.app.ethgas.com"
   collateral_contract: "0xe8bfB84b14c383b94365a895fc8bfA36dE236dc8"
+  
+  # useJwtAuth -- Set to true to use pre-generated JWT tokens (ACCESS_JWT, REFRESH_JWT)
+  # Set to false to use EOA signing key for automatic registration
+  # Note: All sensitive values MUST be provided via existingSecret
+  useJwtAuth: false
   
   # Remote signer configuration
   # Example for Dirk (uncomment and modify):

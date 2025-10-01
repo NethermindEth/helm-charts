@@ -130,6 +130,7 @@ spec:
             value: "{{ .Values.service.port.ethgas_commit.metrics }}"
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
+          {{- if .Values.ethgas.useJwtAuth }}
           - name: ACCESS_JWT
             valueFrom:
               secretKeyRef:
@@ -140,6 +141,13 @@ spec:
               secretKeyRef:
                 name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
                 key: REFRESH_JWT
+          {{- else }}
+          - name: EOA_SIGNING_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
+                key: EOA_SIGNING_KEY
+          {{- end }}
           envFrom:
           - secretRef:
               name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
