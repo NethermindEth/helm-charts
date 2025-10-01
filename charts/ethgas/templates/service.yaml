@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ethgas.fullname" . }}
+  {{- with $.Values.namespaceOverride }}
+  namespace: {{ . }}
+  {{- end }}
+  labels:
+    {{- include "ethgas.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+#    - port: {{ .Values.service.port }}
+#      targetPort: http
+#      protocol: TCP
+#      name: http
+    - name: pbs
+      port: {{ .Values.service.port.pbs.http }}
+      targetPort: {{ .Values.service.port.pbs.http }}
+    - name: pbs-metrics
+      port: {{ .Values.service.port.pbs.metrics }}
+      targetPort: {{ .Values.service.port.pbs.metrics }}
+    - name: signer-metrics
+      port: {{ .Values.service.port.signer.metrics }}
+      targetPort: {{ .Values.service.port.signer.metrics }}
+    - name: ethgas-commit-metrics
+      port: {{ .Values.service.port.ethgas_commit.metrics }}
+      targetPort: {{ .Values.service.port.ethgas_commit.metrics }}
+  selector:
+    {{- include "ethgas.selectorLabels" . | nindent 4 }}
