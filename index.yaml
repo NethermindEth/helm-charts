@@ -781,6 +781,23 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/espresso-1.0.0/espresso-1.0.0.tgz
     version: 1.0.0
+  ethgas:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2025-10-01T14:20:58.138834833Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: ETHGas Helm Chart
+    digest: 87a0da9c4e6bd8bd28760f92adae09abbbaa4d00986ebacad51d5ac14eb42b50
+    maintainers:
+    - name: aivarasko
+    name: ethgas
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/ethgas-0.1.0/ethgas-0.1.0.tgz
+    version: 0.1.0
   execution-beacon:
   - apiVersion: v2
     created: "2025-09-29T18:29:49.845708795Z"
@@ -2207,4 +2224,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-09-29T18:29:49.845996012Z"
+generated: "2025-10-01T14:20:58.139066556Z"
