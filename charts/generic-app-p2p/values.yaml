@@ -91,7 +91,7 @@ extraInitScript: |
 # -- Init containers
 initContainers:
   - name: init
-    image: bitnami/kubectl:1.28
+    image: bitnamilegacy/kubectl:1.32
     command: ["sh", "-c", "/scripts/init.sh"]
     volumeMounts:
       - name: scripts

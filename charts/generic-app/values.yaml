@@ -171,6 +171,27 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+HTTPRoute:
+  enabled: false
+  annotations: {}
+  parentRefs: []
+  # - group: gateway.networking.k8s.io
+  #   kind: Gateway
+  #   name: gateway
+  #   namespace: istio-ingress
+  hostnames: []
+  # - example.com
+  rules: []
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /
+  #   backendRefs:
+  #   - group: ''
+  #     kind: Service
+  #     name: {{ include "generic-app.fullname" $ }}
+  #     port: 1027
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little

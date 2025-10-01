@@ -275,6 +275,7 @@ spec:
               --datadir=/data/execution
               --private.api.addr={{ .Values.execution.privateApiAddr }}
               --chain={{ .Values.global.network }}
+              --externalcl={{ .Values.execution.externalCl }}
             {{- if .Values.global.p2pNodePort.enabled }}
               --nat=extip:$EXTERNAL_IP
               --port=$EXTERNAL_EXECUTION_PORT
@@ -306,13 +307,10 @@ spec:
               --ws
             {{- end }}
             {{- end }}
-            {{- range .Values.extraFlags }}
-                {{ . }}
-            {{- end }}
             {{- if and .Values.global.metrics.enabled .Values.execution.metrics.enabled }}
-                --metrics
-                --metrics.addr={{ .Values.execution.metrics.host }}
-                --metrics.port={{ .Values.execution.metrics.port }}
+              --metrics
+              --metrics.addr={{ .Values.execution.metrics.host }}
+              --metrics.port={{ .Values.execution.metrics.port }}
             {{- end }}
             {{- end }}
             {{- range .Values.execution.extraFlags }}

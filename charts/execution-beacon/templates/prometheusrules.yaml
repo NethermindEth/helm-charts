@@ -21,29 +21,16 @@ spec:
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
   {{- if .Values.global.metrics.prometheusRule.default }}
-  {{- if eq .Values.execution.client "geth" }}
     - name: {{ include "common.names.fullname" $ }}-default
       rules:
-        - alert: GethNodeDown
+        - alert: ExecutionNodeDown
           expr: up{job="{{ include "common.names.fullname" . }}"} == 0
           for: 5m
           labels:
             severity: critical
           annotations:
-            summary: Geth Node {{ printf "{{ $labels.instance }}" }} down
-            description: Geth Node {{ printf "{{ $labels.instance }}" }} is down
-  {{- else if eq .Values.execution.client "nethermind" }}
-    - name: {{ include "common.names.fullname" $ }}-default
-      rules:
-        - alert: NethermindNodeDown
-          expr: up{job="{{ include "common.names.fullname" . }}"} == 0
-          for: 5m
-          labels:
-            severity: critical
-          annotations:
-            summary: Nethermind Node {{ printf "{{ $labels.instance }}" }} down
-            description: Nethermind Node {{ printf "{{ $labels.instance }}" }} is down
-  {{- end }}
+            summary: Exectution Node {{ printf "{{ $labels.instance }}" }} down
+            description: Execution Node {{ printf "{{ $labels.instance }}" }} is down
   {{- end }}
 ---
 apiVersion: monitoring.coreos.com/v1
