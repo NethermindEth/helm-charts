@@ -30,7 +30,7 @@ image:
 ethgas:
   network: "Hoodi"
   rpc_url: "https://ethereum-hoodi-rpc.publicnode.com"
-  relays:  "https://0xb20c3fe59db9c3655088839ef3d972878d182eb745afd8abb1dd2abf6c14f93cd5934ed4446a5fe1ba039e2bc0cf1011@hoodi-relay.ethgas.com"
+  relays: "https://0xb20c3fe59db9c3655088839ef3d972878d182eb745afd8abb1dd2abf6c14f93cd5934ed4446a5fe1ba039e2bc0cf1011@hoodi-relay.ethgas.com"
   token: ""
   entity_name: ""
   eoa_signing_key: ""
