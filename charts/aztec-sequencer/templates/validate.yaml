@@ -1,3 +1,0 @@
-{{- if not .Values.validatorKeysSecret }}
-{{- fail "validatorKeysSecret is required" }}
-{{- end }}
