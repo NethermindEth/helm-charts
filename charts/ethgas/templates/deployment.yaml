@@ -39,22 +39,19 @@ spec:
         env:
         - name: CB_MODULE_ID
           value: ETHGAS_COMMIT
+        envFrom:
+        - secretRef:
+            name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
         volumeMounts:
         - name: env
           mountPath: /app
       - name: init
         image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
-        command: ['sh', '-c', 'printenv | grep CB_; find /app/; cat /app/.cb.env; chmod 777 -R /var/logs/commit-boost/; cat /cb-config.toml']
+        command: ['sh', '-c', 'printenv | grep CB_; find /app/; cat /app/.cb.env; cat /cb-config.toml']
         envFrom:
-        - configMapRef:
-            name: {{ include "ethgas.fullname" . }}-env-vars
+        - secretRef:
+            name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
         volumeMounts:
-        - name: logs-pbs
-          mountPath: /var/logs/commit-boost/logs-pbs
-        - name: logs-signer
-          mountPath: /var/logs/commit-boost/logs-signer
-        - name: logs-ethgas-commit
-          mountPath: /var/logs/commit-boost/logs-ethgas-commit
         - name: env
           mountPath: /app
         - name: config
@@ -99,21 +96,21 @@ spec:
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
           envFrom:
-          - configMapRef:
-              name: {{ include "ethgas.fullname" . }}-env-vars
+          - secretRef:
+              name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
           volumeMounts:
           - name: config
             mountPath: /cb-config.toml
             subPath: config.toml
           - name: env
             mountPath: /app
-          - name: keys
-            mountPath: /keys
           - name: logs-signer
             mountPath: /var/logs/commit-boost
-          - name: signer-secrets
-            mountPath: "/signer/secrets"
+          {{- if .Values.existingDirkSecret }}
+          - name: dirk-certs
+            mountPath: /signer/secrets
             readOnly: true
+          {{- end }}
         - name: ethgas-commit
           image: "{{ .Values.image.ethgas_commit.repository }}:{{ .Values.image.ethgas_commit.tag }}"
           command: ["/bin/sh"]
@@ -133,9 +130,19 @@ spec:
             value: "{{ .Values.service.port.ethgas_commit.metrics }}"
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
+          - name: ACCESS_JWT
+            valueFrom:
+              secretKeyRef:
+                name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
+                key: ACCESS_JWT
+          - name: REFRESH_JWT
+            valueFrom:
+              secretKeyRef:
+                name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
+                key: REFRESH_JWT
           envFrom:
-          - configMapRef:
-              name: {{ include "ethgas.fullname" . }}-env-vars
+          - secretRef:
+              name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
           volumeMounts:
           - name: config
             mountPath: /cb-config.toml
@@ -151,20 +158,16 @@ spec:
         - name: env
           emptyDir: {}
         - name: logs-pbs
-          persistentVolumeClaim:
-            claimName: {{ include "ethgas.fullname" . }}-pbs-logs
+          emptyDir: {}
         - name: logs-signer
-          persistentVolumeClaim:
-            claimName: {{ include "ethgas.fullname" . }}-signer-logs
+          emptyDir: {}
         - name: logs-ethgas-commit
-          persistentVolumeClaim:
-            claimName: {{ include "ethgas.fullname" . }}-commit-logs
-        - name: keys
-          persistentVolumeClaim:
-            claimName: {{ include "ethgas.fullname" . }}-signer-keys
-        - name: signer-secrets
+          emptyDir: {}
+        {{- if .Values.existingDirkSecret }}
+        - name: dirk-certs
           secret:
-            secretName: {{ include "ethgas.fullname" . }}-signer
+            secretName: {{ .Values.existingDirkSecret }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

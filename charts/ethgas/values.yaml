@@ -9,6 +9,26 @@ replicaCount: 1
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
+# existingSecret -- REQUIRED. Name of existing secret containing sensitive configuration
+# Use external secret management (e.g., Infisical, External Secrets Operator)
+# See examples/infisical-secret.yaml for a complete example
+# The secret MUST contain the following keys:
+#   - CB_JWT_ETHGAS_COMMIT: JWT token for CommitBoost authentication
+#   - CB_JWTS: JWT tokens in format "ETHGAS_COMMIT=<token>"
+#   - CB_SIGNER_JWT: JWT token for signer
+#   - ACCESS_JWT: ETHGas Exchange access token (pre-generated via API)
+#   - REFRESH_JWT: ETHGas Exchange refresh token (pre-generated via API)
+existingSecret: ""
+
+# existingDirkSecret -- Optional. Name of existing secret for Dirk TLS certificates
+# Only required if using Dirk as remote signer (configured via ethgas.signer)
+# If using web3signer or other remote signers, leave empty
+# The secret must contain (base64 encoded):
+#   - ca.crt: CA certificate for Dirk TLS
+#   - dirk.crt: Client certificate for Dirk TLS
+#   - dirk.key: Client private key for Dirk TLS
+existingDirkSecret: ""
+
 image:
   initContainer:
     repository: alpine
@@ -25,22 +45,33 @@ image:
   ethgas_commit:
     repository: ghcr.io/ethgas-developer/commitboost_ethgas_commit
     pullPolicy: IfNotPresent
-    tag: "v1.0.0-beta.5"
+    tag: "v1.0.0-beta.7"
 
 ethgas:
   network: "Hoodi"
   rpc_url: "https://ethereum-hoodi-rpc.publicnode.com"
   relays: "https://0xb20c3fe59db9c3655088839ef3d972878d182eb745afd8abb1dd2abf6c14f93cd5934ed4446a5fe1ba039e2bc0cf1011@hoodi-relay.ethgas.com"
-  token: ""
   entity_name: ""
-  eoa_signing_key: ""
   exchange_api_base: "https://hoodi.app.ethgas.com"
   collateral_contract: "0xe8bfB84b14c383b94365a895fc8bfA36dE236dc8"
+  
+  # Remote signer configuration
+  # Example for Dirk (uncomment and modify):
+  # signer: |
+  #   [signer.dirk]
+  #   cert_path = "/signer/secrets/dirk.crt"
+  #   key_path = "/signer/secrets/dirk.key"
+  #   ca_cert_path = "/signer/secrets/ca.crt"
+  #   
+  #   [[signer.dirk.hosts]]
+  #   url = "https://dirk-0.example.com:8881"
+  #   wallets = ["Validators"]
+  #
+  # Example for Web3Signer (uncomment and modify):
+  # signer: |
+  #   [signer.remote]
+  #   url = "http://web3signer-url:6174"
   signer: ""
-  dirk:
-    ca.crt: ""
-    dirk.crt: ""
-    dirk.key: ""
 
 # Extra arguments to pass to the ethgas binary.
 extraArgs: []

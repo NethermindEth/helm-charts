@@ -9,32 +9,8 @@ metadata:
 data:
   TODO: ALL_DIRK_KEYS
 ---
-# ConfigMap for .cb.env
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "ethgas.fullname" . }}-env-vars
-  {{- with $.Values.namespaceOverride }}
-  namespace: {{ . }}
-  {{- end }}
-data:
-  CB_JWT_ETHGAS_COMMIT: {{ .Values.ethgas.token }}
-  CB_JWTS: ETHGAS_COMMIT={{ .Values.ethgas.token }}
-  CB_SIGNER_JWT: {{ .Values.ethgas.token }}
----
-# ConfigMap for .cb.env
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "ethgas.fullname" . }}-env
-  {{- with $.Values.namespaceOverride }}
-  namespace: {{ . }}
-  {{- end }}
-data:
-  .cb.env: |
-    CB_JWT_ETHGAS_COMMIT={{ .Values.ethgas.token }}
-    CB_JWTS=ETHGAS_COMMIT={{ .Values.ethgas.token }}
-    CB_SIGNER_JWT={{ .Values.ethgas.token }}
+# Note: Sensitive environment variables are now stored in the Secret
+# This ConfigMap is kept for non-sensitive configuration if needed in the future
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -64,7 +40,7 @@ data:
     late_in_slot_time_ms = 2000
     extra_validation_enabled = false
     rpc_url = "{{ .Values.ethgas.rpc_url }}"
-    
+
     [[relays]]
     id = "ethgas"
     url = "{{ .Values.ethgas.relays }}"
@@ -78,7 +54,7 @@ data:
     port = {{ .Values.service.port.signer.http }}
 
     {{ .Values.ethgas.signer | indent 4 | trim }}
-    
+
     [[modules]]
     id = "ETHGAS_COMMIT"
     type = "commit"
@@ -94,9 +70,8 @@ data:
     enable_builder = false
     collateral_per_slot = "0"
     builder_pubkey = "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-    is_jwt_provided = false
-    eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
-    
+    is_jwt_provided = true
+
     [[modules]]
     id = "ETHGAS_DEPOSIT"
     type = "commit"
@@ -106,19 +81,18 @@ data:
     exchange_api_base = "{{ .Values.ethgas.exchange_api_base }}"
     collateral_to_be_deposited = "0.01"
     collateral_contract = "{{ .Values.ethgas.collateral_contract }}"
-    eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
-    
+
     [metrics]
     enabled = true
     host = "127.0.0.1"
     start_port = {{ .Values.service.port.pbs.metrics }}
-    
+
     [logs.stdout]
     enabled = true
     level = "info"
     use_json = false
     color = true
-    
+
     [logs.file]
     enabled = true
     level = "debug"
