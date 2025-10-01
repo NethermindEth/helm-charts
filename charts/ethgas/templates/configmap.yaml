@@ -70,7 +70,7 @@ data:
     enable_builder = false
     collateral_per_slot = "0"
     builder_pubkey = "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-    is_jwt_provided = true
+    is_jwt_provided = {{ .Values.ethgas.useJwtAuth }}
 
     [[modules]]
     id = "ETHGAS_DEPOSIT"
