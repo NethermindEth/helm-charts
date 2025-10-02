@@ -227,7 +227,7 @@ config:
   p2pTcpAddress: "0.0.0.0"
 
   # -- The path to the charon enr private key file. (default ".charon/charon-enr-private-key")
-  privateKeyFile: "/charon/charon-enr-private-key/charon-enr-private-key"
+  privateKeyFile: "/charon/charon-enr-private-key"
 
   # -- Enables an internal mock beacon node for running a simnet.
   simnetBeaconMock: ""

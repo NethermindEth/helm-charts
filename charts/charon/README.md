@@ -3,7 +3,7 @@
 Charon
 ===========
 
-![Version: 0.3.18](https://img.shields.io/badge/Version-0.3.18-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.1](https://img.shields.io/badge/AppVersion-1.6.1-informational?style=flat-square)
+![Version: 0.3.19](https://img.shields.io/badge/Version-0.3.19-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.1](https://img.shields.io/badge/AppVersion-1.6.1-informational?style=flat-square)
 
 Charon is an open-source Ethereum Distributed validator middleware written in golang.
 
@@ -43,7 +43,7 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | config.p2pExternalHostname | string | `""` | The DNS hostname advertised by libp2p. This may be used to advertise an external DNS. |
 | config.p2pRelays | string | `"https://0.relay.obol.tech/enr"` | Comma-separated list of libp2p relay URLs or multiaddrs. (default [https://0.relay.obol.tech/enr]) |
 | config.p2pTcpAddress | string | `"0.0.0.0"` | Comma-separated list of listening TCP addresses (ip and port) for libP2P traffic. Empty default doesn't bind to local port therefore only supports outgoing connections. |
-| config.privateKeyFile | string | `"/charon/charon-enr-private-key/charon-enr-private-key"` | The path to the charon enr private key file. (default ".charon/charon-enr-private-key") |
+| config.privateKeyFile | string | `"/charon/charon-enr-private-key"` | The path to the charon enr private key file. (default ".charon/charon-enr-private-key") |
 | config.simnetBeaconMock | string | `""` | Enables an internal mock beacon node for running a simnet. |
 | config.simnetValidatorKeysDir | string | `""` | The directory containing the simnet validator key shares. (default ".charon/validator_keys") |
 | config.simnetValidatorMock | string | `""` | Enables an internal mock validator client when running a simnet. Requires simnet-beacon-mock. |
