@@ -66,8 +66,6 @@ jobs:
           trivyignores: ".trivyignore.yaml"
           scanners: "misconfig,secret"
           skip-setup-trivy: true
-          severity: 'CRITICAL,HIGH,MEDIUM,LOW'
-          trivy-config: '.github/trivy-ci.yaml'
           severity: "CRITICAL,HIGH,MEDIUM,LOW"
           trivy-config: ".trivy.yaml"
         env:
