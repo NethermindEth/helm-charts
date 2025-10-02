@@ -9,7 +9,37 @@ misconfigurations:
       - "**/templates/configmap.yaml"
     statement: "ConfigMap uses environment variable substitution for secrets, not actual values"
 
-  - id: KSV014
+  - id: AVD-KSV-0014
+    paths:
+      - "charon/templates/deployment.yaml"
+    statement: "Init container requires write access for initialization tasks"
+
+  - id: AVD-KSV-0014
+    paths:
+      - "dirk/templates/statefulset.yaml"
+    statement: "Init container requires write access for certificate generation and key sync"
+
+  - id: AVD-KSV-0014
+    paths:
+      - "lodestar-vc/templates/statefulset.yaml"
+    statement: "Container requires write access to filesystem for validator operations"
+
+  - id: AVD-KSV-0014
+    paths:
+      - "mev-boost/templates/deployment.yaml"
+    statement: "Container requires write access to filesystem for MEV boost operations"
+
+  - id: AVD-KSV-0014
+    paths:
+      - "validator-ejector/templates/statefulset.yaml"
+    statement: "Init container requires write access for loading validator keys"
+
+  - id: AVD-KSV-0014
     paths:
       - "web3signer/templates/statefulset.yaml"
     statement: "Container requires write access to filesystem for web3signer"
+
+  - id: AVD-KSV-0056
+    paths:
+      - "validators/templates/role.yaml"
+    statement: "Role requires service patch permissions for validator operations"
