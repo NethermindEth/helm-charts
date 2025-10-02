@@ -3,7 +3,6 @@
 # Declare variables to be passed into your templates.
 
 global:
-  label: ""
   serviceAccount:
     create: true
   ## Pod Security Context
@@ -32,7 +31,7 @@ image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "25.4.1"
+  tag: "25.9.1"
 
 ## Init image is used to chown data volume, etc.
 ##
@@ -45,7 +44,7 @@ initImage:
 ##
 cliImage:
   repository: nethermindeth/keystores-cli
-  tag: "v1.0.11"
+  tag: "v1.0.14"
   pullPolicy: IfNotPresent
 
 
@@ -55,7 +54,7 @@ enableReloader: false
 ##
 flywayImage:
   repository: flyway/flyway
-  tag: "11.1.0"
+  tag: "11.13.2"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -163,8 +162,7 @@ env: []
   #       name: secret-name
 
 # -- envFrom configuration
-envFrom:
-  []
+envFrom: []
   # - secretRef:
   #     name: '{{ include "common.names.fullname" . }}'
   # - configMapRef:

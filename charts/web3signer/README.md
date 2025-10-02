@@ -1,7 +1,7 @@
 
 # web3signer
 
-![Version: 1.0.9](https://img.shields.io/badge/Version-1.0.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.4.1](https://img.shields.io/badge/AppVersion-25.4.1-informational?style=flat-square)
+![Version: 1.0.10](https://img.shields.io/badge/Version-1.0.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.4.1](https://img.shields.io/badge/AppVersion-25.4.1-informational?style=flat-square)
 
 A Helm chart for Web3Signer
 
@@ -25,15 +25,14 @@ A Helm chart for Web3Signer
 | affinity | object | `{}` |  |
 | cliImage.pullPolicy | string | `"IfNotPresent"` |  |
 | cliImage.repository | string | `"nethermindeth/keystores-cli"` |  |
-| cliImage.tag | string | `"v1.0.11"` |  |
+| cliImage.tag | string | `"v1.0.14"` |  |
 | enableReloader | bool | `false` |  |
 | env | list | `[]` |  |
 | envFrom | list | `[]` | envFrom configuration |
 | flywayImage.pullPolicy | string | `"IfNotPresent"` |  |
 | flywayImage.repository | string | `"flyway/flyway"` |  |
-| flywayImage.tag | string | `"11.1.0"` |  |
+| flywayImage.tag | string | `"11.13.2"` |  |
 | fullnameOverride | string | `""` |  |
-| global.label | string | `""` |  |
 | global.podSecurityContext.fsGroup | int | `1000` |  |
 | global.podSecurityContext.runAsNonRoot | bool | `true` |  |
 | global.podSecurityContext.runAsUser | int | `1000` |  |
@@ -46,7 +45,7 @@ A Helm chart for Web3Signer
 | idleTimeout | int | `30` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"consensys/web3signer"` |  |
-| image.tag | string | `"25.4.1"` |  |
+| image.tag | string | `"25.9.1"` |  |
 | imagePullSecrets | list | `[]` |  |
 | initImage.pullPolicy | string | `"IfNotPresent"` |  |
 | initImage.repository | string | `"busybox"` |  |
