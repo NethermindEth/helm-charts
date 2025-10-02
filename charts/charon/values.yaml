@@ -188,7 +188,7 @@ config:
   jaegerService: "charon"
 
   # -- The path to the cluster lock file defining distributed validator cluster. (default ".charon/cluster-lock.json")
-  lockFile: "/charon/cluster-lock/cluster-lock.json"
+  lockFile: "/charon/cluster-lock.json"
 
   # -- Log format; console, logfmt or json (default "console")
   logFormat: "json"

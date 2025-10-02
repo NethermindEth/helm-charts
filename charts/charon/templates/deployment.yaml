@@ -139,12 +139,11 @@ spec:
           volumeMounts:
             - name: env-nodeport
               mountPath: /env
+            - name: charon-data
+              mountPath: /charon
             - name: charon-enr-private-key
               mountPath: /charon/charon-enr-private-key
-            - name: cluster-lock
-              mountPath: /charon/cluster-lock
-            - name: validator-keys
-              mountPath: /charon/validator_keys
+              subPath: charon-enr-private-key
           {{- if .Values.extraVolumeMounts -}}
             {{ toYaml .Values.extraVolumeMounts | nindent 12 }}
           {{- end }}
@@ -160,6 +159,8 @@ spec:
         - name: scripts-init
           configMap:
             name: {{ include "release.name" . }}-init
+        - name: charon-data
+          emptyDir: {}
         - name: charon-enr-private-key
           projected:
             sources:
@@ -168,7 +169,3 @@ spec:
                 items:
                   - key: charon-enr-private-key
                     path: charon-enr-private-key
-        - name: cluster-lock
-          emptyDir: {}
-        - name: validator-keys
-          emptyDir: {}
