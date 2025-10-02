@@ -2067,6 +2067,34 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/validators-0.0.8/validators-0.0.8.tgz
     version: 0.0.8
+  vouch:
+  - apiVersion: v2
+    appVersion: 1.11.1
+    created: "2025-10-02T11:39:41.446396625Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: A Helm chart for installing and configuring large scale ETH staking
+      infrastructure on top of the Kubernetes
+    digest: 98c33f572e76ea84c34e6ce7393527c660a6246bd604bb4481e516313ec4ea16
+    home: https://stakewise.io/
+    keywords:
+    - ethereum
+    - blockchain
+    - lighthouse
+    - prysm
+    - teku
+    - stakewise
+    maintainers:
+    - name: matilote
+    - name: aivarasko
+    - name: adriantpaez
+    name: vouch
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/vouch-0.0.1/vouch-0.0.1.tgz
+    version: 0.0.1
   web3signer:
   - apiVersion: v2
     appVersion: 25.4.1
@@ -2298,4 +2326,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-02T11:32:21.90943642Z"
+generated: "2025-10-02T11:39:41.446665888Z"
