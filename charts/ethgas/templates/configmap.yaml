@@ -24,7 +24,7 @@ metadata:
 data:
   config.toml: |-
     chain = "{{ .Values.ethgas.network }}"
-    
+
     [pbs]
     docker_image = "ghcr.io/commit-boost/pbs:latest"
     with_signer = true
@@ -48,7 +48,7 @@ data:
     target_first_request_ms = 0
     frequency_get_header_ms = 100
     validator_registration_batch_size = "1"
-    
+
     [signer]
     host = "0.0.0.0"
     port = {{ .Values.service.port.signer.http }}
