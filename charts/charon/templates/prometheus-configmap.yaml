@@ -11,7 +11,7 @@ data:
     remote_write:
       - url: {{ $.Values.centralMonitoring.promEndpoint }}
         authorization:
-          credentials: {{ $.Values.centralMonitoring.token }}
+          credentials_file: /etc/prometheus/secrets/token
     scrape_configs:
       - job_name: '{{ include "release.name" . }}'
         static_configs:

@@ -162,6 +162,9 @@ spec:
           projected:
             sources:
             - secret:
-                name: {{ .Values.secrets.enrPrivateKey }}
+                name: {{ .Values.secrets.charon }}
+                items:
+                  - key: charon-enr-private-key
+                    path: charon-enr-private-key
         - name: cluster-lock
           emptyDir: {}

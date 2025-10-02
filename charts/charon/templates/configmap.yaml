@@ -79,6 +79,12 @@ data:
   {{- if .Values.config.validatorApiAddress }}
   CHARON_VALIDATOR_API_ADDRESS: {{ .Values.config.validatorApiAddress }}:{{ .Values.httpPort }}
   {{- end }}
+  {{- if .Values.config.nickname }}
+  CHARON_NICKNAME: {{ .Values.config.nickname | quote }}
+  {{- end }}
+  {{- if .Values.config.fallbackBeaconNodes }}
+  CHARON_FALLBACK_BEACON_NODES: {{ .Values.config.fallbackBeaconNodes | quote }}
+  {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap

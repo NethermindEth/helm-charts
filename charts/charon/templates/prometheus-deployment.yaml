@@ -27,6 +27,9 @@ spec:
         - mountPath: /etc/prometheus/prometheus.yaml
           name: prometheus
           subPath: prometheus.yaml
+        - mountPath: /etc/prometheus/secrets
+          name: monitoring-token
+          readOnly: true
         {{- with .Values.centralMonitoring.resources }}
         resources:
           {{- toYaml . | nindent 10 }}
@@ -38,4 +41,10 @@ spec:
           defaultMode: 420
           name: {{ include "release.name" . }}-prometheus
         name: prometheus
+      - name: monitoring-token
+        secret:
+          secretName: {{ .Values.secrets.charon }}
+          items:
+            - key: token
+              path: token
 {{- end }}
