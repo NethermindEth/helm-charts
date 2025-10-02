@@ -6,11 +6,11 @@
 image:
   repository: obolnetwork/charon
   pullPolicy: IfNotPresent
-  tag: v1.2.0
+  tag: v1.6.1
 
 initImage:
-  repository: "bitnami/kubectl"
-  tag: "1.30.3"
+  repository: "bitnamilegacy/kubectl"
+  tag: "1.32"
   pullPolicy: IfNotPresent
 
 # -- Credentials to fetch images from private registry
@@ -167,7 +167,7 @@ jaegerPort: 6831
 ## ref: https://docs.obol.tech/docs/charon/charon_cli_reference
 config:
   # -- Comma separated list of one or more beacon node endpoint URLs.
-  beaconNodeEndpoints: ""
+  beaconNodeEndpoints: "http://localhost:5051"
 
   # -- Enables the builder api. Will only produce builder blocks. Builder API must also be enabled on the validator client. Beacon node must be connected to a builder-relay to access the builder network.
   builderApi: ""
@@ -188,7 +188,7 @@ config:
   jaegerService: "charon"
 
   # -- The path to the cluster lock file defining distributed validator cluster. (default ".charon/cluster-lock.json")
-  LockFile: "/charon/cluster-lock/cluster-lock.json"
+  lockFile: "/charon/cluster-lock/cluster-lock.json"
 
   # -- Log format; console, logfmt or json (default "console")
   logFormat: "json"
@@ -244,15 +244,12 @@ config:
   # -- Listening address (ip and port) for validator-facing traffic proxying the beacon-node API. (default "127.0.0.1:3600")
   validatorApiAddress: "0.0.0.0"
 
-# -- Kubernetes secrets names
+# -- Kubernetes secrets configuration
+# The enrPrivateKey is always required and should be provided via external secret provider (e.g., Infisical)
+# cluster-lock.json should be downloaded via initContainers (e.g., from Minio) as files are sometimes too large for secrets
 secrets:
-  enabled: false
-  # -- validators keys
-  validatorKeys: "validator-keys"
-  # -- charon enr private key
-  enrPrivateKey: ""
-  # -- charon cluster lock
-  clusterlock: ""
+  # -- charon enr private key (required, must be provided via external secret)
+  enrPrivateKey: "charon-enr-private-key"
 
 # -- Additional init containers
 initContainers: []
@@ -305,7 +302,7 @@ livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 120
   httpGet:
-    path: /livez
+    path: /readyz
     port: monitoring
 
 # -- Configure readiness probes

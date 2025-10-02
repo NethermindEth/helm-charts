@@ -4,13 +4,6 @@
 
 A Helm chart for Kubernetes generic app
 
-## Installation
-
-```bash
-helm repo add nethermind https://nethermindeth.github.io/helm-charts
-helm install generic-app nethermind/generic-app
-```
-
 ## Maintainers
 
 | Name | Email | Url |

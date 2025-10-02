@@ -4,13 +4,6 @@
 
 A Helm chart for Kubernetes generic apps (P2P)
 
-## Installation
-
-```bash
-helm repo add nethermind https://nethermindeth.github.io/helm-charts
-helm install generic-app-p2p nethermind/generic-app-p2p
-```
-
 ## Maintainers
 
 | Name | Email | Url |
