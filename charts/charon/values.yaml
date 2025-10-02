@@ -305,7 +305,7 @@ livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 120
   httpGet:
-    path: /livez
+    path: /readyz
     port: monitoring
 
 # -- Configure readiness probes
