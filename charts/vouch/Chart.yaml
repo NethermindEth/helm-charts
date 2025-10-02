@@ -1,0 +1,25 @@
+apiVersion: v2
+name: vouch
+description: A Helm chart for installing and configuring large scale ETH staking infrastructure on top of the Kubernetes
+type: application
+version: 0.0.1
+appVersion: "1.11.1"
+
+keywords:
+  - ethereum
+  - blockchain
+  - lighthouse
+  - prysm
+  - teku
+  - stakewise
+
+home: https://stakewise.io/
+maintainers:
+  - name: matilote
+  - name: aivarasko
+  - name: adriantpaez
+
+dependencies:
+- name: common
+  repository: file://../common
+  version: 1.0.0
