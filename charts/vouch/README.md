@@ -29,7 +29,7 @@ A Helm chart for installing and configuring large scale ETH staking infrastructu
 | blockRelayPort | int | `18550` |  |
 | cliImage.pullPolicy | string | `"IfNotPresent"` |  |
 | cliImage.repository | string | `"nethermindeth/keystores-cli"` |  |
-| cliImage.tag | string | `"v1.0.0"` |  |
+| cliImage.tag | string | `"v1.0.14"` |  |
 | externalSecrets.dataFrom.key | string | `"vouch"` |  |
 | externalSecrets.enabled | bool | `false` |  |
 | externalSecrets.secretStoreRef.kind | string | `"SecretStore"` |  |

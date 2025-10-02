@@ -36,7 +36,7 @@ initImage:
 
 cliImage:
   repository: nethermindeth/keystores-cli
-  tag: "v1.0.0"
+  tag: "v1.0.14"
   pullPolicy: IfNotPresent
 
 externalSecrets:
