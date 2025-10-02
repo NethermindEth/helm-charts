@@ -244,12 +244,37 @@ config:
   # -- Listening address (ip and port) for validator-facing traffic proxying the beacon-node API. (default "127.0.0.1:3600")
   validatorApiAddress: "0.0.0.0"
 
+  # -- Optional Charon nickname for identification in logs and metrics
+  nickname: ""
+
+  # -- Comma separated list of fallback beacon node endpoints
+  fallbackBeaconNodes: ""
+
 # -- Kubernetes secrets configuration
-# The enrPrivateKey is always required and should be provided via external secret provider (e.g., Infisical)
+# Example:
+# apiVersion: external-secrets.io/v1beta1
+# kind: ExternalSecret
+# metadata:
+#   name: charon-enr-private-key
+# spec:
+#   secretStoreRef:
+#     name: infisical
+#   target:
+#     name: charon-enr-private-key
+#   data:
+#     - secretKey: charon-enr-private-key  # Hardcoded name
+#       remoteRef:
+#         key: CHARON_ENR_PRIVATE_KEY
+#     - secretKey: token                    # Hardcoded name
+#       remoteRef:
+#         key: CHARON_MONITORING_TOKEN
+#
+# The secret must contain 'charon-enr-private-key' key (always required)
+# If centralMonitoring is enabled, the secret must also contain 'token' key
 # cluster-lock.json should be downloaded via initContainers (e.g., from Minio) as files are sometimes too large for secrets
 secrets:
-  # -- charon enr private key (required, must be provided via external secret)
-  enrPrivateKey: "charon-enr-private-key"
+  # -- charon secret name (required, must be provided via external secret)
+  charon: "charon-enr-private-key"
 
 # -- Additional init containers
 initContainers: []
@@ -320,5 +345,3 @@ centralMonitoring:
   enabled: false
   # -- https endpoint to obol central prometheus
   promEndpoint: "https://vm.monitoring.gcp.obol.tech/write"
-  # -- The authentication token to the central prometheus
-  token: ""
