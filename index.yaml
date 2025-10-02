@@ -784,6 +784,23 @@ entries:
   ethgas:
   - apiVersion: v2
     appVersion: 0.3.0
+    created: "2025-10-02T11:32:21.752037944Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: ETHGas Helm Chart
+    digest: 21a4cb53f06b62bd8817f8859190fdfcdc308798ac1bf990ad6b33010b9b5e10
+    maintainers:
+    - name: aivarasko
+    - name: matilote
+    name: ethgas
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/ethgas-0.3.1/ethgas-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
+    appVersion: 0.3.0
     created: "2025-10-01T16:47:30.710429632Z"
     dependencies:
     - name: common
@@ -833,6 +850,29 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/ethgas-0.1.0/ethgas-0.1.0.tgz
     version: 0.1.0
   execution-beacon:
+  - apiVersion: v2
+    created: "2025-10-02T11:32:21.909189661Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: A Helm chart for deploying Ethereum execution and consensus clients
+    digest: a80025db798790596a3dddc13023512535f87b8fd881795e53c20733e8ded7e7
+    home: https://www.ethereum.org/
+    keywords:
+    - ethereum
+    - blockchain
+    - nethermind
+    - prysm
+    - p2p
+    maintainers:
+    - name: 0xDones
+    - name: matilote
+    name: execution-beacon
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/execution-beacon-1.0.16/execution-beacon-1.0.16.tgz
+    version: 1.0.16
   - apiVersion: v2
     created: "2025-09-29T18:29:49.845708795Z"
     dependencies:
@@ -2258,4 +2298,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-01T16:47:30.710803799Z"
+generated: "2025-10-02T11:32:21.90943642Z"
