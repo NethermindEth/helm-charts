@@ -1,0 +1,7 @@
+# Trivy ignore file for misconfiguration checks
+# ReadOnlyRootFilesystem not feasible for init containers and containers requiring write access
+AVD-KSV-0014
+# Role permissions required for validator operations
+AVD-KSV-0056
+# ConfigMap uses environment variable substitution for secrets, not actual values
+AVD-KSV-0109
