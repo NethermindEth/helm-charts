@@ -3,7 +3,7 @@
 Charon
 ===========
 
-![Version: 0.3.16](https://img.shields.io/badge/Version-0.3.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.1](https://img.shields.io/badge/AppVersion-1.6.1-informational?style=flat-square)
+![Version: 0.3.17](https://img.shields.io/badge/Version-0.3.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.1](https://img.shields.io/badge/AppVersion-1.6.1-informational?style=flat-square)
 
 Charon is an open-source Ethereum Distributed validator middleware written in golang.
 
@@ -84,7 +84,7 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | rbac.rules[0] | object | `{"apiGroups":[""],"resources":["services"],"verbs":["get","list","watch"]}` | Required to get information about the serices nodePort. |
 | readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":"monitoring"},"initialDelaySeconds":10,"periodSeconds":10}` | Configure readiness probes |
 | resources | object | `{}` | Pod resources limits and requests |
-| secrets | object | `{"charon":"charon-enr-private-key"}` | Kubernetes secrets configuration Example: apiVersion: external-secrets.io/v1beta1 kind: ExternalSecret metadata:   name: charon-enr-private-key spec:   secretStoreRef:     name: infisical   target:     name: charon-enr-private-key   data:     - secretKey: charon-enr-private-key  # Hardcoded name       remoteRef:         key: CHARON_ENR_PRIVATE_KEY     - secretKey: token                    # Hardcoded name       remoteRef:         key: CHARON_MONITORING_TOKEN  The secret must contain 'charon-enr-private-key' key (always required) If centralMonitoring is enabled, the secret must also contain 'token' key cluster-lock.json should be downloaded via initContainers (e.g., from Minio) as files are sometimes too large for secrets |
+| secrets | object | `{"charon":"charon-enr-private-key"}` | Kubernetes secrets configuration Example: apiVersion: external-secrets.io/v1beta1 kind: ExternalSecret metadata:   name: charon-enr-private-key spec:   secretStoreRef:     name: infisical   target:     name: charon-enr-private-key   data:     - secretKey: charon-enr-private-key  # Hardcoded name       remoteRef:         key: CHARON_ENR_PRIVATE_KEY     - secretKey: token                    # Hardcoded name       remoteRef:         key: CHARON_MONITORING_TOKEN  The secret must contain 'charon-enr-private-key' key (always required) If centralMonitoring is enabled, the secret must also contain 'token' key cluster-lock.json and validator_keys should be downloaded via initContainers (e.g., from Minio) |
 | secrets.charon | string | `"charon-enr-private-key"` | charon secret name (required, must be provided via external secret) |
 | securityContext | object | See `values.yaml` | The security context for pods |
 | service.type | string | `"ClusterIP"` | Service type |

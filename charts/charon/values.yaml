@@ -271,7 +271,7 @@ config:
 #
 # The secret must contain 'charon-enr-private-key' key (always required)
 # If centralMonitoring is enabled, the secret must also contain 'token' key
-# cluster-lock.json should be downloaded via initContainers (e.g., from Minio) as files are sometimes too large for secrets
+# cluster-lock.json and validator_keys should be downloaded via initContainers (e.g., from Minio)
 secrets:
   # -- charon secret name (required, must be provided via external secret)
   charon: "charon-enr-private-key"
