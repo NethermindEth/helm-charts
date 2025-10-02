@@ -3,7 +3,7 @@
 Charon
 ===========
 
-![Version: 0.3.17](https://img.shields.io/badge/Version-0.3.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.1](https://img.shields.io/badge/AppVersion-1.6.1-informational?style=flat-square)
+![Version: 0.3.18](https://img.shields.io/badge/Version-0.3.18-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.1](https://img.shields.io/badge/AppVersion-1.6.1-informational?style=flat-square)
 
 Charon is an open-source Ethereum Distributed validator middleware written in golang.
 
@@ -29,7 +29,7 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | config.featureSetEnable | string | `""` | Comma-separated list of features to enable, overriding the default minimum feature set. |
 | config.jaegerAddress | string | `""` | Listening address for jaeger tracing. |
 | config.jaegerService | string | `"charon"` | Service name used for jaeger tracing. (default "charon") |
-| config.lockFile | string | `"/charon/cluster-lock/cluster-lock.json"` | The path to the cluster lock file defining distributed validator cluster. (default ".charon/cluster-lock.json") |
+| config.lockFile | string | `"/charon/cluster-lock.json"` | The path to the cluster lock file defining distributed validator cluster. (default ".charon/cluster-lock.json") |
 | config.logFormat | string | `"json"` | Log format; console, logfmt or json (default "console") |
 | config.logLevel | string | `"info"` | Log level; debug, info, warn or error (default "info") |
 | config.lokiAddresses | string | `""` | Enables sending of logfmt structured logs to these Loki log aggregation server addresses. This is in addition to normal stderr logs. |
