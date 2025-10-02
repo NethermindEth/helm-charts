@@ -251,6 +251,24 @@ config:
   fallbackBeaconNodes: ""
 
 # -- Kubernetes secrets configuration
+# Example:
+# apiVersion: external-secrets.io/v1beta1
+# kind: ExternalSecret
+# metadata:
+#   name: charon-enr-private-key
+# spec:
+#   secretStoreRef:
+#     name: infisical
+#   target:
+#     name: charon-enr-private-key
+#   data:
+#     - secretKey: charon-enr-private-key  # Hardcoded name
+#       remoteRef:
+#         key: CHARON_ENR_PRIVATE_KEY
+#     - secretKey: token                    # Hardcoded name
+#       remoteRef:
+#         key: CHARON_MONITORING_TOKEN
+#
 # The secret must contain 'charon-enr-private-key' key (always required)
 # If centralMonitoring is enabled, the secret must also contain 'token' key
 # cluster-lock.json should be downloaded via initContainers (e.g., from Minio) as files are sometimes too large for secrets
