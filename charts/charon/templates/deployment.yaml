@@ -143,6 +143,8 @@ spec:
               mountPath: /charon/charon-enr-private-key
             - name: cluster-lock
               mountPath: /charon/cluster-lock
+            - name: validator-keys
+              mountPath: /charon/validator_keys
           {{- if .Values.extraVolumeMounts -}}
             {{ toYaml .Values.extraVolumeMounts | nindent 12 }}
           {{- end }}
@@ -167,4 +169,6 @@ spec:
                   - key: charon-enr-private-key
                     path: charon-enr-private-key
         - name: cluster-lock
+          emptyDir: {}
+        - name: validator-keys
           emptyDir: {}
