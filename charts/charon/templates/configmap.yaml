@@ -24,8 +24,8 @@ data:
   {{- if .Values.config.jaegerService }}
   CHARON_JAEGER_SERVICE: {{ .Values.config.jaegerService }}
   {{- end }}
-  {{- if .Values.config.LockFile }}
-  CHARON_LOCK_FILE: {{ .Values.config.LockFile | quote }}
+  {{- if .Values.config.lockFile }}
+  CHARON_LOCK_FILE: {{ .Values.config.lockFile | quote }}
   {{- end }}
   {{- if .Values.config.logFormat }}
   CHARON_LOG_FORMAT: {{ .Values.config.logFormat }}
