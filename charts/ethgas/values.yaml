@@ -57,12 +57,12 @@ ethgas:
   entity_name: ""
   exchange_api_base: "https://hoodi.app.ethgas.com"
   collateral_contract: "0xe8bfB84b14c383b94365a895fc8bfA36dE236dc8"
-  
+
   # useJwtAuth -- Set to true to use pre-generated JWT tokens (ACCESS_JWT, REFRESH_JWT)
   # Set to false to use EOA signing key for automatic registration
   # Note: All sensitive values MUST be provided via existingSecret
   useJwtAuth: false
-  
+
   # Remote signer configuration
   # Example for Dirk (uncomment and modify):
   # signer: |
@@ -70,7 +70,7 @@ ethgas:
   #   cert_path = "/signer/secrets/dirk.crt"
   #   key_path = "/signer/secrets/dirk.key"
   #   ca_cert_path = "/signer/secrets/ca.crt"
-  #   
+  #
   #   [[signer.dirk.hosts]]
   #   url = "https://dirk-0.example.com:8881"
   #   wallets = ["Validators"]

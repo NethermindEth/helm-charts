@@ -1,0 +1,9 @@
+misconfiguration:
+  helm:
+    set:
+      - web3signerEndpoint="http://example.com"
+      - config.beaconNodeEndpoints="http://example.com"
+  exclude-ids:
+    - AVD-KSV-0014
+    - AVD-KSV-0056
+    - AVD-KSV-0109

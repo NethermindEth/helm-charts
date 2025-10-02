@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.14](https://img.shields.io/badge/Version-1.0.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.16](https://img.shields.io/badge/Version-1.0.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -39,18 +39,19 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.initChownData | bool | `true` |  |
 | beacon.metrics.annotations | object | `{}` |  |
 | beacon.metrics.categories[0] | string | `"JVM"` |  |
-| beacon.metrics.categories[10] | string | `"REMOTE_VALIDATOR"` |  |
+| beacon.metrics.categories[10] | string | `"STORAGE_FINALIZED_DB"` |  |
 | beacon.metrics.categories[11] | string | `"VALIDATOR"` |  |
 | beacon.metrics.categories[12] | string | `"VALIDATOR_PERFORMANCE"` |  |
+| beacon.metrics.categories[13] | string | `"VALIDATOR_DUTY"` |  |
 | beacon.metrics.categories[1] | string | `"PROCESS"` |  |
 | beacon.metrics.categories[2] | string | `"BEACON"` |  |
 | beacon.metrics.categories[3] | string | `"DISCOVERY"` |  |
 | beacon.metrics.categories[4] | string | `"EVENTBUS"` |  |
 | beacon.metrics.categories[5] | string | `"EXECUTOR"` |  |
-| beacon.metrics.categories[6] | string | `"NETWORK"` |  |
-| beacon.metrics.categories[7] | string | `"STORAGE"` |  |
-| beacon.metrics.categories[8] | string | `"STORAGE_HOT_DB"` |  |
-| beacon.metrics.categories[9] | string | `"STORAGE_FINALIZED_DB"` |  |
+| beacon.metrics.categories[6] | string | `"LIBP2P"` |  |
+| beacon.metrics.categories[7] | string | `"NETWORK"` |  |
+| beacon.metrics.categories[8] | string | `"STORAGE"` |  |
+| beacon.metrics.categories[9] | string | `"STORAGE_HOT_DB"` |  |
 | beacon.metrics.enabled | bool | `true` |  |
 | beacon.metrics.host | string | `"0.0.0.0"` |  |
 | beacon.metrics.hostAllowList[0] | string | `"*"` |  |
@@ -82,6 +83,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.client | string | `"nethermind"` |  |
 | execution.env | list | `[]` |  |
 | execution.envFrom | list | `[]` |  |
+| execution.externalCl | bool | `true` |  |
 | execution.extraFlags | list | `[]` |  |
 | execution.healthchecks.enabled | bool | `true` |  |
 | execution.healthchecks.lowStorageSpaceShutdownThreshold | int | `0` |  |
@@ -93,7 +95,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.jsonrpc.engine.corsOrigins[0] | string | `"*"` |  |
 | execution.jsonrpc.engine.hostAllowList[0] | string | `"*"` |  |
 | execution.jsonrpc.engine.port | int | `8551` |  |
-| execution.jsonrpc.grpc.port | int | `9090` |  |
+| execution.jsonrpc.grpc.port | int | `8655` |  |
 | execution.jsonrpc.host | string | `"0.0.0.0"` |  |
 | execution.jsonrpc.http.corsOrigins[0] | string | `"*"` |  |
 | execution.jsonrpc.http.hostAllowList[0] | string | `"*"` |  |
@@ -165,19 +167,19 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | global.externalSecrets.secretStoreRef.kind | string | `"SecretStore"` |  |
 | global.externalSecrets.secretStoreRef.name | string | `"secretStoreRef"` |  |
 | global.image.beacon.lighthouse.repository | string | `"sigp/lighthouse"` |  |
-| global.image.beacon.lighthouse.tag | string | `"v6.0.1"` |  |
+| global.image.beacon.lighthouse.tag | string | `"v7.1.0"` |  |
 | global.image.beacon.lodestar.repository | string | `"chainsafe/lodestar"` |  |
-| global.image.beacon.lodestar.tag | string | `"v1.28.1"` |  |
+| global.image.beacon.lodestar.tag | string | `"v1.34.1"` |  |
 | global.image.beacon.nimbus.repository | string | `"statusim/nimbus-eth2"` |  |
 | global.image.beacon.nimbus.tag | string | `"multiarch-v25.9.2"` |  |
 | global.image.beacon.prysm.repository | string | `"gcr.io/prylabs-dev/prysm/beacon-chain"` |  |
-| global.image.beacon.prysm.tag | string | `"v5.3.2"` |  |
+| global.image.beacon.prysm.tag | string | `"v6.0.5"` |  |
 | global.image.beacon.teku.repository | string | `"consensys/teku"` |  |
-| global.image.beacon.teku.tag | string | `"25.4.0"` |  |
+| global.image.beacon.teku.tag | string | `"25.9.3"` |  |
 | global.image.execution.bseu.repository | string | `"hyperledger/besu"` |  |
-| global.image.execution.bseu.tag | string | `"25.3.0"` |  |
-| global.image.execution.erigon.repository | string | `"thorax/erigon"` |  |
-| global.image.execution.erigon.tag | string | `"v3.0.0"` |  |
+| global.image.execution.bseu.tag | string | `"25.9.0"` |  |
+| global.image.execution.erigon.repository | string | `"erigontech/erigon"` |  |
+| global.image.execution.erigon.tag | string | `"v3.1.0"` |  |
 | global.image.execution.geth.repository | string | `"ethereum/client-go"` |  |
 | global.image.execution.geth.tag | string | `"v1.16.4"` |  |
 | global.image.execution.nethermind.repository | string | `"nethermind/nethermind"` |  |
