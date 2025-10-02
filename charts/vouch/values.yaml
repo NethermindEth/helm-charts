@@ -20,7 +20,7 @@ global:
     capabilities:
       drop:
       - ALL
-      
+
 image:
   repository: attestant/vouch
   pullPolicy: IfNotPresent
@@ -101,7 +101,7 @@ fullnameOverride: ""
 ## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
 loggingLevel: "INFO"
 
-## By default, Vouch's MEV-boost service listens on port 18550. Beacon nodes used by Vouch should be configured to talk directly to this, rather than other MEV-boost services or directly to relays. 
+## By default, Vouch's MEV-boost service listens on port 18550. Beacon nodes used by Vouch should be configured to talk directly to this, rather than other MEV-boost services or directly to relays.
 blockRelayPort: 18550
 
 ## Port on which vouch HTTP listens.
