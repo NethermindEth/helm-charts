@@ -7,6 +7,14 @@ A Helm chart for installing and configuring large scale ETH staking infrastructu
 
 **Homepage:** <https://stakewise.io/>
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| matilote |  |  |
+| aivarasko |  |  |
+| adriantpaez |  |  |
+
 ## Requirements
 
 | Repository | Name | Version |
