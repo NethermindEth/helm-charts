@@ -211,6 +211,31 @@ entries:
   charon:
   - apiVersion: v2
     appVersion: 1.6.1
+    created: "2025-10-02T18:23:50.443639611Z"
+    description: Charon is an open-source Ethereum Distributed validator middleware
+      written in golang.
+    digest: d2121f389023c414bc2d65d11a5f4cca7d31977e57352d3b05f3e9c3cac7b708
+    home: https://obol.tech/
+    icon: https://raw.githubusercontent.com/ObolNetwork/charon/main/docs/images/charonlogo.svg
+    keywords:
+    - ethereum
+    - blockchain
+    - obol
+    - charon
+    - dvt
+    - node
+    maintainers:
+    - name: matilote
+    - name: 0xDones
+    name: charon
+    sources:
+    - https://github.com/ObolNetwork/charon
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/charon-0.3.18/charon-0.3.18.tgz
+    version: 0.3.18
+  - apiVersion: v2
+    appVersion: 1.6.1
     created: "2025-10-02T18:08:58.967362492Z"
     description: Charon is an open-source Ethereum Distributed validator middleware
       written in golang.
@@ -2401,4 +2426,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-02T18:08:58.967551205Z"
+generated: "2025-10-02T18:23:50.4441189Z"
