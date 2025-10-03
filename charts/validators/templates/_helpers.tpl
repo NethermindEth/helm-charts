@@ -76,7 +76,7 @@ Update permissions on files inside /data directory
   imagePullPolicy: {{ .Values.initImageBusybox.pullPolicy }}
   securityContext:
     runAsUser: 0
-  command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
+  command: ["chown", "-R", "{{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.runAsUser }}", "/data"]
   volumeMounts:
     - name: data
       mountPath: /data
