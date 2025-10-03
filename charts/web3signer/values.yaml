@@ -62,7 +62,7 @@ flyway:
   # Set to true to automatically create baseline history table on first run
   baselineOnMigrate: true
   # Optional: specify a baselineVersion if your existing schema predates migrations
-  # baselineVersion: "1"
+  baselineVersion: "0"
   # Optional: schema name if not using default public
   # schemas: ["public"]
 

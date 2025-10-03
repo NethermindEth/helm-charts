@@ -1,7 +1,7 @@
 
 # web3signer
 
-![Version: 1.0.11](https://img.shields.io/badge/Version-1.0.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.4.1](https://img.shields.io/badge/AppVersion-25.4.1-informational?style=flat-square)
+![Version: 1.0.12](https://img.shields.io/badge/Version-1.0.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.4.1](https://img.shields.io/badge/AppVersion-25.4.1-informational?style=flat-square)
 
 A Helm chart for Web3Signer
 
@@ -30,6 +30,7 @@ A Helm chart for Web3Signer
 | env | list | `[]` |  |
 | envFrom | list | `[]` | envFrom configuration |
 | flyway.baselineOnMigrate | bool | `true` |  |
+| flyway.baselineVersion | string | `"0"` |  |
 | flywayImage.pullPolicy | string | `"IfNotPresent"` |  |
 | flywayImage.repository | string | `"flyway/flyway"` |  |
 | flywayImage.tag | string | `"11.13.2"` |  |
