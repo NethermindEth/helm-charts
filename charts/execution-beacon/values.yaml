@@ -429,9 +429,6 @@ execution:
         - eth
         - web3
         - net
-        - reth
-        - engine
-        - debug
     host: "0.0.0.0"
     grpc:
       port: 8655
