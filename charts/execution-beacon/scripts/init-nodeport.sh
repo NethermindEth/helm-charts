@@ -10,6 +10,15 @@ mkdir -p /data && chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Va
 mkdir -p /data/beacon && chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data/beacon
 {{- end }}
 
+{{- if .Values.jwtSecretEnv }}
+echo "==> Writing JWT secret from environment variable to file"
+mkdir -p /data/jwt
+echo -n "${{ .Values.jwtSecretEnv }}" > /data/jwt/jwtsecret
+chmod 600 /data/jwt/jwtsecret
+chown {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data/jwt/jwtsecret
+echo "JWT secret written to /data/jwt/jwtsecret"
+{{- end }}
+
 {{- if .Values.p2pNodePort.enabled }}
 echo "==> Configuring P2P NodePort"
 
