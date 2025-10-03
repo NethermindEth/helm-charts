@@ -49,9 +49,16 @@ fi
 # Extract and format pubkeys for Lodestar
 if [ "${VALIDATOR_TYPE}" = "lodestar" ] && [ -f "${DATA_DIR}/signer_keys.yml" ]; then
   echo "==> Processing keys for Lodestar"
-  formatted_content=$(cat "${DATA_DIR}/signer_keys.yml" | grep -o '".*"' | sed -e 's/"//g' | tr ',' '\n')
-  echo "$formatted_content" > "${DATA_DIR}/pubkeys.txt"
-  echo "{\"externalSigner.pubkeys\": [$(awk '{printf "%s\"%s\"", (NR==1 ? "" : ", "), $0}' "${DATA_DIR}/pubkeys.txt")"]}" > "${DATA_DIR}/rcconfig.json"
+  # Extract pubkeys from signer_keys.yml
+  cat "${DATA_DIR}/signer_keys.yml" | grep -o '".*"' | sed -e 's/"//g' | tr ',' '\n' > "${DATA_DIR}/pubkeys.txt"
+
+  # Build JSON array of pubkeys
+  pubkeys_json=$(awk 'BEGIN{ORS=""} {printf "%s\"%s\"", (NR==1 ? "" : ", "), $0}' "${DATA_DIR}/pubkeys.txt")
+
+  # Create rcconfig.json with proper escaping
+  cat > "${DATA_DIR}/rcconfig.json" <<EOF
+{"externalSigner.pubkeys": [${pubkeys_json}]}
+EOF
   echo "==> Created rcconfig.json for Lodestar"
 fi
 
