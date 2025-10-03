@@ -67,41 +67,31 @@ replicaCount: 1
 network: mainnet
 
 ## Container image configuration
+## Images are automatically selected based on execution.client and beacon.client values
+## You can override the repository if needed (e.g., for custom builds or registries)
+##
+## Execution client images (auto-selected):
+##   nethermind -> nethermind/nethermind
+##   geth       -> ethereum/client-go
+##   besu       -> hyperledger/besu
+##   erigon     -> erigontech/erigon
+##   reth       -> ghcr.io/paradigmxyz/reth
+##
+## Beacon client images (auto-selected):
+##   prysm      -> gcr.io/prylabs-dev/prysm/beacon-chain
+##   teku       -> consensys/teku
+##   lighthouse -> sigp/lighthouse
+##   nimbus     -> statusim/nimbus-eth2
+##   lodestar   -> chainsafe/lodestar
 ##
 image:
   imagePullPolicy: IfNotPresent
   execution:
-    nethermind:
-      repository: "nethermind/nethermind"
-      tag: "1.34.0"
-    geth:
-      repository: "ethereum/client-go"
-      tag: "v1.16.4"
-    besu:
-      repository: "hyperledger/besu"
-      tag: "25.9.0"
-    erigon:
-      repository: "erigontech/erigon"
-      tag: "v3.1.0"
-    reth:
-      repository: "ghcr.io/paradigmxyz/reth"
-      tag: "v1.8.2"
+    repository: ""  # Leave empty to auto-select based on execution.client
+    tag: "1.34.0"   # Update to your desired version
   beacon:
-    prysm:
-      repository: "gcr.io/prylabs-dev/prysm/beacon-chain"
-      tag: "v6.0.5"
-    teku:
-      repository: "consensys/teku"
-      tag: "25.9.3"
-    lighthouse:
-      repository: "sigp/lighthouse"
-      tag: "v7.1.0"
-    nimbus:
-      repository: "statusim/nimbus-eth2"
-      tag: "multiarch-v25.9.2"
-    lodestar:
-      repository: "chainsafe/lodestar"
-      tag: "v1.34.1"
+    repository: ""  # Leave empty to auto-select based on beacon.client
+    tag: "multiarch-v25.9.2"  # Update to your desired version
 
 ## JSON Web Token (JWT) authentication is used to secure the communication
 ## between the beacon node and execution client. You can generate a JWT using
@@ -441,6 +431,7 @@ execution:
         - web3
         - net
         - reth
+        - engine
         - debug
     host: "0.0.0.0"
     grpc:

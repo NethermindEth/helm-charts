@@ -83,7 +83,7 @@ spec:
               mountPath: /scripts
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
-          image: "{{ (pluck .Values.beacon.client .Values.image.beacon | first ).repository }}:{{ (pluck .Values.beacon.client .Values.image.beacon | first ).tag }}"
+          image: "{{ include "beacon.image" . }}"
           imagePullPolicy: {{ .Values.image.imagePullPolicy }}
           securityContext:
             {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
@@ -112,10 +112,10 @@ spec:
         {{- end }}
       containers:
         {{/*
-        Container used for Execution clients: Nethermind, Geth, Besu, Erigon
+        Container used for Execution clients: Nethermind, Geth, Besu, Erigon, Reth
         */}}
         - name: execution
-          image: "{{ (pluck .Values.execution.client .Values.image.execution | first ).repository }}:{{ (pluck .Values.execution.client .Values.image.execution | first ).tag }}"
+          image: "{{ include "execution.image" . }}"
           imagePullPolicy: {{ .Values.image.imagePullPolicy }}
           securityContext:
             {{- toYaml .Values.global.securityContext | nindent 12 }}
@@ -135,17 +135,17 @@ spec:
               {{- if .Values.p2pNodePort.enabled }}
               . /env/init-nodeport;
               {{- end }}
-            {{- if eq .Values.execution.client "nethermind" }}
-              {{- include "execution-args-nethermind" . | nindent 14 }}
-            {{- else if eq .Values.execution.client "geth" }}
-              {{- include "execution-args-geth" . | nindent 14 }}
-            {{- else if eq .Values.execution.client "besu" }}
-              {{- include "execution-args-besu" . | nindent 14 }}
-            {{- else if eq .Values.execution.client "erigon" }}
-              {{- include "execution-args-erigon" . | nindent 14 }}
-            {{- else if eq .Values.execution.client "reth" }}
-              {{- include "execution-args-reth" . | nindent 14 }}
-            {{- end }}
+          {{- if eq .Values.execution.client "nethermind" }}
+            {{- include "execution-args-nethermind" . | nindent 14 }}
+          {{- else if eq .Values.execution.client "geth" }}
+            {{- include "execution-args-geth" . | nindent 14 }}
+          {{- else if eq .Values.execution.client "besu" }}
+            {{- include "execution-args-besu" . | nindent 14 }}
+          {{- else if eq .Values.execution.client "erigon" }}
+            {{- include "execution-args-erigon" . | nindent 14 }}
+          {{- else if eq .Values.execution.client "reth" }}
+            {{- include "execution-args-reth" . | nindent 14 }}
+          {{- end }}
             {{- range .Values.execution.extraFlags }}
               {{ . }}
             {{- end }}
@@ -226,7 +226,7 @@ spec:
         Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar
         */}}
         - name: beacon
-          image: "{{ (pluck .Values.beacon.client .Values.image.beacon | first ).repository }}:{{ (pluck .Values.beacon.client .Values.image.beacon | first ).tag }}"
+          image: "{{ include "beacon.image" . }}"
           imagePullPolicy: {{ .Values.image.imagePullPolicy }}
           securityContext:
             {{- toYaml .Values.global.securityContext | nindent 12 }}
