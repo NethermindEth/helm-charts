@@ -2,7 +2,7 @@ apiVersion: v2
 name: vouch
 description: A Helm chart for installing and configuring Vouch validator client for large scale ETH staking infrastructure on top of the Kubernetes
 type: application
-version: 0.0.1
+version: 0.1.0
 appVersion: "1.11.1"
 
 keywords:
