@@ -196,6 +196,7 @@ Reth execution client arguments
 {{- define "execution-args-reth" -}}
 exec reth node
 --datadir=/data/execution
+--log.file.directory=/data/execution/logs
 --ipcdisable
 --chain={{ .Values.network }}
 {{- if .Values.JWTSecret }}
