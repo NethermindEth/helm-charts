@@ -57,6 +57,15 @@ flywayImage:
   tag: "11.13.2"
   pullPolicy: IfNotPresent
 
+# Flyway configuration for migrations init container
+flyway:
+  # Set to true to automatically create baseline history table on first run
+  baselineOnMigrate: true
+  # Optional: specify a baselineVersion if your existing schema predates migrations
+  # baselineVersion: "1"
+  # Optional: schema name if not using default public
+  # schemas: ["public"]
+
 imagePullSecrets: []
 
 ## Provide a name in place of operator for `app:` labels
