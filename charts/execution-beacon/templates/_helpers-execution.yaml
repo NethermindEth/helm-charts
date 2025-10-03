@@ -21,10 +21,10 @@ exec /nethermind/Nethermind.Runner
 {{- end }}
 {{- end }}
 {{- end }}
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+--JsonRpc.JwtSecret=${{ .Values.jwtSecretEnv }}
+{{- else if .Values.JWTSecret }}
 --JsonRpc.JwtSecretFile=/secret/jwtsecret
-{{- else if .Values.JWTSecretFile }}
---JsonRpc.JwtSecretFile={{ .Values.JWTSecretFile }}
 {{- end }}
 --JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
 --JsonRpc.EngineHost={{ .Values.execution.jsonrpc.host }}
@@ -58,10 +58,10 @@ exec geth
 --datadir=/data/execution
 --ipcdisable
 --{{ .Values.network }}
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+--authrpc.jwtsecret=${{ .Values.jwtSecretEnv }}
+{{- else if .Values.JWTSecret }}
 --authrpc.jwtsecret=/secret/jwtsecret
-{{- else if .Values.JWTSecretFile }}
---authrpc.jwtsecret={{ .Values.JWTSecretFile }}
 {{- end }}
 --authrpc.addr={{ .Values.execution.jsonrpc.host }}
 --authrpc.port={{ .Values.execution.jsonrpc.engine.port }}
@@ -108,10 +108,10 @@ exec /opt/besu/bin/besu
 --data-path=/data/execution
 --sync-mode=X_SNAP
 --p2p-enabled=true
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+--engine-jwt-secret=${{ .Values.jwtSecretEnv }}
+{{- else if .Values.JWTSecret }}
 --engine-jwt-secret=/secret/jwtsecret
-{{- else if .Values.JWTSecretFile }}
---engine-jwt-secret={{ .Values.JWTSecretFile }}
 {{- end }}
 --engine-rpc-enabled=true
 --engine-host-allowlist={{ .Values.execution.jsonrpc.engine.hostAllowList | join "," }}
@@ -164,10 +164,10 @@ exec erigon
 {{- if .Values.execution.terminalTotalDifficulty }}
 --override.terminaltotaldifficulty={{ .Values.execution.terminalTotalDifficulty }}
 {{- end }}
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+--authrpc.jwtsecret=${{ .Values.jwtSecretEnv }}
+{{- else if .Values.JWTSecret }}
 --authrpc.jwtsecret=/secret/jwtsecret
-{{- else if .Values.JWTSecretFile }}
---authrpc.jwtsecret={{ .Values.JWTSecretFile }}
 {{- end }}
 --authrpc.addr={{ .Values.execution.jsonrpc.host }}
 --authrpc.port={{ .Values.execution.jsonrpc.engine.port }}
@@ -199,10 +199,10 @@ exec reth node
 --log.file.directory=/data/execution/logs
 --ipcdisable
 --chain={{ .Values.network }}
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+--authrpc.jwtsecret=${{ .Values.jwtSecretEnv }}
+{{- else if .Values.JWTSecret }}
 --authrpc.jwtsecret=/secret/jwtsecret
-{{- else if .Values.JWTSecretFile }}
---authrpc.jwtsecret={{ .Values.JWTSecretFile }}
 {{- end }}
 --authrpc.addr={{ .Values.execution.jsonrpc.host }}
 --authrpc.port={{ .Values.execution.jsonrpc.engine.port }}

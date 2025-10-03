@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.21](https://img.shields.io/badge/Version-1.0.21-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.22](https://img.shields.io/badge/Version-1.0.22-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -26,7 +26,6 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | JWTSecret | string | `""` |  |
-| JWTSecretFile | string | `""` |  |
 | affinity | object | `{}` |  |
 | beacon.builderEndpoint | string | `""` |  |
 | beacon.checkPointSync.enabled | bool | `true` |  |
@@ -196,6 +195,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | initImage.pullPolicy | string | `"IfNotPresent"` |  |
 | initImage.repository | string | `"bitnamilegacy/kubectl"` |  |
 | initImage.tag | string | `"1.32"` |  |
+| jwtSecretEnv | string | `"JWT_SECRET"` |  |
 | metrics.annotations | object | `{}` |  |
 | metrics.enabled | bool | `true` |  |
 | metrics.prometheusRule.additionalLabels | object | `{}` |  |
