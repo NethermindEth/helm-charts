@@ -1,297 +1,359 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Default security settings for the pod
-podSecurityContext:
-  fsGroup: 1000
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-  seccompProfile:
-    type: RuntimeDefault
-
-# Default security settings for containers
-securityContext:
-  capabilities:
-    drop:
-      - ALL
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-  allowPrivilegeEscalation: false
-  seccompProfile:
-    type: RuntimeDefault
-
-# Security settings for init containers
-initContainerSecurityContext:
-  capabilities:
-    drop:
-      - ALL
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-  allowPrivilegeEscalation: false
-  seccompProfile:
-    type: RuntimeDefault
-
+## Global values that can be shared across multiple charts
+##
 global:
-  replicaCount: 1
-
-  ## Ethereum network
-  ##
-  network: mainnet
-
-  image:
-    imagePullPolicy: IfNotPresent
-    execution:
-      nethermind:
-        repository: "nethermind/nethermind"
-        tag: "1.34.0"
-      geth:
-        repository: "ethereum/client-go"
-        tag: "v1.16.4"
-      bseu:
-        repository: "hyperledger/besu"
-        tag: "25.9.0"
-      erigon:
-        repository: "erigontech/erigon"
-        tag: "v3.1.0"
-    beacon:
-      prysm:
-        repository: "gcr.io/prylabs-dev/prysm/beacon-chain"
-        tag: "v6.0.5"
-      teku:
-        repository: "consensys/teku"
-        tag: "25.9.3"
-      lighthouse:
-        repository: "sigp/lighthouse"
-        tag: "v7.1.0"
-      nimbus:
-        repository: "statusim/nimbus-eth2"
-        tag: "multiarch-v25.9.2"
-      lodestar:
-        repository: "chainsafe/lodestar"
-        tag: "v1.34.1"
-
-  ## JSON Web Token (JWT) authentication is used to secure the communication
-  ## between the beacon node and execution client. You can generate a JWT using
-  ## a command line tool, for example:
-  ## openssl rand -hex 32 > token.txt
-  ##
-  JWTSecret: ""
-  JWTSecretFile: ""
-
-  ## Credentials to fetch images from private registry
+  ## Global image pull secrets (merged with chart-level imagePullSecrets)
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   ##
   imagePullSecrets: []
-  # Node labels for pod assignment
-  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
-  nodeSelector: {}
 
-  ## Tolerations for pod assignment
-  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ## Global container security context (applied to containers)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
-  tolerations: []
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
 
-  ## Affinity for pod assignment
-  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## Global pod security context (applied at pod level)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
-  ## Example:
-  ## affinity:
-  ##   podAntiAffinity:
-  ##     requiredDuringSchedulingIgnoredDuringExecution:
-  ##     - labelSelector:
-  ##         matchExpressions:
-  ##         - key: app.kubernetes.io/name
-  ##           operator: In
-  ##           values:
-  ##           - prysm
-  ##       topologyKey: kubernetes.io/hostname
-  ##
-  affinity: {}
+  podSecurityContext:
+    fsGroup: 1000
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
 
-  ## Used to assign priority to pods
-  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ## Security settings for init containers
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
-  priorityClassName: ""
+  initContainerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
 
-  ## Whether or not to allocate persistent volume disk for the data directory.
-  ## In case of node failure, the node data directory will still persist.
+## Provide a name in place of execution-beacon for `app:` labels
+##
+nameOverride: ""
+
+## Provide a name to substitute for the full names of resources
+##
+fullnameOverride: ""
+
+## Number of replicas
+##
+replicaCount: 1
+
+## Ethereum network
+##
+network: mainnet
+
+## Container image configuration
+##
+image:
+  imagePullPolicy: IfNotPresent
+  execution:
+    nethermind:
+      repository: "nethermind/nethermind"
+      tag: "1.34.0"
+    geth:
+      repository: "ethereum/client-go"
+      tag: "v1.16.4"
+    besu:
+      repository: "hyperledger/besu"
+      tag: "25.9.0"
+    erigon:
+      repository: "erigontech/erigon"
+      tag: "v3.1.0"
+    reth:
+      repository: "ghcr.io/paradigmxyz/reth"
+      tag: "v1.8.2"
+  beacon:
+    prysm:
+      repository: "gcr.io/prylabs-dev/prysm/beacon-chain"
+      tag: "v6.0.5"
+    teku:
+      repository: "consensys/teku"
+      tag: "25.9.3"
+    lighthouse:
+      repository: "sigp/lighthouse"
+      tag: "v7.1.0"
+    nimbus:
+      repository: "statusim/nimbus-eth2"
+      tag: "multiarch-v25.9.2"
+    lodestar:
+      repository: "chainsafe/lodestar"
+      tag: "v1.34.1"
+
+## JSON Web Token (JWT) authentication is used to secure the communication
+## between the beacon node and execution client. You can generate a JWT using
+## a command line tool, for example:
+## openssl rand -hex 32 > token.txt
+##
+JWTSecret: ""
+JWTSecretFile: ""
+
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - prysm
+##       topologyKey: kubernetes.io/hostname
+##
+affinity: {}
+
+## Used to assign priority to pods
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of node failure, the node data directory will still persist.
+##
+sharedPersistence:
+  enabled: false
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 300Gi
+  annotations: {}
+
+## Additional env to add into the execution and beacon containers
+##
+env: []
+
+## Additional envFrom to add into the execution and beacon containers
+##
+envFrom: []
+
+## Ethsider sidecar container configuration
+##
+ethsider:
+  enabled: true
+  repository: "nethermindeth/ethsider"
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent
+  bindAddr: 3000
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before genesis
   ##
-  sharedPersistence:
+  livenessProbe:
     enabled: false
-    storageClassName: ""
-    accessModes:
-      - ReadWriteOnce
-    size: 300Gi
-    annotations: {}
+    initialDelaySeconds: 10
+    timeoutSeconds: 3
+    periodSeconds: 1
+    failureThreshold: 3
+    successThreshold: 3
+    httpGet:
+      path: /liveness
+      port: sidecar
+      scheme: HTTP
 
-  externalSecrets:
-    enabled: false
-    secretStoreRef:
-      name: secretStoreRef
-      kind: SecretStore
-    data: []
-
-  ## Additional env to add into the execution and beacon containers
-  ##
-  env: []
-
-  ## Additional envFrom to add into the execution and beacon containers
-  ##
-  envFrom: []
-
-  ethsider:
+  readinessProbe:
     enabled: true
-    repository: "nethermindeth/ethsider"
-    tag: "v1.0.0"
-    pullPolicy: IfNotPresent
-    bindAddr: 3000
-    ## Configure liveness and readiness probes
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-    ## NB! readinessProbe and livenessProbe must be disabled before genesis
+    initialDelaySeconds: 10
+    timeoutSeconds: 3
+    periodSeconds: 1
+    failureThreshold: 3
+    successThreshold: 3
+    httpGet:
+      path: /readiness
+      port: sidecar
+      scheme: HTTP
+
+## Service configuration
+##
+service:
+  svcHeadless: true
+
+## Session affinity configuration
+##
+sessionAffinity:
+  # Whether to enable session affinity or not
+  enabled: false
+  # The session duration in seconds
+  timeoutSeconds: 86400
+
+## Service account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## RBAC configuration.
+## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
+rbac:
+  create: true
+  # The name of the cluster role to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  ## Required ClusterRole rules
+  ##
+  clusterRules:
+    ## Required to obtain the nodes external IP
     ##
-    livenessProbe:
-      enabled: false
-      initialDelaySeconds: 10
-      timeoutSeconds: 3
-      periodSeconds: 1
-      failureThreshold: 3
-      successThreshold: 3
-      httpGet:
-        path: /liveness
-        port: sidecar
-        scheme: HTTP
-
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 10
-      timeoutSeconds: 3
-      periodSeconds: 1
-      failureThreshold: 3
-      successThreshold: 3
-      httpGet:
-        path: /readiness
-        port: sidecar
-        scheme: HTTP
-
-  service:
-    svcHeadless: true
-
-  sessionAffinity:
-    # Whether to enable session affinity or not
-    enabled: false
-    # The session duration in seconds
-    timeoutSeconds: 86400
-
-  ## Service account
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+    - apiGroups: [""]
+      resources:
+        - "nodes"
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
+  ## Required Role rules
   ##
-  serviceAccount:
-    create: true
-
-  ## RBAC configuration.
-  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-  ##
-  rbac:
-    create: true
-
-  ## Termination Grace Period
-  ## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
-  ##
-  terminationGracePeriodSeconds: 120
-
-  ## Init image is used to chown data volume, initialise genesis, etc.
-  ##
-  initImage:
-    repository: "bitnamilegacy/kubectl"
-    tag: "1.32"
-    pullPolicy: IfNotPresent
-
-  ## Monitoring
-  ##
-  metrics:
-    enabled: true
-    annotations: {}
-    ## Prometheus Service Monitor
-    ## ref: https://github.com/coreos/prometheus-operator
-    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  rules:
+    ## Required to get information about the services nodePort.
     ##
-    serviceMonitor:
-      ## The namespace in which the ServiceMonitor will be created
-      ##
-      namespace: ""
-      ## The interval at which metrics should be scraped
-      ##
-      interval: 30s
-      ## The timeout after which the scrape is ended
-      ##
-      scrapeTimeout: ""
-      ## Metrics RelabelConfigs to apply to samples before scraping.
-      ##
-      relabellings: []
-      ## Metrics RelabelConfigs to apply to samples before ingestion.
-      ##
-      metricRelabelings: []
-      ## Specify honorLabels parameter to add the scrape endpoint
-      ##
-      honorLabels: false
-      ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
-      ##
-      additionalLabels: {}
-    ## Custom PrometheusRule to be defined
-    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-    ##
-    prometheusRule:
-      ## Create a default set of Alerts
-      ##
-      default: true
-      ## The namespace in which the prometheusRule will be created
-      ##
-      namespace: ""
-      ## Additional labels for the prometheusRule
-      ##
-      additionalLabels: {}
-      ## Custom Prometheus rules
-      ##
-      rules: []
+    - apiGroups: [""]
+      resources:
+        - "services"
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
 
-  ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
-  ## This will generate a service for each replica, with a port binding via NodePort.
-  ## This is useful if you want to expose and announce your node to the Internet.
+## Termination Grace Period
+## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+##
+terminationGracePeriodSeconds: 120
+
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  repository: "bitnamilegacy/kubectl"
+  tag: "1.32"
+  pullPolicy: IfNotPresent
+
+## Monitoring
+##
+metrics:
+  enabled: true
+  annotations: {}
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
   ##
-  p2pNodePort:
-    ## @param p2pNodePort.enabled Expose P2P port via NodePort
+  serviceMonitor:
+    ## The namespace in which the ServiceMonitor will be created
     ##
-    enabled: false
-    ## @param p2pNodePort.annotations
+    namespace: ""
+    ## The interval at which metrics should be scraped
     ##
-    annotations: {}
-    ## @param p2pNodePort.type
-    ## Options: NodePort, LoadBalancer
-    type: NodePort
-    ## @param p2pNodePort.startAt The ports allocation will start from this value
+    interval: 30s
+    ## The timeout after which the scrape is ended
     ##
-    startAtExecution: 31100
-    startAtBeacon: 31200
-    ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
-    ## @default -- See `values.yaml` for example
-    replicaToNodePort: {}
-    #  "0": 32345
-    #  "3": 32348
-
-  ## Additional volumes to create
+    scrapeTimeout: ""
+    ## Metrics RelabelConfigs to apply to samples before scraping.
+    ##
+    relabellings: []
+    ## Metrics RelabelConfigs to apply to samples before ingestion.
+    ##
+    metricRelabelings: []
+    ## Specify honorLabels parameter to add the scrape endpoint
+    ##
+    honorLabels: false
+    ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ##
+    additionalLabels: {}
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
   ##
-  volumes: []
+  prometheusRule:
+    ## Create a default set of Alerts
+    ##
+    default: true
+    ## The namespace in which the prometheusRule will be created
+    ##
+    namespace: ""
+    ## Additional labels for the prometheusRule
+    ##
+    additionalLabels: {}
+    ## Custom Prometheus rules
+    ##
+    rules: []
 
-  ## Additional volume mounts to create
+## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
+## This will generate a service for each replica, with a port binding via NodePort.
+## This is useful if you want to expose and announce your node to the Internet.
+##
+p2pNodePort:
+  ## @param p2pNodePort.enabled Expose P2P port via NodePort
   ##
-  volumeMounts: []
+  enabled: false
+  ## @param p2pNodePort.annotations
+  ##
+  annotations: {}
+  ## @param p2pNodePort.type
+  ## Options: NodePort, LoadBalancer
+  type: NodePort
+  ## @param p2pNodePort.startAt The ports allocation will start from this value
+  ##
+  startAtExecution: 31100
+  startAtBeacon: 31200
+  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
+  ## @default -- See `values.yaml` for example
+  replicaToNodePort: {}
+  #  "0": 32345
+  #  "3": 32348
 
+## Additional volumes to create
+##
+volumes: []
+
+## Additional volume mounts to create
+##
+volumeMounts: []
+
+## Execution client configuration
+##
 execution:
   client: nethermind
 
@@ -374,6 +436,12 @@ execution:
         - web3
         - net
         - engine
+      reth:
+        - eth
+        - web3
+        - net
+        - reth
+        - debug
     host: "0.0.0.0"
     grpc:
       port: 8655
@@ -403,6 +471,15 @@ execution:
     lowStorageSpaceWarningThreshold: 5
 
   targetPeers: 50
+
+  ## Reth-specific: Enable Discovery v5 protocol for better peer discovery
+  ## Only applicable when using Reth as execution client
+  ## Discovery v5 port is automatically set to P2P_PORT + 2 to avoid conflicts with multiple replicas
+  ## Example: Pod 0: P2P=30303, Discovery v5=30305
+  ##          Pod 1: P2P=30305, Discovery v5=30307
+  ##
+  enableDiscoveryV5: true
+
   ## Extra flags to pass to the node
   ##
   extraFlags: []
@@ -420,6 +497,8 @@ execution:
   ##
   envFrom: []
 
+## Beacon client configuration
+##
 beacon:
   client: nimbus
 
@@ -559,52 +638,3 @@ beacon:
   ## Additional envFrom to add into the beacon container
   ##
   envFrom: []
-
-## Service account
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-##
-serviceAccount:
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
-## Provide a name in place of geth for `app:` labels
-##
-nameOverride: ""
-
-## Provide a name to substitute for the full names of resources
-##
-fullnameOverride: ""
-# RBAC configuration.
-## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-##
-rbac:
-  # The name of the cluster role to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-  ## Required ClusterRole rules
-  ##
-  clusterRules:
-    ## Required to obtain the nodes external IP
-    ##
-    - apiGroups: [""]
-      resources:
-        - "nodes"
-      verbs:
-        - "get"
-        - "list"
-        - "watch"
-  ## Required Role rules
-  ##
-  rules:
-    ## Required to get information about the services nodePort.
-    ##
-    - apiGroups: [""]
-      resources:
-        - "services"
-      verbs:
-        - "get"
-        - "list"
-        - "watch"

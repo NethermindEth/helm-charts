@@ -21,14 +21,14 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
-{{- if .Values.global.sessionAffinity.enabled }}
+{{- if .Values.sessionAffinity.enabled }}
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
-      timeoutSeconds: {{ .Values.global.sessionAffinity.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
 {{- end }}
   type: ClusterIP
-{{- if .Values.global.service.svcHeadless }}
+{{- if .Values.service.svcHeadless }}
   clusterIP: None
 {{- end }}
   ports:
@@ -68,7 +68,7 @@ spec:
       port: {{ index .Values.beacon.restApi.portMap .Values.beacon.client }}
       targetPort: http-beacon
   {{- end }}
-  {{- if and .Values.global.metrics.enabled .Values.beacon.metrics.enabled }}
+  {{- if and .Values.metrics.enabled .Values.beacon.metrics.enabled }}
     - name: metrics-beacon
       port: {{ .Values.beacon.metrics.port }}
       targetPort: metrics-beacon

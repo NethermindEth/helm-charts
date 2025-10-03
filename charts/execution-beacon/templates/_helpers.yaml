@@ -1,3 +1,29 @@
+{{/* vim: set filetype=mustache: */}}
+
+{{/*
+Override common.names.serviceAccountName to use only top-level serviceAccount
+(not global.serviceAccount which was moved out of global scope)
+*/}}
+{{- define "common.names.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "common.names.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Override common.names.clusterRoleName to use only top-level rbac
+(not global.rbac which was moved out of global scope)
+*/}}
+{{- define "common.names.clusterRoleName" -}}
+{{- if .Values.rbac.create }}
+{{- default (include "common.names.fullname" .) .Values.rbac.name }}
+{{- else }}
+{{- default "default" .Values.rbac.name }}
+{{- end }}
+{{- end }}
+
 {{- define "execution.p2pPort" -}}
 {{- printf "30303" -}}
 {{- end -}}
