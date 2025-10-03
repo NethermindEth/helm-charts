@@ -2222,6 +2222,29 @@ entries:
     version: 0.0.1
   web3signer:
   - apiVersion: v2
+    appVersion: 25.9.1
+    created: "2025-10-03T12:18:53.839731187Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: A Helm chart for Web3Signer
+    digest: 4f9c48e3db7796044855179e1b4a5cad57e62f472d9d027435e126c87db561a4
+    keywords:
+    - web3signer
+    - ethereum
+    - blockchain
+    - slashing
+    - database
+    maintainers:
+    - name: aivarasko
+    - name: matilote
+    name: web3signer
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.13/web3signer-1.0.13.tgz
+    version: 1.0.13
+  - apiVersion: v2
     appVersion: 25.4.1
     created: "2025-10-03T11:57:22.055470104Z"
     dependencies:
@@ -2520,4 +2543,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-03T11:57:22.055826679Z"
+generated: "2025-10-03T12:18:53.839969091Z"
