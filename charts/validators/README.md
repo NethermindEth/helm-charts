@@ -1,7 +1,7 @@
 
 # validators
 
-![Version: 1.0.10](https://img.shields.io/badge/Version-1.0.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.9](https://img.shields.io/badge/AppVersion-v0.0.9-informational?style=flat-square)
+![Version: 1.0.11](https://img.shields.io/badge/Version-1.0.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.9](https://img.shields.io/badge/AppVersion-v0.0.9-informational?style=flat-square)
 
 A Helm chart for installing validators with the web3signer.
 
@@ -56,6 +56,14 @@ A Helm chart for installing validators with the web3signer.
 | flags.teku[2] | string | `"--data-base-path=/data"` |  |
 | fullnameOverride | string | `""` |  |
 | gasLimit | string | `"45000000"` |  |
+| global.imagePullSecrets | list | `[]` |  |
+| global.podSecurityContext.fsGroup | int | `1001` |  |
+| global.podSecurityContext.runAsUser | int | `1001` |  |
+| global.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| global.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| global.securityContext.readOnlyRootFilesystem | bool | `false` |  |
+| global.securityContext.runAsNonRoot | bool | `true` |  |
+| global.securityContext.runAsUser | int | `1001` |  |
 | graffiti | string | `""` |  |
 | image.lighthouse.repository | string | `"sigp/lighthouse"` |  |
 | image.lighthouse.tag | string | `"v7.1.0"` |  |
@@ -163,8 +171,6 @@ A Helm chart for installing validators with the web3signer.
 | readinessProbe.teku.successThreshold | int | `1` |  |
 | readinessProbe.teku.timeoutSeconds | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext.fsGroup | int | `1001` |  |
-| securityContext.runAsUser | int | `1001` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | strictFeeRecipientCheck | bool | `false` |  |

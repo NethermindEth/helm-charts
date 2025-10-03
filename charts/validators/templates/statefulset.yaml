@@ -38,7 +38,7 @@ spec:
       annotations:
         checksum/configmap: {{ include (print $root.Template.BasePath "/configmap.yaml") $root | sha256sum }}
     spec:
-      {{- with $root.Values.imagePullSecrets }}
+      {{- with (concat $root.Values.imagePullSecrets $root.Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -57,7 +57,7 @@ spec:
       nodeSelector:
         {{ toYaml . | nindent 8 | trim }}
       {{- end }}
-      {{- with $root.Values.securityContext }}
+      {{- with $root.Values.global.podSecurityContext }}
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
       {{- end }}

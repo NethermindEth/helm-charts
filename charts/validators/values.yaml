@@ -1,8 +1,37 @@
 # Default values for operator.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+## Global values that can be shared across multiple charts
+##
+global:
+  ## Global image pull secrets (merged with chart-level imagePullSecrets)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Global container security context (applied to containers and init containers)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+
+  ## Global pod security context (applied at pod level)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext:
+    fsGroup: 1001
+    runAsUser: 1001
+
 dvt:
   enabled: false
+
 ## Provide a name in place of operator for `app:` labels
 ##
 nameOverride: ""
@@ -10,13 +39,6 @@ nameOverride: ""
 ## Provide a name to substitute for the full names of resources
 ##
 fullnameOverride: ""
-
-## Pod Security Context
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-##
-securityContext:
-  fsGroup: 1001
-  runAsUser: 1001
 
 # This is for setting container environment variables
 env: []
