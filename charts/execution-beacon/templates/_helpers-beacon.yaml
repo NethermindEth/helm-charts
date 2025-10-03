@@ -18,9 +18,7 @@ Prysm beacon client arguments
 {{- end }}
 - "--p2p-max-peers={{ .Values.beacon.targetPeers }}"
 - "--accept-terms-of-use"
-{{- if .Values.jwtSecretEnv }}
-- "--jwt-secret=/data/jwt/jwtsecret"
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName }}
 - "--jwt-secret=/secret/jwtsecret"
 {{- end }}
 {{- if .Values.beacon.builderEndpoint }}
@@ -70,9 +68,7 @@ Teku beacon client command
   --data-beacon-path=/data/beacon/teku
   --data-path=/data/beacon
   --ee-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-{{- if .Values.jwtSecretEnv }}
-  --ee-jwt-secret-file=/data/jwt/jwtsecret
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName }}
   --ee-jwt-secret-file=/secret/jwtsecret
 {{- end }}
 {{- if .Values.beacon.builderEndpoint }}
@@ -151,9 +147,7 @@ Lighthouse beacon client command
   --suggested-fee-recipient={{ .Values.beacon.suggestedFeeRecipient }}
 {{- end }}
   --execution-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-{{- if .Values.jwtSecretEnv }}
-  --execution-jwt=/data/jwt/jwtsecret
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName }}
   --execution-jwt=/secret/jwtsecret
 {{- end }}
 {{- if .Values.p2pNodePort.enabled }}

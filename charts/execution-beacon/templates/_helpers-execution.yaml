@@ -21,9 +21,7 @@ exec /nethermind/Nethermind.Runner
 {{- end }}
 {{- end }}
 {{- end }}
-{{- if .Values.jwtSecretEnv }}
---JsonRpc.JwtSecretFile=/data/jwt/jwtsecret
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName }}
 --JsonRpc.JwtSecretFile=/secret/jwtsecret
 {{- end }}
 --JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
@@ -58,9 +56,7 @@ exec geth
 --datadir=/data/execution
 --ipcdisable
 --{{ .Values.network }}
-{{- if .Values.jwtSecretEnv }}
---authrpc.jwtsecret=/data/jwt/jwtsecret
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName }}
 --authrpc.jwtsecret=/secret/jwtsecret
 {{- end }}
 --authrpc.addr={{ .Values.execution.jsonrpc.host }}
@@ -108,9 +104,7 @@ exec /opt/besu/bin/besu
 --data-path=/data/execution
 --sync-mode=X_SNAP
 --p2p-enabled=true
-{{- if .Values.jwtSecretEnv }}
---engine-jwt-secret=/data/jwt/jwtsecret
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName }}
 --engine-jwt-secret=/secret/jwtsecret
 {{- end }}
 --engine-rpc-enabled=true
@@ -164,9 +158,7 @@ exec erigon
 {{- if .Values.execution.terminalTotalDifficulty }}
 --override.terminaltotaldifficulty={{ .Values.execution.terminalTotalDifficulty }}
 {{- end }}
-{{- if .Values.jwtSecretEnv }}
---authrpc.jwtsecret=/data/jwt/jwtsecret
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName }}
 --authrpc.jwtsecret=/secret/jwtsecret
 {{- end }}
 --authrpc.addr={{ .Values.execution.jsonrpc.host }}
@@ -199,9 +191,7 @@ exec reth node
 --log.file.directory=/data/execution/logs
 --ipcdisable
 --chain={{ .Values.network }}
-{{- if .Values.jwtSecretEnv }}
---authrpc.jwtsecret=/data/jwt/jwtsecret
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName }}
 --authrpc.jwtsecret=/secret/jwtsecret
 {{- end }}
 --authrpc.addr={{ .Values.execution.jsonrpc.host }}

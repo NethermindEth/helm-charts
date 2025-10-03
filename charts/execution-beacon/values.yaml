@@ -97,14 +97,14 @@ image:
 ## a command line tool, for example:
 ## openssl rand -hex 32 > token.txt
 ##
-## To use JWT from env/envFrom (recommended):
-##   1. Add your secret to envFrom (see below)
-##   2. Set jwtSecretEnv to the environment variable name
+## Option 1: Reference an existing secret (recommended):
+##   Set JWTSecretName to your secret name and JWTSecretKey to the key in that secret
 ##
-## Or provide JWT inline (creates a Secret):
+## Option 2: Provide JWT inline (creates a Secret):
 ##   Set JWTSecret to your JWT value
 ##
-jwtSecretEnv: "JWT_SECRET"
+JWTSecretName: ""
+JWTSecretKey: "JWT_SECRET"
 JWTSecret: ""
 
 ## Credentials to fetch images from private registry
