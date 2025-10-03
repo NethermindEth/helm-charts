@@ -57,6 +57,7 @@ spec:
             - >
               mkdir -p /data/web3signer /data/keystore;
               chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/web3signer /data/keystore;
+              chmod -R g+rwX /data/web3signer /data/keystore;
               mkdir -p /opt/web3signer/file-uploads;
               chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /opt/web3signer/file-uploads;
           volumeMounts:
