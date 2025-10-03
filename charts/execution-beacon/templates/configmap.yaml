@@ -7,4 +7,4 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
   init.sh: |
-{{ .Files.Get "scripts/init-nodeport.sh" | indent 4 }}
+{{ tpl (.Files.Get "scripts/init-nodeport.sh") . | indent 4 }}
