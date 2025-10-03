@@ -22,7 +22,7 @@ exec /nethermind/Nethermind.Runner
 {{- end }}
 {{- end }}
 {{- if .Values.jwtSecretEnv }}
---JsonRpc.JwtSecret=${{ .Values.jwtSecretEnv }}
+--JsonRpc.JwtSecretFile=/data/jwt/jwtsecret
 {{- else if .Values.JWTSecret }}
 --JsonRpc.JwtSecretFile=/secret/jwtsecret
 {{- end }}
@@ -59,7 +59,7 @@ exec geth
 --ipcdisable
 --{{ .Values.network }}
 {{- if .Values.jwtSecretEnv }}
---authrpc.jwtsecret=${{ .Values.jwtSecretEnv }}
+--authrpc.jwtsecret=/data/jwt/jwtsecret
 {{- else if .Values.JWTSecret }}
 --authrpc.jwtsecret=/secret/jwtsecret
 {{- end }}
@@ -109,7 +109,7 @@ exec /opt/besu/bin/besu
 --sync-mode=X_SNAP
 --p2p-enabled=true
 {{- if .Values.jwtSecretEnv }}
---engine-jwt-secret=${{ .Values.jwtSecretEnv }}
+--engine-jwt-secret=/data/jwt/jwtsecret
 {{- else if .Values.JWTSecret }}
 --engine-jwt-secret=/secret/jwtsecret
 {{- end }}
@@ -165,7 +165,7 @@ exec erigon
 --override.terminaltotaldifficulty={{ .Values.execution.terminalTotalDifficulty }}
 {{- end }}
 {{- if .Values.jwtSecretEnv }}
---authrpc.jwtsecret=${{ .Values.jwtSecretEnv }}
+--authrpc.jwtsecret=/data/jwt/jwtsecret
 {{- else if .Values.JWTSecret }}
 --authrpc.jwtsecret=/secret/jwtsecret
 {{- end }}
@@ -200,7 +200,7 @@ exec reth node
 --ipcdisable
 --chain={{ .Values.network }}
 {{- if .Values.jwtSecretEnv }}
---authrpc.jwtsecret=${{ .Values.jwtSecretEnv }}
+--authrpc.jwtsecret=/data/jwt/jwtsecret
 {{- else if .Values.JWTSecret }}
 --authrpc.jwtsecret=/secret/jwtsecret
 {{- end }}
