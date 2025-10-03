@@ -81,6 +81,10 @@ spec:
               mountPath: /env
             - name: scripts-init
               mountPath: /scripts
+          {{- if .Values.jwtSecretEnv }}
+            - name: jwt
+              mountPath: /data/jwt
+          {{- end }}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
           image: "{{ include "beacon.image" . }}"
@@ -205,11 +209,16 @@ spec:
             - name: data-execution
               mountPath: /data/execution
           {{- end }}
-            {{- if .Values.JWTSecret }}
+          {{- if .Values.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
-            {{- end }}
+          {{- end }}
+          {{- if .Values.jwtSecretEnv }}
+            - name: jwt
+              mountPath: /data/jwt
+              readOnly: true
+          {{- end }}
             - name: env-nodeport
               mountPath: /env
           {{- with .Values.execution.volumeMounts }}
@@ -307,6 +316,11 @@ spec:
               mountPath: /secret
               readOnly: true
           {{- end }}
+          {{- if .Values.jwtSecretEnv }}
+            - name: jwt
+              mountPath: /data/jwt
+              readOnly: true
+          {{- end }}
             - name: env-nodeport
               mountPath: /env
           {{- with .Values.beacon.volumeMounts }}
@@ -372,6 +386,10 @@ spec:
       {{- end }}
         - name: env-nodeport
           emptyDir: {}
+      {{- if .Values.jwtSecretEnv }}
+        - name: jwt
+          emptyDir: {}
+      {{- end }}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
