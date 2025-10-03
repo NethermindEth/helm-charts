@@ -1,7 +1,7 @@
 
 # web3signer
 
-![Version: 1.0.12](https://img.shields.io/badge/Version-1.0.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.4.1](https://img.shields.io/badge/AppVersion-25.4.1-informational?style=flat-square)
+![Version: 1.0.13](https://img.shields.io/badge/Version-1.0.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.9.1](https://img.shields.io/badge/AppVersion-25.9.1-informational?style=flat-square)
 
 A Helm chart for Web3Signer
 
@@ -35,13 +35,13 @@ A Helm chart for Web3Signer
 | flywayImage.repository | string | `"flyway/flyway"` |  |
 | flywayImage.tag | string | `"11.13.2"` |  |
 | fullnameOverride | string | `""` |  |
-| global.podSecurityContext.fsGroup | int | `1000` |  |
+| global.podSecurityContext.fsGroup | int | `10000` |  |
 | global.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| global.podSecurityContext.runAsUser | int | `1000` |  |
+| global.podSecurityContext.runAsUser | int | `10000` |  |
 | global.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | global.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | global.securityContext.runAsNonRoot | bool | `true` |  |
-| global.securityContext.runAsUser | int | `1000` |  |
+| global.securityContext.runAsUser | int | `10000` |  |
 | global.serviceAccount.create | bool | `true` |  |
 | httpPort | int | `6174` |  |
 | idleTimeout | int | `30` |  |

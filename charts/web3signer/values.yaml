@@ -10,13 +10,13 @@ global:
   ##
   podSecurityContext:
     runAsNonRoot: true
-    runAsUser: 1000
-    fsGroup: 1000
+    runAsUser: 10000
+    fsGroup: 10000
 
   securityContext:
     readOnlyRootFilesystem: true
     runAsNonRoot: true
-    runAsUser: 1000
+    runAsUser: 10000
     capabilities:
       drop:
       - ALL

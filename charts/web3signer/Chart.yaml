@@ -2,8 +2,8 @@ apiVersion: v2
 name: web3signer
 description: A Helm chart for Web3Signer
 type: application
-version: 1.0.12
-appVersion: "25.4.1"
+version: 1.0.13
+appVersion: "25.9.1"
 
 keywords:
   - web3signer
