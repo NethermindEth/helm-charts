@@ -81,10 +81,6 @@ spec:
               mountPath: /env
             - name: scripts-init
               mountPath: /scripts
-          {{- if .Values.jwtSecretEnv }}
-            - name: jwt
-              mountPath: /data/jwt
-          {{- end }}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
           image: "{{ include "beacon.image" . }}"
@@ -209,14 +205,9 @@ spec:
             - name: data-execution
               mountPath: /data/execution
           {{- end }}
-          {{- if .Values.JWTSecret }}
+          {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
             - name: jwtsecret
               mountPath: /secret
-              readOnly: true
-          {{- end }}
-          {{- if .Values.jwtSecretEnv }}
-            - name: jwt
-              mountPath: /data/jwt
               readOnly: true
           {{- end }}
             - name: env-nodeport
@@ -311,14 +302,9 @@ spec:
             - name: data-beacon
               mountPath: /data/beacon
           {{- end }}
-          {{- if .Values.JWTSecret }}
+          {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
             - name: jwtsecret
               mountPath: /secret
-              readOnly: true
-          {{- end }}
-          {{- if .Values.jwtSecretEnv }}
-            - name: jwt
-              mountPath: /data/jwt
               readOnly: true
           {{- end }}
             - name: env-nodeport
@@ -379,17 +365,25 @@ spec:
         - name: scripts-init
           configMap:
             name: {{ include "common.names.fullname" . }}-scripts
-      {{- if .Values.JWTSecret }}
+      {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
         - name: jwtsecret
           secret:
+            {{- if .Values.JWTSecret }}
             secretName: {{ include "common.names.fullname" . }}
+            {{- else if .Values.JWTSecretName }}
+            secretName: {{ .Values.JWTSecretName }}
+            items:
+              - key: {{ .Values.JWTSecretKey }}
+                path: jwtsecret
+            {{- else }}
+            secretName: {{ (index .Values.envFrom 0).secretRef.name }}
+            items:
+              - key: {{ .Values.JWTSecretKey }}
+                path: jwtsecret
+            {{- end }}
       {{- end }}
         - name: env-nodeport
           emptyDir: {}
-      {{- if .Values.jwtSecretEnv }}
-        - name: jwt
-          emptyDir: {}
-      {{- end }}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
