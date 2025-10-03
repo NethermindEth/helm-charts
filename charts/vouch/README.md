@@ -1,7 +1,7 @@
 
 # vouch
 
-![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.11.1](https://img.shields.io/badge/AppVersion-1.11.1-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.11.1](https://img.shields.io/badge/AppVersion-1.11.1-informational?style=flat-square)
 
 A Helm chart for installing and configuring Vouch validator client for large scale ETH staking infrastructure on top of the Kubernetes
 
@@ -30,10 +30,8 @@ A Helm chart for installing and configuring Vouch validator client for large sca
 | cliImage.pullPolicy | string | `"IfNotPresent"` |  |
 | cliImage.repository | string | `"nethermindeth/keystores-cli"` |  |
 | cliImage.tag | string | `"v1.0.14"` |  |
-| externalSecrets.dataFrom.key | string | `"vouch"` |  |
-| externalSecrets.enabled | bool | `false` |  |
-| externalSecrets.secretStoreRef.kind | string | `"SecretStore"` |  |
-| externalSecrets.secretStoreRef.name | string | `"secretStoreRef"` |  |
+| env | list | `[]` |  |
+| envFrom | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | gasLimit | string | `nil` |  |
 | global.podSecurityContext.fsGroup | int | `10000` |  |

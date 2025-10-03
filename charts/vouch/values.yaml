@@ -39,13 +39,6 @@ cliImage:
   tag: "v1.0.14"
   pullPolicy: IfNotPresent
 
-externalSecrets:
-  enabled: false
-  secretStoreRef:
-    name: secretStoreRef
-    kind: SecretStore
-  dataFrom:
-    key: vouch
 
 gasLimit:
 
@@ -88,6 +81,10 @@ vouch:
 relays: []
 
 imagePullSecrets: []
+
+envFrom: []
+
+env: []
 
 ## Provide a name in place of operator for `app:` labels
 ##
