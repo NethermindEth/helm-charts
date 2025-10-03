@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.20](https://img.shields.io/badge/Version-1.0.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.21](https://img.shields.io/badge/Version-1.0.21-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -147,9 +147,6 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.jsonrpc.namespaces.reth[0] | string | `"eth"` |  |
 | execution.jsonrpc.namespaces.reth[1] | string | `"web3"` |  |
 | execution.jsonrpc.namespaces.reth[2] | string | `"net"` |  |
-| execution.jsonrpc.namespaces.reth[3] | string | `"reth"` |  |
-| execution.jsonrpc.namespaces.reth[4] | string | `"engine"` |  |
-| execution.jsonrpc.namespaces.reth[5] | string | `"debug"` |  |
 | execution.jsonrpc.websocket.enabled | bool | `true` |  |
 | execution.jsonrpc.websocket.origins | string | `"*"` |  |
 | execution.jsonrpc.websocket.port | int | `8546` |  |
