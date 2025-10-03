@@ -73,6 +73,13 @@ spec:
             - -user=$(DB_USERNAME)
             - -password=$(DB_PASSWORD)
             - -url=$(DB_URL)
+            - -baselineOnMigrate={{ .Values.flyway.baselineOnMigrate | default false }}
+            {{- with .Values.flyway.baselineVersion }}
+            - -baselineVersion={{ . }}
+            {{- end }}
+            {{- with .Values.flyway.schemas }}
+            - -schemas={{ join "," . }}
+            {{- end }}
             - migrate
           envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
           env: {{- toYaml .Values.env | nindent 12 }}
