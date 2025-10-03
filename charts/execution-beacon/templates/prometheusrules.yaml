@@ -4,23 +4,23 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: {{ include "common.names.fullname" . }}-execution
-  {{- if .Values.global.metrics.prometheusRule.namespace }}
-  namespace: {{ .Values.global.metrics.prometheusRule.namespace }}
+  {{- if .Values.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.metrics.prometheusRule.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
-    {{- if .Values.global.metrics.prometheusRule.additionalLabels }}
-    {{- toYaml .Values.global.metrics.prometheusRule.additionalLabels | nindent 4 }}
+    {{- if .Values.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.metrics.prometheusRule.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
   groups:
-  {{- with .Values.global.metrics.prometheusRule.rules }}
+  {{- with .Values.metrics.prometheusRule.rules }}
     - name: {{ include "common.names.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
-  {{- if .Values.global.metrics.prometheusRule.default }}
+  {{- if .Values.metrics.prometheusRule.default }}
     - name: {{ include "common.names.fullname" $ }}-default
       rules:
         - alert: ExecutionNodeDown
@@ -37,23 +37,23 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: {{ include "common.names.fullname" . }}-beacon
-  {{- if .Values.global.metrics.prometheusRule.namespace }}
-  namespace: {{ .Values.global.metrics.prometheusRule.namespace }}
+  {{- if .Values.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.metrics.prometheusRule.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
-    {{- if .Values.global.metrics.prometheusRule.additionalLabels }}
-    {{- toYaml .Values.global.metrics.prometheusRule.additionalLabels | nindent 4 }}
+    {{- if .Values.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.metrics.prometheusRule.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
   groups:
-  {{- with .Values.global.metrics.prometheusRule.rules }}
+  {{- with .Values.metrics.prometheusRule.rules }}
     - name: {{ include "common.names.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
-  {{- if .Values.global.metrics.prometheusRule.default }}
+  {{- if .Values.metrics.prometheusRule.default }}
   {{- if eq .Values.beacon.client "lighthouse" }}
     - name: {{ include "common.names.fullname" $ }}-default
       rules:
