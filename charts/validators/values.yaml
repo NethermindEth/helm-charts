@@ -2,13 +2,36 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+## Global values that can be shared across multiple charts
+##
 global:
+  ## Global image pull secrets (merged with chart-level imagePullSecrets)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
   imagePullSecrets: []
-  network: mainnet
 
+  ## Global container security context (applied to containers and init containers)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+
+  ## Global pod security context (applied at pod level)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext:
+    fsGroup: 1001
+    runAsUser: 1001
 
 dvt:
   enabled: false
+
 ## Provide a name in place of operator for `app:` labels
 ##
 nameOverride: ""
@@ -16,13 +39,6 @@ nameOverride: ""
 ## Provide a name to substitute for the full names of resources
 ##
 fullnameOverride: ""
-
-## Pod Security Context
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-##
-securityContext:
-  fsGroup: 1001
-  runAsUser: 1001
 
 # This is for setting container environment variables
 env: []
@@ -35,8 +51,7 @@ env: []
   #       name: secret-name
 
 # -- envFrom configuration
-envFrom:
-  []
+envFrom: []
   # - secretRef:
   #     name: '{{ include "common.names.fullname" . }}'
   # - configMapRef:
@@ -69,7 +84,7 @@ initImage:
 ##
 cliImage:
   repository: nethermindeth/keystores-cli
-  tag: "v1.0.11"
+  tag: "v1.0.14"
   pullPolicy: IfNotPresent
 
 ## Configuration for validators
@@ -82,6 +97,11 @@ cliImage:
 ## until synchronization of eth1/eth2 nodes is complete
 ##
 enabled: true
+
+## Enable debug mode for init containers
+## Shows detailed file contents and directory listings
+##
+debug: false
 
 ## What type of validator to use.
 ## Options for Ethereum: prysm, lighthouse, teku
@@ -129,34 +149,34 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v5.1.2"
+    tag: "v6.1.1"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v6.0.1"
+    tag: "v7.1.0"
   teku:
     repository: "consensys/teku"
-    tag: "23.12.0"
+    tag: "25.9.3"
   nimbus:
     repository: "statusim/nimbus-validator-client"
-    tag: "multiarch-v23.11.0"
+    tag: "multiarch-v25.9.2"
   lodestar:
     repository: "chainsafe/lodestar"
-    tag: "v1.23.1"
+    tag: "v1.34.1"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 ##
 imagePullSecrets: []
 
-terminationGracePeriodSeconds: 300
+terminationGracePeriodSeconds: 120
 
-## Spearate service account per validator.
+## Single shared service account for all validator StatefulSets.
+## The ServiceAccount name is unique per Helm release.
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
-  name: "validators"
   # Annotations to add to the service account
   annotations: {}
 
@@ -225,9 +245,13 @@ extraFlags:
   nimbus: []
   lodestar: []
 
+## Gas limit
+##
+gasLimit: "45000000"
+
 ## Web3Signer Endpoint
 ##
-web3signerEndpoint: ""
+web3signerEndpoint: "http://localhost:6174"
 
 ## List of Beacon Chain node addresses
 ##

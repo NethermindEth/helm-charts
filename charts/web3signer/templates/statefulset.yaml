@@ -57,6 +57,7 @@ spec:
             - >
               mkdir -p /data/web3signer /data/keystore;
               chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/web3signer /data/keystore;
+              chmod -R g+rwX /data/web3signer /data/keystore;
               mkdir -p /opt/web3signer/file-uploads;
               chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /opt/web3signer/file-uploads;
           volumeMounts:
@@ -73,6 +74,13 @@ spec:
             - -user=$(DB_USERNAME)
             - -password=$(DB_PASSWORD)
             - -url=$(DB_URL)
+            - -baselineOnMigrate={{ .Values.flyway.baselineOnMigrate | default false }}
+            {{- with .Values.flyway.baselineVersion }}
+            - -baselineVersion={{ . }}
+            {{- end }}
+            {{- with .Values.flyway.schemas }}
+            - -schemas={{ join "," . }}
+            {{- end }}
             - migrate
           envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
           env: {{- toYaml .Values.env | nindent 12 }}

@@ -10,13 +10,13 @@ global:
   ##
   podSecurityContext:
     runAsNonRoot: true
-    runAsUser: 1000
-    fsGroup: 1000
+    runAsUser: 10000
+    fsGroup: 10000
 
   securityContext:
     readOnlyRootFilesystem: true
     runAsNonRoot: true
-    runAsUser: 1000
+    runAsUser: 10000
     capabilities:
       drop:
       - ALL
@@ -56,6 +56,15 @@ flywayImage:
   repository: flyway/flyway
   tag: "11.13.2"
   pullPolicy: IfNotPresent
+
+# Flyway configuration for migrations init container
+flyway:
+  # Set to true to automatically create baseline history table on first run
+  baselineOnMigrate: true
+  # Optional: specify a baselineVersion if your existing schema predates migrations
+  baselineVersion: "0"
+  # Optional: schema name if not using default public
+  # schemas: ["public"]
 
 imagePullSecrets: []
 
