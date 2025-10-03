@@ -18,10 +18,10 @@ Prysm beacon client arguments
 {{- end }}
 - "--p2p-max-peers={{ .Values.beacon.targetPeers }}"
 - "--accept-terms-of-use"
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+- "--jwt-secret=${{ .Values.jwtSecretEnv }}"
+{{- else if .Values.JWTSecret }}
 - "--jwt-secret=/secret/jwtsecret"
-{{- else if .Values.JWTSecretFile }}
-- "--jwt-secret={{ .Values.JWTSecretFile }}"
 {{- end }}
 {{- if .Values.beacon.builderEndpoint }}
 - "--http-mev-relay={{ .Values.beacon.builderEndpoint }}"
@@ -70,10 +70,10 @@ Teku beacon client command
   --data-beacon-path=/data/beacon/teku
   --data-path=/data/beacon
   --ee-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+  --ee-jwt-secret=${{ .Values.jwtSecretEnv }}
+{{- else if .Values.JWTSecret }}
   --ee-jwt-secret-file=/secret/jwtsecret
-{{- else if .Values.JWTSecretFile }}
-  --ee-jwt-secret-file={{ .Values.JWTSecretFile }}
 {{- end }}
 {{- if .Values.beacon.builderEndpoint }}
   --builder-endpoint={{ .Values.beacon.builderEndpoint }}
@@ -151,10 +151,10 @@ Lighthouse beacon client command
   --suggested-fee-recipient={{ .Values.beacon.suggestedFeeRecipient }}
 {{- end }}
   --execution-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+  --execution-jwt=${{ .Values.jwtSecretEnv }}
+{{- else if .Values.JWTSecret }}
   --execution-jwt=/secret/jwtsecret
-{{- else if .Values.JWTSecretFile }}
-  --execution-jwt={{ .Values.JWTSecretFile }}
 {{- end }}
 {{- if .Values.p2pNodePort.enabled }}
   --discovery-port=$EXTERNAL_BEACON_PORT
@@ -192,10 +192,10 @@ Nimbus beacon client command
   --network={{ .Values.network }}
   --data-dir=/data/beacon
   --web3-url=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+  --jwt-secret=${{ .Values.jwtSecretEnv }}
+{{- else if .Values.JWTSecret }}
   --jwt-secret=/secret/jwtsecret
-{{- else if .Values.JWTSecretFile }}
-  --jwt-secret={{ .Values.JWTSecretFile }}
 {{- end }}
 {{- if .Values.beacon.builderEndpoint }}
   --payload-builder=true
@@ -266,10 +266,10 @@ Lodestar beacon client command
 {{- end }}
   --targetPeers={{ .Values.beacon.targetPeers }}
   --execution.urls=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-{{- if .Values.JWTSecret }}
+{{- if .Values.jwtSecretEnv }}
+  --jwt-secret=${{ .Values.jwtSecretEnv }}
+{{- else if .Values.JWTSecret }}
   --jwt-secret=/secret/jwtsecret
-{{- else if .Values.JWTSecretFile }}
-  --jwt-secret={{ .Values.JWTSecretFile }}
 {{- end }}
 {{- if .Values.p2pNodePort.enabled }}
   --nat=true
