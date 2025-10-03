@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.19](https://img.shields.io/badge/Version-1.0.19-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.20](https://img.shields.io/badge/Version-1.0.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -171,13 +171,13 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.volumeMounts | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | global.imagePullSecrets | list | `[]` |  |
-| global.initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
-| global.initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| global.initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
-| global.initContainerSecurityContext.runAsGroup | int | `1000` |  |
-| global.initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
-| global.initContainerSecurityContext.runAsUser | int | `1000` |  |
-| global.initContainerSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| global.initContainerSecurityContext.capabilities.add[0] | string | `"CHOWN"` |  |
+| global.initContainerSecurityContext.capabilities.add[1] | string | `"DAC_OVERRIDE"` |  |
+| global.initContainerSecurityContext.capabilities.add[2] | string | `"FOWNER"` |  |
+| global.initContainerSecurityContext.readOnlyRootFilesystem | bool | `false` |  |
+| global.initContainerSecurityContext.runAsGroup | int | `0` |  |
+| global.initContainerSecurityContext.runAsNonRoot | bool | `false` |  |
+| global.initContainerSecurityContext.runAsUser | int | `0` |  |
 | global.podSecurityContext.fsGroup | int | `1000` |  |
 | global.podSecurityContext.runAsGroup | int | `1000` |  |
 | global.podSecurityContext.runAsNonRoot | bool | `true` |  |
@@ -185,7 +185,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | global.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | global.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | global.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| global.securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| global.securityContext.readOnlyRootFilesystem | bool | `false` |  |
 | global.securityContext.runAsGroup | int | `1000` |  |
 | global.securityContext.runAsNonRoot | bool | `true` |  |
 | global.securityContext.runAsUser | int | `1000` |  |
