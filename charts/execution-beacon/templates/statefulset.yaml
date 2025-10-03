@@ -205,7 +205,7 @@ spec:
             - name: data-execution
               mountPath: /data/execution
           {{- end }}
-          {{- if or .Values.JWTSecret .Values.JWTSecretName }}
+          {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -302,7 +302,7 @@ spec:
             - name: data-beacon
               mountPath: /data/beacon
           {{- end }}
-          {{- if or .Values.JWTSecret .Values.JWTSecretName }}
+          {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -365,13 +365,18 @@ spec:
         - name: scripts-init
           configMap:
             name: {{ include "common.names.fullname" . }}-scripts
-      {{- if or .Values.JWTSecret .Values.JWTSecretName }}
+      {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
         - name: jwtsecret
           secret:
             {{- if .Values.JWTSecret }}
             secretName: {{ include "common.names.fullname" . }}
-            {{- else }}
+            {{- else if .Values.JWTSecretName }}
             secretName: {{ .Values.JWTSecretName }}
+            items:
+              - key: {{ .Values.JWTSecretKey }}
+                path: jwtsecret
+            {{- else }}
+            secretName: {{ (index .Values.envFrom 0).secretRef.name }}
             items:
               - key: {{ .Values.JWTSecretKey }}
                 path: jwtsecret

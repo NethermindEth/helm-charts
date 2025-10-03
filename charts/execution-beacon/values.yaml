@@ -97,11 +97,16 @@ image:
 ## a command line tool, for example:
 ## openssl rand -hex 32 > token.txt
 ##
-## Option 1: Reference an existing secret (recommended):
-##   Set JWTSecretName to your secret name and JWTSecretKey to the key in that secret
+## Option 1: Auto-detect from envFrom (recommended):
+##   Just specify the key name in your secret, chart will auto-use the first secretRef from envFrom
+##   JWTSecretKey: "JWT_SECRET"
 ##
-## Option 2: Provide JWT inline (creates a Secret):
-##   Set JWTSecret to your JWT value
+## Option 2: Explicitly specify secret name:
+##   JWTSecretName: "my-secret"
+##   JWTSecretKey: "JWT_SECRET"
+##
+## Option 3: Provide JWT inline (creates a Secret):
+##   JWTSecret: "0x123abc..."
 ##
 JWTSecretName: ""
 JWTSecretKey: "JWT_SECRET"
