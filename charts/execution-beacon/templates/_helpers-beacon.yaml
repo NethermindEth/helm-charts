@@ -186,9 +186,7 @@ Nimbus beacon client command
   --network={{ .Values.network }}
   --data-dir=/data/beacon
   --web3-url=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-{{- if .Values.jwtSecretEnv }}
-  --jwt-secret=${{ .Values.jwtSecretEnv }}
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
   --jwt-secret=/secret/jwtsecret
 {{- end }}
 {{- if .Values.beacon.builderEndpoint }}
@@ -257,9 +255,7 @@ Lodestar beacon client command
 {{- end }}
   --targetPeers={{ .Values.beacon.targetPeers }}
   --execution.urls=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
-{{- if .Values.jwtSecretEnv }}
-  --jwt-secret=${{ .Values.jwtSecretEnv }}
-{{- else if .Values.JWTSecret }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
   --jwt-secret=/secret/jwtsecret
 {{- end }}
 {{- if .Values.p2pNodePort.enabled }}
