@@ -198,9 +198,6 @@ Nimbus beacon client command
 {{- if .Values.beacon.suggestedFeeRecipient }}
   --suggested-fee-recipient={{ .Values.beacon.suggestedFeeRecipient }}
 {{- end }}
-{{- if .Values.beacon.checkPointSync.enabled }}
-  --trusted-node-url={{ .Values.beacon.checkPointSync.url }}
-{{- end }}
 {{- if .Values.beacon.restApi.enabled }}
   --rest
   --rest-port={{ index .Values.beacon.restApi.portMap "nimbus" }}
