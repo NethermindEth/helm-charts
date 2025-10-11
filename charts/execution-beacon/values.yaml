@@ -479,6 +479,37 @@ execution:
   ##
   enableDiscoveryV5: true
 
+  ## Reth snapshot download configuration
+  ## This allows downloading a pre-synced database snapshot to speed up initial sync
+  ## Only applicable when using Reth as execution client
+  ##
+  snapshot:
+    ## Whether to enable snapshot downloading
+    ##
+    enabled: false
+
+    ## Snapshot URL to download from
+    ## Supported formats: .tar.lz4, .tar.zst, .tar.gz, .tar
+    ## Example URLs:
+    ##   - https://snapshots.publicnode.com/ethereum-reth-23546967.tar.lz4
+    ##   - https://your-custom-snapshot-url.com/reth-snapshot.tar.zst
+    ##
+    url: ""
+
+    ## Force snapshot download even if data directory already exists
+    ## If true, existing data will be backed up before downloading snapshot
+    ##
+    force: false
+
+    ## Container image for snapshot init container
+    ## This image needs curl and compression tools (lz4, zstd, tar, gzip)
+    ## We use alpine as base and install necessary tools in the script
+    ##
+    image:
+      repository: "alpine"
+      tag: "3.20"
+      pullPolicy: IfNotPresent
+
   ## Extra flags to pass to the node
   ##
   extraFlags: []

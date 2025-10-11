@@ -44,6 +44,33 @@ spec:
         {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       initContainers:
+      {{- if and (eq .Values.execution.client "reth") .Values.execution.snapshot.enabled }}
+        - name: init-snapshot
+          image: "{{ .Values.execution.snapshot.image.repository }}:{{ .Values.execution.snapshot.image.tag }}"
+          imagePullPolicy: {{ .Values.execution.snapshot.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command: ['/bin/sh', '/scripts/init-snapshot.sh']
+          volumeMounts:
+          {{- if .Values.sharedPersistence.enabled }}
+            - name: data
+              mountPath: /data
+          {{- else }}
+            - name: data-execution
+              mountPath: /data/execution
+          {{- end }}
+            - name: scripts-init
+              mountPath: /scripts
+      {{- end }}
         - name: init
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
