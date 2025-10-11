@@ -83,7 +83,7 @@ data:
   CHARON_NICKNAME: {{ .Values.config.nickname | quote }}
   {{- end }}
   {{- if .Values.config.fallbackBeaconNodes }}
-  CHARON_FALLBACK_BEACON_NODES: {{ .Values.config.fallbackBeaconNodes | quote }}
+  CHARON_FALLBACK_BEACON_NODE_ENDPOINTS: {{ .Values.config.fallbackBeaconNodes | quote }}
   {{- end }}
 ---
 apiVersion: v1
