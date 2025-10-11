@@ -8,3 +8,7 @@ metadata:
 data:
   init.sh: |
 {{ tpl (.Files.Get "scripts/init-nodeport.sh") . | indent 4 }}
+{{- if and (eq .Values.execution.client "reth") .Values.execution.snapshot.enabled }}
+  init-snapshot.sh: |
+{{ tpl (.Files.Get "scripts/init-snapshot.sh") . | indent 4 }}
+{{- end }}

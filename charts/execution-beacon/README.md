@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.0.26](https://img.shields.io/badge/Version-1.0.26-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.28](https://img.shields.io/badge/Version-1.0.28-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -164,6 +164,12 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.persistence.storageClassName | string | `""` |  |
 | execution.privateApiAddr | string | `"127.0.0.1:9090"` |  |
 | execution.resources | object | `{}` |  |
+| execution.snapshot.enabled | bool | `false` |  |
+| execution.snapshot.force | bool | `false` |  |
+| execution.snapshot.image.pullPolicy | string | `"IfNotPresent"` |  |
+| execution.snapshot.image.repository | string | `"alpine"` |  |
+| execution.snapshot.image.tag | string | `"3.20"` |  |
+| execution.snapshot.url | string | `""` |  |
 | execution.targetPeers | int | `50` |  |
 | execution.terminalTotalDifficulty | string | `""` |  |
 | execution.volumeMounts | list | `[]` |  |
