@@ -8,14 +8,25 @@ echo "Namespace: ${POD_NAMESPACE}, Pod: ${POD_NAME}"
 
 # Install required packages
 echo "==> Installing required packages..."
-apk add --no-cache curl lz4 zstd tar gzip > /dev/null 2>&1
+apk add --no-cache curl lz4 zstd tar gzip pv > /dev/null 2>&1
 
 # Check if data directory already has data
 if [ -d "/data/execution/db" ] && [ "$(ls -A /data/execution/db 2>/dev/null)" ]; then
   {{- if .Values.execution.snapshot.force }}
   echo "==> WARNING: Data directory exists but force flag is enabled. Backing up existing data..."
-  BACKUP_DIR="/data/execution/db-backup-$(date +%s)"
-  mv /data/execution/db "$BACKUP_DIR"
+  BACKUP_DIR="/data/execution-backup-$(date +%s)"
+  mkdir -p "$BACKUP_DIR"
+
+  if [ -d "/data/execution/db" ]; then
+    mv /data/execution/db "$BACKUP_DIR/"
+    echo "==> Backed up db/ to $BACKUP_DIR/"
+  fi
+
+  if [ -d "/data/execution/static_files" ]; then
+    mv /data/execution/static_files "$BACKUP_DIR/"
+    echo "==> Backed up static_files/ to $BACKUP_DIR/"
+  fi
+
   echo "==> Existing data backed up to $BACKUP_DIR"
   {{- else }}
   echo "==> Data directory already exists and is not empty. Skipping snapshot download."
@@ -25,12 +36,12 @@ if [ -d "/data/execution/db" ] && [ "$(ls -A /data/execution/db 2>/dev/null)" ];
 fi
 
 echo "==> Creating target directory structure"
-mkdir -p /data/execution/db
-mkdir -p /tmp/snapshot-extract
+mkdir -p /data/execution
 
 {{- if .Values.execution.snapshot.url }}
 echo "==> Downloading and extracting snapshot from: {{ .Values.execution.snapshot.url }}"
-echo "==> Target directory: /data/execution/db"
+echo "==> Target directory: /data/execution"
+echo "==> Archive should contain: db/ and static_files/ directories"
 
 # Determine compression type from URL
 SNAPSHOT_URL="{{ .Values.execution.snapshot.url }}"
@@ -51,39 +62,64 @@ else
 fi
 
 echo "==> Detected compression: $COMPRESSION"
-echo "==> Starting download... (this may take a while for large snapshots)"
+echo "==> Starting download and extraction..."
+echo "==> Started at: $(date)"
+echo ""
 
 # Download and extract based on compression type
-# Using -L to follow redirects, --fail to exit on HTTP errors, --progress-bar for visual feedback
+# Using pv to show live progress with speed and ETA
+# Extracting to /data/execution so archive creates db/ and static_files/ subdirectories
 case "$COMPRESSION" in
   lz4)
-    echo "==> Downloading and extracting (lz4)..."
-    curl -L --fail --progress-bar "$SNAPSHOT_URL" | lz4 -d | tar -xf - -C /data/execution/db
+    echo "==> Downloading and decompressing (lz4)..."
+    curl -L --fail -s "$SNAPSHOT_URL" | pv | lz4 -d | tar -xf - -C /data/execution
     RESULT=$?
     ;;
   zstd)
-    echo "==> Downloading and extracting (zstd)..."
-    curl -L --fail --progress-bar "$SNAPSHOT_URL" | zstd -d | tar -xf - -C /data/execution/db
+    echo "==> Downloading and decompressing (zstd)..."
+    curl -L --fail -s "$SNAPSHOT_URL" | pv | zstd -d | tar -xf - -C /data/execution
     RESULT=$?
     ;;
   gzip)
-    echo "==> Downloading and extracting (gzip)..."
-    curl -L --fail --progress-bar "$SNAPSHOT_URL" | tar -xzf - -C /data/execution/db
+    echo "==> Downloading and decompressing (gzip)..."
+    curl -L --fail -s "$SNAPSHOT_URL" | pv | tar -xzf - -C /data/execution
     RESULT=$?
     ;;
   none)
-    echo "==> Downloading and extracting (uncompressed)..."
-    curl -L --fail --progress-bar "$SNAPSHOT_URL" | tar -xf - -C /data/execution/db
+    echo "==> Downloading (uncompressed)..."
+    curl -L --fail -s "$SNAPSHOT_URL" | pv | tar -xf - -C /data/execution
     RESULT=$?
     ;;
 esac
 
+echo ""
+echo "==> Completed at: $(date)"
+
 if [ $RESULT -eq 0 ]; then
   echo "==> Snapshot downloaded and extracted successfully"
-  echo "==> Data directory contents:"
-  ls -lah /data/execution/db
-  echo "==> Disk usage:"
-  du -sh /data/execution/db
+  echo "==> Data directory structure:"
+  ls -lah /data/execution
+  echo ""
+
+  # Verify expected directories exist
+  if [ -d "/data/execution/db" ]; then
+    echo "==> ✓ db/ directory found"
+    if [ -f "/data/execution/db/mdbx.dat" ]; then
+      echo "==> ✓ mdbx.dat database file found"
+    fi
+  else
+    echo "==> ⚠ WARNING: db/ directory not found!"
+  fi
+
+  if [ -d "/data/execution/static_files" ]; then
+    echo "==> ✓ static_files/ directory found"
+  else
+    echo "==> ⚠ WARNING: static_files/ directory not found (may be optional depending on snapshot)"
+  fi
+
+  echo ""
+  echo "==> Total disk usage:"
+  du -sh /data/execution
 else
   echo "==> ERROR: Failed to download or extract snapshot (exit code: $RESULT)"
   echo "==> Please check:"
