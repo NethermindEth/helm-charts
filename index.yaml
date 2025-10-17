@@ -2407,6 +2407,29 @@ entries:
   validators:
   - apiVersion: v2
     appVersion: v0.0.9
+    created: "2025-10-17T21:30:15.053906203Z"
+    description: A Helm chart for installing validators with the web3signer.
+    digest: 233d9cdac5b4772b654690a0bdbd3615320ca163039a8656b86ba1741526f9ba
+    keywords:
+    - ethereum
+    - blockchain
+    - lighthouse
+    - prysm
+    - teku
+    - nimbus
+    - lodestar
+    - dvt
+    - validators
+    maintainers:
+    - name: aivarasko
+    - name: matilote
+    name: validators
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/validators-1.0.13/validators-1.0.13.tgz
+    version: 1.0.13
+  - apiVersion: v2
+    appVersion: v0.0.9
     created: "2025-10-03T13:38:18.367888198Z"
     description: A Helm chart for installing validators with the web3signer.
     digest: f2ebd6baadb603e54bdff242718ab497f13d62ee3bee97426db936b228496c6f
@@ -3063,4 +3086,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-11T21:16:21.162893296Z"
+generated: "2025-10-17T21:30:15.054197956Z"
