@@ -218,12 +218,8 @@ Teku validator arguments
 {{- if not $values.dvt.enabled }}
 - "--validators-proposer-config=/data/proposerConfig.json"
 {{- else }}
-- "--distributed"
 - "--validators-builder-registration-default-enabled=true"
 - "--validators-proposer-config={{ (index $values.beaconChainRpcEndpoints 0) }}/teku_proposer_config"
-{{- end }}
-{{- if $values.enableBuilder }}
-- "--validators-proposer-blinded-blocks-enabled=true"
 {{- end }}
 {{- if $values.graffiti }}
 - "--validators-graffiti={{ $values.graffiti }}"
