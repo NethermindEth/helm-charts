@@ -219,7 +219,6 @@ Teku validator arguments
 - "--validators-proposer-config=/data/proposerConfig.json"
 {{- else }}
 - "--validators-builder-registration-default-enabled=true"
-- "--validators-proposer-config={{ (index $values.beaconChainRpcEndpoints 0) }}/teku_proposer_config"
 {{- end }}
 {{- if $values.graffiti }}
 - "--validators-graffiti={{ $values.graffiti }}"

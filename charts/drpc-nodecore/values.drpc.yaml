@@ -1,0 +1,92 @@
+nameOverride: "drpc-nodecore-starknet-staking"
+
+image:
+  repository: drpcorg/nodecore
+  pullPolicy: IfNotPresent
+  tag: "0.1.6"
+
+initContainers:
+  - name: init-starknet-staking-config
+    image: nginx:latest
+    command:
+      - sh
+      - -c
+      - |
+        envsubst < /etc/starknet-staking-raw.yaml > /etc/starknet-staking-config/starknet-staking.yaml
+    envFrom:
+      - secretRef:
+          name: drpc-nodecore-starknet-staking-secrets
+      - secretRef:
+          name: drpc-nodecore-auth-secrets
+    volumeMounts:
+      - name: drpc-starknet-staking-config
+        mountPath: /etc/starknet-staking-raw.yaml
+        subPath: starknet-staking.yaml
+      - name: starknet-staking-config
+        mountPath: /etc/starknet-staking-config
+
+deployment:
+  enabled: true
+  restartOnChanges: true
+  autoscaling:
+    enabled: false
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+
+envFrom:
+  - secretRef:
+      name: drpc-nodecore-starknet-staking-secrets
+  - secretRef:
+      name: drpc-nodecore-auth-secrets
+
+volumes:
+  - name: drpc-starknet-staking-config
+    configMap:
+      name: drpc-starknet-staking-config
+  - name: starknet-staking-config
+    emptyDir: {}
+
+volumeMounts:
+  - name: starknet-staking-config
+    mountPath: /app/nodecore.yml
+    subPath: starknet-staking.yaml
+
+service:
+  type: ClusterIP
+  ports:
+    - name: rpc-proxy
+      port: 8080
+      protocol: TCP
+    - name: rpc
+      port: 9090
+      protocol: TCP
+    - name: metrics
+      port: 9093
+      protocol: TCP
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: drpc-nc-starknet-staking.angkor.ovh.staging-nethermind.xyz
+      paths:
+        - path: /
+          pathType: Prefix
+          portName: rpc-proxy
+  tls:
+    - secretName: drpc-nc-starknet-staking-tls
+      hosts:
+        - drpc-nc-starknet-staking.angkor.ovh.staging-nethermind.xyz
+
+
+resources:
+  requests:
+    memory: 250Mi
+    cpu: 250m
+  limits:
+    memory: 500Mi
+    cpu: 500m
