@@ -1,0 +1,123 @@
+{{- if .Values.deployment.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "generic-app.fullname" . }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.deployment.strategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  revisionHistoryLimit: 3
+  {{- if not .Values.deployment.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "generic-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.deployment.restartOnChanges }}
+        values-hash: {{ include "values.hash" . | quote }}
+        {{- end }}
+        configmap-hash: {{ include "configmap.hash" . }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "generic-app.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      initContainers:
+        - name: init-nginx-cache
+          image: nginx:1.25
+          command: ['sh', '-c', 'mkdir -p /var/cache/nginx']
+          volumeMounts:
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+        {{- range $container := .Values.initContainers }}
+        - securityContext:
+            {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
+          {{- with $container }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
+
+      containers:
+        - name: nginx-sidecar
+          image: nginx:1.25
+          ports:
+           - name: rpc-proxy
+             containerPort: 8080
+          command:
+            - sh
+            - -c
+            - |
+              rm -f /etc/nginx/conf.d/default.conf
+              exec nginx -g 'daemon off;'
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/drpc-nginx.conf
+              subPath: drpc-nginx.conf
+              readOnly: true
+            - name: nginx-conf-d
+              mountPath: /etc/nginx/conf.d
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            readOnlyRootFilesystem: false
+        {{- with .Values.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "generic-app.fullname" . }}-env-cm
+          {{- with .Values.envFrom }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env: {{- toYaml .Values.env | nindent 12 }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+      volumes:
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: {{ include "generic-app.fullname" . }}-nginx-config
+        - name: nginx-conf-d
+          emptyDir: {}
+        {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+{{- end }}
