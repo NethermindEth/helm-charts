@@ -1,7 +1,7 @@
 
 # ethgas
 
-![Version: 0.3.2](https://img.shields.io/badge/Version-0.3.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.2](https://img.shields.io/badge/AppVersion-0.3.2-informational?style=flat-square)
+![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.3](https://img.shields.io/badge/AppVersion-0.3.3-informational?style=flat-square)
 
 ETHGas Helm Chart
 
@@ -36,7 +36,6 @@ ETHGas Helm Chart
 | ethgas.relays | string | `"https://0xb20c3fe59db9c3655088839ef3d972878d182eb745afd8abb1dd2abf6c14f93cd5934ed4446a5fe1ba039e2bc0cf1011@hoodi-relay.ethgas.com"` |  |
 | ethgas.rpc_url | string | `"https://ethereum-hoodi-rpc.publicnode.com"` |  |
 | ethgas.signer | string | `"[signer.dirk]\ncert_path = \"/certs/dirk.crt\"\nkey_path = \"/certs/dirk.key\"\nca_cert_path = \"/certs/ca.crt\"\nsecrets_path = \"/secrets/dirk/secrets\"\n\n[[signer.dirk.hosts]]\nurl = \"https://dirk0:8881\"\nwallets = [\"Validators\"]\n\n[[signer.dirk.hosts]]\nurl = \"https://dirk1:8881\"\nwallets = [\"Validators\"]\n\n[[signer.dirk.hosts]]\nurl = \"https://dirk2:8881\"\nwallets = [\"Validators\"]\n"` |  |
-| ethgas.token | string | `""` |  |
 | externalSecrets.data | list | `[]` |  |
 | externalSecrets.enabled | bool | `false` |  |
 | externalSecrets.secretStoreRef.kind | string | `"SecretStore"` |  |
