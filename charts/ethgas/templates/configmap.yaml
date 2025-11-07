@@ -1,17 +1,3 @@
-# ConfigMap for .cb.env
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "ethgas.fullname" . }}-dirk
-  {{- with $.Values.namespaceOverride }}
-  namespace: {{ . }}
-  {{- end }}
-data:
-  TODO: ALL_DIRK_KEYS
----
-# Note: Sensitive environment variables are now stored in the Secret
-# This ConfigMap is kept for non-sensitive configuration if needed in the future
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -20,7 +6,7 @@ metadata:
   namespace: {{ . }}
   {{- end }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "ethgas.labels" . | nindent 4 }}
 data:
   config.toml: |-
     chain = "{{ .Values.ethgas.network }}"
@@ -40,6 +26,7 @@ data:
     late_in_slot_time_ms = 2000
     extra_validation_enabled = false
     rpc_url = "{{ .Values.ethgas.rpc_url }}"
+    validator_registration_batch_size = "1"
 
     [[relays]]
     id = "ethgas"
@@ -47,7 +34,6 @@ data:
     enable_timing_games = true
     target_first_request_ms = 0
     frequency_get_header_ms = 100
-    validator_registration_batch_size = "1"
 
     [signer]
     host = "0.0.0.0"
@@ -58,7 +44,6 @@ data:
     [[modules]]
     id = "ETHGAS_COMMIT"
     type = "commit"
-    env_file = "/app/.cb.env"
     docker_image = "ghcr.io/ethgas-developer/commitboost_ethgas_commit:latest"
     exchange_api_base = "{{ .Values.ethgas.exchange_api_base }}"
     entity_name = "{{ .Values.ethgas.entity_name }}"
@@ -70,17 +55,18 @@ data:
     enable_builder = false
     collateral_per_slot = "0"
     builder_pubkey = "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-    is_jwt_provided = {{ .Values.ethgas.useJwtAuth }}
+    is_jwt_provided = false
+    eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
 
     [[modules]]
     id = "ETHGAS_DEPOSIT"
     type = "commit"
-    env_file = "/app/.cb.env"
     docker_image = "ghcr.io/ethgas-developer/commitboost_ethgas_deposit:latest"
     block_confirmation = 12
     exchange_api_base = "{{ .Values.ethgas.exchange_api_base }}"
     collateral_to_be_deposited = "0.01"
     collateral_contract = "{{ .Values.ethgas.collateral_contract }}"
+    eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
 
     [metrics]
     enabled = true

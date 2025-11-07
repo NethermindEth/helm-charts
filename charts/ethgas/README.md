@@ -1,7 +1,7 @@
 
 # ethgas
 
-![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.0](https://img.shields.io/badge/AppVersion-0.3.0-informational?style=flat-square)
+![Version: 0.3.2](https://img.shields.io/badge/Version-0.3.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.2](https://img.shields.io/badge/AppVersion-0.3.2-informational?style=flat-square)
 
 ETHGas Helm Chart
 
@@ -27,30 +27,34 @@ ETHGas Helm Chart
 | autoscaling.maxReplicas | int | `10` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| envFrom | list | `[]` |  |
 | ethgas.collateral_contract | string | `"0xe8bfB84b14c383b94365a895fc8bfA36dE236dc8"` |  |
 | ethgas.entity_name | string | `""` |  |
+| ethgas.eoa_signing_key | string | `""` |  |
 | ethgas.exchange_api_base | string | `"https://hoodi.app.ethgas.com"` |  |
 | ethgas.network | string | `"Hoodi"` |  |
 | ethgas.relays | string | `"https://0xb20c3fe59db9c3655088839ef3d972878d182eb745afd8abb1dd2abf6c14f93cd5934ed4446a5fe1ba039e2bc0cf1011@hoodi-relay.ethgas.com"` |  |
 | ethgas.rpc_url | string | `"https://ethereum-hoodi-rpc.publicnode.com"` |  |
-| ethgas.signer | string | `""` |  |
-| ethgas.useJwtAuth | bool | `false` |  |
-| existingDirkSecret | string | `""` | Optional. Name of existing secret for Dirk TLS certificates Only required if using Dirk as remote signer (configured via ethgas.signer) If using web3signer or other remote signers, leave empty The secret must contain (base64 encoded):   - ca.crt: CA certificate for Dirk TLS   - dirk.crt: Client certificate for Dirk TLS   - dirk.key: Client private key for Dirk TLS |
-| existingSecret | string | `""` | REQUIRED. Name of existing secret containing sensitive configuration Use external secret management (e.g., Infisical, External Secrets Operator) See examples/infisical-secret.yaml for a complete example The secret MUST contain the following keys:   - CB_JWT_ETHGAS_COMMIT: JWT token for CommitBoost authentication   - CB_JWTS: JWT tokens in format "ETHGAS_COMMIT=<token>"   - CB_SIGNER_JWT: JWT token for signer   If useJwtAuth = true:     - ACCESS_JWT: ETHGas Exchange access token     - REFRESH_JWT: ETHGas Exchange refresh token   If useJwtAuth = false:     - EOA_SIGNING_KEY: EOA private key for transactions |
+| ethgas.signer | string | `"[signer.dirk]\ncert_path = \"/certs/dirk.crt\"\nkey_path = \"/certs/dirk.key\"\nca_cert_path = \"/certs/ca.crt\"\nsecrets_path = \"/secrets/dirk/secrets\"\n\n[[signer.dirk.hosts]]\nurl = \"https://dirk0:8881\"\nwallets = [\"Validators\"]\n\n[[signer.dirk.hosts]]\nurl = \"https://dirk1:8881\"\nwallets = [\"Validators\"]\n\n[[signer.dirk.hosts]]\nurl = \"https://dirk2:8881\"\nwallets = [\"Validators\"]\n"` |  |
+| ethgas.token | string | `""` |  |
+| externalSecrets.data | list | `[]` |  |
+| externalSecrets.enabled | bool | `false` |  |
+| externalSecrets.secretStoreRef.kind | string | `"SecretStore"` |  |
+| externalSecrets.secretStoreRef.name | string | `"secretStoreRef"` |  |
 | extraArgs | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | image.ethgas_commit.pullPolicy | string | `"IfNotPresent"` |  |
 | image.ethgas_commit.repository | string | `"ghcr.io/ethgas-developer/commitboost_ethgas_commit"` |  |
-| image.ethgas_commit.tag | string | `"v1.0.0-beta.7"` |  |
+| image.ethgas_commit.tag | string | `"v1.0.1"` |  |
 | image.initContainer.pullPolicy | string | `"IfNotPresent"` |  |
 | image.initContainer.repository | string | `"alpine"` |  |
 | image.initContainer.tag | string | `"3.12"` |  |
 | image.pbs.pullPolicy | string | `"IfNotPresent"` |  |
 | image.pbs.repository | string | `"ghcr.io/commit-boost/pbs"` |  |
-| image.pbs.tag | string | `"v0.8.0"` |  |
+| image.pbs.tag | string | `"v0.9.2"` |  |
 | image.signer.pullPolicy | string | `"IfNotPresent"` |  |
 | image.signer.repository | string | `"ghcr.io/commit-boost/signer"` |  |
-| image.signer.tag | string | `"v0.8.0"` |  |
+| image.signer.tag | string | `"v0.9.2"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
