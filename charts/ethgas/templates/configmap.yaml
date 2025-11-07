@@ -6,7 +6,7 @@ metadata:
   namespace: {{ . }}
   {{- end }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "ethgas.labels" . | nindent 4 }}
 data:
   config.toml: |-
     chain = "{{ .Values.ethgas.network }}"
