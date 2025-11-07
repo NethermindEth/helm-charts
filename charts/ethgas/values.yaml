@@ -34,7 +34,7 @@ ethgas:
   entity_name: ""
   eoa_signing_key: ""
   exchange_api_base: "https://hoodi.app.ethgas.com"
-  collateral_contract: "0xe8bfB84b14c383b94365a895fc8bfA36dE236dc8"
+  collateral_contract: "0x104Ef4192a97E0A93aBe8893c8A2d2484DFCBAF1"
   signer: |
     [signer.dirk]
     cert_path = "/certs/dirk.crt"
