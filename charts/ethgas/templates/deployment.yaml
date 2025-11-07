@@ -40,7 +40,7 @@ spec:
         - name: CB_MODULE_ID
           value: ETHGAS_COMMIT
         volumeMounts:
-        - name: env
+        - name: app
           mountPath: /app
         - name: certs
           mountPath: /certs
@@ -50,10 +50,7 @@ spec:
           - sh
           - -ac
           - >
-            printenv | grep CB_;
-            find /app/; cat /app/.cb.env;
             chmod 777 -R /var/logs/commit-boost/;
-            cat /cb-config.toml;
             printenv ca.crt | base64 -d  > /certs/ca.crt;
             printenv dirk.crt | base64 -d  > /certs/dirk.crt;
             printenv dirk.key | base64 -d  > /certs/dirk.key
@@ -74,13 +71,12 @@ spec:
           mountPath: /var/logs/commit-boost/logs-signer
         - name: logs-ethgas-commit
           mountPath: /var/logs/commit-boost/logs-ethgas-commit
-        - name: env
+        - name: app
           mountPath: /app
         - name: certs
           mountPath: /certs
         - name: config
-          mountPath: /cb-config.toml
-          subPath: config.toml
+          mountPath: /configs
       containers:
         - name: pbs
           image: "{{ .Values.image.pbs.repository }}:{{ .Values.image.pbs.tag }}"
@@ -89,7 +85,7 @@ spec:
           - containerPort: {{ .Values.service.port.pbs.metrics }}
           env:
           - name: CB_CONFIG
-            value: /cb-config.toml
+            value: /configs/config.toml
           - name: CB_PBS_ENDPOINT
             value: 0.0.0.0:{{ .Values.service.port.pbs.http }}
           - name: CB_METRICS_PORT
@@ -97,19 +93,26 @@ spec:
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
           volumeMounts:
+          - name: app
+            mountPath: /app
           - name: config
-            mountPath: /cb-config.toml
-            subPath: config.toml
+            mountPath: /configs
           - name: logs-pbs
             mountPath: /var/logs/commit-boost
         - name: signer
           image: "{{ .Values.image.signer.repository }}:{{ .Values.image.signer.tag }}"
+          command:
+            - sh
+            - -ac
+            - >
+              export $(cat /app/.cb.env);
+              /usr/local/bin/commit-boost-signer
           ports:
           - containerPort: {{ .Values.service.port.signer.http }}
           - containerPort: {{ .Values.service.port.signer.metrics }}
           env:
           - name: CB_CONFIG
-            value: /cb-config.toml
+            value: /configs/config.toml
           - name: CB_SIGNER_ENDPOINT
             value: 0.0.0.0:{{ .Values.service.port.signer.http }}
           - name: CB_METRICS_PORT
@@ -127,15 +130,12 @@ spec:
           {{- end }}
           {{- end }}
           volumeMounts:
-          - name: config
-            mountPath: /cb-config.toml
-            subPath: config.toml
-          - name: env
+          - name: app
             mountPath: /app
           - name: certs
             mountPath: /certs
-          - name: keys
-            mountPath: /keys
+          - name: config
+            mountPath: /configs
           - name: logs-signer
             mountPath: /var/logs/commit-boost
           {{- if .Values.externalSecrets.enabled }}
@@ -145,17 +145,19 @@ spec:
           {{- end }}
         - name: ethgas-commit
           image: "{{ .Values.image.ethgas_commit.repository }}:{{ .Values.image.ethgas_commit.tag }}"
-          command: ["/bin/sh"]
-          args:
-          - -c
-          - while true; do /usr/local/bin/ethgas_commit; sleep 3600; done
+          command:
+            - sh
+            - -ac
+            - >
+              export $(cat /app/.cb.env);
+              while true; do /usr/local/bin/ethgas_commit; sleep 3600; done
           ports:
           - containerPort: {{ .Values.service.port.ethgas_commit.metrics }}
           env:
           - name: CB_MODULE_ID
             value: ETHGAS_COMMIT
           - name: CB_CONFIG
-            value: /cb-config.toml
+            value: /configs/config.toml
           - name: CB_SIGNER_URL
             value: http://localhost:{{ .Values.service.port.signer.http }}
           - name: CB_METRICS_PORT
@@ -173,13 +175,12 @@ spec:
           {{- end }}
           {{- end }}
           volumeMounts:
-          - name: config
-            mountPath: /cb-config.toml
-            subPath: config.toml
-          - name: env
+          - name: app
             mountPath: /app
           - name: certs
             mountPath: /certs
+          - name: config
+            mountPath: /configs
           - name: logs-ethgas-commit
             mountPath: /var/logs/commit-boost
           {{- if .Values.externalSecrets.enabled }}
@@ -191,7 +192,7 @@ spec:
         - name: config
           configMap:
             name: {{ include "ethgas.fullname" . }}
-        - name: env
+        - name: app
           emptyDir: {}
         - name: certs
           emptyDir: {}
@@ -204,9 +205,6 @@ spec:
         - name: logs-ethgas-commit
           persistentVolumeClaim:
             claimName: {{ include "ethgas.fullname" . }}-commit-logs
-        - name: keys
-          persistentVolumeClaim:
-            claimName: {{ include "ethgas.fullname" . }}-signer-keys
         {{- if .Values.externalSecrets.enabled }}
         - name: external-secrets
           secret:

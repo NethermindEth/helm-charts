@@ -53,10 +53,11 @@ data:
     enable_registration = true
     enable_pricer = true
     enable_builder = false
+    enable_ofac = false
     collateral_per_slot = "0"
     builder_pubkey = "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
     is_jwt_provided = false
-    eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
+    query_pubkey = true
 
     [[modules]]
     id = "ETHGAS_DEPOSIT"
@@ -66,7 +67,6 @@ data:
     exchange_api_base = "{{ .Values.ethgas.exchange_api_base }}"
     collateral_to_be_deposited = "0.01"
     collateral_contract = "{{ .Values.ethgas.collateral_contract }}"
-    eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
 
     [metrics]
     enabled = true
