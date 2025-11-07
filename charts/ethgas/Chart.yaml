@@ -2,10 +2,11 @@ apiVersion: v2
 name: ethgas
 description: ETHGas Helm Chart
 type: application
-version: 0.1.0
-appVersion: "0.1.0"
+version: 0.3.1
+appVersion: "0.3.0"
 maintainers:
   - name: aivarasko
+  - name: matilote
 
 dependencies:
   - name: common

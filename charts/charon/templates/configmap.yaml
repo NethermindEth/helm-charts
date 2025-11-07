@@ -24,8 +24,8 @@ data:
   {{- if .Values.config.jaegerService }}
   CHARON_JAEGER_SERVICE: {{ .Values.config.jaegerService }}
   {{- end }}
-  {{- if .Values.config.LockFile }}
-  CHARON_LOCK_FILE: {{ .Values.config.LockFile | quote }}
+  {{- if .Values.config.lockFile }}
+  CHARON_LOCK_FILE: {{ .Values.config.lockFile | quote }}
   {{- end }}
   {{- if .Values.config.logFormat }}
   CHARON_LOG_FORMAT: {{ .Values.config.logFormat }}
@@ -78,6 +78,12 @@ data:
   {{- end }}
   {{- if .Values.config.validatorApiAddress }}
   CHARON_VALIDATOR_API_ADDRESS: {{ .Values.config.validatorApiAddress }}:{{ .Values.httpPort }}
+  {{- end }}
+  {{- if .Values.config.nickname }}
+  CHARON_NICKNAME: {{ .Values.config.nickname | quote }}
+  {{- end }}
+  {{- if .Values.config.fallbackBeaconNodes }}
+  CHARON_FALLBACK_BEACON_NODE_ENDPOINTS: {{ .Values.config.fallbackBeaconNodes | quote }}
   {{- end }}
 ---
 apiVersion: v1

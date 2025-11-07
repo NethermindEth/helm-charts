@@ -1,7 +1,7 @@
 
 # web3signer
 
-![Version: 1.0.9](https://img.shields.io/badge/Version-1.0.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.4.1](https://img.shields.io/badge/AppVersion-25.4.1-informational?style=flat-square)
+![Version: 1.0.13](https://img.shields.io/badge/Version-1.0.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.9.1](https://img.shields.io/badge/AppVersion-25.9.1-informational?style=flat-square)
 
 A Helm chart for Web3Signer
 
@@ -25,28 +25,29 @@ A Helm chart for Web3Signer
 | affinity | object | `{}` |  |
 | cliImage.pullPolicy | string | `"IfNotPresent"` |  |
 | cliImage.repository | string | `"nethermindeth/keystores-cli"` |  |
-| cliImage.tag | string | `"v1.0.11"` |  |
+| cliImage.tag | string | `"v1.0.14"` |  |
 | enableReloader | bool | `false` |  |
 | env | list | `[]` |  |
 | envFrom | list | `[]` | envFrom configuration |
+| flyway.baselineOnMigrate | bool | `true` |  |
+| flyway.baselineVersion | string | `"0"` |  |
 | flywayImage.pullPolicy | string | `"IfNotPresent"` |  |
 | flywayImage.repository | string | `"flyway/flyway"` |  |
-| flywayImage.tag | string | `"11.1.0"` |  |
+| flywayImage.tag | string | `"11.13.2"` |  |
 | fullnameOverride | string | `""` |  |
-| global.label | string | `""` |  |
-| global.podSecurityContext.fsGroup | int | `1000` |  |
+| global.podSecurityContext.fsGroup | int | `10000` |  |
 | global.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| global.podSecurityContext.runAsUser | int | `1000` |  |
+| global.podSecurityContext.runAsUser | int | `10000` |  |
 | global.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | global.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | global.securityContext.runAsNonRoot | bool | `true` |  |
-| global.securityContext.runAsUser | int | `1000` |  |
+| global.securityContext.runAsUser | int | `10000` |  |
 | global.serviceAccount.create | bool | `true` |  |
 | httpPort | int | `6174` |  |
 | idleTimeout | int | `30` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"consensys/web3signer"` |  |
-| image.tag | string | `"25.4.1"` |  |
+| image.tag | string | `"25.9.1"` |  |
 | imagePullSecrets | list | `[]` |  |
 | initImage.pullPolicy | string | `"IfNotPresent"` |  |
 | initImage.repository | string | `"busybox"` |  |

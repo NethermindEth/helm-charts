@@ -1,4 +1,4 @@
-{{- $jwtSecret := .Values.global.JWTSecret }}
+{{- $jwtSecret := .Values.JWTSecret }}
 {{- $regex := "^[0-9a-f]{64}$" }}
 {{- if and $jwtSecret (not (regexMatch $regex $jwtSecret)) }}
 {{- fail "global.JWTSecret must be a 32-byte long hex string" }}

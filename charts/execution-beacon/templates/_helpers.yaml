@@ -1,3 +1,69 @@
+{{/* vim: set filetype=mustache: */}}
+
+{{/*
+Get execution client image
+Automatically selects the correct image repository based on execution.client
+Users can override via image.execution.repository and image.execution.tag
+*/}}
+{{- define "execution.image" -}}
+{{- $defaultRepos := dict
+  "nethermind" "nethermind/nethermind"
+  "geth" "ethereum/client-go"
+  "besu" "hyperledger/besu"
+  "erigon" "erigontech/erigon"
+  "reth" "ghcr.io/paradigmxyz/reth"
+-}}
+{{- $repo := .Values.image.execution.repository | default (index $defaultRepos .Values.execution.client) -}}
+{{- if not $repo -}}
+{{- fail (printf "Unknown execution client: %s. Valid options: nethermind, geth, besu, erigon, reth" .Values.execution.client) -}}
+{{- end -}}
+{{- printf "%s:%s" $repo .Values.image.execution.tag -}}
+{{- end -}}
+
+{{/*
+Get beacon client image
+Automatically selects the correct image repository based on beacon.client
+Users can override via image.beacon.repository and image.beacon.tag
+*/}}
+{{- define "beacon.image" -}}
+{{- $defaultRepos := dict
+  "prysm" "gcr.io/prysmaticlabs/prysm/beacon-chain"
+  "teku" "consensys/teku"
+  "lighthouse" "sigp/lighthouse"
+  "nimbus" "statusim/nimbus-eth2"
+  "lodestar" "chainsafe/lodestar"
+-}}
+{{- $repo := .Values.image.beacon.repository | default (index $defaultRepos .Values.beacon.client) -}}
+{{- if not $repo -}}
+{{- fail (printf "Unknown beacon client: %s. Valid options: prysm, teku, lighthouse, nimbus, lodestar" .Values.beacon.client) -}}
+{{- end -}}
+{{- printf "%s:%s" $repo .Values.image.beacon.tag -}}
+{{- end -}}
+
+{{/*
+Override common.names.serviceAccountName to use only top-level serviceAccount
+(not global.serviceAccount which was moved out of global scope)
+*/}}
+{{- define "common.names.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "common.names.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Override common.names.clusterRoleName to use only top-level rbac
+(not global.rbac which was moved out of global scope)
+*/}}
+{{- define "common.names.clusterRoleName" -}}
+{{- if .Values.rbac.create }}
+{{- default (include "common.names.fullname" .) .Values.rbac.name }}
+{{- else }}
+{{- default "default" .Values.rbac.name }}
+{{- end }}
+{{- end }}
+
 {{- define "execution.p2pPort" -}}
 {{- printf "30303" -}}
 {{- end -}}

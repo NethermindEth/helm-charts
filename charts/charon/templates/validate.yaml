@@ -2,18 +2,6 @@
 {{- fail ".Values.config.beaconNodeEndpoints is required" }}
 {{- end }}
 
-{{- if not .Values.secrets.validatorKeys }}
-{{- fail ".Values.secrets.validatorKeys is required" }}
-{{- end }}
-
-{{- if .Values.secrets.enabled }}
-{{- if not .Values.secrets.enrPrivateKey }}
-{{- fail ".Values.secrets.enrPrivateKey is required" }}
-{{- end }}
-{{- end }}
-
-{{- if .Values.centralMonitoring.enabled }}
-{{- if not .Values.centralMonitoring.token }}
-{{- fail ".Values.centralMonitoring.token is required" }}
-{{- end }}
+{{- if not .Values.secrets.charon }}
+{{- fail ".Values.secrets.charon is required" }}
 {{- end }}

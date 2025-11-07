@@ -76,7 +76,7 @@ Update permissions on files inside /data directory
   imagePullPolicy: {{ .Values.initImageBusybox.pullPolicy }}
   securityContext:
     runAsUser: 0
-  command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
+  command: ["chown", "-R", "{{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.runAsUser }}", "/data"]
   volumeMounts:
     - name: data
       mountPath: /data
@@ -134,3 +134,177 @@ Web3signer endpoint
 {{- define "flatten" -}}
   {{- get ( fromYaml (include "flatten_list" . ) ) "list" | uniq | join "," }}
 {{- end -}}
+
+{{/*
+Prysm validator arguments
+*/}}
+{{- define "validator-args-prysm" -}}
+{{- $values := .Values -}}
+{{- $rpcEndpoints := .rpcEndpoints -}}
+{{- range (pluck "prysm" $values.flags | first) }}
+- {{ . | quote }}
+{{- end }}
+{{- if ne $values.network "gnosis" }}
+- "--{{ $values.network }}"
+- "--config-file=/data/config"
+- "--validators-external-signer-url={{ $values.web3signerEndpoint }}"
+- "--proposer-settings-file=/data/proposerConfig.json"
+{{- else }}
+- "--config-file=/data/config_gnosis_prysm"
+- "--chain-config-file=/data/config_gnosis_prysm"
+- "--validators-external-signer-url={{ $values.web3signerEndpoint }}"
+{{- end }}
+{{- if $values.graffiti }}
+- "--graffiti={{ $values.graffiti }}"
+{{- end }}
+{{- if $values.beaconChainRpcEndpointsRandomized }}
+- "--beacon-rpc-provider={{ $rpcEndpoints }}"
+{{- else }}
+- "--beacon-rpc-provider={{ $values.beaconChainRpcEndpoints | join "," }}"
+{{- end }}
+{{- if $values.metrics.enabled }}
+{{- range (pluck "prysm" $values.metrics.flags | first) }}
+- {{ . | quote }}
+{{- end }}
+{{- end }}
+{{- range (pluck "prysm" $values.extraFlags | first) }}
+- {{ . | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Lighthouse validator arguments
+*/}}
+{{- define "validator-args-lighthouse" -}}
+{{- $values := .Values -}}
+{{- $rpcEndpoints := .rpcEndpoints -}}
+{{- range (pluck "lighthouse" $values.flags | first) }}
+- {{ . | quote }}
+{{- end }}
+- "--network={{ $values.network }}"
+{{- if $values.dvt.enabled }}
+- "--distributed"
+{{- end }}
+{{- if $values.graffiti }}
+- "--graffiti={{ $values.graffiti }}"
+{{- end }}
+{{- if $values.beaconChainRpcEndpointsRandomized }}
+- "--beacon-nodes={{ $rpcEndpoints }}"
+{{- else }}
+- "--beacon-nodes={{ $values.beaconChainRpcEndpoints | join "," }}"
+{{- end }}
+{{- if $values.metrics.enabled }}
+{{- range (pluck "lighthouse" $values.metrics.flags | first) }}
+- {{ . | quote }}
+{{- end }}
+{{- end }}
+{{- range (pluck "lighthouse" $values.extraFlags | first) }}
+- {{ . | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Teku validator arguments
+*/}}
+{{- define "validator-args-teku" -}}
+{{- $values := .Values -}}
+{{- $rpcEndpoints := .rpcEndpoints -}}
+{{- range (pluck "teku" $values.flags | first) }}
+- {{ . | quote }}
+{{- end }}
+- "--network=auto"
+- "--config-file=/data/config"
+- "--validators-external-signer-url={{ $values.web3signerEndpoint }}"
+{{- if not $values.dvt.enabled }}
+- "--validators-proposer-config=/data/proposerConfig.json"
+{{- else }}
+- "--validators-builder-registration-default-enabled=true"
+{{- end }}
+{{- if $values.graffiti }}
+- "--validators-graffiti={{ $values.graffiti }}"
+{{- end }}
+{{- if $values.beaconChainRpcEndpointsRandomized }}
+{{- $beaconChainRpcEndpointsLen := len $values.beaconChainRpcEndpointsRandomized }}
+{{- if gt $beaconChainRpcEndpointsLen 1 }}
+- "--beacon-node-api-endpoints={{ $rpcEndpoints | join "," }}"
+{{- else }}
+- "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
+{{- end }}
+{{- else }}
+- "--beacon-node-api-endpoint={{ $values.beaconChainRpcEndpoints | join "," }}"
+{{- end }}
+{{- if $values.metrics.enabled }}
+{{- range (pluck "teku" $values.metrics.flags | first) }}
+- {{ . | quote }}
+{{- end }}
+{{- end }}
+{{- range (pluck "teku" $values.extraFlags | first) }}
+- {{ . | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Nimbus validator arguments
+*/}}
+{{- define "validator-args-nimbus" -}}
+{{- $values := .Values -}}
+{{- $rpcEndpoints := .rpcEndpoints -}}
+{{- range (pluck "nimbus" $values.flags | first) }}
+- {{ . | quote }}
+{{- end }}
+- "--network={{ $values.network }}"
+{{- if $values.graffiti }}
+- "--graffiti={{ $values.graffiti }}"
+{{- end }}
+{{- if $values.beaconChainRpcEndpointsRandomized }}
+- "--beacon-node={{ $rpcEndpoints }}"
+{{- else }}
+- "--beacon-node={{ $values.beaconChainRpcEndpoints | join "," }}"
+{{- end }}
+{{- if $values.metrics.enabled }}
+{{- range (pluck "nimbus" $values.metrics.flags | first) }}
+- {{ . | quote }}
+{{- end }}
+{{- end }}
+{{- range (pluck "nimbus" $values.extraFlags | first) }}
+- {{ . | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Lodestar validator command
+*/}}
+{{- define "validator-command-lodestar" -}}
+{{- $values := .Values -}}
+{{- $rpcEndpoints := .rpcEndpoints -}}
+- sh
+- -c
+- >
+  node ./packages/cli/bin/lodestar
+{{- range (pluck "lodestar" $values.flags | first) }}
+  {{ . }}
+{{- end }}
+  --network={{ $values.network }}
+  --proposerSettingsFile=/data/proposerConfig.yaml
+  --externalSigner.url={{ $values.web3signerEndpoint }}
+  --rcConfig=/data/rcconfig.json
+{{- if $values.dvt.enabled }}
+  --distributed
+{{- if $values.enableBuilder }}
+  --builder.selection="builderalways"
+{{- end }}
+{{- end }}
+{{- if $values.beaconChainRpcEndpointsRandomized }}
+  --beaconNodes={{ $rpcEndpoints }}
+{{- else }}
+  --beaconNodes={{ $values.beaconChainRpcEndpoints | join "," }}
+{{- end }}
+{{- if $values.metrics.enabled }}
+{{- range (pluck "lodestar" $values.metrics.flags | first) }}
+  {{ . }}
+{{- end }}
+{{- end }}
+{{- range (pluck "lodestar" $values.extraFlags | first) }}
+  {{ . }}
+{{- end }}
+{{- end }}

@@ -6,11 +6,11 @@
 image:
   repository: obolnetwork/charon
   pullPolicy: IfNotPresent
-  tag: v1.2.0
+  tag: v1.7.0
 
 initImage:
-  repository: "bitnami/kubectl"
-  tag: "1.30.3"
+  repository: "bitnamilegacy/kubectl"
+  tag: "1.32"
   pullPolicy: IfNotPresent
 
 # -- Credentials to fetch images from private registry
@@ -167,7 +167,7 @@ jaegerPort: 6831
 ## ref: https://docs.obol.tech/docs/charon/charon_cli_reference
 config:
   # -- Comma separated list of one or more beacon node endpoint URLs.
-  beaconNodeEndpoints: ""
+  beaconNodeEndpoints: "http://localhost:5051"
 
   # -- Enables the builder api. Will only produce builder blocks. Builder API must also be enabled on the validator client. Beacon node must be connected to a builder-relay to access the builder network.
   builderApi: ""
@@ -188,7 +188,7 @@ config:
   jaegerService: "charon"
 
   # -- The path to the cluster lock file defining distributed validator cluster. (default ".charon/cluster-lock.json")
-  LockFile: "/charon/cluster-lock/cluster-lock.json"
+  lockFile: "/charon/cluster-lock.json"
 
   # -- Log format; console, logfmt or json (default "console")
   logFormat: "json"
@@ -227,7 +227,7 @@ config:
   p2pTcpAddress: "0.0.0.0"
 
   # -- The path to the charon enr private key file. (default ".charon/charon-enr-private-key")
-  privateKeyFile: "/charon/charon-enr-private-key/charon-enr-private-key"
+  privateKeyFile: "/charon/charon-enr-private-key"
 
   # -- Enables an internal mock beacon node for running a simnet.
   simnetBeaconMock: ""
@@ -244,15 +244,37 @@ config:
   # -- Listening address (ip and port) for validator-facing traffic proxying the beacon-node API. (default "127.0.0.1:3600")
   validatorApiAddress: "0.0.0.0"
 
-# -- Kubernetes secrets names
+  # -- Optional Charon nickname for identification in logs and metrics
+  nickname: ""
+
+  # -- Comma separated list of fallback beacon node endpoints
+  fallbackBeaconNodes: ""
+
+# -- Kubernetes secrets configuration
+# Example:
+# apiVersion: external-secrets.io/v1beta1
+# kind: ExternalSecret
+# metadata:
+#   name: charon-enr-private-key
+# spec:
+#   secretStoreRef:
+#     name: infisical
+#   target:
+#     name: charon-enr-private-key
+#   data:
+#     - secretKey: charon-enr-private-key  # Hardcoded name
+#       remoteRef:
+#         key: CHARON_ENR_PRIVATE_KEY
+#     - secretKey: token                    # Hardcoded name
+#       remoteRef:
+#         key: CHARON_MONITORING_TOKEN
+#
+# The secret must contain 'charon-enr-private-key' key (always required)
+# If centralMonitoring is enabled, the secret must also contain 'token' key
+# cluster-lock.json and validator_keys should be downloaded via initContainers (e.g., from Minio)
 secrets:
-  enabled: false
-  # -- validators keys
-  validatorKeys: "validator-keys"
-  # -- charon enr private key
-  enrPrivateKey: ""
-  # -- charon cluster lock
-  clusterlock: ""
+  # -- charon secret name (required, must be provided via external secret)
+  charon: "charon-enr-private-key"
 
 # -- Additional init containers
 initContainers: []
@@ -305,7 +327,7 @@ livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 120
   httpGet:
-    path: /livez
+    path: /readyz
     port: monitoring
 
 # -- Configure readiness probes
@@ -323,5 +345,3 @@ centralMonitoring:
   enabled: false
   # -- https endpoint to obol central prometheus
   promEndpoint: "https://vm.monitoring.gcp.obol.tech/write"
-  # -- The authentication token to the central prometheus
-  token: ""

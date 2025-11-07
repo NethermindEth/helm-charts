@@ -11,5 +11,5 @@ roleRef:
   name: {{ template "validators.fullname" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "validators.serviceAccountName" . }}
+    name: {{ template "validators.fullname" . }}
 {{- end }}

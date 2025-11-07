@@ -1,10 +1,10 @@
-{{- if .Values.global.p2pNodePort.enabled -}}
-{{- range $i, $e := until (int .Values.global.replicaCount) }}
-{{- $portExecution := add $.Values.global.p2pNodePort.startAtExecution $i -}}
-{{- $portBeacon := add $.Values.global.p2pNodePort.startAtBeacon $i -}}
-{{- if hasKey $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) -}}
-  {{ $portExecution = index $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) }}
-  {{ $portBeacon = index $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) }}
+{{- if .Values.p2pNodePort.enabled -}}
+{{- range $i, $e := until (int .Values.replicaCount) }}
+{{- $portExecution := add $.Values.p2pNodePort.startAtExecution $i -}}
+{{- $portBeacon := add $.Values.p2pNodePort.startAtBeacon $i -}}
+{{- if hasKey $.Values.p2pNodePort.replicaToNodePort ($i | toString) -}}
+  {{ $portExecution = index $.Values.p2pNodePort.replicaToNodePort ($i | toString) }}
+  {{ $portBeacon = index $.Values.p2pNodePort.replicaToNodePort ($i | toString) }}
 {{- end }}
 
 ---
@@ -17,12 +17,12 @@ metadata:
     pod: "{{ include "common.names.fullname" $ }}-{{ $i }}"
     type: p2p
     client: execution
-  {{- with $.Values.global.p2pNodePort.annotations }}
+  {{- with $.Values.p2pNodePort.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ $.Values.global.p2pNodePort.type }}
+  type: {{ $.Values.p2pNodePort.type }}
   externalTrafficPolicy: Local
   ports:
     - name: p2p-tcp-exec
@@ -30,12 +30,19 @@ spec:
       protocol: TCP
       targetPort: {{ $portExecution }}
       nodePort: {{ $portExecution }}
-  {{- if eq $.Values.global.p2pNodePort.type "NodePort" }}
+  {{- if eq $.Values.p2pNodePort.type "NodePort" }}
     - name: p2p-udp-exec
       port: {{ include "execution.p2pPort" $ }}
       protocol: UDP
       targetPort: {{ $portExecution }}
       nodePort: {{ $portExecution }}
+    {{- if and (eq $.Values.execution.client "reth") $.Values.execution.enableDiscoveryV5 }}
+    - name: discv5-udp-exec
+      port: {{ add (include "execution.p2pPort" $ | int) 2 }}
+      protocol: UDP
+      targetPort: {{ add $portExecution 2 }}
+      nodePort: {{ add $portExecution 2 }}
+    {{- end }}
   {{- end }}
   selector:
     {{- include "common.labels.matchLabels" $ | nindent 4 }}
@@ -51,12 +58,12 @@ metadata:
     pod: "{{ include "common.names.fullname" $ }}-{{ $i }}"
     type: p2p
     client: beacon
-  {{- with $.Values.global.p2pNodePort.annotations }}
+  {{- with $.Values.p2pNodePort.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ $.Values.global.p2pNodePort.type }}
+  type: {{ $.Values.p2pNodePort.type }}
   externalTrafficPolicy: Local
   ports:
     - name: p2p-tcp-beacon
@@ -64,7 +71,7 @@ spec:
       protocol: TCP
       targetPort: {{ $portBeacon }}
       nodePort: {{ $portBeacon }}
-  {{- if eq $.Values.global.p2pNodePort.type "NodePort" }}
+  {{- if eq $.Values.p2pNodePort.type "NodePort" }}
     - name: p2p-udp-beacon
       port: {{ include "beacon.p2pPort" $ }}
       protocol: UDP

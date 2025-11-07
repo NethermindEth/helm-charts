@@ -2,17 +2,27 @@ apiVersion: v2
 name: execution-beacon
 description: A Helm chart for deploying Ethereum execution and consensus clients
 type: application
-version: 1.0.13
+version: 1.0.29
 keywords:
   - ethereum
   - blockchain
   - nethermind
   - prysm
+  - reth
+  - lighthouse
+  - nimbus
+  - lodestar
+  - erigon
+  - teku
+  - besu
   - p2p
+
 home: https://www.ethereum.org/
+
 maintainers:
   - name: 0xDones
   - name: matilote
+  - name: aivarasko
 
 dependencies:
   - name: common

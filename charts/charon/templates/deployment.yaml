@@ -139,16 +139,13 @@ spec:
           volumeMounts:
             - name: env-nodeport
               mountPath: /env
+            - name: charon-data
+              mountPath: /charon
+            - name: charon-enr-private-key
+              mountPath: /charon/charon-enr-private-key
+              subPath: charon-enr-private-key
           {{- if .Values.extraVolumeMounts -}}
             {{ toYaml .Values.extraVolumeMounts | nindent 12 }}
-          {{- end }}
-          {{- if .Values.secrets.enrPrivateKey }}
-            - mountPath: /charon/charon-enr-private-key
-              name: charon-enr-private-key
-          {{- end }}
-          {{- if .Values.secrets.clusterlock }}
-            - mountPath: /charon/cluster-lock
-              name: cluster-lock
           {{- end }}
       {{- if .Values.extraContainers }}
         {{ tpl (toYaml .Values.extraContainers | nindent 8) $ }}
@@ -162,21 +159,13 @@ spec:
         - name: scripts-init
           configMap:
             name: {{ include "release.name" . }}-init
+        - name: charon-data
+          emptyDir: {}
         - name: charon-enr-private-key
-          {{- if .Values.secrets.enrPrivateKey }}
           projected:
             sources:
             - secret:
-                name: {{ .Values.secrets.enrPrivateKey }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-        - name: cluster-lock
-          {{- if .Values.secrets.clusterlock }}
-          projected:
-            sources:
-            - secret:
-                name: {{ .Values.secrets.clusterlock }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
+                name: {{ .Values.secrets.charon }}
+                items:
+                  - key: charon-enr-private-key
+                    path: charon-enr-private-key

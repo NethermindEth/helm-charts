@@ -1,14 +1,22 @@
 
 # ethgas
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.9.0](https://img.shields.io/badge/AppVersion-1.9.0-informational?style=flat-square)
+![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.0](https://img.shields.io/badge/AppVersion-0.3.0-informational?style=flat-square)
 
-Mev Boost Helm Chart
+ETHGas Helm Chart
 
 ## Maintainers
 
 | Name | Email | Url |
 | ---- | ------ | --- |
+| aivarasko |  |  |
+| matilote |  |  |
+
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../common | common | 1.0.0 |
 
 ## Values
 

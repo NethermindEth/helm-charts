@@ -1,15 +1,8 @@
 # generic-app-p2p
 
-![Version: 0.0.11](https://img.shields.io/badge/Version-0.0.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.12](https://img.shields.io/badge/Version-0.0.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic apps (P2P)
-
-## Installation
-
-```bash
-helm repo add nethermind https://nethermindeth.github.io/helm-charts
-helm install generic-app-p2p nethermind/generic-app-p2p
-```
 
 ## Maintainers
 
@@ -212,7 +205,7 @@ persistence:
 | initContainerSecurityContext.runAsGroup | int | `1000` |  |
 | initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
 | initContainerSecurityContext.runAsUser | int | `1000` |  |
-| initContainers | list | `[{"command":["sh","-c","/scripts/init.sh"],"env":[{"name":"NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}}],"image":"bitnami/kubectl:1.28","name":"init","volumeMounts":[{"mountPath":"/scripts","name":"scripts"},{"mountPath":"/shared","name":"shared"}]}]` | Init containers |
+| initContainers | list | `[{"command":["sh","-c","/scripts/init.sh"],"env":[{"name":"NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}}],"image":"bitnamilegacy/kubectl:1.32","name":"init","volumeMounts":[{"mountPath":"/scripts","name":"scripts"},{"mountPath":"/shared","name":"shared"}]}]` | Init containers |
 | initScript | string | `"#!/usr/bin/env bash\necho \"Starting init script for pod ${POD_NAME}...\"\ntouch /shared/env\n\necho \"Getting external node ip and port...\"\nEXTERNAL_NODE_IP=$(kubectl get node $NODE_NAME -o jsonpath='{.status.addresses[?(@.type==\"ExternalIP\")].address}')\nEXTERNAL_NODE_PORT=$(kubectl get services -l \"pod=${POD_NAME},type=p2p\" -o jsonpath='{.items[0].spec.ports[0].nodePort}')\n\nREPLICA_INDEX=$(echo $POD_NAME | awk -F'-' '{print $NF}')\n\necho \"REPLICA_INDEX=${REPLICA_INDEX}\"\necho \"EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\"\necho \"EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\"\n\necho \"export REPLICA_INDEX=${REPLICA_INDEX}\" >> /shared/env\necho \"export EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\" >> /shared/env\necho \"export EXTERNAL_NODE_PORT=${EXTERNAL_NODE_PORT}\" >> /shared/env\n"` | InitScript for the pod (Used to get external node ip and port) |
 | livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
