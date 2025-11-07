@@ -6,11 +6,11 @@ metadata:
   namespace: {{ . }}
   {{- end }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "ethgas.labels" . | nindent 4 }}
 data:
   config.toml: |-
     chain = "{{ .Values.ethgas.network }}"
-    
+
     [pbs]
     docker_image = "ghcr.io/commit-boost/pbs:latest"
     with_signer = true
@@ -27,18 +27,18 @@ data:
     extra_validation_enabled = false
     rpc_url = "{{ .Values.ethgas.rpc_url }}"
     validator_registration_batch_size = "1"
-    
+
     [[relays]]
     id = "ethgas"
     url = "{{ .Values.ethgas.relays }}"
     enable_timing_games = true
     target_first_request_ms = 0
     frequency_get_header_ms = 100
-    
+
     [signer]
     host = "0.0.0.0"
     port = {{ .Values.service.port.signer.http }}
-    
+
     {{ .Values.ethgas.signer | indent 4 | trim }}
 
     [[modules]]
@@ -57,7 +57,7 @@ data:
     builder_pubkey = "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
     is_jwt_provided = false
     eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
-    
+
     [[modules]]
     id = "ETHGAS_DEPOSIT"
     type = "commit"
@@ -67,18 +67,18 @@ data:
     collateral_to_be_deposited = "0.01"
     collateral_contract = "{{ .Values.ethgas.collateral_contract }}"
     eoa_signing_key = "{{ .Values.ethgas.eoa_signing_key}}"
-    
+
     [metrics]
     enabled = true
     host = "127.0.0.1"
     start_port = {{ .Values.service.port.pbs.metrics }}
-    
+
     [logs.stdout]
     enabled = true
     level = "info"
     use_json = false
     color = true
-    
+
     [logs.file]
     enabled = true
     level = "debug"

@@ -163,6 +163,14 @@ volumeMounts: []
 #   mountPath: "/etc/foo"
 #   readOnly: true
 
+# Additional envFrom configuration for all containers
+# This allows you to reference additional secrets or configmaps
+envFrom: []
+# - secretRef:
+#     name: my-secret
+# - configMapRef:
+#     name: my-configmap
+
 nodeSelector: {}
 
 tolerations: []
