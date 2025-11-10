@@ -28,7 +28,7 @@ ETHGas Helm Chart
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | envFrom | list | `[]` |  |
-| ethgas.collateral_contract | string | `"0xe8bfB84b14c383b94365a895fc8bfA36dE236dc8"` |  |
+| ethgas.collateral_contract | string | `"0x104Ef4192a97E0A93aBe8893c8A2d2484DFCBAF1"` |  |
 | ethgas.entity_name | string | `""` |  |
 | ethgas.eoa_signing_key | string | `""` |  |
 | ethgas.exchange_api_base | string | `"https://hoodi.app.ethgas.com"` |  |
