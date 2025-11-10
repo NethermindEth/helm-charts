@@ -61,10 +61,6 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{- define "configmap.hash" -}}
-{{- .Values.config | toJson | sha256sum }}
-{{- end }}
-
 {{- define "values.hash" -}}
 {{- .Values | toJson | sha256sum }}
 {{- end }}
