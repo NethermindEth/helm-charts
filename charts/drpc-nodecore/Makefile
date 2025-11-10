@@ -1,2 +1,2 @@
 template:
-	helm template drpc-project-name . -f values.yaml -f values.project.yaml --debug > manifest.yamlhelm
+	helm template drpc-nodecore . -f values.yaml -f values.override.yaml --debug > manifest.yaml
