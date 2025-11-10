@@ -659,6 +659,19 @@ entries:
     version: 1.1.2
   drpc-nodecore:
   - apiVersion: v2
+    appVersion: 0.0.2
+    created: "2025-11-10T11:58:07.718999185Z"
+    description: A Helm chart for dRPC nodeCore application
+    digest: fee6ced4c09737c0099a0781bb3670aab53d3aefa5631e64357bdee1c777521d
+    maintainers:
+    - name: manjeet-nt
+    - name: adriantpaez
+    name: drpc-nodecore
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/drpc-nodecore-0.0.2/drpc-nodecore-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
     created: "2025-11-10T10:53:38.225017125Z"
     description: A Helm chart for dRPC nodeCore application
     digest: 8575f6c4c380be0ceb6bda45a6f5e8168dbea19916c32a76a831e930672f1ec2
@@ -3207,4 +3220,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-11-10T10:53:38.379389822Z"
+generated: "2025-11-10T11:58:07.719334753Z"
