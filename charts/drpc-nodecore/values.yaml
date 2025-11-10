@@ -31,24 +31,6 @@ deployment:
   # If true, the container will be restarted when the values.yaml file changes.
   restartOnChanges: false
 
-# -- Command and args for the container
-command: []
-args: []
-
-# -- Working directory for the container. If not set, the container's default will be used.
-workingDir: ""
-
-# -- config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration.
-config: {}
-  # ENV_1: value1
-  # ENV_2: value2
-
-# -- Extra ConfigMaps, they need to be configured using volumes and volumeMounts
-configMaps: []
-  # - name: extra-configmap
-  #   data:
-  #     EXTRA_ENV: extra-value
-
 # -- This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
 env: []
   # - name: MY_ENV_VAR
@@ -66,74 +48,6 @@ envFrom:
   #     name: my-configmap
   # - secretRef:
   #     name: my-secret
-
-# -- Default init containers
-defaultInitContainers: []
-  # - name: init-nginx-cache
-  #   image: nginx:1.25
-  #   command: ['sh', '-c', 'mkdir -p /var/cache/nginx && chmod -R 777 /var/cache/nginx']
-  #   volumeMounts:
-  #     - name: nginx-cache
-  #       mountPath: /var/cache/nginx
-
-# -- Sidecar containers
-extraContainers: []
-  # - name: nginx-sidecar
-  #   image: nginx:1.25
-  #   ports:
-  #     - containerPort: 8080
-  #   command:
-  #     - sh
-  #     - -c
-  #     - |
-  #       rm -f /etc/nginx/conf.d/default.conf
-  #       exec nginx -g 'daemon off;'
-  #   volumeMounts:
-  #     - name: nginx-config
-  #       mountPath: /etc/nginx/nginx.conf
-  #       subPath: nginx.conf
-  #       readOnly: true
-  #     - name: nginx-config
-  #       mountPath: /etc/nginx/conf.d/drpc-nginx.conf
-  #       subPath: drpc-nginx.conf
-  #       readOnly: true
-  #     - name: nginx-conf-d
-  #       mountPath: /etc/nginx/conf.d
-  #     - name: nginx-cache
-  #       mountPath: /var/cache/nginx
-  #   securityContext:
-  #     runAsNonRoot: true
-  #     runAsUser: 1000
-  #     runAsGroup: 1000
-  #     readOnlyRootFilesystem: false
-
-# -- Extra Kubernetes resources to be created
-extraObjects: []
-# - apiVersion: v1
-#   kind: Secret
-#   metadata:
-#     name: '{{ include "generic-app.fullname" . }}'
-#   stringData:
-#     SOME_SECRET: "<secret val>"
-
-# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Automatically mount a ServiceAccount's API credentials?
-  automount: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
-# This is for setting Kubernetes Annotations to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-podAnnotations: {}
-# This is for setting Kubernetes Labels to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-podLabels: {}
 
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
@@ -170,27 +84,6 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-HTTPRoute:
-  enabled: false
-  annotations: {}
-  parentRefs: []
-  # - group: gateway.networking.k8s.io
-  #   kind: Gateway
-  #   name: gateway
-  #   namespace: istio-ingress
-  hostnames: []
-  # - example.com
-  rules: []
-  # - matches:
-  #   - path:
-  #       type: PathPrefix
-  #       value: /
-  #   backendRefs:
-  #   - group: ''
-  #     kind: Service
-  #     name: {{ include "generic-app.fullname" $ }}
-  #     port: 1027
-
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -223,19 +116,8 @@ livenessProbe:
   failureThreshold: 3
   successThreshold: 1
 
-# Default volumes on the output Deployment definition.
-defaultVolumes:
-  # - name: nginx-cache
-  #   emptyDir: {}
-  # - name: nginx-config
-  #   configMap:
-  #     name: nginx-config
-  # - name: nginx-conf-d
-  #   emptyDir: {}
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+# Additional volumes on the output Deployment definition.
+volumes: []
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts: []
@@ -248,7 +130,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
 
 # Default security settings for the pod
 podSecurityContext:
