@@ -1,7 +1,7 @@
 
 # drpc-nodecore
 
-![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.2](https://img.shields.io/badge/AppVersion-0.0.2-informational?style=flat-square)
 
 A Helm chart for dRPC nodeCore application
 
@@ -90,8 +90,10 @@ A Helm chart for dRPC nodeCore application
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
 | serviceMonitor.enabled | bool | `true` |  |
+| serviceMonitor.interval | string | `"30s"` |  |
 | serviceMonitor.path | string | `"/metrics"` |  |
 | serviceMonitor.port | string | `"metrics"` |  |
+| serviceMonitor.scheme | string | `"http"` |  |
 | terminationGracePeriodSeconds | int | `30` | Default termination grace period for the pod |
 | tolerations | list | `[]` |  |
 | volumeMounts | list | `[]` |  |

@@ -287,6 +287,8 @@ serviceMonitor:
   enabled: true
   port: metrics
   path: /metrics
+  interval: 30s
+  scheme: http
 
 # -- Default termination grace period for the pod
 terminationGracePeriodSeconds: 30
