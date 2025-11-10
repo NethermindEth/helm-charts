@@ -1,7 +1,7 @@
 
 # ethgas
 
-![Version: 0.3.5](https://img.shields.io/badge/Version-0.3.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.5](https://img.shields.io/badge/AppVersion-0.3.5-informational?style=flat-square)
+![Version: 0.3.6](https://img.shields.io/badge/Version-0.3.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.6](https://img.shields.io/badge/AppVersion-0.3.6-informational?style=flat-square)
 
 ETHGas Helm Chart
 
@@ -28,7 +28,7 @@ ETHGas Helm Chart
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | envFrom | list | `[]` |  |
-| ethgas.collateral_contract | string | `"0xe8bfB84b14c383b94365a895fc8bfA36dE236dc8"` |  |
+| ethgas.collateral_contract | string | `"0x104Ef4192a97E0A93aBe8893c8A2d2484DFCBAF1"` |  |
 | ethgas.entity_name | string | `""` |  |
 | ethgas.eoa_signing_key | string | `""` |  |
 | ethgas.exchange_api_base | string | `"https://hoodi.app.ethgas.com"` |  |

@@ -1,0 +1,295 @@
+############################################
+# Generic App
+############################################
+
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: drpcorg/nodecore
+  pullPolicy: IfNotPresent
+  tag: "0.1.6"
+
+# This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# -- Enable Deployment
+deployment:
+  enabled: true
+  # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  # If true, the container will be restarted when the values.yaml file changes.
+  restartOnChanges: false
+
+# -- Command and args for the container
+command: []
+args: []
+
+# -- Working directory for the container. If not set, the container's default will be used.
+workingDir: ""
+
+# -- config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration.
+config: {}
+  # ENV_1: value1
+  # ENV_2: value2
+
+# -- Extra ConfigMaps, they need to be configured using volumes and volumeMounts
+configMaps: []
+  # - name: extra-configmap
+  #   data:
+  #     EXTRA_ENV: extra-value
+
+# -- This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+env: []
+  # - name: MY_ENV_VAR
+  #   value: my-env-var-value
+  # - name: SECRET
+  #   valueFrom:
+  #     secretKeyRef:
+  #       key: SECRET
+  #       name: secret-name
+
+# -- envFrom configuration
+envFrom:
+  []
+  # - configMapRef:
+  #     name: my-configmap
+  # - secretRef:
+  #     name: my-secret
+
+# -- Default init containers
+defaultInitContainers: []
+  # - name: init-nginx-cache
+  #   image: nginx:1.25
+  #   command: ['sh', '-c', 'mkdir -p /var/cache/nginx && chmod -R 777 /var/cache/nginx']
+  #   volumeMounts:
+  #     - name: nginx-cache
+  #       mountPath: /var/cache/nginx
+
+# -- Sidecar containers
+extraContainers: []
+  # - name: nginx-sidecar
+  #   image: nginx:1.25
+  #   ports:
+  #     - containerPort: 8080
+  #   command:
+  #     - sh
+  #     - -c
+  #     - |
+  #       rm -f /etc/nginx/conf.d/default.conf
+  #       exec nginx -g 'daemon off;'
+  #   volumeMounts:
+  #     - name: nginx-config
+  #       mountPath: /etc/nginx/nginx.conf
+  #       subPath: nginx.conf
+  #       readOnly: true
+  #     - name: nginx-config
+  #       mountPath: /etc/nginx/conf.d/drpc-nginx.conf
+  #       subPath: drpc-nginx.conf
+  #       readOnly: true
+  #     - name: nginx-conf-d
+  #       mountPath: /etc/nginx/conf.d
+  #     - name: nginx-cache
+  #       mountPath: /var/cache/nginx
+  #   securityContext:
+  #     runAsNonRoot: true
+  #     runAsUser: 1000
+  #     runAsGroup: 1000
+  #     readOnlyRootFilesystem: false
+
+# -- Extra Kubernetes resources to be created
+extraObjects: []
+# - apiVersion: v1
+#   kind: Secret
+#   metadata:
+#     name: '{{ include "generic-app.fullname" . }}'
+#   stringData:
+#     SOME_SECRET: "<secret val>"
+
+# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  annotations: {}
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+  extraContainersPorts: []
+    # - name: http
+    #   port: 8080
+    #   protocol: TCP
+
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+# -- For now all traffic is routed to the `http` port
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          # -- Port name as defined in the service.ports section
+          portName: http
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+HTTPRoute:
+  enabled: false
+  annotations: {}
+  parentRefs: []
+  # - group: gateway.networking.k8s.io
+  #   kind: Gateway
+  #   name: gateway
+  #   namespace: istio-ingress
+  hostnames: []
+  # - example.com
+  rules: []
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /
+  #   backendRefs:
+  #   - group: ''
+  #     kind: Service
+  #     name: {{ include "generic-app.fullname" $ }}
+  #     port: 1027
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: 9093
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 5
+  failureThreshold: 2
+  successThreshold: 1
+
+livenessProbe:
+  tcpSocket:
+    port: 9090
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+  successThreshold: 1
+
+# Default volumes on the output Deployment definition.
+defaultVolumes:
+  # - name: nginx-cache
+  #   emptyDir: {}
+  # - name: nginx-config
+  #   configMap:
+  #     name: nginx-config
+  # - name: nginx-conf-d
+  #   emptyDir: {}
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+
+# Default security settings for the pod
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: true
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsGroup: 0
+  runAsNonRoot: false
+  runAsUser: 0
+  seccompProfile:
+    type: RuntimeDefault
+
+initContainerSecurityContext:
+  allowPrivilegeEscalation: true
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsGroup: 0
+  runAsNonRoot: false
+  runAsUser: 0
+  seccompProfile:
+    type: RuntimeDefault
+
+serviceMonitor:
+  enabled: true
+  port: metrics
+  path: /metrics
+
+# -- Default termination grace period for the pod
+terminationGracePeriodSeconds: 30
+
+# -- Runtime class name for the pod (e.g., "nvidia" for GPU workloads)
+runtimeClassName: ""

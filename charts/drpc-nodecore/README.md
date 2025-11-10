@@ -1,0 +1,101 @@
+
+# drpc-nodecore
+
+![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
+A Helm chart for dRPC nodeCore application
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| manjeet-nt |  |  |
+| adriantpaez |  |  |
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| HTTPRoute.annotations | object | `{}` |  |
+| HTTPRoute.enabled | bool | `false` |  |
+| HTTPRoute.hostnames | list | `[]` |  |
+| HTTPRoute.parentRefs | list | `[]` |  |
+| HTTPRoute.rules | list | `[]` |  |
+| affinity | object | `{}` |  |
+| args | list | `[]` |  |
+| command | list | `[]` | Command and args for the container |
+| config | object | `{}` | config is the most straightforward way to set environment variables for your application, the key/value configmap will be mounted as envs. No need to do any extra configuration. |
+| configMaps | list | `[]` | Extra ConfigMaps, they need to be configured using volumes and volumeMounts |
+| defaultInitContainers | list | `[]` | Default init containers |
+| defaultVolumes | string | `nil` |  |
+| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":true,"restartOnChanges":false}` | Enable Deployment |
+| env | list | `[]` | This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/ |
+| envFrom | list | `[]` | envFrom configuration |
+| extraContainers | list | `[]` | Sidecar containers |
+| extraObjects | list | `[]` | Extra Kubernetes resources to be created |
+| fullnameOverride | string | `""` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.repository | string | `"drpcorg/nodecore"` |  |
+| image.tag | string | `"0.1.6"` |  |
+| imagePullSecrets | list | `[]` |  |
+| ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific","portName":"http"}]}],"tls":[]}` | For now all traffic is routed to the `http` port |
+| ingress.hosts[0].paths[0].portName | string | `"http"` | Port name as defined in the service.ports section |
+| initContainerSecurityContext.allowPrivilegeEscalation | bool | `true` |  |
+| initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| initContainerSecurityContext.readOnlyRootFilesystem | bool | `false` |  |
+| initContainerSecurityContext.runAsGroup | int | `0` |  |
+| initContainerSecurityContext.runAsNonRoot | bool | `false` |  |
+| initContainerSecurityContext.runAsUser | int | `0` |  |
+| initContainerSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| livenessProbe.failureThreshold | int | `3` |  |
+| livenessProbe.initialDelaySeconds | int | `30` |  |
+| livenessProbe.periodSeconds | int | `10` |  |
+| livenessProbe.successThreshold | int | `1` |  |
+| livenessProbe.tcpSocket.port | int | `9090` |  |
+| livenessProbe.timeoutSeconds | int | `1` |  |
+| nameOverride | string | `""` |  |
+| nodeSelector | object | `{}` |  |
+| podAnnotations | object | `{}` |  |
+| podLabels | object | `{}` |  |
+| podSecurityContext.fsGroup | int | `1000` |  |
+| podSecurityContext.runAsGroup | int | `1000` |  |
+| podSecurityContext.runAsNonRoot | bool | `true` |  |
+| podSecurityContext.runAsUser | int | `1000` |  |
+| podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| readinessProbe.failureThreshold | int | `2` |  |
+| readinessProbe.httpGet.path | string | `"/metrics"` |  |
+| readinessProbe.httpGet.port | int | `9093` |  |
+| readinessProbe.initialDelaySeconds | int | `10` |  |
+| readinessProbe.periodSeconds | int | `5` |  |
+| readinessProbe.successThreshold | int | `1` |  |
+| readinessProbe.timeoutSeconds | int | `5` |  |
+| replicaCount | int | `1` |  |
+| resources | object | `{}` |  |
+| runtimeClassName | string | `""` | Runtime class name for the pod (e.g., "nvidia" for GPU workloads) |
+| securityContext.allowPrivilegeEscalation | bool | `true` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `false` |  |
+| securityContext.runAsGroup | int | `0` |  |
+| securityContext.runAsNonRoot | bool | `false` |  |
+| securityContext.runAsUser | int | `0` |  |
+| securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| service.annotations | object | `{}` |  |
+| service.extraContainersPorts | list | `[]` |  |
+| service.ports[0].name | string | `"http"` |  |
+| service.ports[0].port | int | `8080` |  |
+| service.ports[0].protocol | string | `"TCP"` |  |
+| service.type | string | `"ClusterIP"` |  |
+| serviceAccount.annotations | object | `{}` |  |
+| serviceAccount.automount | bool | `true` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `""` |  |
+| serviceMonitor.enabled | bool | `true` |  |
+| serviceMonitor.path | string | `"/metrics"` |  |
+| serviceMonitor.port | string | `"metrics"` |  |
+| terminationGracePeriodSeconds | int | `30` | Default termination grace period for the pod |
+| tolerations | list | `[]` |  |
+| volumeMounts | list | `[]` |  |
+| workingDir | string | `""` | Working directory for the container. If not set, the container's default will be used. |
+
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
