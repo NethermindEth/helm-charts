@@ -39,24 +39,44 @@ spec:
         env:
         - name: CB_MODULE_ID
           value: ETHGAS_COMMIT
-        envFrom:
-        - secretRef:
-            name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
         volumeMounts:
-        - name: env
+        - name: app
           mountPath: /app
+        - name: certs
+          mountPath: /certs
       - name: init
         image: "{{ .Values.image.initContainer.repository }}:{{ .Values.image.initContainer.tag }}"
-        command: ['sh', '-c', 'printenv | grep CB_; find /app/; cat /app/.cb.env; cat /cb-config.toml']
+        command:
+          - sh
+          - -ac
+          - >
+            chmod 777 -R /var/logs/commit-boost/;
+            printenv ca.crt | base64 -d  > /certs/ca.crt;
+            printenv dirk.crt | base64 -d  > /certs/dirk.crt;
+            printenv dirk.key | base64 -d  > /certs/dirk.key
+        {{- if or .Values.externalSecrets.enabled .Values.envFrom }}
         envFrom:
+        {{- if .Values.externalSecrets.enabled }}
         - secretRef:
-            name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
+            name: eso-{{ include "common.names.fullname" . }}
+        {{- end }}
+        {{- with .Values.envFrom }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- end }}
         volumeMounts:
-        - name: env
+        - name: logs-pbs
+          mountPath: /var/logs/commit-boost/logs-pbs
+        - name: logs-signer
+          mountPath: /var/logs/commit-boost/logs-signer
+        - name: logs-ethgas-commit
+          mountPath: /var/logs/commit-boost/logs-ethgas-commit
+        - name: app
           mountPath: /app
+        - name: certs
+          mountPath: /certs
         - name: config
-          mountPath: /cb-config.toml
-          subPath: config.toml
+          mountPath: /configs
       containers:
         - name: pbs
           image: "{{ .Values.image.pbs.repository }}:{{ .Values.image.pbs.tag }}"
@@ -65,116 +85,130 @@ spec:
           - containerPort: {{ .Values.service.port.pbs.metrics }}
           env:
           - name: CB_CONFIG
-            value: /cb-config.toml
+            value: /configs/config.toml
           - name: CB_PBS_ENDPOINT
             value: 0.0.0.0:{{ .Values.service.port.pbs.http }}
           - name: CB_METRICS_PORT
             value: "{{ .Values.service.port.pbs.metrics }}"
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
-#          envFrom:
-#          - configMapRef:
-#              name: {{ include "ethgas.fullname" . }}-env-vars
           volumeMounts:
+          - name: app
+            mountPath: /app
           - name: config
-            mountPath: /cb-config.toml
-            subPath: config.toml
+            mountPath: /configs
           - name: logs-pbs
             mountPath: /var/logs/commit-boost
         - name: signer
           image: "{{ .Values.image.signer.repository }}:{{ .Values.image.signer.tag }}"
+          command:
+            - sh
+            - -ac
+            - >
+              export $(cat /app/.cb.env);
+              /usr/local/bin/commit-boost-signer
           ports:
           - containerPort: {{ .Values.service.port.signer.http }}
           - containerPort: {{ .Values.service.port.signer.metrics }}
           env:
           - name: CB_CONFIG
-            value: /cb-config.toml
+            value: /configs/config.toml
           - name: CB_SIGNER_ENDPOINT
             value: 0.0.0.0:{{ .Values.service.port.signer.http }}
           - name: CB_METRICS_PORT
             value: "{{ .Values.service.port.signer.metrics }}"
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
+          {{- if or .Values.externalSecrets.enabled .Values.envFrom }}
           envFrom:
+          {{- if .Values.externalSecrets.enabled }}
           - secretRef:
-              name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
+              name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- end }}
           volumeMounts:
-          - name: config
-            mountPath: /cb-config.toml
-            subPath: config.toml
-          - name: env
+          - name: app
             mountPath: /app
+          - name: certs
+            mountPath: /certs
+          - name: config
+            mountPath: /configs
           - name: logs-signer
             mountPath: /var/logs/commit-boost
-          {{- if .Values.existingDirkSecret }}
-          - name: dirk-certs
-            mountPath: /signer/secrets
+          {{- if .Values.externalSecrets.enabled }}
+          - name: external-secrets
+            mountPath: /external-secrets
             readOnly: true
           {{- end }}
         - name: ethgas-commit
           image: "{{ .Values.image.ethgas_commit.repository }}:{{ .Values.image.ethgas_commit.tag }}"
-          command: ["/bin/sh"]
-          args:
-          - -c
-          - while true; do /usr/local/bin/ethgas_commit; sleep 3600; done
+          command:
+            - sh
+            - -ac
+            - >
+              export $(cat /app/.cb.env);
+              while true; do /usr/local/bin/ethgas_commit; sleep 3600; done
           ports:
           - containerPort: {{ .Values.service.port.ethgas_commit.metrics }}
           env:
           - name: CB_MODULE_ID
             value: ETHGAS_COMMIT
           - name: CB_CONFIG
-            value: /cb-config.toml
+            value: /configs/config.toml
           - name: CB_SIGNER_URL
             value: http://localhost:{{ .Values.service.port.signer.http }}
           - name: CB_METRICS_PORT
             value: "{{ .Values.service.port.ethgas_commit.metrics }}"
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
-          {{- if .Values.ethgas.useJwtAuth }}
-          - name: ACCESS_JWT
-            valueFrom:
-              secretKeyRef:
-                name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
-                key: ACCESS_JWT
-          - name: REFRESH_JWT
-            valueFrom:
-              secretKeyRef:
-                name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
-                key: REFRESH_JWT
-          {{- else }}
-          - name: EOA_SIGNING_KEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
-                key: EOA_SIGNING_KEY
-          {{- end }}
+          {{- if or .Values.externalSecrets.enabled .Values.envFrom }}
           envFrom:
+          {{- if .Values.externalSecrets.enabled }}
           - secretRef:
-              name: {{ default (include "ethgas.fullname" .) .Values.existingSecret }}
+              name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- end }}
           volumeMounts:
-          - name: config
-            mountPath: /cb-config.toml
-            subPath: config.toml
-          - name: env
+          - name: app
             mountPath: /app
+          - name: certs
+            mountPath: /certs
+          - name: config
+            mountPath: /configs
           - name: logs-ethgas-commit
             mountPath: /var/logs/commit-boost
+          {{- if .Values.externalSecrets.enabled }}
+          - name: external-secrets
+            mountPath: /external-secrets
+            readOnly: true
+          {{- end }}
       volumes:
         - name: config
           configMap:
             name: {{ include "ethgas.fullname" . }}
-        - name: env
+        - name: app
+          emptyDir: {}
+        - name: certs
           emptyDir: {}
         - name: logs-pbs
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: {{ include "ethgas.fullname" . }}-pbs-logs
         - name: logs-signer
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: {{ include "ethgas.fullname" . }}-signer-logs
         - name: logs-ethgas-commit
-          emptyDir: {}
-        {{- if .Values.existingDirkSecret }}
-        - name: dirk-certs
+          persistentVolumeClaim:
+            claimName: {{ include "ethgas.fullname" . }}-commit-logs
+        {{- if .Values.externalSecrets.enabled }}
+        - name: external-secrets
           secret:
-            secretName: {{ .Values.existingDirkSecret }}
+            secretName: eso-{{ include "common.names.fullname" . }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

@@ -9,29 +9,6 @@ replicaCount: 1
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
-# existingSecret -- REQUIRED. Name of existing secret containing sensitive configuration
-# Use external secret management (e.g., Infisical, External Secrets Operator)
-# See examples/infisical-secret.yaml for a complete example
-# The secret MUST contain the following keys:
-#   - CB_JWT_ETHGAS_COMMIT: JWT token for CommitBoost authentication
-#   - CB_JWTS: JWT tokens in format "ETHGAS_COMMIT=<token>"
-#   - CB_SIGNER_JWT: JWT token for signer
-#   If useJwtAuth = true:
-#     - ACCESS_JWT: ETHGas Exchange access token
-#     - REFRESH_JWT: ETHGas Exchange refresh token
-#   If useJwtAuth = false:
-#     - EOA_SIGNING_KEY: EOA private key for transactions
-existingSecret: ""
-
-# existingDirkSecret -- Optional. Name of existing secret for Dirk TLS certificates
-# Only required if using Dirk as remote signer (configured via ethgas.signer)
-# If using web3signer or other remote signers, leave empty
-# The secret must contain (base64 encoded):
-#   - ca.crt: CA certificate for Dirk TLS
-#   - dirk.crt: Client certificate for Dirk TLS
-#   - dirk.key: Client private key for Dirk TLS
-existingDirkSecret: ""
-
 image:
   initContainer:
     repository: alpine
@@ -40,46 +17,42 @@ image:
   pbs:
     repository: ghcr.io/commit-boost/pbs
     pullPolicy: IfNotPresent
-    tag: "v0.8.0"
+    tag: "v0.9.2"
   signer:
     repository: ghcr.io/commit-boost/signer
     pullPolicy: IfNotPresent
-    tag: "v0.8.0"
+    tag: "v0.9.2"
   ethgas_commit:
     repository: ghcr.io/ethgas-developer/commitboost_ethgas_commit
     pullPolicy: IfNotPresent
-    tag: "v1.0.0-beta.7"
+    tag: "v1.0.1"
 
 ethgas:
   network: "Hoodi"
   rpc_url: "https://ethereum-hoodi-rpc.publicnode.com"
   relays: "https://0xb20c3fe59db9c3655088839ef3d972878d182eb745afd8abb1dd2abf6c14f93cd5934ed4446a5fe1ba039e2bc0cf1011@hoodi-relay.ethgas.com"
   entity_name: ""
+  eoa_signing_key: ""
   exchange_api_base: "https://hoodi.app.ethgas.com"
-  collateral_contract: "0xe8bfB84b14c383b94365a895fc8bfA36dE236dc8"
+  collateral_contract: "0x104Ef4192a97E0A93aBe8893c8A2d2484DFCBAF1"
+  signer: |
+    [signer.dirk]
+    cert_path = "/certs/dirk.crt"
+    key_path = "/certs/dirk.key"
+    ca_cert_path = "/certs/ca.crt"
+    secrets_path = "/secrets/dirk/secrets"
 
-  # useJwtAuth -- Set to true to use pre-generated JWT tokens (ACCESS_JWT, REFRESH_JWT)
-  # Set to false to use EOA signing key for automatic registration
-  # Note: All sensitive values MUST be provided via existingSecret
-  useJwtAuth: false
+    [[signer.dirk.hosts]]
+    url = "https://dirk0:8881"
+    wallets = ["Validators"]
 
-  # Remote signer configuration
-  # Example for Dirk (uncomment and modify):
-  # signer: |
-  #   [signer.dirk]
-  #   cert_path = "/signer/secrets/dirk.crt"
-  #   key_path = "/signer/secrets/dirk.key"
-  #   ca_cert_path = "/signer/secrets/ca.crt"
-  #
-  #   [[signer.dirk.hosts]]
-  #   url = "https://dirk-0.example.com:8881"
-  #   wallets = ["Validators"]
-  #
-  # Example for Web3Signer (uncomment and modify):
-  # signer: |
-  #   [signer.remote]
-  #   url = "http://web3signer-url:6174"
-  signer: ""
+    [[signer.dirk.hosts]]
+    url = "https://dirk1:8881"
+    wallets = ["Validators"]
+
+    [[signer.dirk.hosts]]
+    url = "https://dirk2:8881"
+    wallets = ["Validators"]
 
 # Extra arguments to pass to the ethgas binary.
 extraArgs: []
@@ -189,8 +162,23 @@ volumeMounts: []
 #   mountPath: "/etc/foo"
 #   readOnly: true
 
+# Additional envFrom configuration for all containers
+# This allows you to reference additional secrets or configmaps
+envFrom: []
+# - secretRef:
+#     name: my-secret
+# - configMapRef:
+#     name: my-configmap
+
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+externalSecrets:
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
+  data: []
