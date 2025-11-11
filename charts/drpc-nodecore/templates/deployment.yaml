@@ -44,6 +44,8 @@ spec:
           volumeMounts:
             - name: nginx-cache
               mountPath: /var/cache/nginx
+          securityContext:
+            {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
         - name: init-starknet-staking-config
           image: nginx:1.25
           command:
@@ -59,15 +61,11 @@ spec:
           volumeMounts:
             - name: drpc-nodecore-config-raw
               mountPath: /etc/nodecore-raw.yaml
-              subPath: {{ .Values.configMap.subPath }} 
+              subPath: {{ .Values.configMap.subPath }}
             - name: drpc-nodecore-config
               mountPath: /etc/nodecore-config
-        - securityContext:
+          securityContext:
             {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
-          {{- with $container }}
-          {{- toYaml . | nindent 10 }}
-          {{- end }}
-        {{- end }}
 
       containers:
         - name: nginx-sidecar
