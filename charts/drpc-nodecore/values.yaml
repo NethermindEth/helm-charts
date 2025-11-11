@@ -56,8 +56,8 @@ service:
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   ports:
-    - name: http
-      port: 8080
+    - name: rpc
+      port: 9090
       protocol: TCP
   extraContainersPorts: []
     # - name: http
