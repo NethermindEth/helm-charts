@@ -5,15 +5,9 @@ metadata:
   name: {{ include "drpc-nodecore.fullname" . }}
   labels:
     {{- include "drpc-nodecore.labels" . | nindent 4 }}
-  {{- with .Values.service.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+  annotations: {}
 spec:
-  type: {{ .Values.service.type }}
-  {{- with .Values.service.clusterIP }}
-  clusterIP: {{ . }}
-  {{- end }}
+  type: ClusterIP
   ports:
     - name: rpc-proxy
       port: 8080

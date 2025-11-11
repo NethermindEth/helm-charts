@@ -1,7 +1,7 @@
 
 # drpc-nodecore
 
-![Version: 0.0.5](https://img.shields.io/badge/Version-0.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.5](https://img.shields.io/badge/AppVersion-0.0.5-informational?style=flat-square)
+![Version: 0.0.6](https://img.shields.io/badge/Version-0.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.6](https://img.shields.io/badge/AppVersion-0.0.6-informational?style=flat-square)
 
 A Helm chart for dRPC nodeCore application
 
@@ -27,8 +27,7 @@ A Helm chart for dRPC nodeCore application
 | image.repository | string | `"drpcorg/nodecore"` |  |
 | image.tag | string | `"0.1.6"` |  |
 | imagePullSecrets | list | `[]` |  |
-| ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific","portName":"http"}]}],"tls":[]}` | For now all traffic is routed to the `http` port |
-| ingress.hosts[0].paths[0].portName | string | `"http"` | Port name as defined in the service.ports section |
+| ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local"}],"tls":[]}` | For now all traffic is routed to the `http` port |
 | initContainerSecurityContext.allowPrivilegeEscalation | bool | `true` |  |
 | initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | initContainerSecurityContext.readOnlyRootFilesystem | bool | `false` |  |
@@ -66,17 +65,8 @@ A Helm chart for dRPC nodeCore application
 | securityContext.runAsNonRoot | bool | `false` |  |
 | securityContext.runAsUser | int | `0` |  |
 | securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
-| service.annotations | object | `{}` |  |
-| service.extraContainersPorts | list | `[]` |  |
-| service.ports[0].name | string | `"rpc"` |  |
-| service.ports[0].port | int | `9090` |  |
-| service.ports[0].protocol | string | `"TCP"` |  |
-| service.type | string | `"ClusterIP"` |  |
 | serviceMonitor.enabled | bool | `true` |  |
 | serviceMonitor.interval | string | `"30s"` |  |
-| serviceMonitor.path | string | `"/metrics"` |  |
-| serviceMonitor.port | string | `"metrics"` |  |
-| serviceMonitor.scheme | string | `"http"` |  |
 | terminationGracePeriodSeconds | int | `30` | Default termination grace period for the pod |
 | tolerations | list | `[]` |  |
 
