@@ -614,6 +614,13 @@ beacon:
   # Lighthouse specific setting
   proposerOnly: false
 
+  # Taiko specific settings
+  taikoChainspecURL: "https://raw.githubusercontent.com/NethermindEth/Surge/refs/heads/main/spec/surge-staging-devnet/chainspec.json"
+  taikoInbox: ""
+  taikoAnchor: ""
+  l1Ws: ""
+  l1Beacon: ""
+
   ## MEV Boost endpoint
   ##
   builderEndpoint: ""

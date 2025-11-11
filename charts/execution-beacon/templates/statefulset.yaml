@@ -64,7 +64,7 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
+          {{- else if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
           {{- end }}
@@ -99,15 +99,36 @@ spec:
             - name: data
               mountPath: /data
           {{- else }}
+            {{- if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
+            {{- end }}
+            {{- if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
+            {{- end }}
           {{- end }}
             - name: env-nodeport
               mountPath: /env
             - name: scripts-init
               mountPath: /scripts
+        {{- if eq .Values.beacon.client "taiko" }}
+        - name: init-taiko
+          image: nethermind.jfrog.io/angkor-oci-remote-dockerhub/curlimages/curl:7.88.1
+          securityContext:
+            {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
+          command:
+            - sh
+            - -c
+            - |
+              curl -sSL {{ .Values.beacon.taikoChainspecURL }} -o /data/execution/chainspec.json
+              echo "Chainspec file downloaded and saved to /data/execution/chainspec.json"
+          {{- if .Values.execution.persistence.enabled }}
+          volumeMounts:
+            - name: data-execution
+              mountPath: /data/execution
+          {{- end }}
+        {{- end }}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
           image: "{{ include "beacon.image" . }}"
@@ -129,10 +150,10 @@ spec:
               --data-dir=/data/beacon
               --trusted-node-url={{ .Values.beacon.checkPointSync.url }}
           volumeMounts:
-          {{- if .Values.sharedPersistence.enabled }}
+            {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
+            {{- else if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
           {{- end }}
@@ -228,7 +249,7 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
+          {{- else if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
           {{- end }}
@@ -250,7 +271,7 @@ spec:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
         {{/*
-        Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar
+        Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar, Taiko
         */}}
         - name: beacon
           image: "{{ include "beacon.image" . }}"
@@ -269,6 +290,9 @@ spec:
           {{- if eq .Values.beacon.client "prysm" }}
           args:
             {{- include "beacon-args-prysm" . | nindent 12 }}
+          {{- else if eq .Values.beacon.client "taiko" }}
+          args:
+            {{- include "beacon-args-taiko" . | nindent 12 }}
           {{- else if eq .Values.beacon.client "teku" }}
           command:
             {{- include "beacon-command-teku" . | nindent 12 }}
@@ -325,7 +349,7 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
+          {{- else if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
           {{- end }}
@@ -433,6 +457,7 @@ spec:
           requests:
             storage: {{ .Values.sharedPersistence.size | quote }}
     {{- else }}
+    {{- if .Values.execution.persistence.enabled }}
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
@@ -449,6 +474,8 @@ spec:
         resources:
           requests:
             storage: {{ .Values.execution.persistence.size | quote }}
+    {{- end }}
+    {{- if .Values.beacon.persistence.enabled }}
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
@@ -465,4 +492,5 @@ spec:
         resources:
           requests:
             storage: {{ .Values.beacon.persistence.size | quote }}
+    {{- end }}
     {{- end }}

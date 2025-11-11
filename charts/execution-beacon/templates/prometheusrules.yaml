@@ -157,6 +157,17 @@ spec:
           annotations:
             summary: Lodestar beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+  {{- else if  eq .Values.beacon.client "taiko" }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: taikoBeaconNodeDown
+          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: taiko beacon node is down
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
   {{- end }}
   {{- end }}
 {{- end }}
