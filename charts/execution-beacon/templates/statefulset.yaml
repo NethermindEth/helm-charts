@@ -152,10 +152,10 @@ spec:
               --data-dir=/data/beacon
               --trusted-node-url={{ .Values.beacon.checkPointSync.url }}
           volumeMounts:
-           {{- if .Values.sharedPersistence.enabled }}
+            {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-           {{- else }}
+            {{- else }}
             {{- if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
