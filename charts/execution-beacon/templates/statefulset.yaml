@@ -253,11 +253,9 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
-            {{- if .Values.execution.persistence.enabled }}
+          {{- else if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
-            {{- end }}
           {{- end }}
           {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
             - name: jwtsecret
@@ -355,11 +353,9 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
-            {{- if .Values.beacon.persistence.enabled }}
+          {{- else if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
-            {{- end }}
           {{- end }}
           {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
             - name: jwtsecret
