@@ -2,7 +2,7 @@ apiVersion: v2
 name: execution-beacon
 description: A Helm chart for deploying Ethereum execution and consensus clients
 type: application
-version: 1.0.29
+version: 1.0.30
 keywords:
   - ethereum
   - blockchain
@@ -16,6 +16,7 @@ keywords:
   - teku
   - besu
   - p2p
+  - taiko
 
 home: https://www.ethereum.org/
 

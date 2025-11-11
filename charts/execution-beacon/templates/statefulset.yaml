@@ -108,6 +108,21 @@ spec:
               mountPath: /env
             - name: scripts-init
               mountPath: /scripts
+        {{- if eq .Values.beacon.client "taiko" }}
+        - name: init-taiko
+          image: nethermind.jfrog.io/angkor-oci-remote-dockerhub/curlimages/curl:7.88.1
+          securityContext:
+            {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
+          command:
+            - sh
+            - -c
+            - |
+              curl -sSL {{ .Values.beacon.taikoChainspecURL }} -o /data/execution/chainspec.json
+              echo "Chainspec file downloaded and saved to /data/execution/chainspec.json"
+          volumeMounts:
+            - name: data-execution
+              mountPath: /data/execution
+        {{- end}}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
           image: "{{ include "beacon.image" . }}"
@@ -250,7 +265,7 @@ spec:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
         {{/*
-        Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar
+        Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar, Taiko
         */}}
         - name: beacon
           image: "{{ include "beacon.image" . }}"
@@ -269,6 +284,9 @@ spec:
           {{- if eq .Values.beacon.client "prysm" }}
           args:
             {{- include "beacon-args-prysm" . | nindent 12 }}
+          {{- else if eq .Values.beacon.client "taiko" }}
+          args:
+            {{- include "beacon-args-taiko" . | nindent 12 }}
           {{- else if eq .Values.beacon.client "teku" }}
           command:
             {{- include "beacon-command-teku" . | nindent 12 }}

@@ -54,6 +54,38 @@ Prysm beacon client arguments
 {{- end }}
 
 {{/*
+Taiko beacon client arguments
+*/}}
+{{- define "beacon-args-taiko" -}}
+- "driver"
+{{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
+- "--jwtSecret=/secret/jwtsecret"
+{{- end }}
+{{- if .Values.beacon.taikoInbox }}
+- "--taikoInbox={{ .Values.beacon.taikoInbox }}"
+{{- end }}
+{{- if .Values.beacon.taikoAnchor }}
+- "--taikoAnchor={{ .Values.beacon.taikoAnchor }}"
+{{- end }}
+{{- if .Values.beacon.l1Ws }}
+- "--l1.ws={{ .Values.beacon.l1Ws }}"
+{{- end }}
+{{- if .Values.beacon.l1Beacon }}
+- "--l1.beacon={{ .Values.beacon.l1Beacon }}"
+{{- end }}
+- "--l2.ws=ws://localhost:{{ .Values.execution.jsonrpc.websocket.port }}"
+- "--l2.auth=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}"
+{{- if and .Values.metrics.enabled .Values.beacon.metrics.enabled }}
+- "--metrics=true"
+{{- else }}
+- "--metrics=false"
+{{- end }}
+{{- range .Values.beacon.extraFlags }}
+- {{ . | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
 Teku beacon client command
 */}}
 {{- define "beacon-command-teku" -}}
