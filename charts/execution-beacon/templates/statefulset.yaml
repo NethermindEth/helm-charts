@@ -64,9 +64,11 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else if .Values.execution.persistence.enabled }}
+          {{- else }}
+            {{- if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
+            {{- end }}
           {{- end }}
             - name: scripts-init
               mountPath: /scripts
@@ -98,12 +100,15 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else if .Values.execution.persistence.enabled }}
+          {{- else }}
+            {{- if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
-          {{- else if .Values.beacon.persistence.enabled }}
+            {{- end }}
+            {{- if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
+            {{- end }}
           {{- end }}
             - name: env-nodeport
               mountPath: /env
@@ -121,11 +126,11 @@ spec:
               curl -sSL {{ .Values.beacon.taikoChainspecURL }} -o /data/execution/chainspec.json
               echo "Chainspec file downloaded and saved to /data/execution/chainspec.json"
           {{- if .Values.execution.persistence.enabled }}
-            volumeMounts:
-              - name: data-execution
-                mountPath: /data/execution
+          volumeMounts:
+            - name: data-execution
+              mountPath: /data/execution
           {{- end }}
-        {{- end}}
+        {{- end }}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
           image: "{{ include "beacon.image" . }}"
@@ -150,9 +155,11 @@ spec:
            {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-           {{- else if .Values.beacon.persistence.enabled }}
+           {{- else }}
+            {{- if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
+            {{- end }}
           {{- end }}
         {{- end }}
       containers:
@@ -247,8 +254,10 @@ spec:
             - name: data
               mountPath: /data
           {{- else }}
+            {{- if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
+            {{- end }}
           {{- end }}
           {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
             - name: jwtsecret
@@ -346,9 +355,11 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else if .Values.beacon.persistence.enabled }}
+          {{- else }}
+            {{- if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
+            {{- end }}
           {{- end }}
           {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
             - name: jwtsecret
