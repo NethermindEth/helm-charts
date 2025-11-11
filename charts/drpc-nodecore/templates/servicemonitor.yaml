@@ -23,7 +23,7 @@ spec:
     scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
     {{- end }}
     honorLabels: true
-    port: nodecore-metrics
+    port: metrics
     path: /metrics
     scheme: http
     {{- if .Values.serviceMonitor.tlsConfig }}

@@ -13,9 +13,9 @@ spec:
       port: 8080
       targetPort: rpc-proxy
       protocol: TCP
-    - name: nodecore-metrics
+    - name: metrics
       port: 9093
-      targetPort: nodecore-metrics
+      targetPort: metrics
       protocol: TCP
   selector:
     {{- include "drpc-nodecore.selectorLabels" . | nindent 4 }}
