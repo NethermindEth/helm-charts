@@ -2,9 +2,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "generic-app.fullname" . }}
+  name: {{ include "drpc-nodecore.fullname" . }}
   labels:
-    {{- include "generic-app.labels" . | nindent 4 }}
+    {{- include "drpc-nodecore.labels" . | nindent 4 }}
 spec:
   {{- with .Values.deployment.strategy }}
   strategy:
@@ -16,7 +16,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "generic-app.selectorLabels" . | nindent 6 }}
+      {{- include "drpc-nodecore.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
@@ -24,7 +24,7 @@ spec:
         values-hash: {{ include "values.hash" . | quote }}
         {{- end }}
       labels:
-        {{- include "generic-app.labels" . | nindent 8 }}
+        {{- include "drpc-nodecore.labels" . | nindent 8 }}
     spec:
       {{- with .Values.dnsConfig }}
       dnsConfig:
@@ -103,6 +103,9 @@ spec:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: nodecore-metrics
+              containerPort: 9093
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           envFrom:
@@ -137,7 +140,7 @@ spec:
           emptyDir: {}
         - name: nginx-config
           configMap:
-            name: {{ include "generic-app.fullname" . }}-nginx-config
+            name: {{ include "drpc-nodecore.fullname" . }}-nginx-config
         - name: nginx-conf-d
           emptyDir: {}
         - name: drpc-nodecore-config-raw
