@@ -3,9 +3,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "generic-app.fullname" . }}
+  name: {{ include "drpc-nodecore.fullname" . }}
   labels:
-    {{- include "generic-app.labels" . | nindent 4 }}
+    {{- include "drpc-nodecore.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -24,21 +24,18 @@ spec:
       secretName: {{ .secretName }}
     {{- end }}
   {{- end }}
+
   rules:
     {{- range .Values.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            {{- with .pathType }}
-            pathType: {{ . }}
-            {{- end }}
+          - path: /
+            pathType: Prefix
             backend:
               service:
-                name: {{ include "generic-app.fullname" $ }}
+                name: {{ include "drpc-nodecore.fullname" $ }}
                 port:
-                  name: {{ .portName }}
-          {{- end }}
+                  name: rpc-proxy
     {{- end }}
 {{- end }}
