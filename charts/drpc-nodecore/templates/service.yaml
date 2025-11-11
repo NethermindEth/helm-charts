@@ -15,6 +15,10 @@ spec:
   clusterIP: {{ . }}
   {{- end }}
   ports:
+    - name: rpc-proxy
+      port: 8080
+      targetPort: rpc-proxy
+      protocol: TCP
     {{- $svcPorts := concat .Values.service.ports .Values.service.extraContainersPorts }}
     {{- if $svcPorts }}
     {{- range $port := $svcPorts }}

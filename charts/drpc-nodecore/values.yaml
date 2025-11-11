@@ -31,6 +31,10 @@ deployment:
   # If true, the container will be restarted when the values.yaml file changes.
   restartOnChanges: false
 
+configMap:
+  name: drpc-nodecore-config
+  subPath: nodecore.config.yaml
+
 # -- This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
 env: []
   # - name: MY_ENV_VAR
@@ -42,8 +46,7 @@ env: []
   #       name: secret-name
 
 # -- envFrom configuration
-envFrom:
-  []
+envFrom: []
   # - configMapRef:
   #     name: my-configmap
   # - secretRef:
@@ -56,8 +59,8 @@ service:
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   ports:
-    - name: http
-      port: 8080
+    - name: rpc
+      port: 9090
       protocol: TCP
   extraContainersPorts: []
     # - name: http
@@ -115,15 +118,6 @@ livenessProbe:
   timeoutSeconds: 1
   failureThreshold: 3
   successThreshold: 1
-
-# Additional volumes on the output Deployment definition.
-volumes: []
-
-# Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
 
 nodeSelector: {}
 

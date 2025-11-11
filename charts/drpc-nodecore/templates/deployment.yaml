@@ -44,13 +44,28 @@ spec:
           volumeMounts:
             - name: nginx-cache
               mountPath: /var/cache/nginx
-        {{- range $container := .Values.initContainers }}
-        - securityContext:
+          securityContext:
             {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
-          {{- with $container }}
-          {{- toYaml . | nindent 10 }}
+        - name: init-starknet-staking-config
+          image: nginx:1.25
+          command:
+            - sh
+            - -c
+            - |
+              envsubst < /etc/nodecore-raw.yaml > /etc/nodecore-config/nodecore.yaml
+          envFrom:
+          {{- with .Values.envFrom }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- end }}
+          env: {{- toYaml .Values.env | nindent 12 }}
+          volumeMounts:
+            - name: drpc-nodecore-config-raw
+              mountPath: /etc/nodecore-raw.yaml
+              subPath: {{ .Values.configMap.subPath }}
+            - name: drpc-nodecore-config
+              mountPath: /etc/nodecore-config
+          securityContext:
+            {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
 
       containers:
         - name: nginx-sidecar
@@ -101,10 +116,10 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            - name: drpc-nodecore-config
+              mountPath: /app/nodecore.yml
+              subPath: nodecore.yaml
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -125,7 +140,9 @@ spec:
             name: {{ include "generic-app.fullname" . }}-nginx-config
         - name: nginx-conf-d
           emptyDir: {}
-        {{- with .Values.volumes }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        - name: drpc-nodecore-config-raw
+          configMap:
+            name: {{ .Values.configMap.name }}
+        - name: drpc-nodecore-config
+          emptyDir: {}
 {{- end }}
