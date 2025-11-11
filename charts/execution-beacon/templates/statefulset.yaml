@@ -64,7 +64,7 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
+          {{- else if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
           {{- end }}
@@ -98,9 +98,10 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
+          {{- else if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
+          {{- else if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
           {{- end }}
@@ -119,9 +120,11 @@ spec:
             - |
               curl -sSL {{ .Values.beacon.taikoChainspecURL }} -o /data/execution/chainspec.json
               echo "Chainspec file downloaded and saved to /data/execution/chainspec.json"
-          volumeMounts:
-            - name: data-execution
-              mountPath: /data/execution
+          {{- if .Values.execution.persistence.enabled }}
+            volumeMounts:
+              - name: data-execution
+                mountPath: /data/execution
+          {{- end }}
         {{- end}}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
@@ -144,10 +147,10 @@ spec:
               --data-dir=/data/beacon
               --trusted-node-url={{ .Values.beacon.checkPointSync.url }}
           volumeMounts:
-          {{- if .Values.sharedPersistence.enabled }}
+           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
+           {{- else if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
           {{- end }}
@@ -343,7 +346,7 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
+          {{- else if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
           {{- end }}
@@ -455,6 +458,7 @@ spec:
           requests:
             storage: {{ .Values.sharedPersistence.size | quote }}
     {{- else }}
+    {{- if .Values.execution.persistence.enabled }}
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
@@ -471,6 +475,8 @@ spec:
         resources:
           requests:
             storage: {{ .Values.execution.persistence.size | quote }}
+    {{- end }}
+    {{- if .Values.beacon.persistence.enabled }}
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
@@ -487,4 +493,5 @@ spec:
         resources:
           requests:
             storage: {{ .Values.beacon.persistence.size | quote }}
+    {{- end }}
     {{- end }}
