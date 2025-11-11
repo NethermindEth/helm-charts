@@ -64,11 +64,9 @@ spec:
           {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-          {{- else }}
-            {{- if .Values.execution.persistence.enabled }}
+          {{- else if .Values.execution.persistence.enabled }}
             - name: data-execution
               mountPath: /data/execution
-            {{- end }}
           {{- end }}
             - name: scripts-init
               mountPath: /scripts
@@ -155,11 +153,9 @@ spec:
             {{- if .Values.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
-            {{- else }}
-            {{- if .Values.beacon.persistence.enabled }}
+            {{- else if .Values.beacon.persistence.enabled }}
             - name: data-beacon
               mountPath: /data/beacon
-            {{- end }}
           {{- end }}
         {{- end }}
       containers:
