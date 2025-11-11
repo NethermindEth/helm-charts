@@ -378,21 +378,17 @@ spec:
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-        {{- if and .Values.ethsider.enabled (or .Values.beacon.restApi.enabled .Values.execution.jsonrpc.enabled) }}
+        {{- if and .Values.ethsider.enabled .Values.beacon.restApi.enabled .Values.execution.jsonrpc.enabled }}
         - name: ethsider
           image: "{{ .Values.ethsider.repository }}:{{ .Values.ethsider.tag }}"
           imagePullPolicy: {{ .Values.ethsider.pullPolicy }}
           securityContext:
             {{- toYaml .Values.global.securityContext | nindent 12 }}
           env:
-            {{- if .Values.execution.jsonrpc.enabled }}
             - name: EXECUTION_ENDPOINT
               value: "http://localhost:{{ .Values.execution.jsonrpc.http.port }}"
-            {{- end }}
-            {{- if .Values.beacon.restApi.enabled }}
             - name: BEACON_ENDPOINT
               value: "http://localhost:{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
-            {{- end }}
             - name: BIND_ADDR
               value: "{{ .Values.ethsider.bindAddr }}"
           ports:
