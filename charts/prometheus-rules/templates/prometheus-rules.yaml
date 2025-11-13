@@ -11,7 +11,8 @@ spec:
   - name: {{ .name }}
     rules:
     {{- range .rules }}
-    - expr: {{ .expr }}
+    - expr: |
+        {{- .expr | nindent 8 }}
       {{- with .for }}
       for: {{ . }}
       {{- end }}
