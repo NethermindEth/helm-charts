@@ -1,0 +1,116 @@
+suite: prometheus service level tests
+
+templates:
+  - prometheusservicelevel.yaml
+
+values:
+  - values.tests.yaml
+
+set:
+  slos:
+    testing:
+      objective: 99.9
+      queries:
+        error: sum by(query) (rate(some_metric{some="error"}[{{ .window }}]))
+        total: sum by(query) (rate(some_metric[{{ .window }}]))
+      alerting:
+        summary: "test-summary"
+        description: "test-description"
+        runbook: "test-runbook"
+
+tests:
+  - it: given a non existent SLO window then should error
+    set:
+      window: invalid-window
+    asserts:
+      - failedTemplate:
+          errorMessage: "Window 'invalid-window' is not a valid window, see the comments on the values file for more info"
+  - it: given a valid SLO window then should not error
+    set:
+      window: 1d
+    asserts:
+      - equal:
+          path: metadata.labels["sloth-window"]
+          value: 1d
+
+  - it: given an error query without Sloth's window block then should error
+    set:
+      slos:
+        testing:
+          queries:
+            error: sum by(query) (rate(missing_window_block{some="error"}[5m]))
+    asserts:
+      - failedTemplate:
+          errorMessage: "The query `sum by(query) (rate(missing_window_block{some=\"error\"}[5m]))` does not contain `[{{ .window }}]`, which is required by Sloth to generate the rate rules"
+  - it: given a total query without Sloth's window block then should error
+    set:
+      slos:
+        testing:
+          queries:
+            total: sum by(query) (rate(missing_window_block[5m]))
+    asserts:
+      - failedTemplate:
+          errorMessage: "The query `sum by(query) (rate(missing_window_block[5m]))` does not contain `[{{ .window }}]`, which is required by Sloth to generate the rate rules"
+
+  - it: given disabled alerting then both page and ticket alert should be disabled
+    set:
+      slos:
+        testing:
+          alerting:
+            enabled: false
+    asserts:
+      - equal:
+          path: spec.slos[0].alerting.pageAlert.disable
+          value: true
+      - equal:
+          path: spec.slos[0].alerting.ticketAlert.disable
+          value: true
+  - it: given alerting without enabled key then should be enabled by default
+    set:
+      slos:
+        testing:
+          alerting:
+            summary: foo
+            description: bar
+            runbook: baz
+    asserts:
+      - notEqual:
+          path: spec.slos[0].alerting.pageAlert.disable
+          value: true
+      - notEqual:
+          path: spec.slos[0].alerting.ticketAlert.disable
+          value: true
+      - equal:
+          path: spec.slos[0].alerting.annotations.summary
+          value: foo
+      - equal:
+          path: spec.slos[0].alerting.annotations.description
+          value: bar
+      - equal:
+          path: spec.slos[0].alerting.annotations.runbook_url
+          value: baz
+  - it: given enabled alerting then should be enabled
+    set:
+      slos:
+        testing:
+          alerting:
+            enabled: true
+            summary: foo
+            description: bar
+            runbook: baz
+    asserts:
+      - notEqual:
+          path: spec.slos[0].alerting.pageAlert.disable
+          value: true
+      - notEqual:
+          path: spec.slos[0].alerting.ticketAlert.disable
+          value: true
+      - equal:
+          path: spec.slos[0].alerting.annotations.summary
+          value: foo
+      - equal:
+          path: spec.slos[0].alerting.annotations.description
+          value: bar
+      - equal:
+          path: spec.slos[0].alerting.annotations.runbook_url
+          value: baz

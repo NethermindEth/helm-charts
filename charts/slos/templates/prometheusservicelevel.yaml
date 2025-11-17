@@ -1,0 +1,48 @@
+apiVersion: sloth.slok.dev/v1
+kind: PrometheusServiceLevel
+metadata:
+  name: {{ include "slos.fullname" . }}
+  labels:
+    {{- include "slos.labels" . | nindent 4 }}
+    sloth-window: {{ include "slos.window" .Values.window | quote }}
+spec:
+  service: {{ .Release.Name }}
+  labels:
+    {{- include "slos.labels" . | nindent 4 }}
+  slos:
+    {{- range $sloName, $sloInfo := .Values.slos }}
+    - name: {{ $sloName | quote }}
+      objective: {{ $sloInfo.objective }}
+      description: {{ $sloInfo.description }}
+      sli:
+        events:
+          errorQuery: |
+            {{- include "slos.validateQuery" $sloInfo.queries.error | nindent 12 }}
+          totalQuery: |
+            {{- include "slos.validateQuery" $sloInfo.queries.total | nindent 12 }}
+      {{- with $sloInfo.alerting }}
+      alerting:
+        {{- if (not (hasKey . "enabled") | or .enabled) }}
+        name: {{ $.Release.Name }}-{{ $sloName }}-SLO
+        {{- with .extraLabels }}
+        labels:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        annotations:
+          summary: {{ required (printf "An alert `summary` is required in SLO '%s'" $sloName) .summary | quote }}
+          description: {{ required (printf "An alert `description` is required in SLO '%s'" $sloName) .description | quote }}
+          runbook_url: {{ required (printf "An alert `runbook` is required in SLO '%s'" $sloName) .runbook | quote }}
+        pageAlert:
+          labels:
+            severity: critical
+        ticketAlert:
+          labels:
+            severity: warning
+        {{- else }}
+        pageAlert:
+          disable: true
+        ticketAlert:
+          disable: true
+        {{- end }}
+      {{- end }}
+    {{- end }}

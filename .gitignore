@@ -5,3 +5,5 @@ charts/**/charts
 values.override.yaml
 .cr-release-packages
 manifest.yaml
+
+charts/**/tests/__snapshot__/
