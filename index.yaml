@@ -2626,6 +2626,19 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/prometheus-rules-0.0.1/prometheus-rules-0.0.1.tgz
     version: 0.0.1
+  slos:
+  - apiVersion: v2
+    created: "2025-11-19T19:33:30.430712687Z"
+    description: A Helm chart to help define SLOs
+    digest: f61967ebb27951230321109bd0820149dda0327f29d481d5d5e2d6f17850a5d8
+    maintainers:
+    - email: angelo.ross@nethermind.io
+      name: Angelin01
+    name: slos
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/slos-0.1.0/slos-0.1.0.tgz
+    version: 0.1.0
   validator-ejector:
   - apiVersion: v2
     created: "2025-06-04T15:58:56.549210486Z"
@@ -3358,4 +3371,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-11-17T16:25:04.604984104Z"
+generated: "2025-11-19T19:33:30.430959088Z"
