@@ -1,0 +1,58 @@
+{{- template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+## Usage
+
+Check `values.yaml` for instructions on specific values.
+
+The release name of the chart will be used as the service name and as part of alert names and SLOs. For example, given
+these values:
+```yaml
+slos:
+  availability:
+    # snip
+  latency:
+    # snip
+```
+
+And a release name as such:
+```shell
+helm install some-service nethermind/slos
+```
+or
+```yaml
+helmCharts:
+  - name: slos
+    repo: https://nethermindeth.github.io/helm-charts
+    version: "*"
+    valuesFile: values.something.yaml
+    releaseName: some-service
+    namespace: some-namespace
+```
+
+Will yield:
+- A SLO object named `some-service-slos`
+- With `service` set to `some-service`
+- With two SLOs/alerts:
+  - `some-service-availability-SLO`
+  - `some-service-latency-SLO`
+
+## Testing
+
+This chart experimentally uses [Helm Unittest](https://github.com/helm-unittest/helm-unittest) to validate basic logic.
+Run it from this chart's folder:
+```shell
+helm unittest .
+```
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

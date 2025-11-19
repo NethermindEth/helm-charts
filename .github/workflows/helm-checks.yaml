@@ -30,7 +30,7 @@ jobs:
       - name: Run pre-commit
         run: |
           make install-pre-commit
-          make pre-commit
+          make pre-commit-ci
 
   chart-testing:
     runs-on: ubuntu-latest
@@ -72,3 +72,39 @@ jobs:
       - name: Run chart-testing (lint)
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --config ct.yaml
+
+  helm-unittest:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: "charts/**"
+          dir_names: "true"
+          dir_names_max_depth: "2"
+
+      - name: Determine changed charts
+        id: changed-charts
+        # language="shell script"
+        run: |
+          changedCharts=""
+          for chart in ${{ steps.changed-files.outputs.all_changed_and_modified_files }}; do
+            if [ -f "$chart/Chart.yaml" ] && [ -d "$chart/tests" ]; then
+              changedCharts="$changedCharts $chart"
+            else
+              echo "The $chart folder does not contain a Chart.yaml file or tests folder, skipping"
+            fi
+          done
+          echo "changed_charts=$changedCharts" >> "$GITHUB_OUTPUT"
+
+      - name: Helm Unit Tests
+        uses: d3adb5/helm-unittest-action@v2.5.0
+        with:
+          install-mode: "if-not-present"
+          charts: "${{ steps.changed-charts.outputs.changed_charts }}"
