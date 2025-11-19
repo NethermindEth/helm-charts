@@ -10,9 +10,9 @@
 
 * @angkor-admins
 
-/.github/workflows/ @0xDones @AntiD2ta
+/.github/workflows/ @0xDones
 
-/charts/ @angkor-general
+/charts/ @role_angkor_devops
 
 /charts/generic-app/ @0xDones
 /charts/generic-app-p2p/ @0xDones
