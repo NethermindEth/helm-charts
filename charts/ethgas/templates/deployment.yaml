@@ -50,7 +50,7 @@ spec:
           - sh
           - -ac
           - >
-            chmod 777 -R /var/logs/commit-boost/;
+            chmod 777 -R /var/log/commit-boost/;
             printenv ca.crt | base64 -d  > /certs/ca.crt;
             printenv dirk.crt | base64 -d  > /certs/dirk.crt;
             printenv dirk.key | base64 -d  > /certs/dirk.key
@@ -66,11 +66,11 @@ spec:
         {{- end }}
         volumeMounts:
         - name: logs-pbs
-          mountPath: /var/logs/commit-boost/logs-pbs
+          mountPath: /var/log/commit-boost/logs-pbs
         - name: logs-signer
-          mountPath: /var/logs/commit-boost/logs-signer
+          mountPath: /var/log/commit-boost/logs-signer
         - name: logs-ethgas-commit
-          mountPath: /var/logs/commit-boost/logs-ethgas-commit
+          mountPath: /var/log/commit-boost/logs-ethgas-commit
         - name: app
           mountPath: /app
         - name: certs
@@ -91,14 +91,14 @@ spec:
           - name: CB_METRICS_PORT
             value: "{{ .Values.service.port.pbs.metrics }}"
           - name: CB_LOGS_DIR
-            value: /var/logs/commit-boost
+            value: /var/log/commit-boost
           volumeMounts:
           - name: app
             mountPath: /app
           - name: config
             mountPath: /configs
           - name: logs-pbs
-            mountPath: /var/logs/commit-boost
+            mountPath: /var/log/commit-boost
         - name: signer
           image: "{{ .Values.image.signer.repository }}:{{ .Values.image.signer.tag }}"
           command:
@@ -118,7 +118,7 @@ spec:
           - name: CB_METRICS_PORT
             value: "{{ .Values.service.port.signer.metrics }}"
           - name: CB_LOGS_DIR
-            value: /var/logs/commit-boost
+            value: /var/log/commit-boost
           {{- if or .Values.externalSecrets.enabled .Values.envFrom }}
           envFrom:
           {{- if .Values.externalSecrets.enabled }}
@@ -137,7 +137,7 @@ spec:
           - name: config
             mountPath: /configs
           - name: logs-signer
-            mountPath: /var/logs/commit-boost
+            mountPath: /var/log/commit-boost
           {{- if .Values.externalSecrets.enabled }}
           - name: external-secrets
             mountPath: /external-secrets
@@ -163,7 +163,7 @@ spec:
           - name: CB_METRICS_PORT
             value: "{{ .Values.service.port.ethgas_commit.metrics }}"
           - name: CB_LOGS_DIR
-            value: /var/logs/commit-boost
+            value: /var/log/commit-boost
           {{- if or .Values.externalSecrets.enabled .Values.envFrom }}
           envFrom:
           {{- if .Values.externalSecrets.enabled }}
@@ -182,7 +182,7 @@ spec:
           - name: config
             mountPath: /configs
           - name: logs-ethgas-commit
-            mountPath: /var/logs/commit-boost
+            mountPath: /var/log/commit-boost
           {{- if .Values.externalSecrets.enabled }}
           - name: external-secrets
             mountPath: /external-secrets
