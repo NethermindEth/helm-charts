@@ -40,9 +40,7 @@ helm.sh/chart: {{ include "slos.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-group: {{ required "The value `labels.group` is required" .Values.labels.group | quote }}
-team: {{ required "The value `labels.team` is required" .Values.labels.team | quote }}
-project: {{ required "The value `labels.project` is required" .Values.labels.project | quote }}
+{{ include "slos.alertlabels" . }}
 {{- end }}
 
 {{/*
@@ -51,6 +49,12 @@ Selector labels
 {{- define "slos.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "slos.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{- define "slos.alertlabels" -}}
+group: {{ required "The value `labels.group` is required" .Values.labels.group | quote }}
+team: {{ required "The value `labels.team` is required" .Values.labels.team | quote }}
+project: {{ required "The value `labels.project` is required" .Values.labels.project | quote }}
 {{- end }}
 
 {{/*

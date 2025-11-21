@@ -8,7 +8,7 @@ metadata:
 spec:
   service: {{ .Release.Name }}
   labels:
-    {{- include "slos.labels" . | nindent 4 }}
+    {{- include "slos.alertlabels" . | nindent 4 }}
   slos:
     {{- range $sloName, $sloInfo := .Values.slos }}
     - name: {{ $sloName | quote }}
