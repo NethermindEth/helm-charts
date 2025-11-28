@@ -384,21 +384,11 @@ spec:
             - name: BIND_ADDR
               value: "{{ .Values.ethsider.bindAddr }}"
           args:
-            {{- if not .Values.ethsider.probes.eth1Syncing }}
-            - "--eth1-syncing-probe=false"
-            {{- end }}
-            {{- if not .Values.ethsider.probes.eth1Peers }}
-            - "--eth1-peers-probe=false"
-            {{- end }}
-            {{- if not .Values.ethsider.probes.eth2Syncing }}
-            - "--eth2-syncing-probe=false"
-            {{- end }}
-            {{- if not .Values.ethsider.probes.eth2PeersCount }}
-            - "--eth2-peers-count-probe=false"
-            {{- end }}
-            {{- if not .Values.ethsider.probes.eth2Health }}
-            - "--eth2-health-probe=false"
-            {{- end }}
+            - "--eth1-syncing-probe={{ if hasKey .Values.ethsider.probes "eth1Syncing" }}{{ .Values.ethsider.probes.eth1Syncing | toString | lower }}{{ else }}true{{ end }}"
+            - "--eth1-peers-probe={{ if hasKey .Values.ethsider.probes "eth1Peers" }}{{ .Values.ethsider.probes.eth1Peers | toString | lower }}{{ else }}true{{ end }}"
+            - "--eth2-syncing-probe={{ if hasKey .Values.ethsider.probes "eth2Syncing" }}{{ .Values.ethsider.probes.eth2Syncing | toString | lower }}{{ else }}true{{ end }}"
+            - "--eth2-peers-count-probe={{ if hasKey .Values.ethsider.probes "eth2PeersCount" }}{{ .Values.ethsider.probes.eth2PeersCount | toString | lower }}{{ else }}true{{ end }}"
+            - "--eth2-health-probe={{ if hasKey .Values.ethsider.probes "eth2Health" }}{{ .Values.ethsider.probes.eth2Health | toString | lower }}{{ else }}true{{ end }}"
           ports:
             - containerPort: {{ .Values.ethsider.bindAddr }}
               name: sidecar
