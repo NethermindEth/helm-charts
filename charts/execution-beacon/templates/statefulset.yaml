@@ -383,6 +383,22 @@ spec:
               value: "http://localhost:{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
             - name: BIND_ADDR
               value: "{{ .Values.ethsider.bindAddr }}"
+          args:
+            {{- if not .Values.ethsider.probes.eth1Syncing }}
+            - "--eth1-syncing-probe=false"
+            {{- end }}
+            {{- if not .Values.ethsider.probes.eth1Peers }}
+            - "--eth1-peers-probe=false"
+            {{- end }}
+            {{- if not .Values.ethsider.probes.eth2Syncing }}
+            - "--eth2-syncing-probe=false"
+            {{- end }}
+            {{- if not .Values.ethsider.probes.eth2PeersCount }}
+            - "--eth2-peers-count-probe=false"
+            {{- end }}
+            {{- if not .Values.ethsider.probes.eth2Health }}
+            - "--eth2-health-probe=false"
+            {{- end }}
           ports:
             - containerPort: {{ .Values.ethsider.bindAddr }}
               name: sidecar
