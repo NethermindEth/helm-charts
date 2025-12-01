@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -103,6 +103,11 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | ethsider.livenessProbe.periodSeconds | int | `1` |  |
 | ethsider.livenessProbe.successThreshold | int | `3` |  |
 | ethsider.livenessProbe.timeoutSeconds | int | `3` |  |
+| ethsider.probes.eth1Peers | bool | `true` |  |
+| ethsider.probes.eth1Syncing | bool | `true` |  |
+| ethsider.probes.eth2Health | bool | `true` |  |
+| ethsider.probes.eth2PeersCount | bool | `true` |  |
+| ethsider.probes.eth2Syncing | bool | `true` |  |
 | ethsider.pullPolicy | string | `"IfNotPresent"` |  |
 | ethsider.readinessProbe.enabled | bool | `true` |  |
 | ethsider.readinessProbe.failureThreshold | int | `3` |  |
