@@ -38,6 +38,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
 
       initContainers:
+        {{- if .Values.nginxSidecar.enabled }}
         - name: init-nginx-cache
           image: nginx:1.25
           command: ['sh', '-c', 'mkdir -p /var/cache/nginx']
@@ -46,6 +47,7 @@ spec:
               mountPath: /var/cache/nginx
           securityContext:
             {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
+        {{- end }}
         - name: init-starknet-staking-config
           image: nginx:1.25
           command:
@@ -68,6 +70,7 @@ spec:
             {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
 
       containers:
+        {{- if .Values.nginxSidecar.enabled }}
         - name: nginx-sidecar
           image: nginx:1.25
           ports:
@@ -100,12 +103,15 @@ spec:
         {{- with .Values.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- end }}
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: metrics
               containerPort: 9093
+            - name: rpc
+              containerPort: 9090
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           envFrom:
@@ -136,6 +142,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if .Values.nginxSidecar.enabled }}
         - name: nginx-cache
           emptyDir: {}
         - name: nginx-config
@@ -143,6 +150,7 @@ spec:
             name: {{ include "drpc-nodecore.fullname" . }}-nginx-config
         - name: nginx-conf-d
           emptyDir: {}
+        {{- end }}
         - name: drpc-nodecore-config-raw
           configMap:
             name: {{ .Values.configMap.name }}
