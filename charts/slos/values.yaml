@@ -38,3 +38,7 @@ slos: {}
   #       The current error ratio for APPLICATION {{ $labels.job }} requests is high enough to exhaust the error budget quickly!
   #       Current error rate rate: {{ $value | printf "%.3f" }}
   #     runbook: "https://example.com"  # All good alerts have a runbook to help on-call
+  #     # If necessary, you can override the severity for the page and ticket alerts, generally you'll want to leave them as-is
+  #     severity:
+  #       page: critical
+  #       ticket: warning

@@ -34,10 +34,10 @@ spec:
           runbook_url: {{ required (printf "An alert `runbook` is required in SLO '%s'" $sloName) .runbook | quote }}
         pageAlert:
           labels:
-            severity: critical
+            severity: {{ $sloInfo | dig "alerting" "severity" "page" "critical" }}
         ticketAlert:
           labels:
-            severity: warning
+            severity: {{ $sloInfo | dig "alerting" "severity" "ticket" "warning" }}
         {{- else }}
         pageAlert:
           disable: true
