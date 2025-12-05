@@ -2692,6 +2692,18 @@ entries:
     version: 0.0.1
   slos:
   - apiVersion: v2
+    created: "2025-12-05T17:00:00.580317303Z"
+    description: A Helm chart to help define SLOs
+    digest: 041c8c7a012948d2b9e9db64119be194cdfc7aad32ed524f1e1ec93a9e965fe8
+    maintainers:
+    - email: angelo.ross@nethermind.io
+      name: Angelin01
+    name: slos
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/slos-0.2.0/slos-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2025-11-21T14:02:26.598874372Z"
     description: A Helm chart to help define SLOs
     digest: 68a52e3fb062455365e9ce062b79bb5041efe36646e55b5a17eb765c53b7ab12
@@ -3447,4 +3459,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-12-01T16:39:56.508275064Z"
+generated: "2025-12-05T17:00:00.580551459Z"
