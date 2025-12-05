@@ -114,3 +114,56 @@ tests:
       - equal:
           path: spec.slos[0].alerting.annotations.runbook_url
           value: baz
+
+  - it: given enabled alerting and no severity override then should use defaults
+    set:
+      slos:
+        testing:
+          alerting:
+            enabled: true
+            summary: foo
+            description: bar
+            runbook: baz
+    asserts:
+      - equal:
+          path: spec.slos[0].alerting.pageAlert.labels.severity
+          value: critical
+      - equal:
+          path: spec.slos[0].alerting.ticketAlert.labels.severity
+          value: warning
+  - it: given enabled alerting and ticket severity override then should override only ticket severity
+    set:
+      slos:
+        testing:
+          alerting:
+            enabled: true
+            summary: foo
+            description: bar
+            runbook: baz
+            severity:
+              ticket: foobar
+    asserts:
+      - equal:
+          path: spec.slos[0].alerting.pageAlert.labels.severity
+          value: critical
+      - equal:
+          path: spec.slos[0].alerting.ticketAlert.labels.severity
+          value: foobar
+  - it: given enabled alerting and ticket severity override then should override only ticket severity
+    set:
+      slos:
+        testing:
+          alerting:
+            enabled: true
+            summary: foo
+            description: bar
+            runbook: baz
+            severity:
+              page: foobar
+    asserts:
+      - equal:
+          path: spec.slos[0].alerting.pageAlert.labels.severity
+          value: foobar
+      - equal:
+          path: spec.slos[0].alerting.ticketAlert.labels.severity
+          value: warning
