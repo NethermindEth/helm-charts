@@ -32,6 +32,7 @@ spec:
           summary: {{ required (printf "An alert `summary` is required in SLO '%s'" $sloName) .summary | quote }}
           description: {{ required (printf "An alert `description` is required in SLO '%s'" $sloName) .description | quote }}
           runbook_url: {{ required (printf "An alert `runbook` is required in SLO '%s'" $sloName) .runbook | quote }}
+          dashboard_url: {{ printf "https://nethermind.grafana.net/d/slo-detail/slo-detail?var-Datasource=bf66pyzldcdfka&var-service=%s&var-slo=%s" $.Release.Name $sloName | quote }}
         pageAlert:
           labels:
             severity: {{ $sloInfo | dig "alerting" "severity" "page" "critical" }}
