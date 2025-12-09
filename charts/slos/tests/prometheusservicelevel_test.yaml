@@ -90,6 +90,8 @@ tests:
           path: spec.slos[0].alerting.annotations.runbook_url
           value: baz
   - it: given enabled alerting then should be enabled
+    release:
+      name: some-service
     set:
       slos:
         testing:
@@ -114,6 +116,9 @@ tests:
       - equal:
           path: spec.slos[0].alerting.annotations.runbook_url
           value: baz
+      - equal:
+          path: spec.slos[0].alerting.annotations.dashboard_url
+          value: "https://nethermind.grafana.net/d/slo-detail/slo-detail?var-Datasource=bf66pyzldcdfka&var-service=some-service&var-slo=testing"
 
   - it: given enabled alerting and no severity override then should use defaults
     set:
