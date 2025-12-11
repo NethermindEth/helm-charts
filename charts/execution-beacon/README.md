@@ -260,6 +260,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | sharedPersistence.enabled | bool | `false` |  |
 | sharedPersistence.size | string | `"300Gi"` |  |
 | sharedPersistence.storageClassName | string | `""` |  |
+| tcpRoutes | object | `{}` |  |
 | terminationGracePeriodSeconds | int | `120` |  |
 | tolerations | list | `[]` |  |
 | volumeMounts | list | `[]` |  |

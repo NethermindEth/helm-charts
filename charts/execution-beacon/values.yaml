@@ -226,6 +226,32 @@ sessionAffinity:
   # The session duration in seconds
   timeoutSeconds: 86400
 
+## TCP Routes
+## A map of names to route configurations
+##
+tcpRoutes: {}
+  # beacon:
+  #   # Extra labels to add to the TCPRoute, can override default labels
+  #   labels:
+  #     foo: "123"
+  #     bar: "abc"
+  #
+  #   # Extra annotations to add to the TCPRoute
+  #   annotations:
+  #     external-dns.alpha.kubernetes.io/hostname: "some-domain.example.com"
+  #
+  #   # Parent ref, as defined by https://gateway-api.sigs.k8s.io/reference/spec/#parentreference
+  #   # At a minimum, you'll need name, namespace and sectionName
+  #   parentRefs:
+  #     - name: gateway
+  #       namespace: istio-ingress
+  #       sectionName: some-section
+  #
+  #   # Backend refs, as defined in https://gateway-api.sigs.k8s.io/reference/spec/#backendref
+  #   # At a minimum, you'll need the target port, consider using a YAML alias here to fetch the value from a service
+  #   backendRefs:
+  #     - port: 1234
+
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
