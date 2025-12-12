@@ -10,7 +10,7 @@ spec:
   type: ClusterIP
   ports:
     - name: rpc
-      port: {{ if .Values.nginxSidecar.enabled }}8080{{ else }}9090{{ end }}
+      port: 8080
       targetPort: {{ if .Values.nginxSidecar.enabled }}rpc-proxy{{ else }}rpc{{ end }}
     - name: metrics
       port: 9093
