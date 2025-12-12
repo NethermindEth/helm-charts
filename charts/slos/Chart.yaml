@@ -1,8 +1,0 @@
-apiVersion: v2
-name: slos
-description: A Helm chart to help define SLOs
-type: application
-version: 0.2.0
-maintainers:
-  - name: Angelin01
-    email: angelo.ross@nethermind.io
