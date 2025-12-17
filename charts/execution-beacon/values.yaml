@@ -86,11 +86,11 @@ network: mainnet
 image:
   imagePullPolicy: IfNotPresent
   execution:
-    repository: ""  # Leave empty to auto-select based on execution.client
-    tag: "1.34.0"   # Update to your desired version
+    repository: "" # Leave empty to auto-select based on execution.client
+    tag: "1.34.0" # Update to your desired version
   beacon:
-    repository: ""  # Leave empty to auto-select based on beacon.client
-    tag: "multiarch-v25.9.2"  # Update to your desired version
+    repository: "" # Leave empty to auto-select based on beacon.client
+    tag: "multiarch-v25.9.2" # Update to your desired version
 
 ## JSON Web Token (JWT) authentication is used to secure the communication
 ## between the beacon node and execution client. You can generate a JWT using
@@ -185,6 +185,11 @@ ethsider:
     eth2Syncing: true
     eth2PeersCount: true
     eth2Health: true
+    eth1BlockSync: # Enables and configures Block Sync Monitoring probe
+      enabled: false
+      referenceEndpoint: ""
+      threshold: 0
+
   ## Configure liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   ## NB! readinessProbe and livenessProbe must be disabled before genesis
