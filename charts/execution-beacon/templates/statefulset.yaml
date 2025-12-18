@@ -389,6 +389,11 @@ spec:
             - "--eth2-syncing-probe={{ if hasKey .Values.ethsider.probes "eth2Syncing" }}{{ .Values.ethsider.probes.eth2Syncing | toString | lower }}{{ else }}true{{ end }}"
             - "--eth2-peers-count-probe={{ if hasKey .Values.ethsider.probes "eth2PeersCount" }}{{ .Values.ethsider.probes.eth2PeersCount | toString | lower }}{{ else }}true{{ end }}"
             - "--eth2-health-probe={{ if hasKey .Values.ethsider.probes "eth2Health" }}{{ .Values.ethsider.probes.eth2Health | toString | lower }}{{ else }}true{{ end }}"
+            {{- if .Values.ethsider.probes.eth1BlockSync.enabled }}
+            - "--block-sync-probe=true"
+            - "--block-sync-threshold={{ .Values.ethsider.probes.eth1BlockSync.threshold }}"
+            - "--reference-endpoint={{ .Values.ethsider.probes.eth1BlockSync.referenceEndpoint }}"
+            {{- end }}
           ports:
             - containerPort: {{ .Values.ethsider.bindAddr }}
               name: sidecar
