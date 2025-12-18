@@ -146,6 +146,8 @@ service:
     - name: http
       port: 8080
       protocol: TCP
+      # Optionally, supply a containerPort to pick a different port on the service and the container
+      # containerPort: 8000
   extraContainersPorts: []
     # - name: http
     #   port: 8080

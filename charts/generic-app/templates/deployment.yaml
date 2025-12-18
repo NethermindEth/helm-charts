@@ -75,7 +75,7 @@ spec:
           {{- if .Values.service.ports }}
           {{- range $idx, $port := .Values.service.ports }}
             - name: {{ $port.name }}
-              containerPort: {{ $port.port }}
+              containerPort: {{ $port.containerPort | default $port.port }}
               protocol: {{ $port.protocol }}
           {{- end }}
           {{- else }}
