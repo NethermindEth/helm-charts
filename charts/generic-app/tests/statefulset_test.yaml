@@ -1,0 +1,39 @@
+suite: deployment tests
+
+set:
+  statefulSet:
+    enabled: true
+
+templates:
+  - statefulset.yaml
+
+tests:
+  - it: given service ports with no container port then container uses same port as service
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0]
+          value:
+            name: test
+            containerPort: 1234
+            protocol: TCP
+  - it: given service ports with container port then container uses the container port
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            containerPort: 4321
+            protocol: TCP
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0]
+          value:
+            name: test
+            containerPort: 4321
+            protocol: TCP
