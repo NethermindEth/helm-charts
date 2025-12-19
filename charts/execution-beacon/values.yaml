@@ -689,3 +689,21 @@ beacon:
   ## Additional envFrom to add into the beacon container
   ##
   envFrom: []
+
+## HTTP Route, for the ports that can actually go through HTTP
+##
+HTTPRoute:
+  enabled: false
+  annotations: {}
+  parentRefs: []
+  # - name: gateway
+  #   namespace: istio-ingress
+  hostnames: []
+  # - example.com
+  rules: []
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /
+  #   backendRefs:
+  #   - port: 1234
