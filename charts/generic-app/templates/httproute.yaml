@@ -34,7 +34,7 @@ spec:
     {{- range .backendRefs }}
     - group: {{ .group | default "" | quote }}
       kind: {{ .kind | default "Service" }}
-      name: {{ .name | default (include "generic-app.fullname" $) }}
+      name: {{ .name | default (include "generic-app.fullname" $) | quote }}
       {{- if .namespace }}
       # When specifying a backendRef in a different namespace, you must create a
       # ReferenceGrant in the target namespace to allow this HTTPRoute to
