@@ -36,7 +36,10 @@ spec:
       kind: {{ .kind | default "Service" }}
       name: {{ .name | default (include "generic-app.fullname" $) }}
       {{- if .namespace }}
-      namespace: {{ .namespace }}
+      # When specifying a backendRef in a different namespace, you must create a
+      # ReferenceGrant in the target namespace to allow this HTTPRoute to
+      # reference the backend Service.
+      namespace: {{ .namespace | quote }}
       {{- end }}
       port: {{ .port }}
       weight: {{ .weight | default 1 }}
