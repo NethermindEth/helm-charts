@@ -197,7 +197,7 @@ HTTPRoute:
   #   backendRefs:
   #     - kind: Service
   #       name: my-service      # Optional: defaults to chart fullname
-  #       namespace: my-ns      # Optional: for cross-namespace references
+  #       namespace: my-ns      # Optional: for cross-namespace references.  Remember that a ReferenceGrant must be created in case of cross-namespace references
   #       port: 8080
   #       weight: 1
 
