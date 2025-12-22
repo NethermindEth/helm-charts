@@ -32,9 +32,12 @@ spec:
     {{- end }}
     backendRefs:
     {{- range .backendRefs }}
-    - group: ""
+    - group: {{ .group | default "" | quote }}
       kind: {{ .kind | default "Service" }}
-      name: {{ include "generic-app.fullname" $ }}
+      name: {{ .name | default (include "generic-app.fullname" $) }}
+      {{- if .namespace }}
+      namespace: {{ .namespace }}
+      {{- end }}
       port: {{ .port }}
       weight: {{ .weight | default 1 }}
     {{- end }}

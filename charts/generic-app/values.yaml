@@ -185,14 +185,21 @@ HTTPRoute:
   # - example.com
   rules: []
   # - matches:
-  #   - path:
-  #       type: PathPrefix
-  #       value: /
+  #     - path:
+  #         type: PathPrefix
+  #         value: /
+  #   filters:
+  #     - type: RequestHeaderModifier
+  #       requestHeaderModifier:
+  #         set:
+  #           - name: X-Forwarded-Proto
+  #             value: https
   #   backendRefs:
-  #   - group: ''
-  #     kind: Service
-  #     name: {{ include "generic-app.fullname" $ }}
-  #     port: 1027
+  #     - kind: Service
+  #       name: my-service      # Optional: defaults to chart fullname
+  #       namespace: my-ns      # Optional: for cross-namespace references
+  #       port: 8080
+  #       weight: 1
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
