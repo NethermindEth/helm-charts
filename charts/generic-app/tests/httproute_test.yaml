@@ -1,0 +1,48 @@
+suite: httproute tests
+
+set:
+  HTTPRoute:
+    enabled: true
+
+templates:
+  - httproute.yaml
+
+tests:
+  - it: given a backend ref with only port configured then should default to the chart's service with default weight
+    set:
+      fullnameOverride: some-full-name
+      HTTPRoute:
+        rules:
+          - backendRefs:
+            - port: 8080
+    asserts:
+      - equal:
+          path: .spec.rules[0].backendRefs[0]
+          value:
+            group: ""
+            kind: Service
+            name: some-full-name
+            port: 8080
+            weight: 1
+  - it: given a backend ref with overrides then should use overrides
+    set:
+      fullnameOverride: some-full-name
+      HTTPRoute:
+        rules:
+          - backendRefs:
+              - group: some.customresource.io
+                kind: Potato
+                name: foo
+                namespace: bar
+                port: 1234
+                weight: 999
+    asserts:
+      - equal:
+          path: .spec.rules[0].backendRefs[0]
+          value:
+            group: some.customresource.io
+            kind: Potato
+            name: foo
+            namespace: bar
+            port: 1234
+            weight: 999
