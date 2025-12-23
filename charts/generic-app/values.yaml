@@ -185,14 +185,22 @@ HTTPRoute:
   # - example.com
   rules: []
   # - matches:
-  #   - path:
-  #       type: PathPrefix
-  #       value: /
+  #     - path:
+  #         type: PathPrefix
+  #         value: /
+  #   filters:
+  #     - type: RequestHeaderModifier
+  #       requestHeaderModifier:
+  #         set:
+  #           - name: X-Forwarded-Proto
+  #             value: https
   #   backendRefs:
-  #   - group: ''
-  #     kind: Service
-  #     name: {{ include "generic-app.fullname" $ }}
-  #     port: 1027
+  #     - group: ""             # Optional: defaults to empty string
+  #       kind: Service         # Optional: defaults to Service
+  #       name: my-service      # Optional: defaults to chart fullname
+  #       namespace: my-ns      # Optional: for cross-namespace references.  Remember that a ReferenceGrant must be created in case of cross-namespace references
+  #       port: 8080
+  #       weight: 1             # Optional: defaults to 1
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
