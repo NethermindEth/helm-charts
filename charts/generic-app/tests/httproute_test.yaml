@@ -94,3 +94,38 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: 'The Service was configured with 2 ports, therefore all HTTPRoute rules must manually specify backendRefs'
+
+  - it: given service with exactly one port and empty rules then should create default rule
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+      HTTPRoute:
+        rules: []
+    asserts:
+      - equal:
+          path: .spec.rules
+          value:
+            - backendRefs:
+                - group: ""
+                  kind: Service
+                  name: some-full-name
+                  port: 1234
+                  weight: 1
+  - it: given service with number of ports different than one then at least one rule must be provided
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+          - name: test2
+            port: 4321
+            protocol: TCP
+      HTTPRoute:
+        rules: []
+    asserts:
+      - failedTemplate:
+          errorMessage: 'The Service was configured with 2 ports, therefore at least on HTTPRoute rule must be provided'
