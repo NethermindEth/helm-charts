@@ -1,4 +1,29 @@
 {{- if .Values.HTTPRoute.enabled -}}
+{{- $rules := .Values.HTTPRoute.rules }}
+{{- $portCount := len .Values.service.ports }}
+{{- if eq $portCount 1 }}
+  {{- $singlePort := (first .Values.service.ports).port }}
+
+  {{- if eq (len $rules) 0 }}
+    {{- $rules = list (dict "backendRefs" (list (dict "port" $singlePort))) }}
+  {{- else }}
+    {{- range $r := $rules }}
+      {{- if not (hasKey $r "backendRefs") }}
+        {{- $_ := set $r "backendRefs" (list (dict "port" $singlePort)) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- else }}
+  {{- if eq (len $rules) 0 }}
+    {{- fail (printf "The Service was configured with %d ports, therefore at least on HTTPRoute rule must be provided" $portCount) }}
+  {{- end }}
+
+  {{- range $r := $rules }}
+    {{- if not (hasKey $r "backendRefs") }}
+      {{- fail (printf "The Service was configured with %d ports, therefore all HTTPRoute rules must manually specify backendRefs" $portCount) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -13,8 +38,8 @@ metadata:
 spec:
   parentRefs:
   {{- range .Values.HTTPRoute.parentRefs }}
-  - group: {{ .group }}
-    kind: {{ .kind }}
+  - group: {{ .group | default "gateway.networking.k8s.io" }}
+    kind: {{ .kind | default "Gateway" }}
     name: {{ .name }}
     namespace: {{ .namespace | default "istio-system" }}
   {{- end }}
@@ -23,7 +48,7 @@ spec:
   - {{ . | quote }}
   {{- end }}
   rules:
-  {{- range .Values.HTTPRoute.rules }}
+  {{- range $rules }}
   - {{- if .matches }}
     matches: {{- .matches | toYaml | nindent 4 }}
     {{- end }}

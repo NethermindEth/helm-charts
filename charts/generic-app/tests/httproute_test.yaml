@@ -1,6 +1,7 @@
 suite: httproute tests
 
 set:
+  fullnameOverride: some-full-name
   HTTPRoute:
     enabled: true
 
@@ -10,7 +11,6 @@ templates:
 tests:
   - it: given a backend ref with only port configured then should default to the chart's service with default weight
     set:
-      fullnameOverride: some-full-name
       HTTPRoute:
         rules:
           - backendRefs:
@@ -26,7 +26,6 @@ tests:
             weight: 1
   - it: given a backend ref with overrides then should use overrides
     set:
-      fullnameOverride: some-full-name
       HTTPRoute:
         rules:
           - backendRefs:
@@ -46,3 +45,87 @@ tests:
             namespace: bar
             port: 1234
             weight: 999
+
+  - it: given service with exactly one port then backendRef should be optional and use that port
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+      HTTPRoute:
+        rules:
+          - matches:
+              - path:
+                  type: Exact
+                  value: /foo
+    asserts:
+      - equal:
+          path: .spec.rules[0].matches[0]
+          value:
+            path:
+              type: Exact
+              value: /foo
+      - equal:
+         path: .spec.rules[0].backendRefs[0]
+         value:
+           group: ""
+           kind: Service
+           name: some-full-name
+           port: 1234
+           weight: 1
+
+  - it: given service with number of ports different than one then backendRefs should not be optional
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+          - name: test2
+            port: 4321
+            protocol: TCP
+      HTTPRoute:
+        rules:
+          - matches:
+              - path:
+                  type: Exact
+                  value: /foo
+    asserts:
+      - failedTemplate:
+          errorMessage: 'The Service was configured with 2 ports, therefore all HTTPRoute rules must manually specify backendRefs'
+
+  - it: given service with exactly one port and empty rules then should create default rule
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+      HTTPRoute:
+        rules: []
+    asserts:
+      - equal:
+          path: .spec.rules
+          value:
+            - backendRefs:
+                - group: ""
+                  kind: Service
+                  name: some-full-name
+                  port: 1234
+                  weight: 1
+  - it: given service with number of ports different than one then at least one rule must be provided
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+          - name: test2
+            port: 4321
+            protocol: TCP
+      HTTPRoute:
+        rules: []
+    asserts:
+      - failedTemplate:
+          errorMessage: 'The Service was configured with 2 ports, therefore at least on HTTPRoute rule must be provided'
