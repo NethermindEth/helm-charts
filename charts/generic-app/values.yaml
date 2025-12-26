@@ -183,6 +183,17 @@ HTTPRoute:
   #   namespace: istio-ingress
   hostnames: []
   # - example.com
+
+  ## Route rules configuration. See https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule
+  ##
+  ## When the Service exposes exactly one port (.service.ports has one value):
+  ## - If no rules are defined, a default catch-all rule is created for that port.
+  ## - If rules are defined but `backendRefs` is omitted, it is auto-generated
+  ##   to point to that same port.
+  ##
+  ## If the Service exposes multiple ports, rules and `backendRefs` must be
+  ## defined explicitly.
+  ##
   rules: []
   # - matches:
   #     - path:
