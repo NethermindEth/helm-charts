@@ -75,7 +75,7 @@ tests:
            port: 1234
            weight: 1
 
-  - it: given service with numbers of ports different than one then backendRefs should not be optional
+  - it: given service with number of ports different than one then backendRefs should not be optional
     set:
       service:
         ports:

@@ -29,8 +29,8 @@ metadata:
 spec:
   parentRefs:
   {{- range .Values.HTTPRoute.parentRefs }}
-  - group: {{ .group }}
-    kind: {{ .kind }}
+  - group: {{ .group | default "gateway.networking.k8s.io" }}
+    kind: {{ .kind | default "Gateway" }}
     name: {{ .name }}
     namespace: {{ .namespace | default "istio-system" }}
   {{- end }}
