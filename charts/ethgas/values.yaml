@@ -25,7 +25,7 @@ image:
   ethgas_commit:
     repository: ghcr.io/ethgas-developer/commitboost_ethgas_commit
     pullPolicy: IfNotPresent
-    tag: "v1.0.1"
+    tag: "v1.0.3"
 
 ethgas:
   network: "Hoodi"
