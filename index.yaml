@@ -1037,6 +1037,23 @@ entries:
     version: 1.0.0
   ethgas:
   - apiVersion: v2
+    appVersion: 0.3.8
+    created: "2025-12-31T07:31:00.210060628Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: ETHGas Helm Chart
+    digest: c75ae22253d772a9c65dffb7281d4ccfdc32c788cb7f21af22ba12bf38ab08f1
+    maintainers:
+    - name: aivarasko
+    - name: matilote
+    name: ethgas
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/ethgas-0.3.8/ethgas-0.3.8.tgz
+    version: 0.3.8
+  - apiVersion: v2
     appVersion: 0.3.7
     created: "2025-11-17T16:25:04.60469619Z"
     dependencies:
@@ -3559,4 +3576,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2025-12-26T19:02:30.003191696Z"
+generated: "2025-12-31T07:31:00.210405421Z"
