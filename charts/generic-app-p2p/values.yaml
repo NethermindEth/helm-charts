@@ -185,6 +185,46 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+HTTPRoute:
+  enabled: false
+  annotations: {}
+  parentRefs: []
+  # - group: gateway.networking.k8s.io
+  #   kind: Gateway
+  #   name: gateway
+  #   namespace: istio-ingress
+  hostnames: []
+  # - example.com
+
+  ## Route rules configuration. See https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule
+  ##
+  ## When the Service exposes exactly one port (.service.ports has one value):
+  ## - If no rules are defined, a default catch-all rule is created for that port.
+  ## - If rules are defined but `backendRefs` is omitted, it is auto-generated
+  ##   to point to that same port.
+  ##
+  ## If the Service exposes multiple ports, rules and `backendRefs` must be
+  ## defined explicitly.
+  ##
+  rules: []
+  # - matches:
+  #     - path:
+  #         type: PathPrefix
+  #         value: /
+  #   filters:
+  #     - type: RequestHeaderModifier
+  #       requestHeaderModifier:
+  #         set:
+  #           - name: X-Forwarded-Proto
+  #             value: https
+  #   backendRefs:
+  #     - group: ""             # Optional: defaults to empty string
+  #       kind: Service         # Optional: defaults to Service
+  #       name: my-service      # Optional: defaults to chart fullname, but this chart may deploy more services depending on replicaCount
+  #       namespace: my-ns      # Optional: for cross-namespace references.  Remember that a ReferenceGrant must be created in case of cross-namespace references
+  #       port: 8080
+  #       weight: 1             # Optional: defaults to 1
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little

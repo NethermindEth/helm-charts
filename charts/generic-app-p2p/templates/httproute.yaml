@@ -1,0 +1,70 @@
+{{- if .Values.HTTPRoute.enabled -}}
+{{- $rules := .Values.HTTPRoute.rules }}
+{{- $portCount := len .Values.service.ports }}
+{{- if eq $portCount 1 }}
+  {{- $singlePort := (first .Values.service.ports).port }}
+
+  {{- if eq (len $rules) 0 }}
+    {{- $rules = list (dict "backendRefs" (list (dict "port" $singlePort))) }}
+  {{- else }}
+    {{- range $r := $rules }}
+      {{- if not (hasKey $r "backendRefs") }}
+        {{- $_ := set $r "backendRefs" (list (dict "port" $singlePort)) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- else }}
+  {{- if eq (len $rules) 0 }}
+    {{- fail (printf "The Service was configured with %d ports, therefore at least on HTTPRoute rule must be provided" $portCount) }}
+  {{- end }}
+
+  {{- range $r := $rules }}
+    {{- if not (hasKey $r "backendRefs") }}
+      {{- fail (printf "The Service was configured with %d ports, therefore all HTTPRoute rules must manually specify backendRefs" $portCount) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "generic-app-p2p.fullname" . }}
+  labels:
+    {{- include "generic-app-p2p.labels" . | nindent 4 }}
+  {{- with .Values.HTTPRoute.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+  {{- range .Values.HTTPRoute.parentRefs }}
+  - group: {{ .group | default "gateway.networking.k8s.io" }}
+    kind: {{ .kind | default "Gateway" }}
+    name: {{ .name }}
+    namespace: {{ .namespace | default "istio-system" }}
+  {{- end }}
+  hostnames:
+  {{- range .Values.HTTPRoute.hostnames }}
+  - {{ . | quote }}
+  {{- end }}
+  rules:
+  {{- range $rules }}
+  - {{- if .matches }}
+    matches: {{- .matches | toYaml | nindent 4 }}
+    {{- end }}
+    {{- if .filters }}
+    filters: {{- .filters | toYaml | nindent 4 }}
+    {{- end }}
+    backendRefs:
+    {{- range .backendRefs }}
+    - group: {{ .group | default "" | quote }}
+      kind: {{ .kind | default "Service" }}
+      name: {{ .name | default (include "generic-app-p2p.fullname" $) | quote }}
+      {{- if .namespace }}
+      namespace: {{ .namespace | quote }}
+      {{- end }}
+      port: {{ .port }}
+      weight: {{ .weight | default 1 }}
+    {{- end }}
+  {{- end }}
+{{- end }}
