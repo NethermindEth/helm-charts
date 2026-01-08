@@ -1,0 +1,66 @@
+{{- $portCount := len .Values.service.ports }}
+{{- range $routeName, $routeInfo := .Values.TCPRoutes.routes }}
+{{- $rules := $routeInfo.rules | default (list) }}
+{{- if eq $portCount 1 }}
+  {{- $singlePort := (first $.Values.service.ports).port }}
+
+  {{- if eq (len $rules) 0 }}
+    {{- $rules = list (dict "backendRefs" (list (dict "port" $singlePort))) }}
+  {{- else }}
+    {{- range $r := $rules }}
+      {{- if not (hasKey $r "backendRefs") }}
+        {{- $_ := set $r "backendRefs" (list (dict "port" $singlePort)) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- else }}
+  {{- if eq (len $rules) 0 }}
+    {{- fail (printf "The Service was configured with %d ports, therefore at least one TCPRoute rule must be provided" $portCount) }}
+  {{- end }}
+
+  {{- range $r := $rules }}
+    {{- if not (hasKey $r "backendRefs") }}
+      {{- fail (printf "The Service was configured with %d ports, therefore all TCPRoute rules must manually specify backendRefs" $portCount) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- $_ := set $routeInfo "rules" $rules }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: TCPRoute
+metadata:
+  name: {{ include "generic-app-p2p.fullname" $ }}-{{ $routeName }}
+  labels:
+    {{- include "generic-app-p2p.labels" $ | nindent 4 }}
+  {{- with $.Values.TCPRoutes.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+  {{- range $parent := $routeInfo.parentRefs }}
+    - group: {{ $parent.group | default "gateway.networking.k8s.io" }}
+      kind: {{ $parent.kind | default "Gateway" }}
+      name: {{ $parent.name }}
+      namespace: {{ $parent.namespace }}
+      sectionName: {{ $parent.sectionName }}
+  {{- end }}
+
+  rules:
+  {{- range $rule := $routeInfo.rules }}
+    - backendRefs:
+      {{- range $backend := $rule.backendRefs }}
+        - group: {{ $backend.group | default "" | quote }}
+          kind: {{ $backend.kind | default "Service" }}
+          name: {{ $backend.name | default (include "generic-app-p2p.fullname" $) | quote }}
+          {{- if $backend.namespace }}
+          namespace: {{ $backend.namespace | quote }}
+          {{- end }}
+          port: {{ $backend.port }}
+          weight: {{ $backend.weight | default 1 }}
+      {{- end }}
+      {{- with $rule.name }}
+      name: {{ . }}
+      {{- end }}
+  {{- end }}
+{{- end }}
