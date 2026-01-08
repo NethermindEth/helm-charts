@@ -15,7 +15,7 @@
   {{- end }}
 {{- else }}
   {{- if eq (len $rules) 0 }}
-    {{- fail (printf "The Service was configured with %d ports, therefore at least on HTTPRoute rule must be provided" $portCount) }}
+    {{- fail (printf "The Service was configured with %d ports, therefore at least one HTTPRoute rule must be provided" $portCount) }}
   {{- end }}
 
   {{- range $r := $rules }}
