@@ -1,0 +1,171 @@
+suite: tcproutes tests
+
+set:
+  fullnameOverride: some-full-name
+
+templates:
+  - tcproutes.yaml
+
+tests:
+  - it: given a backend ref with only port configured then should default to the chart's service with default weight
+    set:
+      TCPRoutes:
+        routes:
+          foo:
+            rules:
+              - backendRefs:
+                  - port: 1234
+          bar:
+            rules:
+              - backendRefs:
+                  - port: 4321
+    asserts:
+      - documentSelector:
+          path: .metadata.name
+          value: some-full-name-foo
+        equal:
+          path: .spec.rules[0].backendRefs[0]
+          value:
+            group: ""
+            kind: Service
+            name: some-full-name
+            port: 1234
+            weight: 1
+      - documentSelector:
+          path: .metadata.name
+          value: some-full-name-bar
+        equal:
+          path: .spec.rules[0].backendRefs[0]
+          value:
+            group: ""
+            kind: Service
+            name: some-full-name
+            port: 4321
+            weight: 1
+
+  - it: given a backend ref with overrides then should use overrides
+    set:
+      TCPRoutes:
+        routes:
+          foo:
+            rules:
+              - backendRefs:
+                  - group: some.customresource.io
+                    kind: Potato
+                    name: foo
+                    namespace: abc
+                    port: 1234
+                    weight: 999
+          bar:
+            rules:
+              - backendRefs:
+                  - group: other.customresource.io
+                    kind: Salad
+                    name: bar
+                    namespace: xyz
+                    port: 4321
+                    weight: 111
+    asserts:
+      - documentSelector:
+          path: .metadata.name
+          value: some-full-name-foo
+        equal:
+          path: .spec.rules[0].backendRefs[0]
+          value:
+            group: some.customresource.io
+            kind: Potato
+            name: foo
+            namespace: abc
+            port: 1234
+            weight: 999
+      - documentSelector:
+          path: .metadata.name
+          value: some-full-name-bar
+        equal:
+          path: .spec.rules[0].backendRefs[0]
+          value:
+            group: other.customresource.io
+            kind: Salad
+            name: bar
+            namespace: xyz
+            port: 4321
+            weight: 111
+
+  - it: given service with exactly one port then backendRef should be optional and use that port
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+      TCPRoutes:
+        routes:
+          foo:
+            rules:
+              - name: test
+    asserts:
+      - equal:
+          path: .spec.rules[0].backendRefs[0]
+          value:
+            group: ""
+            kind: Service
+            name: some-full-name
+            port: 1234
+            weight: 1
+  - it: given service with number of ports different than one then backendRefs should not be optional
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+          - name: test2
+            port: 4321
+            protocol: TCP
+      TCPRoutes:
+        routes:
+          foo:
+            rules:
+              - name: test
+    asserts:
+      - failedTemplate:
+          errorMessage: 'The Service was configured with 2 ports, therefore all TCPRoute rules must manually specify backendRefs'
+
+  - it: given service with exactly one port and empty rules then should create default rule
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+      TCPRoutes:
+        routes:
+          foo:
+            rules: []
+    asserts:
+      - equal:
+          path: .spec.rules
+          value:
+            - backendRefs:
+                - group: ""
+                  kind: Service
+                  name: some-full-name
+                  port: 1234
+                  weight: 1
+  - it: given service with number of ports different than one then at least one rule must be provided
+    set:
+      service:
+        ports:
+          - name: test
+            port: 1234
+            protocol: TCP
+          - name: test2
+            port: 4321
+            protocol: TCP
+      TCPRoutes:
+        routes:
+          foo:
+            rules: []
+    asserts:
+      - failedTemplate:
+          errorMessage: 'The Service was configured with 2 ports, therefore at least one TCPRoute rule must be provided'
