@@ -128,4 +128,4 @@ tests:
         rules: []
     asserts:
       - failedTemplate:
-          errorMessage: 'The Service was configured with 2 ports, therefore at least on HTTPRoute rule must be provided'
+          errorMessage: 'The Service was configured with 2 ports, therefore at least one HTTPRoute rule must be provided'

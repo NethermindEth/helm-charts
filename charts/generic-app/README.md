@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.4.0](https://img.shields.io/badge/Version-1.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -179,6 +179,8 @@ statefulSet:
 | HTTPRoute.hostnames | list | `[]` |  |
 | HTTPRoute.parentRefs | list | `[]` |  |
 | HTTPRoute.rules | list | `[]` |  |
+| TCPRoutes.annotations | object | `{}` |  |
+| TCPRoutes.routes | object | `{}` |  |
 | affinity | object | `{}` |  |
 | args | list | `[]` |  |
 | command | list | `[]` | Command and args for the container |

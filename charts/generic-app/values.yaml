@@ -213,6 +213,39 @@ HTTPRoute:
   #       port: 8080
   #       weight: 1             # Optional: defaults to 1
 
+TCPRoutes:
+  annotations: {}
+
+  ## A map of route names to routes, one TCPRoute resource will be created for each element here
+  ## Using a map instead of a list allows you to have stable manifests and avoids recreating routes, which causes downtime
+  routes: {}
+  #  example:
+  #    parentRefs:
+  #      - group: gateway.networking.k8s.io   # Optional: defaults to gateway.networking.k8s.io
+  #        kind: Gateway                      # Optional: defaults to Gateway
+  #        name: gateway
+  #        namespace: istio-ingress
+  #        sectionName: some-section
+  #
+  #    ## Route rules configuration. See https://gateway-api.sigs.k8s.io/reference/spec/#tcprouterule
+  #    ##
+  #    ## When the Service exposes exactly one port (.service.ports has one value):
+  #    ## - If no rules are defined, a default catch-all rule is created for that port.
+  #    ## - If rules are defined but `backendRefs` is omitted, it is auto-generated
+  #    ##   to point to that same port. You can do this by just specifying a rule name, but this is uncommon.
+  #    ##
+  #    ## If the Service exposes multiple ports, rules and `backendRefs` must be
+  #    ## defined explicitly.
+  #    ##
+  #    rules:
+  #      - backendRefs:
+  #          - group: ""             # Optional: defaults to empty string
+  #            kind: Service         # Optional: defaults to Service
+  #            name: my-service      # Optional: defaults to chart fullname
+  #            namespace: my-ns      # Optional: for cross-namespace references.  Remember that a ReferenceGrant must be created in case of cross-namespace references
+  #            port: 8080
+  #            weight: 1             # Optional: defaults to 1
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
