@@ -1,7 +1,5 @@
 {{- if and (or .Values.execution.metrics.enabled .Values.beacon.metrics.enabled)
            (or .Values.execution.metrics.prometheusRule.enabled .Values.beacon.metrics.prometheusRule.enabled) }}
-{{- $upAlertExpr := printf "up{job='%s', namespace='%s'} == 0" (include "common.names.fullname" .) .Release.Namespace }}
-{{- $isNotUpdatingAlertExpr := printf "and on() (kube_statefulset_status_current_revision{statefulset='%s', namespace='%s'} == kube_statefulset_status_update_revision{statefulset='%s', namespace='%s'})" (include "common.names.fullname" .) .Release.Namespace (include "common.names.fullname" .) .Release.Namespace }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -25,28 +23,7 @@ spec:
   {{- if .Values.metrics.prometheusRule.default }}
     - name: {{ include "common.names.fullname" $ }}-default
       rules:
-        - alert: ExecutionNodeDown
-          expr: |
-            {{ $upAlertExpr }}
-            {{ $isNotUpdatingAlertExpr }}
-          for: 5m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Exectution Node {{ printf "{{ $labels.instance }}" }} down
-            description: Execution Node {{ printf "{{ $labels.instance }}" }} is down
-        - alert: ExecutionNodeDown
-          expr: {{ $upAlertExpr }}
-          for: 10m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Exectution Node {{ printf "{{ $labels.instance }}" }} down
-            description: Execution Node {{ printf "{{ $labels.instance }}" }} is down
+        {{- include "execution-beacon.upalerts" (dict "root" $ "type" "execution") | nindent 8 }}
   {{- end }}
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -70,31 +47,10 @@ spec:
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
   {{- if .Values.metrics.prometheusRule.default }}
-  {{- if eq .Values.beacon.client "lighthouse" }}
-    - name: {{ include "common.names.fullname" $ }}-default
+    - name: {{ include "common.names.fullname" . }}-default
       rules:
-        - alert: LighthouseBeaconNodeDown
-          expr: |
-            {{ $upAlertExpr }}
-            {{ $isNotUpdatingAlertExpr }}
-          for: 1m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Lighthouse beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: LighthouseBeaconNodeDown
-          expr: {{ $upAlertExpr }}
-          for: 10m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Lighthouse beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        {{- include "execution-beacon.upalerts" (dict "root" $ "type" "beacon") | nindent 8 }}
+        {{- if eq .Values.beacon.client "lighthouse" }}
         - alert: LighthouseBeaconNodeIsNotConnectedToEth1Node
           expr: sync_eth1_connected{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} == 0
           for: 1m
@@ -115,31 +71,7 @@ spec:
           annotations:
             summary: Lighthouse beacon node is out of sync
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-  {{- else if eq .Values.beacon.client "prysm" }}
-    - name: {{ include "common.names.fullname" $ }}-default
-      rules:
-        - alert: PrysmBeaconNodeDown
-          expr: |
-            {{ $upAlertExpr }}
-            {{ $isNotUpdatingAlertExpr }}
-          for: 1m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Prysm beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: PrysmBeaconNodeDown
-          expr: {{ $upAlertExpr }}
-          for: 10m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Prysm beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        {{- else if eq .Values.beacon.client "prysm" }}
         - alert: Prysm50SlotsBehind
           expr: beacon_clock_time_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} > 50
           for: 2m
@@ -168,31 +100,7 @@ spec:
           annotations:
             summary: Prysm beacon node was restarted
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-  {{- else if eq .Values.beacon.client "teku" }}
-    - name: {{ include "common.names.fullname" $ }}-default
-      rules:
-        - alert: TekuBeaconNodeDown
-          expr: |
-            {{ $upAlertExpr }}
-            {{ $isNotUpdatingAlertExpr }}
-          for: 1m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Teku beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: TekuBeaconNodeDown
-          expr: {{ $upAlertExpr }}
-          for: 10m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Teku beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        {{- else if eq .Values.beacon.client "teku" }}
         - alert: Teku50SlotsBehind
           expr: beacon_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} > 50
           for: 2m
@@ -203,81 +111,6 @@ spec:
           annotations:
             summary: Teku beacon node is out of sync
             description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-  {{- else if  eq .Values.beacon.client "nimbus" }}
-    - name: {{ include "common.names.fullname" $ }}-default
-      rules:
-        - alert: NimbusBeaconNodeDown
-          expr: |
-            {{ $upAlertExpr }}
-            {{ $isNotUpdatingAlertExpr }}
-          for: 1m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Nimbus beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: NimbusBeaconNodeDown
-          expr: {{ $upAlertExpr }}
-          for: 10m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Nimbus beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-  {{- else if  eq .Values.beacon.client "lodestar" }}
-    - name: {{ include "common.names.fullname" $ }}-default
-      rules:
-        - alert: LodestarBeaconNodeDown
-          expr: |
-            {{ $upAlertExpr }}
-            {{ $isNotUpdatingAlertExpr }}
-          for: 1m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Lodestar beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: LodestarBeaconNodeDown
-          expr: {{ $upAlertExpr }}
-          for: 10m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: Lodestar beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-  {{- else if  eq .Values.beacon.client "taiko" }}
-    - name: {{ include "common.names.fullname" $ }}-default
-      rules:
-        - alert: taikoBeaconNodeDown
-          expr: |
-            {{ $upAlertExpr }}
-            {{ $isNotUpdatingAlertExpr }}
-          for: 1m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: taiko beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: taikoBeaconNodeDown
-          expr: {{ $upAlertExpr }}
-          for: 10m
-          labels:
-            {{- with .Values.metrics.prometheusRule.severity }}
-            severity: {{ quote . }}
-            {{- end }}
-          annotations:
-            summary: taiko beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-  {{- end }}
+        {{- end }}
   {{- end }}
 {{- end }}
