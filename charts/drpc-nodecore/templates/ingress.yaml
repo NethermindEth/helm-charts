@@ -36,6 +36,6 @@ spec:
               service:
                 name: {{ include "drpc-nodecore.fullname" $ }}
                 port:
-                  name: rpc-proxy
+                  name: rpc
     {{- end }}
 {{- end }}
