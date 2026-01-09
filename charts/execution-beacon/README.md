@@ -227,6 +227,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | metrics.prometheusRule.default | bool | `true` |  |
 | metrics.prometheusRule.namespace | string | `""` |  |
 | metrics.prometheusRule.rules | list | `[]` |  |
+| metrics.prometheusRule.severity | string | `"critical"` |  |
 | metrics.serviceMonitor.additionalLabels | object | `{}` |  |
 | metrics.serviceMonitor.honorLabels | bool | `false` |  |
 | metrics.serviceMonitor.interval | string | `"30s"` |  |

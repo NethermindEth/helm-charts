@@ -31,7 +31,9 @@ spec:
             {{ $isNotUpdatingAlertExpr }}
           for: 5m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Exectution Node {{ printf "{{ $labels.instance }}" }} down
             description: Execution Node {{ printf "{{ $labels.instance }}" }} is down
@@ -39,7 +41,9 @@ spec:
           expr: {{ $upAlertExpr }}
           for: 10m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Exectution Node {{ printf "{{ $labels.instance }}" }} down
             description: Execution Node {{ printf "{{ $labels.instance }}" }} is down
@@ -75,7 +79,9 @@ spec:
             {{ $isNotUpdatingAlertExpr }}
           for: 1m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Lighthouse beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -83,7 +89,9 @@ spec:
           expr: {{ $upAlertExpr }}
           for: 10m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Lighthouse beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -91,7 +99,9 @@ spec:
           expr: sync_eth1_connected{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} == 0
           for: 1m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Lighthouse beacon node is not connected to eth1 node
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -99,7 +109,9 @@ spec:
           expr: sync_eth2_synced{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} == 0
           for: 3m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Lighthouse beacon node is out of sync
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -112,7 +124,9 @@ spec:
             {{ $isNotUpdatingAlertExpr }}
           for: 1m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Prysm beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -120,7 +134,9 @@ spec:
           expr: {{ $upAlertExpr }}
           for: 10m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Prysm beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -128,7 +144,9 @@ spec:
           expr: beacon_clock_time_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} > 50
           for: 2m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Prysm beacon node is out of sync
             description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -136,7 +154,9 @@ spec:
           expr: beacon_prev_epoch_target_gwei{job='{{ include "common.names.fullname" . }}'}/beacon_prev_epoch_active_gwei{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'}*100 < 66
           for: 5m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Prysm beacon node participation rate less then 66%
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -157,7 +177,9 @@ spec:
             {{ $isNotUpdatingAlertExpr }}
           for: 1m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Teku beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -165,7 +187,9 @@ spec:
           expr: {{ $upAlertExpr }}
           for: 10m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Teku beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -173,7 +197,9 @@ spec:
           expr: beacon_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} > 50
           for: 2m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Teku beacon node is out of sync
             description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -186,7 +212,9 @@ spec:
             {{ $isNotUpdatingAlertExpr }}
           for: 1m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Nimbus beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -194,7 +222,9 @@ spec:
           expr: {{ $upAlertExpr }}
           for: 10m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Nimbus beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -207,7 +237,9 @@ spec:
             {{ $isNotUpdatingAlertExpr }}
           for: 1m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Lodestar beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -215,7 +247,9 @@ spec:
           expr: {{ $upAlertExpr }}
           for: 10m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: Lodestar beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -228,7 +262,9 @@ spec:
             {{ $isNotUpdatingAlertExpr }}
           for: 1m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: taiko beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
@@ -236,7 +272,9 @@ spec:
           expr: {{ $upAlertExpr }}
           for: 10m
           labels:
-            severity: critical
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
           annotations:
             summary: taiko beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
