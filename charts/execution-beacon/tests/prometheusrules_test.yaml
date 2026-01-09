@@ -1,0 +1,92 @@
+suite: prometheusrules tests
+
+templates:
+  - prometheusrules.yaml
+
+set:
+  fullnameOverride: some-full-name
+release:
+  namespace: some-namespace
+
+tests:
+  - it: given disabled default alerts then should not create any default alerts
+    set:
+      metrics:
+        prometheusRule:
+          rules: []
+          default: false
+    asserts:
+      - isEmpty:
+          path: .spec.groups
+
+  - it: given enabled default alerts then should create default up alerts for execution and beacon
+    set:
+      metrics:
+        prometheusRule:
+          rules: []
+          default: true
+          severity: banana
+      beacon:
+        client: Potato
+    asserts:
+      - documentSelector:
+          path: .metadata.name
+          value: some-full-name-execution
+        contains:
+          path: .spec.groups[0].rules
+          content:
+            alert: ExecutionNodeDownNoUpdate
+            expr: |
+              up{job='some-full-name', namespace='some-namespace'} == 0
+              and on() (kube_statefulset_status_current_revision{statefulset='some-full-name', namespace='some-namespace'} == kube_statefulset_status_update_revision{statefulset='some-full-name', namespace='some-namespace'})
+            for: 5m
+            labels:
+              severity: banana
+            annotations:
+              summary: Execution Node {{ $labels.instance }} down
+              description: Execution Node {{ $labels.instance }} is down, and there is no current update underway
+      - documentSelector:
+          path: .metadata.name
+          value: some-full-name-execution
+        contains:
+          path: .spec.groups[0].rules
+          content:
+            alert: ExecutionNodeDown
+            expr: up{job='some-full-name', namespace='some-namespace'} == 0
+            for: 10m
+            labels:
+              severity: banana
+            annotations:
+              summary: Execution Node {{ $labels.instance }} down
+              description: Execution Node {{ $labels.instance }} is down
+
+      - documentSelector:
+          path: .metadata.name
+          value: some-full-name-beacon
+        contains:
+          path: .spec.groups[0].rules
+          content:
+            alert: PotatoBeaconNodeDownNoUpdate
+            expr: |
+              up{job='some-full-name', namespace='some-namespace'} == 0
+              and on() (kube_statefulset_status_current_revision{statefulset='some-full-name', namespace='some-namespace'} == kube_statefulset_status_update_revision{statefulset='some-full-name', namespace='some-namespace'})
+            for: 5m
+            labels:
+              severity: banana
+            annotations:
+              summary: Potato Beacon Node {{ $labels.instance }} down
+              description: Potato Beacon Node {{ $labels.instance }} is down, and there is no current update underway
+      - documentSelector:
+          path: .metadata.name
+          value: some-full-name-beacon
+        contains:
+          path: .spec.groups[0].rules
+          content:
+            alert: PotatoBeaconNodeDown
+            expr: up{job='some-full-name', namespace='some-namespace'} == 0
+            for: 10m
+            labels:
+              severity: banana
+            annotations:
+              summary: Potato Beacon Node {{ $labels.instance }} down
+              description: Potato Beacon Node {{ $labels.instance }} is down

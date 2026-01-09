@@ -328,6 +328,9 @@ metrics:
     ## The namespace in which the prometheusRule will be created
     ##
     namespace: ""
+    ## The value of the `severity` label, commonly used to mark severity, set to empty string or null to omit
+    ##
+    severity: critical
     ## Additional labels for the prometheusRule
     ##
     additionalLabels: {}

@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.4.0](https://img.shields.io/badge/Version-1.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -227,6 +227,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | metrics.prometheusRule.default | bool | `true` |  |
 | metrics.prometheusRule.namespace | string | `""` |  |
 | metrics.prometheusRule.rules | list | `[]` |  |
+| metrics.prometheusRule.severity | string | `"critical"` |  |
 | metrics.serviceMonitor.additionalLabels | object | `{}` |  |
 | metrics.serviceMonitor.honorLabels | bool | `false` |  |
 | metrics.serviceMonitor.interval | string | `"30s"` |  |
