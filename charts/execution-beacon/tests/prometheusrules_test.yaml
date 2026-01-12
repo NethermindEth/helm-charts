@@ -51,8 +51,10 @@ tests:
         contains:
           path: .spec.groups[0].rules
           content:
-            alert: ExecutionNodeDown
-            expr: up{job='some-full-name', namespace='some-namespace'} == 0
+            alert: ExecutionNodeDownMidUpdate
+            expr: |
+              up{job='some-full-name', namespace='some-namespace'} == 0
+              unless on() (kube_statefulset_status_current_revision{statefulset='some-full-name', namespace='some-namespace'} == kube_statefulset_status_update_revision{statefulset='some-full-name', namespace='some-namespace'})
             for: 10m
             labels:
               severity: banana
@@ -82,8 +84,10 @@ tests:
         contains:
           path: .spec.groups[0].rules
           content:
-            alert: PotatoBeaconNodeDown
-            expr: up{job='some-full-name', namespace='some-namespace'} == 0
+            alert: PotatoBeaconNodeDownMidUpdate
+            expr: |
+              up{job='some-full-name', namespace='some-namespace'} == 0
+              unless on() (kube_statefulset_status_current_revision{statefulset='some-full-name', namespace='some-namespace'} == kube_statefulset_status_update_revision{statefulset='some-full-name', namespace='some-namespace'})
             for: 10m
             labels:
               severity: banana

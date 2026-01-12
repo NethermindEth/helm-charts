@@ -12,7 +12,7 @@ Receives a dict as the parameter, with the following keys:
 {{- $namespace := $root.Release.Namespace -}}
 
 {{- $upAlertExpr := printf "up{job='%s', namespace='%s'} == 0" $fullname $namespace -}}
-{{- $isNotUpdatingAlertExpr := printf "and on() (kube_statefulset_status_current_revision{statefulset='%s', namespace='%s'} == kube_statefulset_status_update_revision{statefulset='%s', namespace='%s'})" $fullname $namespace $fullname $namespace -}}
+{{- $isNotUpdatingAlertExpr := printf "kube_statefulset_status_current_revision{statefulset='%s', namespace='%s'} == kube_statefulset_status_update_revision{statefulset='%s', namespace='%s'}" $fullname $namespace $fullname $namespace -}}
 
 {{- $typeTitle := title $type -}}
 {{- $clientTitle := "" -}}
@@ -23,7 +23,7 @@ Receives a dict as the parameter, with the following keys:
 - alert: {{ printf "%s%sNodeDownNoUpdate" $clientTitle $typeTitle }}
   expr: |
     {{ $upAlertExpr }}
-    {{ $isNotUpdatingAlertExpr }}
+    and on() ({{ $isNotUpdatingAlertExpr }})
   for: 5m
   labels:
     {{- with $root.Values.metrics.prometheusRule.severity }}
@@ -32,8 +32,10 @@ Receives a dict as the parameter, with the following keys:
   annotations:
     summary: {{ $annotationMsgPrefix }} Node {{ printf "{{ $labels.instance }}" }} down
     description: {{ $annotationMsgPrefix }} Node {{ printf "{{ $labels.instance }}" }} is down, and there is no current update underway
-- alert: {{ printf "%s%sNodeDown" $clientTitle $typeTitle }}
-  expr: {{ $upAlertExpr }}
+- alert: {{ printf "%s%sNodeDownMidUpdate" $clientTitle $typeTitle }}
+  expr: |
+    {{ $upAlertExpr }}
+    unless on() ({{ $isNotUpdatingAlertExpr }})
   for: 10m
   labels:
     {{- with $root.Values.metrics.prometheusRule.severity }}
