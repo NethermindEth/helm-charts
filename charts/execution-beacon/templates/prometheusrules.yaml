@@ -3,33 +3,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ include "common.names.fullname" . }}-execution
-  {{- if .Values.metrics.prometheusRule.namespace }}
-  namespace: {{ .Values.metrics.prometheusRule.namespace }}
-  {{- else }}
-  namespace: {{ .Release.Namespace | quote }}
-  {{- end }}
-  labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
-    {{- if .Values.metrics.prometheusRule.additionalLabels }}
-    {{- toYaml .Values.metrics.prometheusRule.additionalLabels | nindent 4 }}
-    {{- end }}
-spec:
-  groups:
-  {{- with .Values.metrics.prometheusRule.rules }}
-    - name: {{ include "common.names.fullname" $ }}
-      rules: {{- tpl (toYaml .) $ | nindent 8 }}
-  {{- end }}
-  {{- if .Values.metrics.prometheusRule.default }}
-    - name: {{ include "common.names.fullname" $ }}-default
-      rules:
-        {{- include "execution-beacon.upalerts" (dict "root" $ "type" "execution") | nindent 8 }}
-  {{- end }}
----
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  name: {{ include "common.names.fullname" . }}-beacon
+  name: {{ include "common.names.fullname" . }}
   {{- if .Values.metrics.prometheusRule.namespace }}
   namespace: {{ .Values.metrics.prometheusRule.namespace }}
   {{- else }}
@@ -49,7 +23,7 @@ spec:
   {{- if .Values.metrics.prometheusRule.default }}
     - name: {{ include "common.names.fullname" . }}-default
       rules:
-        {{- include "execution-beacon.upalerts" (dict "root" $ "type" "beacon") | nindent 8 }}
+        {{- include "execution-beacon.upalerts" . | nindent 8 }}
         {{- if eq .Values.beacon.client "lighthouse" }}
         - alert: LighthouseBeaconNodeIsNotConnectedToEth1Node
           expr: sync_eth1_connected{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} == 0
