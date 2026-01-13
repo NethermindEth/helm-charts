@@ -18,3 +18,6 @@ pre-commit-ci: ## Run pre-commit hooks
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+unittest:
+	@docker run --rm -v $(shell pwd):/apps helmunittest/helm-unittest charts/*

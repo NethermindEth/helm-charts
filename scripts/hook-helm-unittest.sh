@@ -2,4 +2,5 @@
 
 set -eu
 
-helm unittest charts/*
+# helm unittest charts/*
+docker run --rm -v $(pwd):/apps helmunittest/helm-unittest charts/*
