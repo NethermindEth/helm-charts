@@ -9,7 +9,6 @@ docs: ## Run helm-docs
 install-pre-commit: ## Install pre-commit hooks
 	@pre-commit install
 	@pre-commit install-hooks
-	@helm plugin install https://github.com/helm-unittest/helm-unittest.git
 
 pre-commit: ## Run pre-commit hooks
 	@pre-commit run --all-files
