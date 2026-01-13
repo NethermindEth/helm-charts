@@ -1038,6 +1038,23 @@ entries:
   ethgas:
   - apiVersion: v2
     appVersion: 0.3.8
+    created: "2026-01-13T14:38:00.514060182Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: ETHGas Helm Chart
+    digest: a41d638d0ea9d254f0db34b3da000d7b3a54e5a59829e8ff5e734d54bbca5d9a
+    maintainers:
+    - name: aivarasko
+    - name: matilote
+    name: ethgas
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/ethgas-0.3.9/ethgas-0.3.9.tgz
+    version: 0.3.9
+  - apiVersion: v2
+    appVersion: 0.3.8
     created: "2025-12-31T07:31:00.210060628Z"
     dependencies:
     - name: common
@@ -1223,6 +1240,38 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/ethgas-0.1.0/ethgas-0.1.0.tgz
     version: 0.1.0
   execution-beacon:
+  - apiVersion: v2
+    created: "2026-01-13T14:38:00.710426007Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: A Helm chart for deploying Ethereum execution and consensus clients
+    digest: 2fb09b120d8651084e85ad1d049ad48f2bd8e759118aac31a91658eb71a2751d
+    home: https://www.ethereum.org/
+    keywords:
+    - ethereum
+    - blockchain
+    - nethermind
+    - prysm
+    - reth
+    - lighthouse
+    - nimbus
+    - lodestar
+    - erigon
+    - teku
+    - besu
+    - p2p
+    - taiko
+    maintainers:
+    - name: 0xDones
+    - name: matilote
+    - name: aivarasko
+    name: execution-beacon
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/execution-beacon-1.5.1/execution-beacon-1.5.1.tgz
+    version: 1.5.1
   - apiVersion: v2
     created: "2026-01-12T16:13:02.428157239Z"
     dependencies:
@@ -3642,4 +3691,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-01-12T16:13:02.428573194Z"
+generated: "2026-01-13T14:38:00.711111326Z"
