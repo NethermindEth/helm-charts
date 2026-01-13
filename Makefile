@@ -9,6 +9,7 @@ docs: ## Run helm-docs
 install-pre-commit: ## Install pre-commit hooks
 	@pre-commit install
 	@pre-commit install-hooks
+	@helm plugin install https://github.com/helm-unittest/helm-unittest.git
 
 pre-commit: ## Run pre-commit hooks
 	@pre-commit run --all-files
@@ -18,3 +19,6 @@ pre-commit-ci: ## Run pre-commit hooks
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+unittest:
+	@docker run --rm -v $(shell pwd):/apps helmunittest/helm-unittest charts/*

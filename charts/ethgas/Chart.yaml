@@ -2,7 +2,7 @@ apiVersion: v2
 name: ethgas
 description: ETHGas Helm Chart
 type: application
-version: 0.3.8
+version: 0.3.9
 appVersion: "0.3.8"
 maintainers:
   - name: aivarasko
