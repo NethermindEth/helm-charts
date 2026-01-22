@@ -89,6 +89,33 @@ ingress:
         - chart-example.local
 ```
 
+### Prometheus Metrics
+
+If you are exposing prometheus-style metrics, they can be collected by deploying a Service Monitor resource.
+
+```yaml
+serviceMonitor:
+  enabled: true
+```
+
+Note that it expects the port named `metrics` to exist in the service, and the metrics to be available at `/metrics`.
+Customize these as necessary:
+```yaml
+service:
+  ports:
+    - name: foo
+      port: 8080
+      protocol: TCP
+    - name: bar
+      port: 9090
+      protocol: TCP
+
+serviceMonitor:
+  enabled: true
+  port: bar
+  path: /some/path/to/metrics
+```
+
 ### Application Configuration
 
 #### Environment Variables
