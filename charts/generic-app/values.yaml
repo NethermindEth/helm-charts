@@ -287,6 +287,16 @@ tolerations: []
 
 affinity: {}
 
+# -- PodDisruptionBudget configuration
+podDisruptionBudget:
+  # -- If true, create a PodDisruptionBudget
+  enabled: false
+  # -- Minimum number/percentage of pods that must remain available
+  # Use either minAvailable OR maxUnavailable, not both
+  minAvailable: 1
+  # -- Maximum number/percentage of pods that can be unavailable
+  # maxUnavailable: ""
+
 serviceMonitor:
   # -- If true, a ServiceMonitor CRD is created for a prometheus operator. https://github.com/coreos/prometheus-operator
   enabled: false
