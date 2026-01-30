@@ -1,6 +1,6 @@
 # generic-app-p2p
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic apps (P2P)
 
@@ -222,6 +222,9 @@ persistence:
 | p2p.serviceType | string | `"NodePort"` |  |
 | persistence | object | `{"accessModes":["ReadWriteOnce"],"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
 | podAnnotations | object | `{}` |  |
+| podDisruptionBudget | object | `{"enabled":false,"minAvailable":1}` | PodDisruptionBudget configuration |
+| podDisruptionBudget.enabled | bool | `false` | If true, create a PodDisruptionBudget |
+| podDisruptionBudget.minAvailable | int | `1` | Minimum number/percentage of pods that must remain available |
 | podLabels | object | `{}` |  |
 | podSecurityContext.fsGroup | int | `1000` |  |
 | podSecurityContext.runAsGroup | int | `1000` |  |
