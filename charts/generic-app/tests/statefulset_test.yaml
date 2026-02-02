@@ -1,6 +1,10 @@
 suite: deployment tests
 
+release:
+  name: some-release
+
 set:
+  nameOverride: some-name
   statefulSet:
     enabled: true
 
@@ -37,3 +41,53 @@ tests:
             name: test
             containerPort: 4321
             protocol: TCP
+
+  - it: given explicit affinity then use that affinity and ignore anti affinity presets
+    set:
+      antiAffinityPreset: hard
+      affinity:
+        nodeAffinity: potato
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            nodeAffinity: potato
+
+  - it: given soft anti affinity preset then use preferred pod anti affinity
+    set:
+      antiAffinityPreset: soft
+      affinity: {}
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    topologyKey: kubernetes.io/hostname
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: some-name
+                        app.kubernetes.io/instance: some-release
+
+  - it: given hard anti affinity preset then use required pod anti affinity
+    set:
+      antiAffinityPreset: hard
+      affinity: {}
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+                  labelSelector:
+                    matchLabels:
+                        app.kubernetes.io/name: some-name
+                        app.kubernetes.io/instance: some-release
+
+  - it: given no affinity and no preset then affinity is not configured
+    asserts:
+      - isEmpty:
+          path: spec.template.spec.affinity
