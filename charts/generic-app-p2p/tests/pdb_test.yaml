@@ -1,0 +1,102 @@
+suite: pdb tests
+
+templates:
+  - pdb.yaml
+
+set:
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: null
+    minAvailable: null
+
+tests:
+  - it: must configure either minAvailable or maxUnavailable
+    set:
+      replicaCount: 3
+      podDisruptionBudget:
+        minAvailable: null
+        maxUnavailable: null
+    asserts:
+      - failedTemplate:
+          errorMessage: "PDB must specify either minAvailable or maxUnavailable"
+  - it: cannot configure both minAvailable and maxUnavailable
+    set:
+      replicaCount: 3
+      podDisruptionBudget:
+        minAvailable: 1
+        maxUnavailable: 1
+    asserts:
+      - failedTemplate:
+          errorMessage: "PDB cannot specify both minAvailable and maxUnavailable"
+
+  - it: given minAvailable equal to replica count then should fail
+    set:
+      replicaCount: 3
+      podDisruptionBudget:
+        minAvailable: 3
+    asserts:
+      - failedTemplate:
+          errorMessage: "PDB minAvailable (current: 3) must be less than replica count (current: 3)"
+  - it: given minAvailable greater than replica count then should fail
+    set:
+      replicaCount: 3
+      podDisruptionBudget:
+        minAvailable: 5
+    asserts:
+      - failedTemplate:
+          errorMessage: "PDB minAvailable (current: 5) must be less than replica count (current: 3)"
+  - it: given minAvailable less than replica count then should succeed
+    set:
+      replicaCount: 3
+      podDisruptionBudget:
+        minAvailable: 2
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: given minAvailable percentage rounds to replica count then should fail
+    set:
+      replicaCount: 3
+      podDisruptionBudget:
+        minAvailable: "100%"
+    asserts:
+      - failedTemplate:
+          errorMessage: "PDB minAvailable (current: 100%) must round to less than replica count (current: 3)"
+  - it: given minAvailable percentage rounds above replica count then should fail
+    set:
+      replicaCount: 3
+      podDisruptionBudget:
+        minAvailable: "80%"  # rounds up: ceil(3 * 0.8) = 3
+    asserts:
+      - failedTemplate:
+          errorMessage: "PDB minAvailable (current: 80%) must round to less than replica count (current: 3)"
+  - it: given minAvailable percentage rounds below replica count then should succeed
+    set:
+      replicaCount: 5
+      podDisruptionBudget:
+        minAvailable: "60%"  # rounds up: ceil(5 * 0.6) = 3
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: given maxUnavailable is 0 then should fail
+    set:
+      podDisruptionBudget:
+        maxUnavailable: 0
+    asserts:
+      - failedTemplate:
+          errorMessage: "PDB maxUnavailable cannot be 0, no pods can be disrupted"
+  - it: given maxUnavailable percentage rounds to 0 then should fail
+    set:
+      podDisruptionBudget:
+        maxUnavailable: "0%"
+    asserts:
+      - failedTemplate:
+          errorMessage: "PDB maxUnavailable cannot be 0%, no pods can be disrupted"
+  - it: given maxUnavailable greater than 0 then should succeed
+    set:
+      podDisruptionBudget:
+        maxUnavailable: 1
+    asserts:
+      - hasDocuments:
+          count: 1

@@ -1,0 +1,68 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+{{- $minAvailable := .Values.podDisruptionBudget.minAvailable }}
+{{- $maxUnavailable := .Values.podDisruptionBudget.maxUnavailable }}
+{{- $replicaCount := int .Values.replicaCount }}
+
+{{- $hasMinAvailable := hasKey .Values.podDisruptionBudget "minAvailable" }}
+{{- $hasMaxUnavailable := hasKey .Values.podDisruptionBudget "maxUnavailable" }}
+{{- if $hasMinAvailable }}
+  {{- if eq ($minAvailable | toString) "<nil>" }}
+    {{- $hasMinAvailable = false }}
+  {{- end }}
+{{- end }}
+{{- if $hasMaxUnavailable }}
+  {{- if eq ($maxUnavailable | toString) "<nil>" }}
+    {{- $hasMaxUnavailable = false }}
+  {{- end }}
+{{- end }}
+
+{{- if and (not $hasMinAvailable) (not $hasMaxUnavailable) }}
+  {{- fail "PDB must specify either minAvailable or maxUnavailable" }}
+{{- end }}
+
+{{- if and $hasMinAvailable $hasMaxUnavailable }}
+  {{- fail "PDB cannot specify both minAvailable and maxUnavailable" }}
+{{- end }}
+
+{{- if $hasMaxUnavailable }}
+  {{- $maxUnavailableStr := $maxUnavailable | toString }}
+  {{- if or (eq $maxUnavailableStr "0") (eq $maxUnavailableStr "0%") }}
+    {{- fail (printf "PDB maxUnavailable cannot be %s, no pods can be disrupted" $maxUnavailableStr) }}
+  {{- end }}
+{{- end }}
+
+{{- if $minAvailable }}
+  {{- $minAvailableStr := $minAvailable | toString }}
+  {{- $isPercentage := hasSuffix "%" $minAvailableStr }}
+
+  {{- if $isPercentage }}
+    {{- $roundedUp := include "generic-app-p2p.percentageAsCeilTotal" (list $minAvailableStr $replicaCount) | int }}
+
+    {{- if ge $roundedUp $replicaCount }}
+      {{- fail (printf "PDB minAvailable (current: %s) must round to less than replica count (current: %d)" $minAvailableStr $replicaCount) }}
+    {{- end }}
+  {{- else }}
+    {{- $minAvailableInt := int $minAvailable }}
+    {{- if ge $minAvailableInt $replicaCount }}
+      {{- fail (printf "PDB minAvailable (current: %d) must be less than replica count (current: %d)" $minAvailableInt $replicaCount) }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "generic-app-p2p.fullname" . }}
+  labels:
+    {{- include "generic-app-p2p.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "generic-app-p2p.selectorLabels" . | nindent 6 }}
+  {{- if $hasMinAvailable }}
+  minAvailable: {{ $minAvailable }}
+  {{- end }}
+  {{- if $hasMaxUnavailable }}
+  maxUnavailable: {{ $maxUnavailable }}
+  {{- end }}
+{{- end }}
