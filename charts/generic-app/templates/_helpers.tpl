@@ -70,3 +70,17 @@ Create the name of the service account to use
 {{- define "values.hash" -}}
 {{- .Values | toJson | sha256sum }}
 {{- end }}
+
+{{/*
+Takes a list with two arguments: a percentage, and a total, and returns the integer value (rounded up) that the
+percentage represents
+*/}}
+{{- define "generic-app.percentageAsCeilTotal" }}
+{{- $percentStr := index . 0 }}
+{{- $total := index . 1 }}
+
+{{- $percentNumeral := trimSuffix "%" $percentStr }}
+{{- $percent := float64 $percentNumeral }}
+{{- $calculated := mulf (divf $percent 100.0) (float64 $total) }}
+{{- ceil $calculated | int }}
+{{- end }}

@@ -1,4 +1,71 @@
 {{- if .Values.podDisruptionBudget.enabled }}
+{{- $minAvailable := .Values.podDisruptionBudget.minAvailable }}
+{{- $maxUnavailable := .Values.podDisruptionBudget.maxUnavailable }}
+{{- $autoscalingEnabled := .Values.deployment.autoscaling.enabled }}
+{{- $replicaCount := int .Values.replicaCount }}
+{{- $minReplicas := int .Values.deployment.autoscaling.minReplicas }}
+
+{{- $hasMinAvailable := hasKey .Values.podDisruptionBudget "minAvailable" }}
+{{- $hasMaxUnavailable := hasKey .Values.podDisruptionBudget "maxUnavailable" }}
+{{- if $hasMinAvailable }}
+  {{- if eq ($minAvailable | toString) "<nil>" }}
+    {{- $hasMinAvailable = false }}
+  {{- end }}
+{{- end }}
+{{- if $hasMaxUnavailable }}
+  {{- if eq ($maxUnavailable | toString) "<nil>" }}
+    {{- $hasMaxUnavailable = false }}
+  {{- end }}
+{{- end }}
+
+{{- if and (not $hasMinAvailable) (not $hasMaxUnavailable) }}
+  {{- fail "PDB must specify either minAvailable or maxUnavailable" }}
+{{- end }}
+
+{{- if and $hasMinAvailable $hasMaxUnavailable }}
+  {{- fail "PDB cannot specify both minAvailable and maxUnavailable" }}
+{{- end }}
+
+{{- if $hasMaxUnavailable }}
+  {{- $maxUnavailableStr := $maxUnavailable | toString }}
+  {{- if or (eq $maxUnavailableStr "0") (eq $maxUnavailableStr "0%") }}
+    {{- fail (printf "PDB maxUnavailable cannot be %s, no pods can be disrupted" $maxUnavailableStr) }}
+  {{- end }}
+{{- end }}
+
+{{- if $minAvailable }}
+  {{- $minAvailableStr := $minAvailable | toString }}
+  {{- $isPercentage := hasSuffix "%" $minAvailableStr }}
+
+  {{- if not $autoscalingEnabled }}
+    {{- if $isPercentage }}
+      {{- $roundedUp := include "generic-app.percentageAsCeilTotal" (list $minAvailableStr $replicaCount) | int }}
+
+      {{- if ge $roundedUp $replicaCount }}
+        {{- fail (printf "PDB minAvailable (current: %s) must round to less than replica count (current: %d)" $minAvailableStr $replicaCount) }}
+      {{- end }}
+    {{- else }}
+      {{- $minAvailableInt := int $minAvailable }}
+      {{- if ge $minAvailableInt $replicaCount }}
+        {{- fail (printf "PDB minAvailable (current: %d) must be less than replica count (current: %d)" $minAvailableInt $replicaCount) }}
+      {{- end }}
+    {{- end }}
+  {{- else }}
+    {{- if $isPercentage }}
+      {{- $roundedUp := include "generic-app.percentageAsCeilTotal" (list $minAvailableStr $minReplicas) | int }}
+
+      {{- if ge $roundedUp $minReplicas }}
+        {{- fail (printf "PDB minAvailable (current: %s) must round to less than min replicas (current: %d)" $minAvailableStr $minReplicas) }}
+      {{- end }}
+    {{- else }}
+      {{- $minAvailableInt := int $minAvailable }}
+      {{- if ge $minAvailableInt $minReplicas }}
+        {{- fail (printf "PDB minAvailable (current: %d) must be less than autoscaling minReplicas (current: %d)" $minAvailableInt $minReplicas) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -9,10 +76,10 @@ spec:
   selector:
     matchLabels:
       {{- include "generic-app.selectorLabels" . | nindent 6 }}
-  {{- if .Values.podDisruptionBudget.minAvailable }}
-  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- if $hasMinAvailable }}
+  minAvailable: {{ $minAvailable }}
   {{- end }}
-  {{- if .Values.podDisruptionBudget.maxUnavailable }}
-  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- if $hasMaxUnavailable }}
+  maxUnavailable: {{ $maxUnavailable }}
   {{- end }}
 {{- end }}
