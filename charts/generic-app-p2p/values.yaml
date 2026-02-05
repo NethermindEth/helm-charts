@@ -297,6 +297,12 @@ nodeSelector: {}
 
 tolerations: []
 
+# Pod Anti affinity presets to use for production, use either "soft" or "hard" as values
+# Soft uses preferredDuringSchedulingIgnoredDuringExecution while hard uses requiredDuringSchedulingIgnoredDuringExecution
+# See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+# Ignored if affinity is configured
+antiAffinityPreset: ""
+
 affinity: {}
 
 # -- PodDisruptionBudget configuration
