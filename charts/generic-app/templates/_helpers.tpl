@@ -84,3 +84,25 @@ percentage represents
 {{- $calculated := mulf (divf $percent 100.0) (float64 $total) }}
 {{- ceil $calculated | int }}
 {{- end }}
+
+{{- define "generic-app.affinity" -}}
+{{- if .Values.affinity -}}
+  {{- toYaml .Values.affinity -}}
+{{- else if eq .Values.antiAffinityPreset "soft" -}}
+podAntiAffinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        topologyKey: kubernetes.io/hostname
+        labelSelector:
+          matchLabels:
+            {{- include "generic-app.selectorLabels" . | nindent 12 }}
+{{- else if eq .Values.antiAffinityPreset "hard" -}}
+podAntiAffinity:
+  requiredDuringSchedulingIgnoredDuringExecution:
+    - topologyKey: kubernetes.io/hostname
+      labelSelector:
+        matchLabels:
+          {{- include "generic-app.selectorLabels" . | nindent 10 -}}
+{{- end }}
+{{- end }}
