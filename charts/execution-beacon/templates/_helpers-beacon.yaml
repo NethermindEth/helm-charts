@@ -265,7 +265,7 @@ Lodestar beacon client command
   . /env/init-nodeport;
 {{- end }}
   exec node
-  /usr/app/node_modules/.bin/lodestar
+  ./packages/cli/bin/lodestar
   beacon
   --dataDir=/data/beacon
   --network={{ .Values.network }}
