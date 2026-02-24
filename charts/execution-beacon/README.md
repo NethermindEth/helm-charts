@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.5.2](https://img.shields.io/badge/Version-1.5.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.5.3](https://img.shields.io/badge/Version-1.5.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -244,6 +244,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | p2pNodePort.startAtBeacon | int | `31200` |  |
 | p2pNodePort.startAtExecution | int | `31100` |  |
 | p2pNodePort.type | string | `"NodePort"` |  |
+| podManagementPolicy | string | `"Parallel"` |  |
 | priorityClassName | string | `""` |  |
 | rbac.clusterRules[0].apiGroups[0] | string | `""` |  |
 | rbac.clusterRules[0].resources[0] | string | `"nodes"` |  |
