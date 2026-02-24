@@ -1,7 +1,6 @@
-
 # drpc-nodecore
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
 
 A Helm chart for dRPC nodeCore application
 
@@ -42,6 +41,7 @@ A Helm chart for dRPC nodeCore application
 | livenessProbe.tcpSocket.port | int | `9090` |  |
 | livenessProbe.timeoutSeconds | int | `1` |  |
 | nameOverride | string | `""` |  |
+| nginxSidecar.enabled | bool | `true` |  |
 | nodeSelector | object | `{}` |  |
 | podSecurityContext.fsGroup | int | `1000` |  |
 | podSecurityContext.runAsGroup | int | `1000` |  |

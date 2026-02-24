@@ -9,10 +9,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - name: rpc-proxy
+    - name: rpc
       port: 8080
-      targetPort: rpc-proxy
-      protocol: TCP
+      targetPort: {{ if .Values.nginxSidecar.enabled }}rpc-proxy{{ else }}rpc{{ end }}
     - name: metrics
       port: 9093
       targetPort: metrics

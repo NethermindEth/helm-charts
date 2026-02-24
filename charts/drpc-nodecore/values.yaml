@@ -35,6 +35,10 @@ configMap:
   name: drpc-nodecore-config
   subPath: nodecore.config.yaml
 
+# Set to false to remove the nginx sidecar and route traffic directly to dRPC (no auth, internal cluster use only).
+nginxSidecar:
+  enabled: true
+
 # -- This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
 env: []
   # - name: MY_ENV_VAR
