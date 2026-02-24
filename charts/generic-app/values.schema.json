@@ -1,0 +1,856 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "parentRef": {
+      "type": "object",
+      "description": "Gateway API parent reference",
+      "properties": {
+        "group": { "type": "string" },
+        "kind": { "type": "string" },
+        "name": { "type": "string" },
+        "namespace": { "type": "string" },
+        "sectionName": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "backendRef": {
+      "type": "object",
+      "description": "Gateway API backend reference",
+      "properties": {
+        "group": { "type": "string" },
+        "kind": { "type": "string" },
+        "name": { "type": "string" },
+        "namespace": { "type": "string" },
+        "port": { "type": "integer" },
+        "weight": { "type": "integer" }
+      },
+      "required": ["port"]
+    },
+    "probe": {
+      "type": "object",
+      "description": "Kubernetes container probe",
+      "properties": {
+        "httpGet": {
+          "type": "object",
+          "properties": {
+            "path": { "type": "string" },
+            "port": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "integer" }
+              ]
+            },
+            "scheme": { "type": "string" },
+            "httpHeaders": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "value": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "tcpSocket": {
+          "type": "object",
+          "properties": {
+            "port": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "integer" }
+              ]
+            }
+          }
+        },
+        "exec": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "grpc": {
+          "type": "object",
+          "properties": {
+            "port": { "type": "integer" },
+            "service": { "type": "string" }
+          }
+        },
+        "initialDelaySeconds": { "type": "integer", "minimum": 0 },
+        "periodSeconds": { "type": "integer", "minimum": 1 },
+        "timeoutSeconds": { "type": "integer", "minimum": 1 },
+        "successThreshold": { "type": "integer", "minimum": 1 },
+        "failureThreshold": { "type": "integer", "minimum": 1 },
+        "terminationGracePeriodSeconds": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" }
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "nameOverride": {
+      "type": "string",
+      "description": "Override the chart name"
+    },
+    "fullnameOverride": {
+      "type": "string",
+      "description": "Override the full release name"
+    },
+    "image": {
+      "type": "object",
+      "description": "Container image configuration",
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "Container image repository"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "description": "Image pull policy",
+          "enum": ["Always", "IfNotPresent", "Never"]
+        },
+        "tag": {
+          "type": "string",
+          "description": "Image tag, defaults to chart appVersion"
+        }
+      }
+    },
+    "imagePullSecrets": {
+      "type": "array",
+      "description": "Secrets for pulling images from private registries",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "replicaCount": {
+      "type": "integer",
+      "description": "Number of replicas",
+      "minimum": 0
+    },
+    "deployment": {
+      "type": "object",
+      "description": "Deployment workload configuration",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable Deployment workload"
+        },
+        "autoscaling": {
+          "type": "object",
+          "description": "HorizontalPodAutoscaler configuration",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable autoscaling"
+            },
+            "minReplicas": {
+              "type": "integer",
+              "description": "Minimum number of replicas",
+              "minimum": 1
+            },
+            "maxReplicas": {
+              "type": "integer",
+              "description": "Maximum number of replicas",
+              "minimum": 1
+            },
+            "targetCPUUtilizationPercentage": {
+              "type": "integer",
+              "description": "Target CPU utilization percentage",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "targetMemoryUtilizationPercentage": {
+              "type": "integer",
+              "description": "Target memory utilization percentage",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "restartOnChanges": {
+          "type": "boolean",
+          "description": "Restart pods when values change"
+        },
+        "strategy": {
+          "type": "object",
+          "description": "Deployment strategy (e.g. RollingUpdate, Recreate)"
+        }
+      }
+    },
+    "statefulSet": {
+      "type": "object",
+      "description": "StatefulSet workload configuration",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable StatefulSet workload"
+        },
+        "persistence": {
+          "type": "object",
+          "description": "PersistentVolumeClaim configuration for StatefulSet",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable PVC for StatefulSet"
+            },
+            "storageClassName": {
+              "type": "string",
+              "description": "Storage class name"
+            },
+            "mountPath": {
+              "type": "string",
+              "description": "Mount path for the persistent volume"
+            },
+            "accessModes": {
+              "type": "array",
+              "description": "PVC access modes",
+              "items": {
+                "type": "string",
+                "enum": ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod"]
+              }
+            },
+            "size": {
+              "description": "PVC size (e.g. 10Gi)",
+              "oneOf": [
+                { "type": "string" },
+                { "type": "number" }
+              ]
+            }
+          }
+        },
+        "restartOnChanges": {
+          "type": "boolean",
+          "description": "Restart pods when values change"
+        }
+      }
+    },
+    "command": {
+      "type": "array",
+      "description": "Container command override",
+      "items": {
+        "type": "string"
+      }
+    },
+    "args": {
+      "type": "array",
+      "description": "Container args override",
+      "items": {
+        "type": "string"
+      }
+    },
+    "workingDir": {
+      "type": "string",
+      "description": "Working directory for the container"
+    },
+    "config": {
+      "type": "object",
+      "description": "Simple key/value pairs mounted as environment variables via ConfigMap",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "configMaps": {
+      "type": "array",
+      "description": "Extra ConfigMaps to create (use volumes/volumeMounts to mount them)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name", "data"]
+      }
+    },
+    "env": {
+      "type": "array",
+      "description": "Container environment variables",
+      "items": {
+        "type": "object"
+      }
+    },
+    "envFrom": {
+      "type": "array",
+      "description": "envFrom configuration for bulk environment variables from ConfigMaps/Secrets",
+      "items": {
+        "type": "object"
+      }
+    },
+    "initContainers": {
+      "type": "array",
+      "description": "Init containers",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "image": { "type": "string" },
+          "command": { "type": "array", "items": { "type": "string" } },
+          "args": { "type": "array", "items": { "type": "string" } },
+          "env": { "type": "array", "items": { "type": "object" } },
+          "envFrom": { "type": "array", "items": { "type": "object" } },
+          "ports": { "type": "array", "items": { "type": "object" } },
+          "resources": { "type": "object" },
+          "volumeMounts": { "type": "array", "items": { "type": "object" } },
+          "workingDir": { "type": "string" },
+          "securityContext": { "type": "object" }
+        },
+        "required": ["name", "image"]
+      }
+    },
+    "extraContainers": {
+      "type": "array",
+      "description": "Sidecar containers",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "image": { "type": "string" },
+          "command": { "type": "array", "items": { "type": "string" } },
+          "args": { "type": "array", "items": { "type": "string" } },
+          "env": { "type": "array", "items": { "type": "object" } },
+          "envFrom": { "type": "array", "items": { "type": "object" } },
+          "ports": { "type": "array", "items": { "type": "object" } },
+          "resources": { "type": "object" },
+          "volumeMounts": { "type": "array", "items": { "type": "object" } },
+          "workingDir": { "type": "string" },
+          "securityContext": { "type": "object" }
+        },
+        "required": ["name", "image"]
+      }
+    },
+    "extraObjects": {
+      "type": "array",
+      "description": "Extra Kubernetes resources to create",
+      "items": {
+        "type": "object"
+      }
+    },
+    "serviceAccount": {
+      "type": "object",
+      "description": "Service account configuration",
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "description": "Create a service account"
+        },
+        "automount": {
+          "type": "boolean",
+          "description": "Automount service account API credentials"
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Service account annotations"
+        },
+        "name": {
+          "type": "string",
+          "description": "Service account name (generated from fullname if not set)"
+        }
+      }
+    },
+    "podAnnotations": {
+      "type": "object",
+      "description": "Annotations to add to pods"
+    },
+    "podLabels": {
+      "type": "object",
+      "description": "Labels to add to pods"
+    },
+    "service": {
+      "type": "object",
+      "description": "Kubernetes Service configuration",
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "description": "Service annotations"
+        },
+        "type": {
+          "type": "string",
+          "description": "Service type",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
+        },
+        "clusterIP": {
+          "type": "string",
+          "description": "Explicit cluster IP for the service"
+        },
+        "ports": {
+          "type": "array",
+          "description": "Service ports",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "port": {
+                "type": "integer"
+              },
+              "containerPort": {
+                "type": "integer"
+              },
+              "protocol": {
+                "type": "string",
+                "enum": ["TCP", "UDP", "SCTP"]
+              }
+            },
+            "required": ["name", "port", "protocol"]
+          }
+        },
+        "extraContainersPorts": {
+          "type": "array",
+          "description": "Extra ports for sidecar containers",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "port": {
+                "type": "integer"
+              },
+              "protocol": {
+                "type": "string",
+                "enum": ["TCP", "UDP", "SCTP"]
+              }
+            },
+            "required": ["name", "port", "protocol"]
+          }
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "description": "Ingress configuration",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable Ingress"
+        },
+        "className": {
+          "type": "string",
+          "description": "Ingress class name"
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Ingress annotations"
+        },
+        "hosts": {
+          "type": "array",
+          "description": "Ingress hosts",
+          "items": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    },
+                    "pathType": {
+                      "type": "string",
+                      "enum": ["ImplementationSpecific", "Exact", "Prefix"]
+                    },
+                    "portName": {
+                      "type": "string",
+                      "description": "Port name as defined in service.ports"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tls": {
+          "type": "array",
+          "description": "Ingress TLS configuration",
+          "items": {
+            "type": "object",
+            "properties": {
+              "secretName": {
+                "type": "string"
+              },
+              "hosts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "HTTPRoute": {
+      "type": "object",
+      "description": "Gateway API HTTPRoute configuration",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable HTTPRoute"
+        },
+        "annotations": {
+          "type": "object",
+          "description": "HTTPRoute annotations"
+        },
+        "parentRefs": {
+          "type": "array",
+          "description": "Parent gateway references",
+          "items": {
+            "$ref": "#/definitions/parentRef"
+          }
+        },
+        "hostnames": {
+          "type": "array",
+          "description": "Hostnames for the HTTPRoute",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "description": "HTTPRoute rules (auto-generated if omitted with single-port service)",
+          "items": {
+            "type": "object",
+            "properties": {
+              "matches": {
+                "type": "array",
+                "items": { "type": "object" }
+              },
+              "filters": {
+                "type": "array",
+                "items": { "type": "object" }
+              },
+              "backendRefs": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/backendRef" }
+              },
+              "timeouts": { "type": "object" }
+            }
+          }
+        }
+      }
+    },
+    "TCPRoutes": {
+      "type": "object",
+      "description": "Gateway API TCPRoute configuration",
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "description": "TCPRoute annotations"
+        },
+        "routes": {
+          "type": "object",
+          "description": "Map of route names to TCPRoute configurations",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "parentRefs": {
+                "type": "array",
+                "items": {
+                  "allOf": [
+                    { "$ref": "#/definitions/parentRef" },
+                    { "required": ["name", "namespace", "sectionName"] }
+                  ]
+                }
+              },
+              "rules": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "backendRefs": {
+                      "type": "array",
+                      "items": { "$ref": "#/definitions/backendRef" }
+                    },
+                    "name": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "description": "Container resource requests and limits",
+      "properties": {
+        "limits": {
+          "type": "object",
+          "properties": {
+            "cpu": { "$ref": "#/definitions/resourceQuantity" },
+            "memory": { "$ref": "#/definitions/resourceQuantity" }
+          }
+        },
+        "requests": {
+          "type": "object",
+          "properties": {
+            "cpu": { "$ref": "#/definitions/resourceQuantity" },
+            "memory": { "$ref": "#/definitions/resourceQuantity" }
+          }
+        }
+      }
+    },
+    "livenessProbe": {
+      "description": "Liveness probe configuration",
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/definitions/probe" }
+      ]
+    },
+    "readinessProbe": {
+      "description": "Readiness probe configuration",
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/definitions/probe" }
+      ]
+    },
+    "volumes": {
+      "type": "array",
+      "description": "Additional volumes",
+      "items": {
+        "type": "object"
+      }
+    },
+    "volumeMounts": {
+      "type": "array",
+      "description": "Additional volume mounts",
+      "items": {
+        "type": "object"
+      }
+    },
+    "nodeSelector": {
+      "type": "object",
+      "description": "Node selector for pod scheduling",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "tolerations": {
+      "type": "array",
+      "description": "Pod tolerations",
+      "items": {
+        "type": "object"
+      }
+    },
+    "antiAffinityPreset": {
+      "type": "string",
+      "description": "Pod anti-affinity preset: 'soft' or 'hard'. Ignored if affinity is set.",
+      "enum": ["", "soft", "hard"]
+    },
+    "affinity": {
+      "type": "object",
+      "description": "Pod affinity/anti-affinity rules (overrides antiAffinityPreset)"
+    },
+    "podDisruptionBudget": {
+      "type": "object",
+      "description": "PodDisruptionBudget configuration",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Create a PodDisruptionBudget"
+        },
+        "minAvailable": {
+          "description": "Minimum number/percentage of pods that must remain available",
+          "oneOf": [
+            { "type": "null" },
+            { "type": "integer", "minimum": 1 },
+            { "type": "string" }
+          ]
+        },
+        "maxUnavailable": {
+          "description": "Maximum number/percentage of pods that can be unavailable",
+          "oneOf": [
+            { "type": "null" },
+            { "type": "integer", "minimum": 0 },
+            { "type": "string" }
+          ]
+        }
+      }
+    },
+    "serviceMonitor": {
+      "type": "object",
+      "description": "Prometheus ServiceMonitor configuration",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Create a ServiceMonitor for Prometheus Operator"
+        },
+        "port": {
+          "type": "string",
+          "description": "Port name to scrape"
+        },
+        "path": {
+          "type": "string",
+          "description": "Metrics path to scrape"
+        },
+        "namespace": {
+          "description": "Alternative namespace for ServiceMonitor",
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string" }
+          ]
+        },
+        "labels": {
+          "type": "object",
+          "description": "Additional ServiceMonitor labels"
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Additional ServiceMonitor annotations"
+        },
+        "interval": {
+          "type": "string",
+          "description": "Scrape interval (e.g. 1m, 30s)"
+        },
+        "scheme": {
+          "type": "string",
+          "description": "Scrape scheme",
+          "enum": ["http", "https"]
+        },
+        "tlsConfig": {
+          "type": "object",
+          "description": "TLS configuration for scraping"
+        },
+        "scrapeTimeout": {
+          "type": "string",
+          "description": "Scrape timeout (e.g. 30s)"
+        },
+        "relabelings": {
+          "type": "array",
+          "description": "Relabeling rules",
+          "items": {
+            "type": "object"
+          }
+        },
+        "metricRelabelings": {
+          "type": "array",
+          "description": "Metric relabeling rules",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "description": "Pod-level security context",
+      "properties": {
+        "runAsUser": { "type": "integer" },
+        "runAsGroup": { "type": "integer" },
+        "runAsNonRoot": { "type": "boolean" },
+        "fsGroup": { "type": "integer" },
+        "fsGroupChangePolicy": {
+          "type": "string",
+          "enum": ["OnRootMismatch", "Always"]
+        },
+        "seccompProfile": { "type": "object" },
+        "supplementalGroups": {
+          "type": "array",
+          "items": { "type": "integer" }
+        },
+        "sysctls": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      }
+    },
+    "securityContext": {
+      "type": "object",
+      "description": "Container-level security context",
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "add": { "type": "array", "items": { "type": "string" } },
+            "drop": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "privileged": { "type": "boolean" },
+        "readOnlyRootFilesystem": { "type": "boolean" },
+        "runAsNonRoot": { "type": "boolean" },
+        "runAsUser": { "type": "integer" },
+        "runAsGroup": { "type": "integer" },
+        "allowPrivilegeEscalation": { "type": "boolean" },
+        "seccompProfile": { "type": "object" },
+        "seLinuxOptions": { "type": "object" },
+        "procMount": { "type": "string" },
+        "appArmorProfile": { "type": "object" }
+      }
+    },
+    "initContainerSecurityContext": {
+      "type": "object",
+      "description": "Security context applied to all init containers",
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "add": { "type": "array", "items": { "type": "string" } },
+            "drop": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "privileged": { "type": "boolean" },
+        "readOnlyRootFilesystem": { "type": "boolean" },
+        "runAsNonRoot": { "type": "boolean" },
+        "runAsUser": { "type": "integer" },
+        "runAsGroup": { "type": "integer" },
+        "allowPrivilegeEscalation": { "type": "boolean" },
+        "seccompProfile": { "type": "object" },
+        "seLinuxOptions": { "type": "object" },
+        "procMount": { "type": "string" },
+        "appArmorProfile": { "type": "object" }
+      }
+    },
+    "terminationGracePeriodSeconds": {
+      "type": "integer",
+      "description": "Termination grace period in seconds",
+      "minimum": 0
+    },
+    "runtimeClassName": {
+      "type": "string",
+      "description": "Runtime class name for the pod (e.g. nvidia for GPU workloads)"
+    },
+    "dnsConfig": {
+      "type": "object",
+      "description": "Pod DNS configuration"
+    }
+  }
+}
