@@ -1,7 +1,7 @@
 
 # dirk
 
-![Version: 1.1.4](https://img.shields.io/badge/Version-1.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v22.10.0](https://img.shields.io/badge/AppVersion-v22.10.0-informational?style=flat-square)
+![Version: 1.1.5](https://img.shields.io/badge/Version-1.1.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v22.10.0](https://img.shields.io/badge/AppVersion-v22.10.0-informational?style=flat-square)
 
 A Helm chart for installing and configuring large scale ETH staking infrastructure on top of the Kubernetes
 
@@ -53,6 +53,7 @@ A Helm chart for installing and configuring large scale ETH staking infrastructu
 | persistence.size | string | `"1Gi"` |  |
 | persistence.storageClassName | string | `""` |  |
 | podAnnotations | object | `{}` |  |
+| podManagementPolicy | string | `"OrderedReady"` |  |
 | readinessProbe.enabled | bool | `true` |  |
 | readinessProbe.failureThreshold | int | `3` |  |
 | readinessProbe.httpGet.path | string | `"/metrics"` |  |
