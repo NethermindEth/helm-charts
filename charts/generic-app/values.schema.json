@@ -1,5 +1,101 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "parentRef": {
+      "type": "object",
+      "description": "Gateway API parent reference",
+      "properties": {
+        "group": { "type": "string" },
+        "kind": { "type": "string" },
+        "name": { "type": "string" },
+        "namespace": { "type": "string" },
+        "sectionName": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "backendRef": {
+      "type": "object",
+      "description": "Gateway API backend reference",
+      "properties": {
+        "group": { "type": "string" },
+        "kind": { "type": "string" },
+        "name": { "type": "string" },
+        "namespace": { "type": "string" },
+        "port": { "type": "integer" },
+        "weight": { "type": "integer" }
+      },
+      "required": ["port"]
+    },
+    "probe": {
+      "type": "object",
+      "description": "Kubernetes container probe",
+      "properties": {
+        "httpGet": {
+          "type": "object",
+          "properties": {
+            "path": { "type": "string" },
+            "port": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "integer" }
+              ]
+            },
+            "scheme": { "type": "string" },
+            "httpHeaders": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "value": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "tcpSocket": {
+          "type": "object",
+          "properties": {
+            "port": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "integer" }
+              ]
+            }
+          }
+        },
+        "exec": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "grpc": {
+          "type": "object",
+          "properties": {
+            "port": { "type": "integer" },
+            "service": { "type": "string" }
+          }
+        },
+        "initialDelaySeconds": { "type": "integer", "minimum": 0 },
+        "periodSeconds": { "type": "integer", "minimum": 1 },
+        "timeoutSeconds": { "type": "integer", "minimum": 1 },
+        "successThreshold": { "type": "integer", "minimum": 1 },
+        "failureThreshold": { "type": "integer", "minimum": 1 },
+        "terminationGracePeriodSeconds": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" }
+      ]
+    }
+  },
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -135,8 +231,11 @@
               }
             },
             "size": {
-              "type": "string",
-              "description": "PVC size (e.g. 10Gi)"
+              "description": "PVC size (e.g. 10Gi)",
+              "oneOf": [
+                { "type": "string" },
+                { "type": "number" }
+              ]
             }
           }
         },
@@ -208,14 +307,42 @@
       "type": "array",
       "description": "Init containers",
       "items": {
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "image": { "type": "string" },
+          "command": { "type": "array", "items": { "type": "string" } },
+          "args": { "type": "array", "items": { "type": "string" } },
+          "env": { "type": "array", "items": { "type": "object" } },
+          "envFrom": { "type": "array", "items": { "type": "object" } },
+          "ports": { "type": "array", "items": { "type": "object" } },
+          "resources": { "type": "object" },
+          "volumeMounts": { "type": "array", "items": { "type": "object" } },
+          "workingDir": { "type": "string" },
+          "securityContext": { "type": "object" }
+        },
+        "required": ["name", "image"]
       }
     },
     "extraContainers": {
       "type": "array",
       "description": "Sidecar containers",
       "items": {
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "image": { "type": "string" },
+          "command": { "type": "array", "items": { "type": "string" } },
+          "args": { "type": "array", "items": { "type": "string" } },
+          "env": { "type": "array", "items": { "type": "object" } },
+          "envFrom": { "type": "array", "items": { "type": "object" } },
+          "ports": { "type": "array", "items": { "type": "object" } },
+          "resources": { "type": "object" },
+          "volumeMounts": { "type": "array", "items": { "type": "object" } },
+          "workingDir": { "type": "string" },
+          "securityContext": { "type": "object" }
+        },
+        "required": ["name", "image"]
       }
     },
     "extraObjects": {
@@ -404,7 +531,7 @@
           "type": "array",
           "description": "Parent gateway references",
           "items": {
-            "type": "object"
+            "$ref": "#/definitions/parentRef"
           }
         },
         "hostnames": {
@@ -418,7 +545,22 @@
           "type": "array",
           "description": "HTTPRoute rules (auto-generated if omitted with single-port service)",
           "items": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "matches": {
+                "type": "array",
+                "items": { "type": "object" }
+              },
+              "filters": {
+                "type": "array",
+                "items": { "type": "object" }
+              },
+              "backendRefs": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/backendRef" }
+              },
+              "timeouts": { "type": "object" }
+            }
           }
         }
       }
@@ -441,13 +583,23 @@
               "parentRefs": {
                 "type": "array",
                 "items": {
-                  "type": "object"
+                  "allOf": [
+                    { "$ref": "#/definitions/parentRef" },
+                    { "required": ["name", "namespace", "sectionName"] }
+                  ]
                 }
               },
               "rules": {
                 "type": "array",
                 "items": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "backendRefs": {
+                      "type": "array",
+                      "items": { "$ref": "#/definitions/backendRef" }
+                    },
+                    "name": { "type": "string" }
+                  }
                 }
               }
             }
@@ -462,15 +614,15 @@
         "limits": {
           "type": "object",
           "properties": {
-            "cpu": { "type": "string" },
-            "memory": { "type": "string" }
+            "cpu": { "$ref": "#/definitions/resourceQuantity" },
+            "memory": { "$ref": "#/definitions/resourceQuantity" }
           }
         },
         "requests": {
           "type": "object",
           "properties": {
-            "cpu": { "type": "string" },
-            "memory": { "type": "string" }
+            "cpu": { "$ref": "#/definitions/resourceQuantity" },
+            "memory": { "$ref": "#/definitions/resourceQuantity" }
           }
         }
       }
@@ -479,14 +631,14 @@
       "description": "Liveness probe configuration",
       "oneOf": [
         { "type": "null" },
-        { "type": "object" }
+        { "$ref": "#/definitions/probe" }
       ]
     },
     "readinessProbe": {
       "description": "Readiness probe configuration",
       "oneOf": [
         { "type": "null" },
-        { "type": "object" }
+        { "$ref": "#/definitions/probe" }
       ]
     },
     "volumes": {
@@ -539,7 +691,7 @@
           "description": "Minimum number/percentage of pods that must remain available",
           "oneOf": [
             { "type": "null" },
-            { "type": "integer", "minimum": 0 },
+            { "type": "integer", "minimum": 1 },
             { "type": "string" }
           ]
         },
@@ -620,15 +772,72 @@
     },
     "podSecurityContext": {
       "type": "object",
-      "description": "Pod-level security context"
+      "description": "Pod-level security context",
+      "properties": {
+        "runAsUser": { "type": "integer" },
+        "runAsGroup": { "type": "integer" },
+        "runAsNonRoot": { "type": "boolean" },
+        "fsGroup": { "type": "integer" },
+        "fsGroupChangePolicy": {
+          "type": "string",
+          "enum": ["OnRootMismatch", "Always"]
+        },
+        "seccompProfile": { "type": "object" },
+        "supplementalGroups": {
+          "type": "array",
+          "items": { "type": "integer" }
+        },
+        "sysctls": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      }
     },
     "securityContext": {
       "type": "object",
-      "description": "Container-level security context"
+      "description": "Container-level security context",
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "add": { "type": "array", "items": { "type": "string" } },
+            "drop": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "privileged": { "type": "boolean" },
+        "readOnlyRootFilesystem": { "type": "boolean" },
+        "runAsNonRoot": { "type": "boolean" },
+        "runAsUser": { "type": "integer" },
+        "runAsGroup": { "type": "integer" },
+        "allowPrivilegeEscalation": { "type": "boolean" },
+        "seccompProfile": { "type": "object" },
+        "seLinuxOptions": { "type": "object" },
+        "procMount": { "type": "string" },
+        "appArmorProfile": { "type": "object" }
+      }
     },
     "initContainerSecurityContext": {
       "type": "object",
-      "description": "Security context applied to all init containers"
+      "description": "Security context applied to all init containers",
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "add": { "type": "array", "items": { "type": "string" } },
+            "drop": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "privileged": { "type": "boolean" },
+        "readOnlyRootFilesystem": { "type": "boolean" },
+        "runAsNonRoot": { "type": "boolean" },
+        "runAsUser": { "type": "integer" },
+        "runAsGroup": { "type": "integer" },
+        "allowPrivilegeEscalation": { "type": "boolean" },
+        "seccompProfile": { "type": "object" },
+        "seLinuxOptions": { "type": "object" },
+        "procMount": { "type": "string" },
+        "appArmorProfile": { "type": "object" }
+      }
     },
     "terminationGracePeriodSeconds": {
       "type": "integer",
