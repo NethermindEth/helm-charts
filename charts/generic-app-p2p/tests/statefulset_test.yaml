@@ -5,8 +5,6 @@ release:
 
 set:
   nameOverride: some-name
-  statefulSet:
-    enabled: true
 
 templates:
   - statefulset.yaml
