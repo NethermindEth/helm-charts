@@ -61,6 +61,10 @@ fullnameOverride: ""
 ##
 replicaCount: 1
 
+## Pod management policy for the StatefulSet
+##
+podManagementPolicy: "Parallel"
+
 ## Ethereum network
 ##
 network: mainnet
