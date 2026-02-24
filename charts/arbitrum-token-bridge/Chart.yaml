@@ -1,0 +1,17 @@
+apiVersion: v2
+name: arbitrum-token-bridge
+description: A Helm chart for Arbitrum Token Bridge UI
+type: application
+version: 0.1.0
+appVersion: "3.3.0"
+keywords:
+  - arbitrum
+  - bridge
+  - token
+  - defi
+  - blockchain
+home: https://github.com/NethermindEth/arbitrum-token-bridge
+sources:
+  - https://github.com/NethermindEth/arbitrum-token-bridge
+maintainers:
+  - name: nme-mvasylenko
