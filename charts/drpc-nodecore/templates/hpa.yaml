@@ -1,32 +1,39 @@
-{{- if .Values.deployment.autoscaling.enabled }}
+{{- range $projectName, $projectConfig := .Values.projects }}
+{{- $ctx := dict "root" $ "projectName" $projectName }}
+{{- $defaults := $.Values.defaults }}
+{{- $deployment := $projectConfig.deployment | default $defaults.deployment }}
+{{- $autoscaling := $deployment.autoscaling | default $defaults.deployment.autoscaling }}
+{{- if $autoscaling.enabled }}
+---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "drpc-nodecore.fullname" . }}
+  name: {{ include "drpc-nodecore.projectName" $ctx }}
   labels:
-    {{- include "drpc-nodecore.labels" . | nindent 4 }}
+    {{- include "drpc-nodecore.projectLabels" $ctx | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "drpc-nodecore.fullname" . }}
-  minReplicas: {{ .Values.deployment.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.deployment.autoscaling.maxReplicas }}
+    name: {{ include "drpc-nodecore.projectName" $ctx }}
+  minReplicas: {{ $autoscaling.minReplicas }}
+  maxReplicas: {{ $autoscaling.maxReplicas }}
   metrics:
-    {{- if .Values.deployment.autoscaling.targetCPUUtilizationPercentage }}
+    {{- if $autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{ .Values.deployment.autoscaling.targetCPUUtilizationPercentage }}
+          averageUtilization: {{ $autoscaling.targetCPUUtilizationPercentage }}
     {{- end }}
-    {{- if .Values.deployment.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- if $autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: {{ .Values.deployment.autoscaling.targetMemoryUtilizationPercentage }}
+          averageUtilization: {{ $autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
+{{- end }}
 {{- end }}

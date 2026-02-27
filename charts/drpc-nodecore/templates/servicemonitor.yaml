@@ -1,48 +1,49 @@
-{{- if .Values.serviceMonitor.enabled }}
+{{- range $projectName, $projectConfig := .Values.projects }}
+{{- $ctx := dict "root" $ "projectName" $projectName }}
+{{- $defaults := $.Values.defaults }}
+{{- $sm := $projectConfig.serviceMonitor | default $defaults.serviceMonitor }}
+{{- if $sm.enabled }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "drpc-nodecore.fullname" . }}
-  {{- if .Values.serviceMonitor.namespace }}
-  namespace: {{ .Values.serviceMonitor.namespace }}
+  name: {{ include "drpc-nodecore.projectName" $ctx }}
+  {{- with $sm.namespace }}
+  namespace: {{ . }}
   {{- end }}
   labels:
-    {{- include "drpc-nodecore.labels" . | nindent 4 }}
-    {{- if .Values.serviceMonitor.labels }}
-    {{- toYaml .Values.serviceMonitor.labels | nindent 4 }}
+    {{- include "drpc-nodecore.projectLabels" $ctx | nindent 4 }}
+    {{- with $sm.labels }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- if .Values.serviceMonitor.annotations }}
+  {{- with $sm.annotations }}
   annotations:
-  {{ toYaml .Values.serviceMonitor.annotations | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   endpoints:
-  - interval: {{ .Values.serviceMonitor.interval }}
-    {{- if .Values.serviceMonitor.scrapeTimeout }}
-    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
-    {{- end }}
-    honorLabels: true
-    port: metrics
-    path: /metrics
-    scheme: http
-    {{- if .Values.serviceMonitor.tlsConfig }}
-    tlsConfig:
-    {{- toYaml .Values.serviceMonitor.tlsConfig | nindent 6 }}
-    {{- end }}
-    {{- if .Values.serviceMonitor.relabelings }}
-    relabelings:
-    {{- toYaml .Values.serviceMonitor.relabelings | nindent 4 }}
-    {{- end }}
-    {{- if .Values.serviceMonitor.metricRelabelings }}
-    metricRelabelings:
-    {{- toYaml .Values.serviceMonitor.metricRelabelings | nindent 4 }}
-    {{- end }}
-  jobLabel: {{ include "drpc-nodecore.fullname" . }}
+    - interval: {{ $sm.interval }}
+      {{- with $sm.scrapeTimeout }}
+      scrapeTimeout: {{ . }}
+      {{- end }}
+      honorLabels: true
+      port: metrics
+      path: /metrics
+      scheme: http
+      {{- with $sm.relabelings }}
+      relabelings:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $sm.metricRelabelings }}
+      metricRelabelings:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  jobLabel: {{ include "drpc-nodecore.projectName" $ctx }}
   selector:
     matchLabels:
-      {{- include "drpc-nodecore.selectorLabels" . | nindent 6 }}
+      {{- include "drpc-nodecore.projectSelectorLabels" $ctx | nindent 6 }}
   namespaceSelector:
     matchNames:
-      - {{ .Release.Namespace }}
+      - {{ $.Release.Namespace }}
+{{- end }}
 {{- end }}

@@ -1,7 +1,7 @@
 
 # drpc-nodecore
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 A Helm chart for dRPC nodeCore application
 
@@ -16,59 +16,62 @@ A Helm chart for dRPC nodeCore application
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
-| configMap.name | string | `"drpc-nodecore-config"` |  |
-| configMap.subPath | string | `"nodecore.config.yaml"` |  |
-| deployment | object | `{"autoscaling":{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80},"enabled":true,"restartOnChanges":false}` | Enable Deployment |
-| env | list | `[]` | This is for setting container environment variables: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/ |
-| envFrom | list | `[]` | envFrom configuration |
+| defaults.affinity | object | `{}` |  |
+| defaults.deployment.autoscaling.enabled | bool | `false` |  |
+| defaults.deployment.autoscaling.maxReplicas | int | `10` |  |
+| defaults.deployment.autoscaling.minReplicas | int | `1` |  |
+| defaults.deployment.autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| defaults.deployment.enabled | bool | `true` |  |
+| defaults.deployment.restartOnChanges | bool | `true` |  |
+| defaults.deployment.strategy | object | `{}` |  |
+| defaults.initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| defaults.initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| defaults.initContainerSecurityContext.readOnlyRootFilesystem | bool | `false` |  |
+| defaults.initContainerSecurityContext.runAsGroup | int | `0` |  |
+| defaults.initContainerSecurityContext.runAsNonRoot | bool | `false` |  |
+| defaults.initContainerSecurityContext.runAsUser | int | `0` |  |
+| defaults.initContainerSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| defaults.livenessProbe.failureThreshold | int | `3` |  |
+| defaults.livenessProbe.initialDelaySeconds | int | `30` |  |
+| defaults.livenessProbe.periodSeconds | int | `10` |  |
+| defaults.livenessProbe.successThreshold | int | `1` |  |
+| defaults.livenessProbe.tcpSocket.port | int | `9090` |  |
+| defaults.livenessProbe.timeoutSeconds | int | `1` |  |
+| defaults.nodeSelector | object | `{}` |  |
+| defaults.podSecurityContext.fsGroup | int | `1000` |  |
+| defaults.podSecurityContext.runAsGroup | int | `1000` |  |
+| defaults.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| defaults.podSecurityContext.runAsUser | int | `1000` |  |
+| defaults.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| defaults.readinessProbe.failureThreshold | int | `2` |  |
+| defaults.readinessProbe.httpGet.path | string | `"/metrics"` |  |
+| defaults.readinessProbe.httpGet.port | int | `9093` |  |
+| defaults.readinessProbe.initialDelaySeconds | int | `10` |  |
+| defaults.readinessProbe.periodSeconds | int | `5` |  |
+| defaults.readinessProbe.successThreshold | int | `1` |  |
+| defaults.readinessProbe.timeoutSeconds | int | `5` |  |
+| defaults.replicaCount | int | `1` |  |
+| defaults.resources | object | `{}` |  |
+| defaults.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| defaults.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| defaults.securityContext.readOnlyRootFilesystem | bool | `false` |  |
+| defaults.securityContext.runAsGroup | int | `0` |  |
+| defaults.securityContext.runAsNonRoot | bool | `false` |  |
+| defaults.securityContext.runAsUser | int | `0` |  |
+| defaults.securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| defaults.serviceMonitor.enabled | bool | `true` |  |
+| defaults.serviceMonitor.interval | string | `"30s"` |  |
+| defaults.terminationGracePeriodSeconds | int | `30` |  |
+| defaults.tolerations | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"drpcorg/nodecore"` |  |
 | image.tag | string | `"0.1.6"` |  |
 | imagePullSecrets | list | `[]` |  |
-| ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local"}],"tls":[]}` | For now all traffic is routed to the `http` port |
-| initContainerSecurityContext.allowPrivilegeEscalation | bool | `true` |  |
-| initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| initContainerSecurityContext.readOnlyRootFilesystem | bool | `false` |  |
-| initContainerSecurityContext.runAsGroup | int | `0` |  |
-| initContainerSecurityContext.runAsNonRoot | bool | `false` |  |
-| initContainerSecurityContext.runAsUser | int | `0` |  |
-| initContainerSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
-| livenessProbe.failureThreshold | int | `3` |  |
-| livenessProbe.initialDelaySeconds | int | `30` |  |
-| livenessProbe.periodSeconds | int | `10` |  |
-| livenessProbe.successThreshold | int | `1` |  |
-| livenessProbe.tcpSocket.port | int | `9090` |  |
-| livenessProbe.timeoutSeconds | int | `1` |  |
+| initImage.repository | string | `"bhgedigital/envsubst"` |  |
+| initImage.tag | string | `"latest"` |  |
 | nameOverride | string | `""` |  |
-| nodeSelector | object | `{}` |  |
-| podSecurityContext.fsGroup | int | `1000` |  |
-| podSecurityContext.runAsGroup | int | `1000` |  |
-| podSecurityContext.runAsNonRoot | bool | `true` |  |
-| podSecurityContext.runAsUser | int | `1000` |  |
-| podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
-| readinessProbe.failureThreshold | int | `2` |  |
-| readinessProbe.httpGet.path | string | `"/metrics"` |  |
-| readinessProbe.httpGet.port | int | `9093` |  |
-| readinessProbe.initialDelaySeconds | int | `10` |  |
-| readinessProbe.periodSeconds | int | `5` |  |
-| readinessProbe.successThreshold | int | `1` |  |
-| readinessProbe.timeoutSeconds | int | `5` |  |
-| replicaCount | int | `1` |  |
-| resources | object | `{}` |  |
-| runtimeClassName | string | `""` | Runtime class name for the pod (e.g., "nvidia" for GPU workloads) |
-| securityContext.allowPrivilegeEscalation | bool | `true` |  |
-| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| securityContext.readOnlyRootFilesystem | bool | `false` |  |
-| securityContext.runAsGroup | int | `0` |  |
-| securityContext.runAsNonRoot | bool | `false` |  |
-| securityContext.runAsUser | int | `0` |  |
-| securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
-| serviceMonitor.enabled | bool | `true` |  |
-| serviceMonitor.interval | string | `"30s"` |  |
-| terminationGracePeriodSeconds | int | `30` | Default termination grace period for the pod |
-| tolerations | list | `[]` |  |
+| projects | object | `{}` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

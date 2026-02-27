@@ -1,21 +1,27 @@
+{{- range $projectName, $projectConfig := .Values.projects }}
+{{- $ctx := dict "root" $ "projectName" $projectName }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "drpc-nodecore.fullname" . }}
+  name: {{ include "drpc-nodecore.projectName" $ctx }}
   labels:
-    {{- include "drpc-nodecore.labels" . | nindent 4 }}
-  annotations: {}
+    {{- include "drpc-nodecore.projectLabels" $ctx | nindent 4 }}
+  {{- with $projectConfig.serviceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: ClusterIP
   ports:
-    - name: rpc-proxy
-      port: 8080
-      targetPort: rpc-proxy
+    - name: rpc
+      port: 9090
+      targetPort: rpc
       protocol: TCP
     - name: metrics
       port: 9093
       targetPort: metrics
       protocol: TCP
   selector:
-    {{- include "drpc-nodecore.selectorLabels" . | nindent 4 }}
+    {{- include "drpc-nodecore.projectSelectorLabels" $ctx | nindent 4 }}
+{{- end }}
