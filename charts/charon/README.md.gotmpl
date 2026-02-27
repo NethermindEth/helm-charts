@@ -33,21 +33,23 @@ You have the following charon node artifacts created as k8s secrets:
 - `cluster-lock`
 
 e.g.:
-```console
+```bash
 kubectl create secret generic charon-enr-private-key --from-file=.charon/charon-enr-private-key
 kubectl create secret generic cluster-lock --from-file=.charon/cluster-lock.json
 kubectl create secret generic validator-keys --from-file=keystore-0.json=.charon/validator_keys/keystore-0.json --from-file=keystore-0.txt=.charon/validator_keys/keystore-0.txt
 ```
 
 ## Add Obol's Helm Charts
-```console
+
+```bash
 helm repo add obol https://obolnetwork.github.io/helm-charts
 helm repo update
 ```
 _See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation._
 
 ## Install the chart
-```console
+
+```bash
 helm upgrade --install charon-node obol/charon \
   --set='config.beaconNodeEndpoints=<BEACON_NODES_ENDPOINTS>' \
   --create-namespace \
@@ -60,7 +62,8 @@ helm upgrade --install charon-node obol/charon \
 
 ## Uninstall the chart
 To uninstall and delete the `charon-node`:
-```console
+
+```bash
 helm uninstall charon-node
 ```
 The command removes all the Kubernetes components associated with the chart and deletes the release.

@@ -43,8 +43,8 @@ spec:
         name: prometheus
       - name: monitoring-token
         secret:
-          secretName: {{ .Values.secrets.charon }}
+          secretName: {{ .Values.centralMonitoring.secretName }}
           items:
-            - key: token
+            - key: PROM_REMOTE_WRITE_TOKEN
               path: token
 {{- end }}
