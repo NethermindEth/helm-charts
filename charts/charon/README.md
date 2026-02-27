@@ -3,7 +3,7 @@
 Charon
 ===========
 
-![Version: 0.3.20](https://img.shields.io/badge/Version-0.3.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.7.0](https://img.shields.io/badge/AppVersion-1.7.0-informational?style=flat-square)
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.8.2](https://img.shields.io/badge/AppVersion-1.8.2-informational?style=flat-square)
 
 Charon is an open-source Ethereum Distributed validator middleware written in golang.
 
@@ -18,9 +18,12 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity for pod assignment # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity # # Example: # affinity: #   podAntiAffinity: #     requiredDuringSchedulingIgnoredDuringExecution: #     - labelSelector: #         matchExpressions: #         - key: app.kubernetes.io/name #           operator: In #           values: #           - charon #       topologyKey: kubernetes.io/hostname # |
-| centralMonitoring | object | `{"enabled":false,"promEndpoint":"https://vm.monitoring.gcp.obol.tech/write"}` | Central Monitoring |
+| centralMonitoring | object | `{"enabled":false,"promEndpoint":"https://vm.monitoring.gcp.obol.tech/write","scrapeConfig":{"relabelConfigs":[]},"secretName":"prometheus-monitoring-token"}` | Central Monitoring |
 | centralMonitoring.enabled | bool | `false` | Specifies whether central monitoring should be enabled |
 | centralMonitoring.promEndpoint | string | `"https://vm.monitoring.gcp.obol.tech/write"` | https endpoint to obol central prometheus |
+| centralMonitoring.scrapeConfig | object | See `values.yaml` | Scrape config overrides for the Prometheus job |
+| centralMonitoring.scrapeConfig.relabelConfigs | list | `[]` | Additional relabel configs appended to the charon scrape job |
+| centralMonitoring.secretName | string | `"prometheus-monitoring-token"` | Name of the Kubernetes Secret containing the Prometheus remote-write token. The secret must have a key named `PROM_REMOTE_WRITE_TOKEN`. |
 | config.beaconNodeEndpoints | string | `"http://localhost:5051"` | Comma separated list of one or more beacon node endpoint URLs. |
 | config.builderApi | string | `""` | Enables the builder api. Will only produce builder blocks. Builder API must also be enabled on the validator client. Beacon node must be connected to a builder-relay to access the builder network. |
 | config.fallbackBeaconNodes | string | `""` | Comma separated list of fallback beacon node endpoints |
@@ -57,12 +60,12 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | extraVolumes | list | `[]` | Additional volumes |
 | fullnameOverride | string | `""` | Provide a name to substitute for the full names of resources |
 | httpPort | int | `3600` | HTTP Port |
-| image | object | `{"pullPolicy":"IfNotPresent","repository":"obolnetwork/charon","tag":"v1.7.0"}` | Charon image ropsitory, pull policy, and tag version |
+| image | object | `{"pullPolicy":"IfNotPresent","repository":"obolnetwork/charon","tag":"v1.8.2"}` | Charon image ropsitory, pull policy, and tag version |
 | imagePullSecrets | list | `[]` | Credentials to fetch images from private registry # ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/ |
 | initContainers | list | `[]` | Additional init containers |
 | initImage.pullPolicy | string | `"IfNotPresent"` |  |
-| initImage.repository | string | `"bitnamilegacy/kubectl"` |  |
-| initImage.tag | string | `"1.32"` |  |
+| initImage.repository | string | `"alpine/kubectl"` |  |
+| initImage.tag | string | `"1.35.1"` |  |
 | jaegerPort | int | `6831` | Jaeger Port |
 | livenessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":"monitoring"},"initialDelaySeconds":60,"periodSeconds":120}` | Configure liveness probes |
 | monitoringPort | int | `3620` | Monitoring Port |
@@ -84,8 +87,8 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | rbac.rules[0] | object | `{"apiGroups":[""],"resources":["services"],"verbs":["get","list","watch"]}` | Required to get information about the serices nodePort. |
 | readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":"monitoring"},"initialDelaySeconds":10,"periodSeconds":10}` | Configure readiness probes |
 | resources | object | `{}` | Pod resources limits and requests |
-| secrets | object | `{"charon":"charon-enr-private-key"}` | Kubernetes secrets configuration Example: apiVersion: external-secrets.io/v1beta1 kind: ExternalSecret metadata:   name: charon-enr-private-key spec:   secretStoreRef:     name: infisical   target:     name: charon-enr-private-key   data:     - secretKey: charon-enr-private-key  # Hardcoded name       remoteRef:         key: CHARON_ENR_PRIVATE_KEY     - secretKey: token                    # Hardcoded name       remoteRef:         key: CHARON_MONITORING_TOKEN  The secret must contain 'charon-enr-private-key' key (always required) If centralMonitoring is enabled, the secret must also contain 'token' key cluster-lock.json and validator_keys should be downloaded via initContainers (e.g., from Minio) |
-| secrets.charon | string | `"charon-enr-private-key"` | charon secret name (required, must be provided via external secret) |
+| secrets | object | See `values.yaml` | Kubernetes secrets names |
+| secrets.charon | string | `"charon-enr-private-key"` | Name of the Kubernetes Secret containing the Charon ENR private key (always required). The secret must have a key named `charon-enr-private-key`. |
 | securityContext | object | See `values.yaml` | The security context for pods |
 | service.type | string | `"ClusterIP"` | Service type |
 | serviceAccount | object | `{"annotations":{},"enabled":true,"name":""}` | Service account # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/ |
@@ -123,21 +126,23 @@ You have the following charon node artifacts created as k8s secrets:
 - `cluster-lock`
 
 e.g.:
-```console
+```bash
 kubectl create secret generic charon-enr-private-key --from-file=.charon/charon-enr-private-key
 kubectl create secret generic cluster-lock --from-file=.charon/cluster-lock.json
 kubectl create secret generic validator-keys --from-file=keystore-0.json=.charon/validator_keys/keystore-0.json --from-file=keystore-0.txt=.charon/validator_keys/keystore-0.txt
 ```
 
 ## Add Obol's Helm Charts
-```console
+
+```bash
 helm repo add obol https://obolnetwork.github.io/helm-charts
 helm repo update
 ```
 _See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation._
 
 ## Install the chart
-```console
+
+```bash
 helm upgrade --install charon-node obol/charon \
   --set='config.beaconNodeEndpoints=<BEACON_NODES_ENDPOINTS>' \
   --create-namespace \
@@ -150,7 +155,8 @@ helm upgrade --install charon-node obol/charon \
 
 ## Uninstall the chart
 To uninstall and delete the `charon-node`:
-```console
+
+```bash
 helm uninstall charon-node
 ```
 The command removes all the Kubernetes components associated with the chart and deletes the release.
