@@ -1,151 +1,121 @@
-{{- if .Values.deployment.enabled }}
+{{- range $projectName, $projectConfig := .Values.projects }}
+{{- $ctx := dict "root" $ "projectName" $projectName }}
+{{- $defaults := $.Values.defaults }}
+{{- $deployment := $projectConfig.deployment | default $defaults.deployment }}
+{{- $autoscaling := $deployment.autoscaling | default $defaults.deployment.autoscaling }}
+{{- if $deployment.enabled | default $defaults.deployment.enabled }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "drpc-nodecore.fullname" . }}
+  name: {{ include "drpc-nodecore.projectName" $ctx }}
   labels:
-    {{- include "drpc-nodecore.labels" . | nindent 4 }}
+    {{- include "drpc-nodecore.projectLabels" $ctx | nindent 4 }}
 spec:
-  {{- with .Values.deployment.strategy }}
+  {{- with $deployment.strategy | default $defaults.deployment.strategy }}
   strategy:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   revisionHistoryLimit: 3
-  {{- if not .Values.deployment.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not $autoscaling.enabled }}
+  replicas: {{ $projectConfig.replicaCount | default $defaults.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "drpc-nodecore.selectorLabels" . | nindent 6 }}
+      {{- include "drpc-nodecore.projectSelectorLabels" $ctx | nindent 6 }}
   template:
     metadata:
       annotations:
-        {{- if .Values.deployment.restartOnChanges }}
-        values-hash: {{ include "values.hash" . | quote }}
+        {{- if $deployment.restartOnChanges | default $defaults.deployment.restartOnChanges }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
         {{- end }}
       labels:
-        {{- include "drpc-nodecore.labels" . | nindent 8 }}
+        {{- include "drpc-nodecore.projectLabels" $ctx | nindent 8 }}
     spec:
-      {{- with .Values.dnsConfig }}
-      dnsConfig:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.imagePullSecrets }}
+      {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml ($projectConfig.podSecurityContext | default $defaults.podSecurityContext) | nindent 8 }}
+      terminationGracePeriodSeconds: {{ $projectConfig.terminationGracePeriodSeconds | default $defaults.terminationGracePeriodSeconds }}
 
       initContainers:
-        - name: init-nginx-cache
-          image: nginx:1.25
-          command: ['sh', '-c', 'mkdir -p /var/cache/nginx']
-          volumeMounts:
-            - name: nginx-cache
-              mountPath: /var/cache/nginx
-          securityContext:
-            {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
-        - name: init-starknet-staking-config
-          image: nginx:1.25
+        - name: envsubst
+          image: "{{ $.Values.initImage.repository }}:{{ $.Values.initImage.tag }}"
           command:
             - sh
             - -c
             - |
-              envsubst < /etc/nodecore-raw.yaml > /etc/nodecore-config/nodecore.yaml
+              envsubst < /etc/nodecore-raw/nodecore.yaml > /etc/nodecore-config/nodecore.yaml
           envFrom:
-          {{- with .Values.envFrom }}
-          {{- toYaml . | nindent 12 }}
+            - secretRef:
+                name: {{ required (printf "secretRef is required for project %s" $projectName) $projectConfig.secretRef }}
+            {{- with $projectConfig.envFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with $projectConfig.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-          env: {{- toYaml .Values.env | nindent 12 }}
           volumeMounts:
-            - name: drpc-nodecore-config-raw
-              mountPath: /etc/nodecore-raw.yaml
-              subPath: {{ .Values.configMap.subPath }}
-            - name: drpc-nodecore-config
+            - name: nodecore-config-raw
+              mountPath: /etc/nodecore-raw
+            - name: nodecore-config
               mountPath: /etc/nodecore-config
           securityContext:
-            {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
+            {{- toYaml ($projectConfig.initContainerSecurityContext | default $defaults.initContainerSecurityContext) | nindent 12 }}
 
       containers:
-        - name: nginx-sidecar
-          image: nginx:1.25
+        - name: nodecore
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           ports:
-           - name: rpc-proxy
-             containerPort: 8080
-          command:
-            - sh
-            - -c
-            - |
-              rm -f /etc/nginx/conf.d/default.conf
-              exec nginx -g 'daemon off;'
-          volumeMounts:
-            - name: nginx-config
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
-              readOnly: true
-            - name: nginx-config
-              mountPath: /etc/nginx/conf.d/drpc-nginx.conf
-              subPath: drpc-nginx.conf
-              readOnly: true
-            - name: nginx-conf-d
-              mountPath: /etc/nginx/conf.d
-            - name: nginx-cache
-              mountPath: /var/cache/nginx
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1000
-            runAsGroup: 1000
-            readOnlyRootFilesystem: false
-        {{- with .Values.extraContainers }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-        - name: {{ .Release.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
+            - name: rpc
+              containerPort: 9090
             - name: metrics
               containerPort: 9093
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml ($projectConfig.securityContext | default $defaults.securityContext) | nindent 12 }}
           envFrom:
-          {{- with .Values.envFrom }}
-          {{- toYaml . | nindent 12 }}
+            - secretRef:
+                name: {{ $projectConfig.secretRef }}
+            {{- with $projectConfig.envFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with $projectConfig.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-          env: {{- toYaml .Values.env | nindent 12 }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- toYaml ($projectConfig.livenessProbe | default $defaults.livenessProbe) | nindent 12 }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- toYaml ($projectConfig.readinessProbe | default $defaults.readinessProbe) | nindent 12 }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml ($projectConfig.resources | default $defaults.resources) | nindent 12 }}
           volumeMounts:
-            - name: drpc-nodecore-config
+            - name: nodecore-config
               mountPath: /app/nodecore.yml
               subPath: nodecore.yaml
-      {{- with .Values.nodeSelector }}
+
+      {{- with $projectConfig.nodeSelector | default $defaults.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- with $projectConfig.affinity | default $defaults.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with $projectConfig.tolerations | default $defaults.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       volumes:
-        - name: nginx-cache
-          emptyDir: {}
-        - name: nginx-config
+        - name: nodecore-config-raw
           configMap:
-            name: {{ include "drpc-nodecore.fullname" . }}-nginx-config
-        - name: nginx-conf-d
+            name: {{ include "drpc-nodecore.projectName" $ctx }}-config
+        - name: nodecore-config
           emptyDir: {}
-        - name: drpc-nodecore-config-raw
-          configMap:
-            name: {{ .Values.configMap.name }}
-        - name: drpc-nodecore-config
-          emptyDir: {}
+{{- end }}
 {{- end }}
