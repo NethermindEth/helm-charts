@@ -8,7 +8,8 @@ metadata:
 spec:
   groups:
   {{- range .Values.spec.groups }}
-  - name: {{ .name }}
+  {{- $groupName := .name }}
+  - name: {{ $groupName }}
     rules:
     {{- range .rules }}
     - expr: |
@@ -32,6 +33,9 @@ spec:
         {{- $mergedLabels := merge $labels $defaultLabels }}
         {{- if not (hasKey $mergedLabels "namespace") }}
           {{- $_ := set $mergedLabels "namespace" $.Release.Namespace}}
+        {{- end }}
+        {{- if and .alert (not (hasKey $mergedLabels "severity")) }}
+          {{ fail (printf "No severity label configured for group %s alert %s, the severity label is required" $groupName .alert) }}
         {{- end }}
         {{- with $mergedLabels }}
         {{- toYaml . | nindent 8 }}

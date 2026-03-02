@@ -17,6 +17,8 @@ tests:
               - alert: TestAlert
                 expr: vector(1)
                 for: 5m
+                labels:
+                  severity: warning
     asserts:
       - equal:
           path: spec.groups[0].rules[0].labels.namespace
@@ -26,6 +28,7 @@ tests:
     set:
       defaultAlertLabels:
         namespace: custom-namespace
+        severity: warning
     asserts:
       - equal:
           path: spec.groups[0].rules[0].labels.namespace
@@ -42,6 +45,7 @@ tests:
                 expr: vector(1)
                 for: 5m
                 labels:
+                  severity: warning
                   namespace: alert-namespace
     asserts:
       - equal:
@@ -60,8 +64,39 @@ tests:
                 expr: vector(1)
                 for: 5m
                 labels:
+                  severity: warning
                   namespace: alert-namespace
     asserts:
       - equal:
           path: spec.groups[0].rules[0].labels.namespace
           value: alert-namespace
+
+  - it: given an alert and no severity label in defaults or alert labels then should fail template
+    set:
+      defaultAlertLabels: {}
+      spec:
+        groups:
+          - name: test.rules
+            rules:
+              - alert: TestAlert
+                expr: vector(1)
+                for: 5m
+                labels: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "No severity label configured for group test.rules alert TestAlert, the severity label is required"
+
+  - it: given a rule without alert and no severity label then should not fail template
+    set:
+      defaultAlertLabels: { }
+      spec:
+        groups:
+          - name: test.rules
+            rules:
+              - record: some_record
+                expr: vector(1)
+                for: 5m
+                labels: {}
+    asserts:
+      - hasDocuments:
+          count: 1
