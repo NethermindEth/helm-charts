@@ -69,7 +69,7 @@ A Helm chart for dRPC nodeCore application
 | image.tag | string | `"0.1.6"` |  |
 | imagePullSecrets | list | `[]` |  |
 | initImage.repository | string | `"bhgedigital/envsubst"` |  |
-| initImage.tag | string | `"latest"` |  |
+| initImage.tag | string | `"v1.0-alpine3.6"` |  |
 | nameOverride | string | `""` |  |
 | projects | object | `{}` |  |
 

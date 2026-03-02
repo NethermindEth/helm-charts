@@ -42,5 +42,6 @@ data:
       {{- end }}
       {{- end }}
       upstreams:
-        {{- toYaml $projectConfig.upstreams | nindent 8 }}
+        {{- $upstreams := required (printf "upstreams is required for project %s" $projectName) $projectConfig.upstreams }}
+        {{- toYaml $upstreams | nindent 8 }}
 {{- end }}

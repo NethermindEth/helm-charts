@@ -15,7 +15,7 @@ image:
 # Image used for the envsubst init container
 initImage:
   repository: bhgedigital/envsubst
-  tag: latest
+  tag: v1.0-alpine3.6
 
 # Secrets for pulling images from a private registry
 imagePullSecrets: []
@@ -131,6 +131,10 @@ projects: {}
   #   # Additional env vars
   #   env: []
   #   envFrom: []
+  #
+  #   # Optional Service annotations
+  #   # serviceAnnotations:
+  #   #   example.com/annotation: "value"
   #
   #   # Override any defaults
   #   replicaCount: 2
