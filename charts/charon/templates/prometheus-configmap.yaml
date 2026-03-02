@@ -16,4 +16,8 @@ data:
       - job_name: '{{ include "release.name" . }}'
         static_configs:
           - targets: ['{{ include "release.name" . }}:3620']
+        {{- with .Values.centralMonitoring.scrapeConfig.relabelConfigs }}
+        relabel_configs:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
 {{- end }}
