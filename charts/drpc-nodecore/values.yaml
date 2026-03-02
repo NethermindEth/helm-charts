@@ -153,7 +153,7 @@ projects: {}
   #   nodecoreConfig:
   #     integrity:
   #       enabled: true
-  #     failsafe:
+  #     failsafe-config:
   #       retry:
   #         attempts: 3
   #         delay: 300ms
@@ -164,7 +164,7 @@ projects: {}
   #       options:
   #         internal-timeout: 5s
   #         validation-interval: 30s
-  #     scoring:
+  #     score-policy-config:
   #       calculation-interval: 10s
   #
   #   # Required: list of upstream definitions
