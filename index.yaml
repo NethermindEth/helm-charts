@@ -3063,6 +3063,17 @@ entries:
     version: 0.1.0
   prometheus-rules:
   - apiVersion: v2
+    created: "2026-03-02T16:53:30.733543505Z"
+    description: A Helm chart for Prometheus Operator PrometheusRule custom resources
+    digest: 2d36a1d3ce322d56a6252b07eaa11ce821b38093fe5b76e694702f69e21537c9
+    maintainers:
+    - name: 0xDones
+    name: prometheus-rules
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/prometheus-rules-0.1.0/prometheus-rules-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
     created: "2025-11-13T12:08:59.937402894Z"
     description: A Helm chart for Prometheus Operator PrometheusRule custom resources
     digest: a245566c199c0eb0723e9b4e98a0c28b191202cf9ee4542b70df410009b92da5
@@ -3897,4 +3908,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-02T15:07:38.088405392Z"
+generated: "2026-03-02T16:53:30.734339291Z"
