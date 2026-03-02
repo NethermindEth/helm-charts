@@ -48,12 +48,16 @@ spec:
             - -c
             - |
               envsubst < /etc/nodecore-raw/nodecore.yaml > /etc/nodecore-config/nodecore.yaml
+          {{- if or $projectConfig.secretRef $projectConfig.envFrom }}
           envFrom:
+            {{- with $projectConfig.secretRef }}
             - secretRef:
-                name: {{ required (printf "secretRef is required for project %s" $projectName) $projectConfig.secretRef }}
+                name: {{ . }}
+            {{- end }}
             {{- with $projectConfig.envFrom }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          {{- end }}
           {{- with $projectConfig.env }}
           env:
             {{- toYaml . | nindent 12 }}
@@ -77,12 +81,16 @@ spec:
               containerPort: 9093
           securityContext:
             {{- toYaml ($projectConfig.securityContext | default $defaults.securityContext) | nindent 12 }}
+          {{- if or $projectConfig.secretRef $projectConfig.envFrom }}
           envFrom:
+            {{- with $projectConfig.secretRef }}
             - secretRef:
-                name: {{ $projectConfig.secretRef }}
+                name: {{ . }}
+            {{- end }}
             {{- with $projectConfig.envFrom }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          {{- end }}
           {{- with $projectConfig.env }}
           env:
             {{- toYaml . | nindent 12 }}

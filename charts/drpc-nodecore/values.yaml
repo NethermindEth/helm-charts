@@ -122,7 +122,8 @@ defaults:
 # The chart references the resulting K8s Secret by name via `secretRef`.
 projects: {}
   # example-project:
-  #   # Required: K8s Secret name containing auth token + provider API keys
+  #   # Optional: K8s Secret name containing auth token + provider API keys
+  #   # If omitted, no auth is configured and no secret is injected.
   #   secretRef: "nodecore-example-project-secret"
   #
   #   # Env var name for the auth token (must exist in the secret)

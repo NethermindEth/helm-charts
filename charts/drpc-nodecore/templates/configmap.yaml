@@ -18,10 +18,12 @@ data:
       listenV4: true
       hostV4: "0.0.0.0"
       port: 9093
+    {{- if $projectConfig.secretRef }}
     request-strategy:
       type: token
       token:
         value: {{ printf "${%s}" ($projectConfig.authTokenEnvVar | default "NODECORE_AUTH_TOKEN") | quote }}
+    {{- end }}
     upstream-config:
       {{- with $projectConfig.nodecoreConfig }}
       {{- with .integrity }}
