@@ -2,7 +2,7 @@ apiVersion: v2
 name: drpc-nodecore
 description: A Helm chart for dRPC nodeCore application
 type: application
-version: 2.0.1
+version: 2.0.2
 appVersion: 1.0.0
 maintainers:
   - name: manjeet-nt
