@@ -30,6 +30,9 @@ spec:
         {{- $defaultLabels := $.Values.defaultAlertLabels | default (dict) }}
         {{- $labels := .labels | default (dict) }}
         {{- $mergedLabels := merge $labels $defaultLabels }}
+        {{- if not (hasKey $mergedLabels "namespace") }}
+          {{- $_ := set $mergedLabels "namespace" $.Release.Namespace}}
+        {{- end }}
         {{- with $mergedLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
