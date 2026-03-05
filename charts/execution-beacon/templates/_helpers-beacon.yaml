@@ -61,12 +61,6 @@ Taiko beacon client arguments
 {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
 - "--jwtSecret=/secret/jwtsecret"
 {{- end }}
-{{- if .Values.beacon.taikoInbox }}
-- "--taikoInbox={{ .Values.beacon.taikoInbox }}"
-{{- end }}
-{{- if .Values.beacon.taikoAnchor }}
-- "--taikoAnchor={{ .Values.beacon.taikoAnchor }}"
-{{- end }}
 {{- if .Values.beacon.l1Ws }}
 - "--l1.ws={{ .Values.beacon.l1Ws }}"
 {{- end }}

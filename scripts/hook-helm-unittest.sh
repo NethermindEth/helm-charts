@@ -2,5 +2,8 @@
 
 set -eu
 
-# helm unittest charts/*
-docker run --rm -v $(pwd):/apps helmunittest/helm-unittest charts/*
+if helm plugin list | grep -q unittest; then
+  helm unittest charts/*
+else
+  docker run --rm -v "$(pwd)":/apps helmunittest/helm-unittest charts/*
+fi

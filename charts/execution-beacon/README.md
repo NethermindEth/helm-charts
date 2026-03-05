@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.5.3](https://img.shields.io/badge/Version-1.5.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.5.4](https://img.shields.io/badge/Version-1.5.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -88,9 +88,6 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.restApi.portMap.prysm | int | `8080` |  |
 | beacon.restApi.portMap.teku | int | `5051` |  |
 | beacon.suggestedFeeRecipient | string | `""` |  |
-| beacon.taikoAnchor | string | `""` |  |
-| beacon.taikoChainspecURL | string | `"https://raw.githubusercontent.com/NethermindEth/Surge/refs/heads/main/spec/surge-staging-devnet/chainspec.json"` |  |
-| beacon.taikoInbox | string | `""` |  |
 | beacon.targetPeers | int | `50` |  |
 | beacon.targetPeersMin | int | `40` |  |
 | beacon.totalDifficultyOverride | string | `""` |  |

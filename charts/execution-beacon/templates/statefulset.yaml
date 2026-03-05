@@ -112,23 +112,6 @@ spec:
               mountPath: /env
             - name: scripts-init
               mountPath: /scripts
-        {{- if eq .Values.beacon.client "taiko" }}
-        - name: init-taiko
-          image: nethermind.jfrog.io/angkor-oci-remote-dockerhub/curlimages/curl:7.88.1
-          securityContext:
-            {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
-          command:
-            - sh
-            - -c
-            - |
-              curl -sSL {{ .Values.beacon.taikoChainspecURL }} -o /data/execution/chainspec.json
-              echo "Chainspec file downloaded and saved to /data/execution/chainspec.json"
-          {{- if .Values.execution.persistence.enabled }}
-          volumeMounts:
-            - name: data-execution
-              mountPath: /data/execution
-          {{- end }}
-        {{- end }}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
           image: "{{ include "beacon.image" . }}"
