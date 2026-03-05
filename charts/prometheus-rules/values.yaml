@@ -8,4 +8,5 @@ spec:
       expr: Vector(1)
       for: 5m
       labels:
+        # The severity label is mandatory for alerts (not records). We recommend either warning or critical
         severity: warning

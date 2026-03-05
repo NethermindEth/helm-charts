@@ -24,6 +24,16 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
+Per-project fully qualified name: <fullname>-<projectName>
+Truncated to 63 chars for DNS compliance.
+Expects a dict with keys: root, projectName
+*/}}
+{{- define "drpc-nodecore.projectName" -}}
+{{- $fullname := include "drpc-nodecore.fullname" .root -}}
+{{- printf "%s-%s" $fullname .projectName | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "drpc-nodecore.chart" -}}
@@ -43,6 +53,19 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Per-project labels.
+Expects a dict with keys: root, projectName
+*/}}
+{{- define "drpc-nodecore.projectLabels" -}}
+{{ include "drpc-nodecore.projectSelectorLabels" . }}
+helm.sh/chart: {{ include "drpc-nodecore.chart" .root }}
+{{- if .root.Chart.AppVersion }}
+app.kubernetes.io/version: {{ .root.Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .root.Release.Service }}
+{{- end }}
+
+{{/*
 Selector labels
 */}}
 {{- define "drpc-nodecore.selectorLabels" -}}
@@ -51,16 +74,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+Per-project selector labels.
+Expects a dict with keys: root, projectName
 */}}
-{{- define "drpc-nodecore.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "drpc-nodecore.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-{{- define "values.hash" -}}
-{{- .Values | toJson | sha256sum }}
+{{- define "drpc-nodecore.projectSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "drpc-nodecore.name" .root }}
+app.kubernetes.io/instance: {{ .root.Release.Name }}
+drpc-nodecore/project: {{ .projectName }}
 {{- end }}

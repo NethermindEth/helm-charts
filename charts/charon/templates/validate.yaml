@@ -5,3 +5,7 @@
 {{- if not .Values.secrets.charon }}
 {{- fail ".Values.secrets.charon is required" }}
 {{- end }}
+
+{{- if and .Values.centralMonitoring.enabled (not .Values.centralMonitoring.secretName) }}
+{{- fail ".Values.centralMonitoring.secretName is required when centralMonitoring is enabled" }}
+{{- end }}

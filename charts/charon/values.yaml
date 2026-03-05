@@ -6,11 +6,11 @@
 image:
   repository: obolnetwork/charon
   pullPolicy: IfNotPresent
-  tag: v1.7.0
+  tag: v1.8.2
 
 initImage:
-  repository: "bitnamilegacy/kubectl"
-  tag: "1.32"
+  repository: "alpine/kubectl"
+  tag: "1.35.1"
   pullPolicy: IfNotPresent
 
 # -- Credentials to fetch images from private registry
@@ -250,30 +250,11 @@ config:
   # -- Comma separated list of fallback beacon node endpoints
   fallbackBeaconNodes: ""
 
-# -- Kubernetes secrets configuration
-# Example:
-# apiVersion: external-secrets.io/v1beta1
-# kind: ExternalSecret
-# metadata:
-#   name: charon-enr-private-key
-# spec:
-#   secretStoreRef:
-#     name: infisical
-#   target:
-#     name: charon-enr-private-key
-#   data:
-#     - secretKey: charon-enr-private-key  # Hardcoded name
-#       remoteRef:
-#         key: CHARON_ENR_PRIVATE_KEY
-#     - secretKey: token                    # Hardcoded name
-#       remoteRef:
-#         key: CHARON_MONITORING_TOKEN
-#
-# The secret must contain 'charon-enr-private-key' key (always required)
-# If centralMonitoring is enabled, the secret must also contain 'token' key
-# cluster-lock.json and validator_keys should be downloaded via initContainers (e.g., from Minio)
+# -- Kubernetes secrets names
+# @default -- See `values.yaml`
 secrets:
-  # -- charon secret name (required, must be provided via external secret)
+  # -- Name of the Kubernetes Secret containing the Charon ENR private key (always required).
+  # The secret must have a key named `charon-enr-private-key`.
   charon: "charon-enr-private-key"
 
 # -- Additional init containers
@@ -345,3 +326,13 @@ centralMonitoring:
   enabled: false
   # -- https endpoint to obol central prometheus
   promEndpoint: "https://vm.monitoring.gcp.obol.tech/write"
+  # -- Name of the Kubernetes Secret containing the Prometheus remote-write token.
+  # The secret must have a key named `PROM_REMOTE_WRITE_TOKEN`.
+  secretName: "prometheus-monitoring-token"
+  # -- Scrape config overrides for the Prometheus job
+  # @default -- See `values.yaml`
+  scrapeConfig:
+    # -- Additional relabel configs appended to the charon scrape job
+    relabelConfigs: []
+    #   - target_label: alert_discord_ids
+    #     replacement: "<discord_ids>"
