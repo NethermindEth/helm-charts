@@ -1,0 +1,131 @@
+{{- if .Values.juno.enabled }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "juno.fullname" . }}-juno
+  labels:
+    app.kubernetes.io/component: juno
+    {{- include "juno.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "juno.juno.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "juno.fullname" . }}-juno-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: juno
+        {{- include "juno.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.juno.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        {{- with .Values.juno.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: juno
+          {{- with .Values.juno.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.juno.image.repository }}:{{ .Values.juno.image.tag }}"
+          imagePullPolicy: {{ .Values.juno.image.pullPolicy }}
+          command:
+            {{- .Values.juno.command | default (list "juno") | toYaml | nindent 12 }}
+          args:
+            - --db-path=/data
+            - --http=true
+            - --http-port={{ .Values.juno.service.ports.rpc }}
+            - --http-host=0.0.0.0
+            - --metrics=true
+            - --metrics-port={{ .Values.juno.service.ports.metrics }}
+            - --metrics-host=0.0.0.0
+            - --ws=true
+            - --ws-port={{ .Values.juno.service.ports.ws }}
+            - --ws-host=0.0.0.0
+            - --log-level={{ .Values.juno.loglevel }}
+            - --network={{ .Values.juno.network }}
+            {{- with .Values.juno.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: rpc
+              containerPort: {{ .Values.juno.service.ports.rpc }}
+              protocol: TCP
+            - name: metrics
+              containerPort: {{ .Values.juno.service.ports.metrics }}
+              protocol: TCP
+            - name: ws
+              containerPort: {{ .Values.juno.service.ports.ws }}
+              protocol: TCP
+          {{- with .Values.juno.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.juno.resources | nindent 12 }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: juno-data
+              mountPath: /data
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default 300 }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: juno-data
+        labels:
+          app.kubernetes.io/component: juno
+          {{- include "juno.labels" . | nindent 10 }}
+      spec:
+        {{- with .Values.juno.persistence.storageClassName }}
+        storageClassName: {{ . | quote }}
+        {{- end }}
+        accessModes:
+          {{- toYaml .Values.juno.persistence.accessModes | nindent 10 }}
+        resources:
+          requests:
+            storage: {{ .Values.juno.persistence.size }}
+{{- end }}

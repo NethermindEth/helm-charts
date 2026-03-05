@@ -1,0 +1,23 @@
+Juno Starknet Node has been deployed!
+
+{{- if .Values.juno.enabled }}
+
+Juno RPC:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "juno.fullname" . }}-juno {{ .Values.juno.service.ports.rpc }}:{{ .Values.juno.service.ports.rpc }}
+  http://localhost:{{ .Values.juno.service.ports.rpc }}
+
+Juno WebSocket:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "juno.fullname" . }}-juno {{ .Values.juno.service.ports.ws }}:{{ .Values.juno.service.ports.ws }}
+  ws://localhost:{{ .Values.juno.service.ports.ws }}
+
+Juno Metrics:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "juno.fullname" . }}-juno {{ .Values.juno.service.ports.metrics }}:{{ .Values.juno.service.ports.metrics }}
+  http://localhost:{{ .Values.juno.service.ports.metrics }}/metrics
+{{- end }}
+
+{{- if .Values.staking.enabled }}
+
+Staking Service Metrics:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "juno.fullname" . }}-staking {{ .Values.staking.service.ports.metrics }}:{{ .Values.staking.service.ports.metrics }}
+  http://localhost:{{ .Values.staking.service.ports.metrics }}/metrics
+{{- end }}

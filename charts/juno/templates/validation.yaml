@@ -1,0 +1,6 @@
+{{- if and .Values.staking.enabled (not .Values.staking.config.existingSecret) (not .Values.staking.config.data) }}
+{{- fail "staking.enabled is true but no config provided. Set staking.config.existingSecret or staking.config.data" }}
+{{- end }}
+{{- if and .Values.staking.enabled (not .Values.juno.enabled) }}
+{{- fail "staking requires juno to be enabled (staking.enabled=true but juno.enabled=false)" }}
+{{- end }}

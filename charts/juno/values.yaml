@@ -1,0 +1,192 @@
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+terminationGracePeriodSeconds: 300
+
+# -- Juno Starknet node configuration
+juno:
+  enabled: true
+  # -- mainnet, sepolia, sepolia-integration
+  network: sepolia
+  loglevel: "info"
+  command: []
+  # -- Extra CLI args passed to juno (list of strings)
+  # Example:
+  #   - --disable-l1-verification
+  #   - --rpc-cors-enable
+  #
+  # -- Note: Provide --disable-l1-verification or --eth-node WS endpoint
+  extraArgs:
+    - --disable-l1-verification
+  image:
+    repository: nethermind/juno
+    tag: "v0.15.18"
+    pullPolicy: IfNotPresent
+  persistence:
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 1Ti
+
+  # -- Resource requests and limits for juno container
+  # Example:
+  #   requests:
+  #     cpu: "1"
+  #     memory: "4Gi"
+  #   limits:
+  #     cpu: "2"
+  #     memory: "8Gi"
+  resources: {}
+
+  service:
+    ports:
+      rpc: 6060
+      ws: 6061
+      metrics: 8080
+
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: rpc
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+
+  initContainers: []
+  extraContainers: []
+  securityContext: {}
+
+# -- Starknet staking service configuration
+staking:
+  enabled: false
+  loglevel: "info"
+  command: []
+  # -- Extra CLI args passed to the staking validator (list of strings)
+  extraArgs: []
+  image:
+    repository: nethermind/starknet-staking-v2
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  config:
+    # -- Use an existing secret for staking config (recommended for production)
+    existingSecret: ""
+    # -- Inline config data (creates a Secret from this; use for dev/test only)
+    # Example:
+    #   data:
+    #     signer:
+    #       privateKey: "0x..."
+    #       operationalAddress: "0x..."
+    data: {}
+
+  # -- Resource requests and limits for staking container
+  # Example:
+  #   requests:
+  #     cpu: "1"
+  #     memory: "4Gi"
+  #   limits:
+  #     cpu: "2"
+  #     memory: "8Gi"
+  resources: {}
+
+  service:
+    ports:
+      metrics: 8081
+
+  readinessProbe:
+    httpGet:
+      path: /metrics
+      port: metrics
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  initContainers: []
+  extraContainers: []
+  securityContext: {}
+
+# -- Service type for all services
+service:
+  type: ClusterIP
+
+serviceMonitor:
+  # -- If true, a ServiceMonitor CRD is created for a prometheus operator
+  enabled: false
+  # -- Path to scrape
+  path: /metrics
+  # -- Alternative namespace for ServiceMonitor
+  namespace: null
+  # -- Additional ServiceMonitor labels
+  labels: {}
+  # -- Additional ServiceMonitor annotations
+  annotations: {}
+  # -- ServiceMonitor scrape interval (leave empty for Prometheus operator default)
+  interval: null
+  # -- ServiceMonitor scheme
+  scheme: http
+  # -- ServiceMonitor TLS configuration
+  tlsConfig: {}
+  # -- ServiceMonitor scrape timeout (leave empty for Prometheus operator default)
+  scrapeTimeout: null
+  # -- ServiceMonitor relabelings
+  relabelings: []
+  # -- ServiceMonitor metricRelabelings
+  metricRelabelings: []
+
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# -- Ingress for exposing Juno RPC externally
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  # -- Each path can optionally set servicePort to route to a specific Juno port.
+  # Defaults to juno.service.ports.rpc (6060). Set servicePort: 6061 for WebSocket.
+  # To expose both RPC and WS, use separate hosts:
+  #   - host: rpc.example.com
+  #     paths:
+  #       - path: /
+  #         pathType: Prefix
+  #   - host: ws.example.com
+  #     paths:
+  #       - path: /
+  #         pathType: Prefix
+  #         servicePort: 6061
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    []
+    # - secretName: chart-example-tls
+    #   hosts:
+    #     - chart-example.local
+
+# -- Expose the service via gateway-api HTTPRoute
+httpRoute:
+  enabled: false
+  annotations: {}
+  parentRefs:
+    - name: gateway
+      sectionName: http
+  hostnames:
+    - chart-example.local
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
