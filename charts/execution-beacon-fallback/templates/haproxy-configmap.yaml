@@ -1,0 +1,34 @@
+{{- if .Values.haproxy.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-haproxy
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  haproxy.cfg.tmpl: |
+    global
+        log stdout format raw local0
+        maxconn 4096
+
+    defaults
+        log global
+        mode http
+        option httplog
+        option dontlognull
+        option forwardfor
+        timeout connect 5s
+        timeout client  55s
+        timeout server  55s
+
+    frontend beacon
+        bind *:{{ .Values.haproxy.service.port }}
+        default_backend beacon_backend
+
+    backend beacon_backend
+        option httpchk GET /eth/v1/node/health
+        http-check expect status 200
+        server local ${LOCAL_BEACON_HOST}:${LOCAL_BEACON_PORT} check inter {{ .Values.haproxy.checkInterval }}ms fall {{ .Values.haproxy.checkFall }} rise {{ .Values.haproxy.checkRise }}
+        server fallback ${FALLBACK_HOST}:${FALLBACK_PORT} ssl verify none check inter {{ .Values.haproxy.checkInterval }}ms fall {{ .Values.haproxy.checkFall }} rise {{ .Values.haproxy.checkRise }} backup
+{{- end }}

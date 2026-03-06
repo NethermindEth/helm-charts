@@ -1,0 +1,36 @@
+suite: haproxy tests
+
+templates:
+  - haproxy-configmap.yaml
+  - haproxy-deployment.yaml
+  - haproxy-service.yaml
+
+set:
+  fullnameOverride: test-node
+  execution:
+    client: nethermind
+  beacon:
+    client: lighthouse
+  haproxy:
+    enabled: true
+    fallback:
+      existingSecret: "my-secret"
+      secretKey: "FALLBACK_BEACON_URL"
+
+tests:
+  - it: when haproxy enabled then configmap is created
+    template: haproxy-configmap.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-node-haproxy
+
+  - it: when haproxy disabled then no configmap
+    template: haproxy-configmap.yaml
+    set:
+      haproxy.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

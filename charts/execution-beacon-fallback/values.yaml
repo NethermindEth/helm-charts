@@ -714,3 +714,82 @@ HTTPRoute:
   #       value: /
   #   backendRefs:
   #   - port: 1234
+
+# -- HAProxy active-fallback proxy for beacon API
+haproxy:
+  # -- Enable HAProxy deployment in front of the beacon node
+  enabled: true
+
+  image:
+    # -- HAProxy container image repository
+    repository: haproxy
+    # -- HAProxy container image tag
+    tag: "3.0-alpine"
+    # -- HAProxy container pull policy
+    pullPolicy: IfNotPresent
+
+  fallback:
+    # -- Name of the K8s Secret containing the fallback beacon URL
+    existingSecret: ""
+    # -- Key within the secret containing the full https://host/path URL
+    secretKey: "FALLBACK_BEACON_URL"
+
+  # -- Milliseconds between active health checks
+  checkInterval: 5000
+  # -- Consecutive failures before marking primary down
+  checkFall: 2
+  # -- Consecutive successes before marking primary back up
+  checkRise: 2
+
+  service:
+    # -- Service type for the HAProxy external-facing service
+    type: ClusterIP
+    # -- Port HAProxy listens on (clients connect here)
+    port: 5052
+
+  # -- Resource requests and limits for HAProxy container
+  resources: {}
+  # limits:
+  #   cpu: 200m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 64Mi
+
+  # -- Pod annotations for HAProxy pods
+  podAnnotations: {}
+
+  # -- Node selector for HAProxy pods
+  nodeSelector: {}
+
+  # -- Tolerations for HAProxy pods
+  tolerations: []
+
+  # -- Affinity for HAProxy pods
+  affinity: {}
+
+  serviceMonitor:
+    # -- If true, create a ServiceMonitor for HAProxy stats endpoint
+    enabled: false
+    # -- Scrape interval
+    interval: 30s
+    # -- Scrape timeout
+    scrapeTimeout: 10s
+    # -- Additional labels for the ServiceMonitor
+    labels: {}
+
+  ingress:
+    # -- If true, create an Ingress pointing to the HAProxy service
+    enabled: false
+    # -- Ingress class name
+    className: ""
+    # -- Ingress annotations
+    annotations: {}
+    # -- Ingress hosts
+    hosts: []
+    #  - host: beacon.example.com
+    #    paths:
+    #      - path: /
+    #        pathType: Prefix
+    # -- Ingress TLS
+    tls: []

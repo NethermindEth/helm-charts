@@ -212,6 +212,32 @@ A Helm chart for deploying Ethereum execution and consensus clients with HAProxy
 | global.securityContext.runAsNonRoot | bool | `true` |  |
 | global.securityContext.runAsUser | int | `1000` |  |
 | global.securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| haproxy | object | `{"affinity":{},"checkFall":2,"checkInterval":5000,"checkRise":2,"enabled":true,"fallback":{"existingSecret":"","secretKey":"FALLBACK_BEACON_URL"},"image":{"pullPolicy":"IfNotPresent","repository":"haproxy","tag":"3.0-alpine"},"ingress":{"annotations":{},"className":"","enabled":false,"hosts":[],"tls":[]},"nodeSelector":{},"podAnnotations":{},"resources":{},"service":{"port":5052,"type":"ClusterIP"},"serviceMonitor":{"enabled":false,"interval":"30s","labels":{},"scrapeTimeout":"10s"},"tolerations":[]}` | HAProxy active-fallback proxy for beacon API |
+| haproxy.affinity | object | `{}` | Affinity for HAProxy pods |
+| haproxy.checkFall | int | `2` | Consecutive failures before marking primary down |
+| haproxy.checkInterval | int | `5000` | Milliseconds between active health checks |
+| haproxy.checkRise | int | `2` | Consecutive successes before marking primary back up |
+| haproxy.enabled | bool | `true` | Enable HAProxy deployment in front of the beacon node |
+| haproxy.fallback.existingSecret | string | `""` | Name of the K8s Secret containing the fallback beacon URL |
+| haproxy.fallback.secretKey | string | `"FALLBACK_BEACON_URL"` | Key within the secret containing the full https://host/path URL |
+| haproxy.image.pullPolicy | string | `"IfNotPresent"` | HAProxy container pull policy |
+| haproxy.image.repository | string | `"haproxy"` | HAProxy container image repository |
+| haproxy.image.tag | string | `"3.0-alpine"` | HAProxy container image tag |
+| haproxy.ingress.annotations | object | `{}` | Ingress annotations |
+| haproxy.ingress.className | string | `""` | Ingress class name |
+| haproxy.ingress.enabled | bool | `false` | If true, create an Ingress pointing to the HAProxy service |
+| haproxy.ingress.hosts | list | `[]` | Ingress hosts |
+| haproxy.ingress.tls | list | `[]` | Ingress TLS |
+| haproxy.nodeSelector | object | `{}` | Node selector for HAProxy pods |
+| haproxy.podAnnotations | object | `{}` | Pod annotations for HAProxy pods |
+| haproxy.resources | object | `{}` | Resource requests and limits for HAProxy container |
+| haproxy.service.port | int | `5052` | Port HAProxy listens on (clients connect here) |
+| haproxy.service.type | string | `"ClusterIP"` | Service type for the HAProxy external-facing service |
+| haproxy.serviceMonitor.enabled | bool | `false` | If true, create a ServiceMonitor for HAProxy stats endpoint |
+| haproxy.serviceMonitor.interval | string | `"30s"` | Scrape interval |
+| haproxy.serviceMonitor.labels | object | `{}` | Additional labels for the ServiceMonitor |
+| haproxy.serviceMonitor.scrapeTimeout | string | `"10s"` | Scrape timeout |
+| haproxy.tolerations | list | `[]` | Tolerations for HAProxy pods |
 | image.beacon.repository | string | `""` |  |
 | image.beacon.tag | string | `"multiarch-v25.9.2"` |  |
 | image.execution.repository | string | `""` |  |
