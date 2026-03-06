@@ -1,0 +1,116 @@
+{{- if .Values.staking.enabled }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "juno.fullname" . }}-staking
+  labels:
+    app.kubernetes.io/component: staking
+    {{- include "juno.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "juno.staking.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "juno.fullname" . }}-staking-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: staking
+        {{- include "juno.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.staking.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        {{- with .Values.staking.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: staking
+          {{- with .Values.staking.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.staking.image.repository }}:{{ .Values.staking.image.tag }}"
+          imagePullPolicy: {{ .Values.staking.image.pullPolicy }}
+          command:
+            {{- .Values.staking.command | default (list "/ko-app/validator") | toYaml | nindent 12 }}
+          args:
+            - "-c"
+            - "/config/config.json"
+            - "--metrics"
+            - "--metrics-host"
+            - "0.0.0.0"
+            - "--metrics-port"
+            - "{{ .Values.staking.service.ports.metrics }}"
+            - "--provider-http"
+            - "http://{{ include "juno.junoServiceName" . }}:{{ .Values.juno.service.ports.rpc }}"
+            - "--provider-ws"
+            - "ws://{{ include "juno.junoServiceName" . }}:{{ .Values.juno.service.ports.ws }}"
+            {{- if .Values.staking.loglevel }}
+            - "--log-level"
+            - "{{ .Values.staking.loglevel }}"
+            {{- end }}
+            {{- with .Values.staking.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.staking.service.ports.metrics }}
+              protocol: TCP
+          {{- with .Values.staking.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.staking.resources | nindent 12 }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: staking-config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: staking-config
+          secret:
+            secretName: {{ include "juno.stakingSecretName" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default 300 }}
+{{- end }}

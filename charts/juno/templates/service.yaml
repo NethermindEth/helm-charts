@@ -1,0 +1,92 @@
+{{- if .Values.juno.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "juno.fullname" . }}-juno
+  labels:
+    app.kubernetes.io/component: juno
+    app.kubernetes.io/fullname: {{ include "juno.fullname" . }}-juno
+    {{- include "juno.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: rpc
+      port: {{ .Values.juno.service.ports.rpc }}
+      targetPort: {{ .Values.juno.service.ports.rpc }}
+      protocol: TCP
+    - name: ws
+      port: {{ .Values.juno.service.ports.ws }}
+      targetPort: {{ .Values.juno.service.ports.ws }}
+      protocol: TCP
+    - name: metrics
+      port: {{ .Values.juno.service.ports.metrics }}
+      targetPort: {{ .Values.juno.service.ports.metrics }}
+      protocol: TCP
+  selector:
+    {{- include "juno.juno.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "juno.fullname" . }}-juno-headless
+  labels:
+    app.kubernetes.io/component: juno
+    {{- include "juno.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: rpc
+      port: {{ .Values.juno.service.ports.rpc }}
+      targetPort: {{ .Values.juno.service.ports.rpc }}
+      protocol: TCP
+    - name: ws
+      port: {{ .Values.juno.service.ports.ws }}
+      targetPort: {{ .Values.juno.service.ports.ws }}
+      protocol: TCP
+    - name: metrics
+      port: {{ .Values.juno.service.ports.metrics }}
+      targetPort: {{ .Values.juno.service.ports.metrics }}
+      protocol: TCP
+  selector:
+    {{- include "juno.juno.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- if .Values.staking.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "juno.fullname" . }}-staking
+  labels:
+    app.kubernetes.io/component: staking
+    app.kubernetes.io/fullname: {{ include "juno.fullname" . }}-staking
+    {{- include "juno.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: metrics
+      port: {{ .Values.staking.service.ports.metrics }}
+      targetPort: {{ .Values.staking.service.ports.metrics }}
+      protocol: TCP
+  selector:
+    {{- include "juno.staking.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "juno.fullname" . }}-staking-headless
+  labels:
+    app.kubernetes.io/component: staking
+    {{- include "juno.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: metrics
+      port: {{ .Values.staking.service.ports.metrics }}
+      targetPort: {{ .Values.staking.service.ports.metrics }}
+      protocol: TCP
+  selector:
+    {{- include "juno.staking.selectorLabels" . | nindent 4 }}
+{{- end }}
