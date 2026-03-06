@@ -34,3 +34,41 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: when haproxy enabled then deployment is created
+    template: haproxy-deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: metadata.name
+          value: test-node-haproxy
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: envsubst
+
+  - it: when haproxy disabled then no deployment
+    template: haproxy-deployment.yaml
+    set:
+      haproxy.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: when existingSecret set then init container has envFrom secretRef
+    template: haproxy-deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].envFrom[0].secretRef.name
+          value: my-secret
+
+  - it: haproxy container mounts rendered config from emptydir
+    template: haproxy-deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: haproxy-config
+            mountPath: /usr/local/etc/haproxy/haproxy.cfg
+            subPath: haproxy.cfg
+            readOnly: true

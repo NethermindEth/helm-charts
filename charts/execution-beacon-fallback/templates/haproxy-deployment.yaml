@@ -1,0 +1,101 @@
+{{- if .Values.haproxy.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "common.names.fullname" . }}-haproxy
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: haproxy
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/haproxy-configmap.yaml") . | sha256sum }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: haproxy
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        app.kubernetes.io/component: haproxy
+      {{- with .Values.haproxy.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      initContainers:
+        - name: envsubst
+          image: "{{ .Values.haproxy.image.repository }}:{{ .Values.haproxy.image.tag }}"
+          imagePullPolicy: {{ .Values.haproxy.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - |
+              _KEY="{{ .Values.haproxy.fallback.secretKey }}"
+              URL=$(eval echo "\$$_KEY")
+              FALLBACK_HOST=$(echo "$URL" | sed 's|https\?://||' | cut -d'/' -f1 | cut -d':' -f1)
+              _PORT=$(echo "$URL" | sed 's|https\?://||' | cut -d'/' -f1 | grep -oE ':[0-9]+$' | cut -d':' -f2)
+              FALLBACK_PORT=${_PORT:-443}
+              LOCAL_BEACON_HOST="{{ include "common.names.fullname" . }}"
+              LOCAL_BEACON_PORT="{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
+              export FALLBACK_HOST FALLBACK_PORT LOCAL_BEACON_HOST LOCAL_BEACON_PORT
+              envsubst < /etc/haproxy-tmpl/haproxy.cfg.tmpl > /etc/haproxy-rendered/haproxy.cfg
+          {{- if .Values.haproxy.fallback.existingSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.haproxy.fallback.existingSecret }}
+          {{- end }}
+          volumeMounts:
+            - name: haproxy-config-tmpl
+              mountPath: /etc/haproxy-tmpl
+              readOnly: true
+            - name: haproxy-config
+              mountPath: /etc/haproxy-rendered
+      containers:
+        - name: haproxy
+          image: "{{ .Values.haproxy.image.repository }}:{{ .Values.haproxy.image.tag }}"
+          imagePullPolicy: {{ .Values.haproxy.image.pullPolicy }}
+          ports:
+            - name: beacon
+              containerPort: {{ .Values.haproxy.service.port }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: beacon
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: beacon
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: haproxy-config
+              mountPath: /usr/local/etc/haproxy/haproxy.cfg
+              subPath: haproxy.cfg
+              readOnly: true
+          {{- with .Values.haproxy.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: haproxy-config-tmpl
+          configMap:
+            name: {{ include "common.names.fullname" . }}-haproxy
+        - name: haproxy-config
+          emptyDir: {}
+      {{- with .Values.haproxy.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.haproxy.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.haproxy.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
