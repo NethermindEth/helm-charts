@@ -32,6 +32,7 @@ spec:
             - sh
             - -c
             - |
+              apk add --no-cache gettext > /dev/null 2>&1
               _KEY="{{ .Values.haproxy.fallback.secretKey }}"
               URL=$(eval echo "\$$_KEY")
               FALLBACK_HOST=$(echo "$URL" | sed 's|https://||; s|http://||' | cut -d'/' -f1 | cut -d':' -f1)
