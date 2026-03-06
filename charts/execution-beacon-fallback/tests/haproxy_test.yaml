@@ -6,6 +6,7 @@ templates:
   - haproxy-service.yaml
   - haproxy-servicemonitor.yaml
   - haproxy-ingress.yaml
+  - service.yaml
 
 set:
   fullnameOverride: test-node
@@ -134,3 +135,14 @@ tests:
     asserts:
       - isKind:
           of: Ingress
+
+  - it: when haproxy enabled beacon service has internal annotation
+    template: service.yaml
+    set:
+      execution.client: nethermind
+      beacon.client: lighthouse
+      haproxy.enabled: true
+    asserts:
+      - equal:
+          path: metadata.annotations["execution-beacon-fallback/internal"]
+          value: "true"
