@@ -4,6 +4,8 @@ templates:
   - haproxy-configmap.yaml
   - haproxy-deployment.yaml
   - haproxy-service.yaml
+  - haproxy-servicemonitor.yaml
+  - haproxy-ingress.yaml
 
 set:
   fullnameOverride: test-node
@@ -98,3 +100,37 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: when servicemonitor disabled then no servicemonitor
+    template: haproxy-servicemonitor.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: when servicemonitor enabled then servicemonitor is created
+    template: haproxy-servicemonitor.yaml
+    set:
+      haproxy.serviceMonitor.enabled: true
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - equal:
+          path: metadata.name
+          value: test-node-haproxy
+
+  - it: when ingress disabled then no ingress
+    template: haproxy-ingress.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: when ingress enabled then ingress is created
+    template: haproxy-ingress.yaml
+    set:
+      haproxy.ingress.enabled: true
+      haproxy.ingress.hosts[0].host: beacon.example.com
+      haproxy.ingress.hosts[0].paths[0].path: /
+      haproxy.ingress.hosts[0].paths[0].pathType: Prefix
+    asserts:
+      - isKind:
+          of: Ingress

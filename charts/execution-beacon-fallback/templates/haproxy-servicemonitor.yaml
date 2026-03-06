@@ -1,0 +1,25 @@
+{{- if and .Values.haproxy.enabled .Values.haproxy.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "common.names.fullname" . }}-haproxy
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- with .Values.haproxy.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: beacon
+      interval: {{ .Values.haproxy.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.haproxy.serviceMonitor.scrapeTimeout }}
+      path: /stats;csv
+  jobLabel: {{ include "common.names.fullname" . }}-haproxy
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: haproxy
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}
