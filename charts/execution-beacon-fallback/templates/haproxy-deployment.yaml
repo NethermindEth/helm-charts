@@ -38,7 +38,7 @@ spec:
               FALLBACK_HOST=$(echo "$URL" | sed 's|https://||; s|http://||' | cut -d'/' -f1 | cut -d':' -f1)
               _PORT=$(echo "$URL" | sed 's|https://||; s|http://||' | cut -d'/' -f1 | awk -F: '{print $NF}' | grep -E '^[0-9]+$')
               FALLBACK_PORT=${_PORT:-443}
-              LOCAL_BEACON_HOST="{{ include "common.names.fullname" . }}-0.{{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
+              LOCAL_BEACON_HOST="{{ include "common.names.fullname" . }}"
               LOCAL_BEACON_PORT="{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
               export FALLBACK_HOST FALLBACK_PORT LOCAL_BEACON_HOST LOCAL_BEACON_PORT
               envsubst < /etc/haproxy-tmpl/haproxy.cfg.tmpl > /etc/haproxy-rendered/haproxy.cfg
