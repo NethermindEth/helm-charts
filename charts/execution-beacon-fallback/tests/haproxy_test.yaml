@@ -72,3 +72,29 @@ tests:
             mountPath: /usr/local/etc/haproxy/haproxy.cfg
             subPath: haproxy.cfg
             readOnly: true
+
+  - it: when haproxy enabled then service is created
+    template: haproxy-service.yaml
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: test-node-haproxy
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports[0].port
+          value: 5052
+      - equal:
+          path: spec.ports[0].name
+          value: beacon
+
+  - it: when haproxy disabled then no service
+    template: haproxy-service.yaml
+    set:
+      haproxy.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
