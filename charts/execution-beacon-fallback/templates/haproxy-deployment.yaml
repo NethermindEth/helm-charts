@@ -35,8 +35,8 @@ spec:
             - |
               _KEY="{{ .Values.haproxy.fallback.secretKey }}"
               URL=$(eval echo "\$$_KEY")
-              FALLBACK_HOST=$(echo "$URL" | sed 's|https\?://||' | cut -d'/' -f1 | cut -d':' -f1)
-              _PORT=$(echo "$URL" | sed 's|https\?://||' | cut -d'/' -f1 | grep -oE ':[0-9]+$' | cut -d':' -f2)
+              FALLBACK_HOST=$(echo "$URL" | sed 's|https://||; s|http://||' | cut -d'/' -f1 | cut -d':' -f1)
+              _PORT=$(echo "$URL" | sed 's|https://||; s|http://||' | cut -d'/' -f1 | awk -F: '{print $NF}' | grep -E '^[0-9]+$')
               FALLBACK_PORT=${_PORT:-443}
               LOCAL_BEACON_HOST="{{ include "common.names.fullname" . }}"
               LOCAL_BEACON_PORT="{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
