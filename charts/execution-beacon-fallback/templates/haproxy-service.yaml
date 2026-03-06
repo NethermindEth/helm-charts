@@ -13,6 +13,10 @@ spec:
       port: {{ .Values.haproxy.service.port }}
       targetPort: beacon
       protocol: TCP
+    - name: stats
+      port: 8404
+      targetPort: stats
+      protocol: TCP
   selector:
     {{- include "common.labels.matchLabels" . | nindent 4 }}
     app.kubernetes.io/component: haproxy

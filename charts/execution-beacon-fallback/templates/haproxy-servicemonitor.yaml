@@ -10,10 +10,10 @@ metadata:
     {{- end }}
 spec:
   endpoints:
-    - port: beacon
+    - port: stats
       interval: {{ .Values.haproxy.serviceMonitor.interval }}
       scrapeTimeout: {{ .Values.haproxy.serviceMonitor.scrapeTimeout }}
-      path: /stats;csv
+      path: /metrics
   jobLabel: {{ include "common.names.fullname" . }}-haproxy
   selector:
     matchLabels:

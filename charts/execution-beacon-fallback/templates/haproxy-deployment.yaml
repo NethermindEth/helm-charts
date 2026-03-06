@@ -7,8 +7,6 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: haproxy
-  annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/haproxy-configmap.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -20,10 +18,11 @@ spec:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
         app.kubernetes.io/component: haproxy
-      {{- with .Values.haproxy.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/haproxy-configmap.yaml") . | sha256sum }}
+        {{- with .Values.haproxy.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
     spec:
       initContainers:
         - name: envsubst
@@ -60,6 +59,9 @@ spec:
           ports:
             - name: beacon
               containerPort: {{ .Values.haproxy.service.port }}
+              protocol: TCP
+            - name: stats
+              containerPort: 8404
               protocol: TCP
           livenessProbe:
             tcpSocket:

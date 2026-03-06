@@ -136,6 +136,35 @@ tests:
       - isKind:
           of: Ingress
 
+  - it: deployment pod template has checksum/config annotation
+    template: haproxy-deployment.yaml
+    asserts:
+      - isNotEmpty:
+          path: spec.template.metadata.annotations["checksum/config"]
+
+  - it: service has stats port on 8404
+    template: haproxy-service.yaml
+    asserts:
+      - contains:
+          path: spec.ports
+          content:
+            name: stats
+            port: 8404
+            targetPort: stats
+            protocol: TCP
+
+  - it: servicemonitor scrapes stats port with prometheus metrics path
+    template: haproxy-servicemonitor.yaml
+    set:
+      haproxy.serviceMonitor.enabled: true
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: stats
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+
   - it: when haproxy enabled beacon service has internal annotation
     template: service.yaml
     set:
