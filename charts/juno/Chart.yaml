@@ -2,4 +2,4 @@ apiVersion: v2
 name: juno
 description: Helm chart for Juno Starknet node with optional staking service
 type: application
-version: 0.2.0
+version: 0.0.1
