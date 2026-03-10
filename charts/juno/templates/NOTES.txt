@@ -1,7 +1,5 @@
-Juno Starknet Node has been deployed!
-
 {{- if .Values.juno.enabled }}
-
+Juno Starknet Node has been deployed!
 Juno RPC:
   kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "juno.fullname" . }}-juno {{ .Values.juno.service.ports.rpc }}:{{ .Values.juno.service.ports.rpc }}
   http://localhost:{{ .Values.juno.service.ports.rpc }}

@@ -17,8 +17,7 @@ juno:
   #   - --rpc-cors-enable
   #
   # -- Note: Provide --disable-l1-verification or --eth-node WS endpoint
-  extraArgs:
-    - --disable-l1-verification
+  extraArgs: []
   image:
     repository: nethermind/juno
     tag: "v0.15.18"
