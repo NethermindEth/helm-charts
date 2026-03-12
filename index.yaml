@@ -3054,6 +3054,18 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/generic-statefulset-0.1.0/generic-statefulset-0.1.0.tgz
     version: 0.1.0
+  juno:
+  - apiVersion: v2
+    created: "2026-03-12T13:56:57.738083354Z"
+    description: Helm chart for Juno Starknet node with optional staking service
+    digest: 1f6ecd490bb01b6415c5ae1fb012bb6bf83bcd1b738796882b2b3935de3b54bf
+    maintainers:
+    - name: brbrr
+    name: juno
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/juno-0.0.1/juno-0.0.1.tgz
+    version: 0.0.1
   lodestar-vc:
   - apiVersion: v2
     created: "2025-01-23T15:51:12.624291269Z"
@@ -3944,4 +3956,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-05T13:13:19.119007415Z"
+generated: "2026-03-12T13:56:57.738431415Z"
