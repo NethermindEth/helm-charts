@@ -1,0 +1,174 @@
+{{- template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+## Usage
+
+The chart deploys a Juno Starknet full node as a StatefulSet with persistent storage. Optionally, a staking validator service can be enabled alongside.
+
+### Minimal Installation
+
+```bash
+helm install my-juno ./juno
+```
+
+### Name Override
+
+Use `nameOverride` to set the name of the resources.
+
+```yaml
+nameOverride: "my-juno"
+```
+
+### Juno Node Configuration
+
+```yaml
+juno:
+  enabled: true
+  network: sepolia          # mainnet, sepolia, sepolia-integration
+  loglevel: "info"
+  extraArgs:
+    - --disable-l1-verification
+  image:
+    repository: nethermind/juno
+    tag: "v0.15.18"
+  persistence:
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 1Ti
+  resources:
+    requests:
+      cpu: "1"
+      memory: "4Gi"
+    limits:
+      cpu: "2"
+      memory: "8Gi"
+```
+
+> **Note:** You must provide either `--disable-l1-verification` or `--eth-node <WS endpoint>` in `juno.extraArgs`.
+
+### Staking Service
+
+Enable the staking validator alongside Juno:
+
+```yaml
+staking:
+  enabled: true
+  loglevel: "info"
+  image:
+    repository: nethermind/starknet-staking-v2
+    tag: "v0.3.0"
+  config:
+    # Recommended: reference an existing secret
+    existingSecret: "my-staking-secret"
+    # Or provide inline config (dev/test only)
+    data:
+      signer:
+        privateKey: "0x..."
+        operationalAddress: "0x..."
+  resources:
+    requests:
+      cpu: "1"
+      memory: "4Gi"
+```
+
+### Container and Service Ports
+
+Juno exposes RPC, WebSocket, and metrics ports. The staking service exposes a separate metrics port.
+
+```yaml
+juno:
+  service:
+    ports:
+      rpc: 6060
+      ws: 6061
+      metrics: 8080
+
+staking:
+  service:
+    ports:
+      metrics: 8081
+
+service:
+  type: ClusterIP
+```
+
+### Ingress
+
+Each ingress path defaults to the Juno RPC port (6060). Set `servicePort` to route to a different port (e.g. 6061 for WebSocket).
+
+```yaml
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: rpc.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: ws.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          servicePort: 6061
+  tls:
+    - secretName: juno-tls
+      hosts:
+        - rpc.example.com
+        - ws.example.com
+```
+
+### HTTPRoute (Gateway API)
+
+```yaml
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: gateway
+      sectionName: http
+  hostnames:
+    - chart-example.local
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+```
+
+### Prometheus Metrics
+
+Deploy a ServiceMonitor to scrape metrics from both Juno and the staking service:
+
+```yaml
+serviceMonitor:
+  enabled: true
+```
+
+The ServiceMonitor targets the `metrics` port on each enabled service at `/metrics`. Customize scrape settings as needed:
+
+```yaml
+serviceMonitor:
+  enabled: true
+  interval: "30s"
+  scrapeTimeout: "10s"
+  labels:
+    release: prometheus
+```
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
