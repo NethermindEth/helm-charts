@@ -44,6 +44,7 @@ spec:
   selector:
     matchLabels:
       {{- include "juno.juno.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/fullname: {{ include "juno.fullname" . }}-juno
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}
@@ -93,6 +94,7 @@ spec:
   jobLabel: app.kubernetes.io/fullname
   selector:
     matchLabels:
+      {{- include "juno.staking.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/fullname: {{ include "juno.fullname" . }}-staking
   namespaceSelector:
     matchNames:

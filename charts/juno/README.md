@@ -66,7 +66,7 @@ staking:
   loglevel: "info"
   image:
     repository: nethermind/starknet-staking-v2
-    tag: "latest"
+    tag: "v0.3.0"
   config:
     # Recommended: reference an existing secret
     existingSecret: "my-staking-secret"

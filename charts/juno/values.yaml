@@ -67,7 +67,7 @@ staking:
   extraArgs: []
   image:
     repository: nethermind/starknet-staking-v2
-    tag: "latest"
+    tag: "v0.3.0"
     pullPolicy: IfNotPresent
 
   config:
