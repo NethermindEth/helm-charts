@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.5.3](https://img.shields.io/badge/Version-1.5.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.5.4](https://img.shields.io/badge/Version-1.5.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -220,7 +220,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | imagePullSecrets | list | `[]` |  |
 | initImage.pullPolicy | string | `"IfNotPresent"` |  |
 | initImage.repository | string | `"bitnamilegacy/kubectl"` |  |
-| initImage.tag | string | `"1.32"` |  |
+| initImage.tag | string | `"1.33.4"` |  |
 | metrics.annotations | object | `{}` |  |
 | metrics.enabled | bool | `true` |  |
 | metrics.prometheusRule.additionalLabels | object | `{}` |  |
