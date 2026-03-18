@@ -288,7 +288,7 @@ terminationGracePeriodSeconds: 120
 ##
 initImage:
   repository: "bitnamilegacy/kubectl"
-  tag: "1.32"
+  tag: "1.33.4"
   pullPolicy: IfNotPresent
 
 ## Monitoring
