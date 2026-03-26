@@ -92,6 +92,10 @@ spec:
             value: "{{ .Values.service.port.pbs.metrics }}"
           - name: CB_LOGS_DIR
             value: /var/logs/commit-boost
+          {{- with .Values.resources.pbs }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
           - name: app
             mountPath: /app
@@ -128,6 +132,10 @@ spec:
           {{- with .Values.envFrom }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
+          {{- end }}
+          {{- with .Values.resources.signer }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
           - name: app
@@ -173,6 +181,10 @@ spec:
           {{- with .Values.envFrom }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
+          {{- end }}
+          {{- with .Values.resources.ethgasCommit }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
           - name: app

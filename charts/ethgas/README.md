@@ -1,7 +1,7 @@
 
 # ethgas
 
-![Version: 0.3.9](https://img.shields.io/badge/Version-0.3.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.8](https://img.shields.io/badge/AppVersion-0.3.8-informational?style=flat-square)
+![Version: 0.3.10](https://img.shields.io/badge/Version-0.3.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.8](https://img.shields.io/badge/AppVersion-0.3.8-informational?style=flat-square)
 
 ETHGas Helm Chart
 
@@ -73,7 +73,9 @@ ETHGas Helm Chart
 | readinessProbe.httpGet.path | string | `"/"` |  |
 | readinessProbe.httpGet.port | string | `"http"` |  |
 | replicaCount | int | `1` |  |
-| resources | object | `{}` |  |
+| resources.ethgasCommit | object | `{}` |  |
+| resources.pbs | object | `{}` |  |
+| resources.signer | object | `{}` |  |
 | securityContext | object | `{}` |  |
 | service.port.ethgas_commit.metrics | int | `10002` |  |
 | service.port.pbs.http | int | `18550` |  |
