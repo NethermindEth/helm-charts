@@ -26,7 +26,7 @@
 {{- end }}
 {{- $_ := set $routeInfo "rules" $rules }}
 ---
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TCPRoute
 metadata:
   name: {{ include "generic-app.fullname" $ }}-{{ $routeName }}
