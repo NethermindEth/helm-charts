@@ -125,6 +125,10 @@ spec:
         name: data
         labels:
           {{- include "generic-app-p2p.labels" . | nindent 10 }}
+        {{- with .Values.persistence.annotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       spec:
         storageClassName: {{ .Values.persistence.storageClassName | quote }}
         accessModes: {{- .Values.persistence.accessModes | toYaml | nindent 10 }}
