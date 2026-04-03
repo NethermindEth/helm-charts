@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "defaultAlertLabels": {
+      "additionalProperties": false,
+      "required": [],
+      "title": "defaultAlertLabels",
+      "type": "object"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "spec": {
+      "additionalProperties": false,
+      "properties": {
+        "groups": {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "default": "./example.rules",
+                    "title": "name",
+                    "type": "string"
+                  },
+                  "rules": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "alert": {
+                              "default": "ExampleAlert",
+                              "title": "alert",
+                              "type": "string"
+                            },
+                            "expr": {
+                              "default": "Vector(1)",
+                              "title": "expr",
+                              "type": "string"
+                            },
+                            "for": {
+                              "default": "5m",
+                              "title": "for",
+                              "type": "string"
+                            },
+                            "labels": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "severity": {
+                                  "default": "warning",
+                                  "description": "The severity label is mandatory for alerts (not records). We recommend either warning or critical",
+                                  "title": "severity",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "severity"
+                              ],
+                              "title": "labels",
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "alert",
+                            "expr",
+                            "for",
+                            "labels"
+                          ],
+                          "type": "object"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "rules",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "name",
+                  "rules"
+                ],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "title": "groups",
+          "type": "array"
+        }
+      },
+      "required": [
+        "groups"
+      ],
+      "title": "spec",
+      "type": "object"
+    }
+  },
+  "required": [
+    "defaultAlertLabels",
+    "spec"
+  ],
+  "type": "object"
+}
