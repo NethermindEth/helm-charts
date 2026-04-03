@@ -76,6 +76,13 @@
         "size": {
           "type": "string",
           "description": "PVC size (e.g. 10Gi)"
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Annotations to add to the PVC",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     },
