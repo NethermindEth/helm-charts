@@ -236,6 +236,13 @@
                 { "type": "string" },
                 { "type": "number" }
               ]
+            },
+            "annotations": {
+              "type": "object",
+              "description": "Annotations to add to the PVC",
+              "additionalProperties": {
+                "type": "string"
+              }
             }
           }
         },

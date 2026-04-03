@@ -124,6 +124,10 @@ spec:
         name: data
         labels:
           {{- include "generic-app.labels" . | nindent 10 }}
+        {{- with .Values.statefulSet.persistence.annotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       spec:
         storageClassName: {{ .Values.statefulSet.persistence.storageClassName | quote }}
         accessModes: {{- .Values.statefulSet.persistence.accessModes | toYaml | nindent 10 }}

@@ -44,6 +44,7 @@ statefulSet:
     accessModes:
       - ReadWriteOnce
     size: 10Gi
+    annotations: {}
   # If true, the container will be restarted when the values.yaml file changes.
   restartOnChanges: false
 
