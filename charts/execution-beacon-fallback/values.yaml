@@ -1,0 +1,795 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## Global values that can be shared across multiple charts
+##
+global:
+  ## Global image pull secrets (merged with chart-level imagePullSecrets)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Global container security context (applied to containers)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
+
+  ## Global pod security context (applied at pod level)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext:
+    fsGroup: 1000
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+
+  ## Security settings for init containers
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  initContainerSecurityContext:
+    readOnlyRootFilesystem: false
+    capabilities:
+      add:
+        - CHOWN
+        - DAC_OVERRIDE
+        - FOWNER
+    runAsNonRoot: false
+    runAsUser: 0
+    runAsGroup: 0
+
+## Provide a name in place of execution-beacon for `app:` labels
+##
+nameOverride: ""
+
+## Provide a name to substitute for the full names of resources
+##
+fullnameOverride: ""
+
+## Number of replicas
+##
+replicaCount: 1
+
+## Pod management policy for the StatefulSet
+##
+podManagementPolicy: "Parallel"
+
+## Ethereum network
+##
+network: mainnet
+
+## Container image configuration
+## Images are automatically selected based on execution.client and beacon.client values
+## You can override the repository if needed (e.g., for custom builds or registries)
+##
+## Execution client images (auto-selected):
+##   nethermind -> nethermind/nethermind
+##   geth       -> ethereum/client-go
+##   besu       -> hyperledger/besu
+##   erigon     -> erigontech/erigon
+##   reth       -> ghcr.io/paradigmxyz/reth
+##
+## Beacon client images (auto-selected):
+##   prysm      -> gcr.io/prylabs-dev/prysm/beacon-chain
+##   teku       -> consensys/teku
+##   lighthouse -> sigp/lighthouse
+##   nimbus     -> statusim/nimbus-eth2
+##   lodestar   -> chainsafe/lodestar
+##
+image:
+  imagePullPolicy: IfNotPresent
+  execution:
+    repository: ""  # Leave empty to auto-select based on execution.client
+    tag: "1.34.0"   # Update to your desired version
+  beacon:
+    repository: ""  # Leave empty to auto-select based on beacon.client
+    tag: "multiarch-v25.9.2"  # Update to your desired version
+
+## JSON Web Token (JWT) authentication is used to secure the communication
+## between the beacon node and execution client. You can generate a JWT using
+## a command line tool, for example:
+## openssl rand -hex 32 > token.txt
+##
+## Option 1: Auto-detect from envFrom (recommended):
+##   Just specify the key name in your secret, chart will auto-use the first secretRef from envFrom
+##   JWTSecretKey: "JWT_SECRET"
+##
+## Option 2: Explicitly specify secret name:
+##   JWTSecretName: "my-secret"
+##   JWTSecretKey: "JWT_SECRET"
+##
+## Option 3: Provide JWT inline (creates a Secret):
+##   JWTSecret: "0x123abc..."
+##
+JWTSecretName: ""
+JWTSecretKey: "JWT_SECRET"
+JWTSecret: ""
+
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - prysm
+##       topologyKey: kubernetes.io/hostname
+##
+affinity: {}
+
+## Used to assign priority to pods
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of node failure, the node data directory will still persist.
+##
+sharedPersistence:
+  enabled: false
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 300Gi
+  annotations: {}
+
+## Additional env to add into the execution and beacon containers
+##
+env: []
+
+## Additional envFrom to add into the execution and beacon containers
+##
+envFrom: []
+
+## Ethsider sidecar container configuration
+##
+ethsider:
+  enabled: true
+  repository: "nethermindeth/ethsider"
+  tag: "v1.1.1"
+  pullPolicy: IfNotPresent
+  bindAddr: 3000
+  ## Configure ethsider probe flags
+  ## ref: https://github.com/NethermindEth/ethsider
+  ##
+  probes:
+    eth1Syncing: true
+    eth1Peers: true
+    eth2Syncing: true
+    eth2PeersCount: true
+    eth2Health: true
+    eth1BlockSync:  # Enables and configures Block Sync Monitoring probe
+      enabled: false
+      referenceEndpoint: ""
+      threshold: 0
+
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before genesis
+  ##
+  livenessProbe:
+    enabled: false
+    initialDelaySeconds: 10
+    timeoutSeconds: 3
+    periodSeconds: 1
+    failureThreshold: 3
+    successThreshold: 3
+    httpGet:
+      path: /liveness
+      port: sidecar
+      scheme: HTTP
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    timeoutSeconds: 3
+    periodSeconds: 1
+    failureThreshold: 3
+    successThreshold: 3
+    httpGet:
+      path: /readiness
+      port: sidecar
+      scheme: HTTP
+
+## Service configuration
+##
+service:
+  svcHeadless: true
+
+## Session affinity configuration
+##
+sessionAffinity:
+  # Whether to enable session affinity or not
+  enabled: false
+  # The session duration in seconds
+  timeoutSeconds: 86400
+
+## Service account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## RBAC configuration.
+## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
+rbac:
+  create: true
+  # The name of the cluster role to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  ## Required ClusterRole rules
+  ##
+  clusterRules:
+    ## Required to obtain the nodes external IP
+    ##
+    - apiGroups: [""]
+      resources:
+        - "nodes"
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
+  ## Required Role rules
+  ##
+  rules:
+    ## Required to get information about the services nodePort.
+    ##
+    - apiGroups: [""]
+      resources:
+        - "services"
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
+
+## Termination Grace Period
+## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+##
+terminationGracePeriodSeconds: 120
+
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  repository: "bitnamilegacy/kubectl"
+  tag: "1.32"
+  pullPolicy: IfNotPresent
+
+## Monitoring
+##
+metrics:
+  enabled: true
+  annotations: {}
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ##
+  serviceMonitor:
+    ## The namespace in which the ServiceMonitor will be created
+    ##
+    namespace: ""
+    ## The interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## The timeout after which the scrape is ended
+    ##
+    scrapeTimeout: ""
+    ## Metrics RelabelConfigs to apply to samples before scraping.
+    ##
+    relabellings: []
+    ## Metrics RelabelConfigs to apply to samples before ingestion.
+    ##
+    metricRelabelings: []
+    ## Specify honorLabels parameter to add the scrape endpoint
+    ##
+    honorLabels: false
+    ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ##
+    additionalLabels: {}
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ##
+  prometheusRule:
+    ## Create a default set of Alerts
+    ##
+    default: true
+    ## The namespace in which the prometheusRule will be created
+    ##
+    namespace: ""
+    ## The value of the `severity` label, commonly used to mark severity, set to empty string or null to omit
+    ##
+    severity: critical
+    ## Additional labels for the prometheusRule
+    ##
+    additionalLabels: {}
+    ## Custom Prometheus rules
+    ##
+    rules: []
+
+## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
+## This will generate a service for each replica, with a port binding via NodePort.
+## This is useful if you want to expose and announce your node to the Internet.
+##
+p2pNodePort:
+  ## @param p2pNodePort.enabled Expose P2P port via NodePort
+  ##
+  enabled: false
+  ## @param p2pNodePort.annotations
+  ##
+  annotations: {}
+  ## @param p2pNodePort.type
+  ## Options: NodePort, LoadBalancer
+  type: NodePort
+  ## @param p2pNodePort.startAt The ports allocation will start from this value
+  ##
+  startAtExecution: 31100
+  startAtBeacon: 31200
+  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
+  ## @default -- See `values.yaml` for example
+  replicaToNodePort: {}
+  #  "0": 32345
+  #  "3": 32348
+
+## Additional volumes to create
+##
+volumes: []
+
+## Additional volume mounts to create
+##
+volumeMounts: []
+
+## Execution client configuration
+##
+execution:
+  client: nethermind
+
+  ## Whether or not to allocate persistent volume disk for the data directory.
+  ## In case of node failure, the node data directory will still persist.
+  ##
+  persistence:
+    enabled: true
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 100Gi
+    annotations: {}
+
+  ## If false, data ownership will not be reset at startup
+  ## This allows the execution node to be run with an arbitrary user
+  ##
+  initChownData: true
+
+  # private api network address, for example: 127.0.0.1:9090,
+  # empty string means not to start the listener.
+  # Do not expose to public network.
+  # Serves remote database interface (default: "127.0.0.1:9090")
+  privateApiAddr: "127.0.0.1:9090"
+
+  # Erigon specific setting, whether to use external client or use caplin
+  externalCl: true
+
+  ## Monitoring
+  ## Additional settings could be made in non-global section.
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+
+    port: 8008
+    host: "0.0.0.0"
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: true
+
+    svcAnnotations: {}
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: true
+
+  ## -------------------------- Execution node specific settings -----------------------------------------
+  # Manually specify TerminalTotalDifficulty, overriding the bundled setting
+  terminalTotalDifficulty: ""
+
+  jsonrpc:
+    enabled: true
+    namespaces:
+      nethermind:
+        - Web3
+        - Eth
+        - Net
+        - Subscribe
+        - Health
+      geth:
+        - web3
+        - eth
+        - net
+        - engine
+      erigon:
+        - eth
+        - erigon
+        - web3
+        - net
+        - engine
+      reth:
+        - eth
+        - web3
+        - net
+    host: "0.0.0.0"
+    grpc:
+      port: 8655
+    http:
+      port: 8545
+      corsOrigins:
+        - "*"
+      hostAllowList:
+        - "*"
+    websocket:
+      enabled: true
+      port: 8546
+      origins: "*"
+    engine:
+      port: 8551
+      hostAllowList:
+        - "*"
+      corsOrigins:
+        - "*"
+
+  # Nethermind HealthChecks module
+  healthchecks:
+    enabled: true
+    slug: "/health"
+    pollingInterval: 5
+    lowStorageSpaceShutdownThreshold: 0
+    lowStorageSpaceWarningThreshold: 5
+
+  targetPeers: 50
+
+  ## Reth-specific: Enable Discovery v5 protocol for better peer discovery
+  ## Only applicable when using Reth as execution client
+  ## Discovery v5 port is automatically set to P2P_PORT + 2 to avoid conflicts with multiple replicas
+  ## Example: Pod 0: P2P=30303, Discovery v5=30305
+  ##          Pod 1: P2P=30305, Discovery v5=30307
+  ##
+  enableDiscoveryV5: true
+
+  ## Reth snapshot download configuration
+  ## This allows downloading a pre-synced database snapshot to speed up initial sync
+  ## Only applicable when using Reth as execution client
+  ##
+  snapshot:
+    ## Whether to enable snapshot downloading
+    ##
+    enabled: false
+
+    ## Snapshot URL to download from
+    ## Supported formats: .tar.lz4, .tar.zst, .tar.gz, .tar
+    ## Example URLs:
+    ##   - https://snapshots.publicnode.com/ethereum-reth-23546967.tar.lz4
+    ##   - https://your-custom-snapshot-url.com/reth-snapshot.tar.zst
+    ##
+    url: ""
+
+    ## Force snapshot download even if data directory already exists
+    ## If true, existing data will be backed up before downloading snapshot
+    ##
+    force: false
+
+    ## Container image for snapshot init container
+    ## This image needs curl and compression tools (lz4, zstd, tar, gzip)
+    ## We use alpine as base and install necessary tools in the script
+    ##
+    image:
+      repository: "alpine"
+      tag: "3.20"
+      pullPolicy: IfNotPresent
+
+  ## Extra flags to pass to the node
+  ##
+  extraFlags: []
+  resources: {}
+
+  ## Additional volumes to mount into the execution container
+  ##
+  volumeMounts: []
+
+  ## Additional env to add into the execution container
+  ##
+  env: []
+
+  ## Additional envFrom to add into the execution container
+  ##
+  envFrom: []
+
+## Beacon client configuration
+##
+beacon:
+  client: nimbus
+
+  ## Whether or not to allocate persistent volume disk for the data directory.
+  ## In case of node failure, the node data directory will still persist.
+  ##
+  persistence:
+    enabled: true
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 100Gi
+    annotations: {}
+
+  ## If false, data ownership will not be reset at startup
+  ## This allows the beacon node to be run with an arbitrary user
+  ##
+  initChownData: true
+
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+    annotations: {}
+
+    port: 9090
+    host: "0.0.0.0"
+
+    ## Monitoring
+    ## Teku Metric categories to enable
+    categories:
+      - JVM
+      - PROCESS
+      - BEACON
+      - DISCOVERY
+      - EVENTBUS
+      - EXECUTOR
+      - LIBP2P
+      - NETWORK
+      - STORAGE
+      - STORAGE_HOT_DB
+      - STORAGE_FINALIZED_DB
+      - VALIDATOR
+      - VALIDATOR_PERFORMANCE
+      - VALIDATOR_DUTY
+
+    # List of hostnames to allow, or * to allow any host
+    hostAllowList:
+      - "*"
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: true
+
+    svcAnnotations: {}
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: true
+
+  ## To get Beacon node up and running in only a few minutes
+  ## from a recent finalized checkpoint state rather than syncing from genesis.
+  ##
+  checkPointSync:
+    enabled: true
+    url: "https://mainnet-checkpoint-sync.attestant.io"
+    trustedSourceUrl: ""
+
+  ## Post bellatrix, this address will receive the transaction fees produced
+  ## by any blocks from this node. Default to junk whilst bellatrix is in development state.
+  ## Validator client can override this value through the preparebeaconproposer api.
+  ##
+  suggestedFeeRecipient: ""
+
+  # Lighthouse specific setting
+  proposerOnly: false
+
+  # Taiko specific settings
+  taikoChainspecURL: "https://raw.githubusercontent.com/NethermindEth/Surge/refs/heads/main/spec/surge-staging-devnet/chainspec.json"
+  taikoInbox: ""
+  taikoAnchor: ""
+  l1Ws: ""
+  l1Beacon: ""
+
+  ## MEV Boost endpoint
+  ##
+  builderEndpoint: ""
+
+  # Rest API Settings
+  restApi:
+    # Enables Beacon Rest API
+    enabled: true
+    host: "0.0.0.0"
+    # Comma-separated list of hostnames to allow, or *
+    # to allow any host
+    hostAllowList:
+      - "*"
+    corsOrigins:
+      - "*"
+    # Port number of Beacon Rest API
+    portMap:
+      teku: 5051
+      prysm: 8080
+      lighthouse: 5052
+      nimbus: 5052
+      lodestar: 9596
+
+  grpc:
+    enabled: true
+    host: "0.0.0.0"
+    port: 4000
+    portName: "rpc"
+
+  targetPeers: 50
+  targetPeersMin: 40
+
+  ## Sets the total difficulty to manual overrides the default
+  ## TERMINAL_TOTAL_DIFFICULTY value. WARNING: This flag should be used only if you
+  ## have a clear understanding that community has decided to override the terminal difficulty.
+  ## Incorrect usage will result in your node experience consensus failure.
+  totalDifficultyOverride: ""
+
+  ## Extra flags to pass to the node
+  ##
+  extraFlags: []
+  resources: {}
+
+  ## Additional volumes to mount into the beacon container
+  ##
+  volumeMounts: []
+
+  ## Additional env to add into the beacon container
+  ##
+  env: []
+
+  ## Additional envFrom to add into the beacon container
+  ##
+  envFrom: []
+
+## HTTP Route, for the ports that can actually go through HTTP
+##
+HTTPRoute:
+  enabled: false
+  annotations: {}
+  parentRefs: []
+  # - name: gateway
+  #   namespace: istio-ingress
+  hostnames: []
+  # - example.com
+  rules: []
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /
+  #   backendRefs:
+  #   - port: 1234
+
+# -- HAProxy active-fallback proxy for beacon API
+haproxy:
+  # -- Enable HAProxy deployment in front of the beacon node
+  enabled: true
+
+  image:
+    # -- HAProxy container image repository
+    repository: haproxy
+    # -- HAProxy container image tag
+    tag: "3.0-alpine"
+    # -- HAProxy container pull policy
+    pullPolicy: IfNotPresent
+
+  fallback:
+    # -- Name of the K8s Secret containing the fallback beacon URL
+    existingSecret: ""
+    # -- Key within the secret containing the full https://host/path URL
+    secretKey: "FALLBACK_BEACON_URL"
+
+  # -- Milliseconds between active health checks
+  checkInterval: 5000
+  # -- Consecutive failures before marking primary down
+  checkFall: 2
+  # -- Consecutive successes before marking primary back up
+  checkRise: 2
+
+  service:
+    # -- Service type for the HAProxy external-facing service
+    type: ClusterIP
+    # -- Port HAProxy listens on (clients connect here)
+    port: 5052
+
+  # -- Resource requests and limits for HAProxy container
+  resources: {}
+  # limits:
+  #   cpu: 200m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 64Mi
+
+  # -- Pod annotations for HAProxy pods
+  podAnnotations: {}
+
+  # -- Node selector for HAProxy pods
+  nodeSelector: {}
+
+  # -- Tolerations for HAProxy pods
+  tolerations: []
+
+  # -- Affinity for HAProxy pods
+  affinity: {}
+
+  serviceMonitor:
+    # -- If true, create a ServiceMonitor for HAProxy stats endpoint
+    enabled: false
+    # -- Scrape interval
+    interval: 30s
+    # -- Scrape timeout
+    scrapeTimeout: 10s
+    # -- Additional labels for the ServiceMonitor
+    labels: {}
+
+  ingress:
+    # -- If true, create an Ingress pointing to the HAProxy service
+    enabled: false
+    # -- Ingress class name
+    className: ""
+    # -- Ingress annotations
+    annotations: {}
+    # -- Ingress hosts
+    hosts: []
+    #  - host: beacon.example.com
+    #    paths:
+    #      - path: /
+    #        pathType: Prefix
+    # -- Ingress TLS
+    tls: []

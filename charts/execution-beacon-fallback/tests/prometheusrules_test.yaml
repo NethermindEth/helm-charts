@@ -1,0 +1,57 @@
+suite: prometheusrules tests
+
+templates:
+  - prometheusrules.yaml
+
+set:
+  fullnameOverride: some-full-name
+release:
+  namespace: some-namespace
+
+tests:
+  - it: given disabled default alerts then should not create any default alerts
+    set:
+      metrics:
+        prometheusRule:
+          rules: []
+          default: false
+    asserts:
+      - isEmpty:
+          path: .spec.groups
+
+  - it: given enabled default alerts then should create default up alerts for execution and beacon
+    set:
+      metrics:
+        prometheusRule:
+          rules: []
+          default: true
+          severity: banana
+      beacon:
+        client: Potato
+    asserts:
+      - contains:
+          path: .spec.groups[0].rules
+          content:
+            alert: EthNodeDown
+            expr: |
+              up{job='some-full-name', namespace='some-namespace'} == 0
+              and on() (kube_statefulset_status_current_revision{statefulset='some-full-name', namespace='some-namespace'} == kube_statefulset_status_update_revision{statefulset='some-full-name', namespace='some-namespace'})
+            for: 5m
+            labels:
+              severity: banana
+            annotations:
+              summary: Node {{ $labels.container }} {{ $labels.job }} down
+              description: Node {{ $labels.container }} {{ $labels.job }}, in namespace {{ $labels.namespace }}, is down
+      - contains:
+          path: .spec.groups[0].rules
+          content:
+            alert: EthNodeUpdateFailed
+            expr: |
+              up{job='some-full-name', namespace='some-namespace'} == 0
+              unless on() (kube_statefulset_status_current_revision{statefulset='some-full-name', namespace='some-namespace'} == kube_statefulset_status_update_revision{statefulset='some-full-name', namespace='some-namespace'})
+            for: 10m
+            labels:
+              severity: banana
+            annotations:
+              summary: Node {{ $labels.container }} {{ $labels.job }} down during update
+              description: Node {{ $labels.container }} {{ $labels.job }}, in namespace {{ $labels.namespace }}, was mid update, but has not recovered
