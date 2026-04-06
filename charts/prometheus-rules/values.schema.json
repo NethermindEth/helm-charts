@@ -3,7 +3,9 @@
   "additionalProperties": false,
   "properties": {
     "defaultAlertLabels": {
-      "additionalProperties": false,
+      "additionalProperties": {
+        "type": "string"
+      },
       "required": [],
       "title": "defaultAlertLabels",
       "type": "object"
@@ -39,6 +41,10 @@
                               "title": "alert",
                               "type": "string"
                             },
+                            "record": {
+                              "title": "record",
+                              "type": "string"
+                            },
                             "expr": {
                               "default": "Vector(1)",
                               "title": "expr",
@@ -50,7 +56,9 @@
                               "type": "string"
                             },
                             "labels": {
-                              "additionalProperties": false,
+                              "additionalProperties": {
+                                "type": "string"
+                              },
                               "properties": {
                                 "severity": {
                                   "default": "warning",
@@ -60,17 +68,26 @@
                                 }
                               },
                               "required": [
-                                "severity"
                               ],
+                              "minProperties": 0,
                               "title": "labels",
                               "type": "object"
                             }
                           },
                           "required": [
-                            "alert",
-                            "expr",
-                            "for",
-                            "labels"
+                            "expr"
+                          ],
+                          "oneOf": [
+                            {
+                              "required": [
+                                "alert"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "record"
+                              ]
+                            }
                           ],
                           "type": "object"
                         }
