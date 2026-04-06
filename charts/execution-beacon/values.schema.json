@@ -12,16 +12,27 @@
       "additionalProperties": false,
       "properties": {
         "cpu": {
-          "type": "string"
+          "$ref": "#/definitions/resourceQuantity"
         },
         "memory": {
-          "type": "string"
+          "$ref": "#/definitions/resourceQuantity"
         },
         "ephemeral-storage": {
-          "type": "string"
+          "$ref": "#/definitions/resourceQuantity"
         }
       },
       "type": "object"
+    },
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        }
+      ]
     },
     "containerResources": {
       "additionalProperties": false,
@@ -1722,6 +1733,11 @@
         "envFrom"
       ],
       "title": "beacon",
+      "type": "object"
+    },
+    "common": {
+      "additionalProperties": true,
+      "title": "common",
       "type": "object"
     },
     "env": {
