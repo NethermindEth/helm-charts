@@ -231,7 +231,6 @@
         }
       },
       "required": [
-        "name",
         "port"
       ],
       "type": "object"
@@ -2923,7 +2922,9 @@
       "type": "string"
     },
     "nodeSelector": {
-      "additionalProperties": false,
+      "additionalProperties": {
+        "type": "string"
+      },
       "description": "# Node labels for pod assignment\n# ref: https://kubernetes.io/docs/user-guide/node-selection/\n#",
       "required": [],
       "title": "nodeSelector",
