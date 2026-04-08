@@ -1,0 +1,980 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. 100m, 256Mi, 1Gi)",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "resourceList": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^hugepages-.*$": {
+          "$ref": "#/definitions/resourceQuantity"
+        }
+      },
+      "properties": {
+        "cpu": {
+          "$ref": "#/definitions/resourceQuantity"
+        },
+        "memory": {
+          "$ref": "#/definitions/resourceQuantity"
+        },
+        "ephemeral-storage": {
+          "$ref": "#/definitions/resourceQuantity"
+        }
+      },
+      "type": "object"
+    },
+    "resourceRequirements": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": {
+          "$ref": "#/definitions/resourceList"
+        },
+        "requests": {
+          "$ref": "#/definitions/resourceList"
+        }
+      },
+      "type": "object"
+    },
+    "portOrName": {
+      "oneOf": [
+        {
+          "minimum": 1,
+          "maximum": 65535,
+          "type": "integer"
+        },
+        {
+          "minLength": 1,
+          "type": "string"
+        }
+      ]
+    },
+    "httpGetAction": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "port": {
+          "$ref": "#/definitions/portOrName"
+        },
+        "host": {
+          "type": "string"
+        },
+        "scheme": {
+          "enum": ["HTTP", "HTTPS"],
+          "type": "string"
+        },
+        "httpHeaders": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "value"],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["path", "port"],
+      "type": "object"
+    },
+    "probe": {
+      "additionalProperties": false,
+      "properties": {
+        "httpGet": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/httpGetAction"
+            }
+          ],
+          "properties": {
+            "path": {
+              "default": "/"
+            },
+            "port": {
+              "default": "http"
+            }
+          }
+        },
+        "initialDelaySeconds": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "periodSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "timeoutSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "successThreshold": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "failureThreshold": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "terminationGracePeriodSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": ["httpGet"],
+      "type": "object"
+    },
+    "kubernetesQualifiedName": {
+      "description": "Kubernetes qualified name used for label/annotation keys.",
+      "maxLength": 317,
+      "pattern": "^(([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?[A-Za-z0-9]([A-Za-z0-9_.-]{0,61}[A-Za-z0-9])?)$",
+      "type": "string"
+    },
+    "kubernetesLabelValue": {
+      "description": "Kubernetes label value (empty string or up to 63 chars, alphanumeric boundaries).",
+      "pattern": "^(([A-Za-z0-9][-A-Za-z0-9_.]{0,61}[A-Za-z0-9])?)$",
+      "type": "string"
+    },
+    "kubernetesAnnotations": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "$ref": "#/definitions/kubernetesQualifiedName"
+      },
+      "type": "object"
+    },
+    "kubernetesLabels": {
+      "additionalProperties": {
+        "$ref": "#/definitions/kubernetesLabelValue"
+      },
+      "propertyNames": {
+        "$ref": "#/definitions/kubernetesQualifiedName"
+      },
+      "type": "object"
+    },
+    "securityContext": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "additionalProperties": false,
+          "properties": {
+            "drop": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "drop"
+          ],
+          "type": "object"
+        },
+        "readOnlyRootFilesystem": {
+          "type": "boolean"
+        },
+        "runAsNonRoot": {
+          "type": "boolean"
+        },
+        "runAsUser": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "envFromSource": {
+      "additionalProperties": false,
+      "properties": {
+        "prefix": {
+          "type": "string"
+        },
+        "secretRef": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "optional": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        },
+        "configMapRef": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "optional": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "volume": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "secret": {
+          "additionalProperties": false,
+          "properties": {
+            "secretName": {
+              "type": "string"
+            },
+            "optional": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "secretName"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "volumeMount": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "mountPath": {
+          "type": "string"
+        },
+        "readOnly": {
+          "type": "boolean"
+        },
+        "subPath": {
+          "type": "string"
+        },
+        "subPathExpr": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "mountPath"
+      ],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "affinity": {
+      "additionalProperties": false,
+      "required": [],
+      "title": "affinity",
+      "type": "object"
+    },
+    "autoscaling": {
+      "additionalProperties": false,
+      "description": "This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "maxReplicas": {
+          "default": 10,
+          "title": "maxReplicas",
+          "type": "integer"
+        },
+        "minReplicas": {
+          "default": 1,
+          "title": "minReplicas",
+          "type": "integer"
+        },
+        "targetCPUUtilizationPercentage": {
+          "default": 80,
+          "title": "targetCPUUtilizationPercentage",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "enabled",
+        "minReplicas",
+        "maxReplicas",
+        "targetCPUUtilizationPercentage"
+      ],
+      "title": "autoscaling",
+      "type": "object"
+    },
+    "envFrom": {
+      "description": "Additional envFrom configuration for all containers\nThis allows you to reference additional secrets or configmaps",
+      "items": {
+        "$ref": "#/definitions/envFromSource"
+      },
+      "title": "envFrom",
+      "type": "array"
+    },
+    "ethgas": {
+      "additionalProperties": false,
+      "properties": {
+        "collateral_contract": {
+          "default": "0x104Ef4192a97E0A93aBe8893c8A2d2484DFCBAF1",
+          "title": "collateral_contract",
+          "type": "string"
+        },
+        "entity_name": {
+          "default": "",
+          "title": "entity_name",
+          "type": "string"
+        },
+        "eoa_signing_key": {
+          "default": "",
+          "title": "eoa_signing_key",
+          "type": "string"
+        },
+        "exchange_api_base": {
+          "default": "https://hoodi.app.ethgas.com",
+          "title": "exchange_api_base",
+          "type": "string"
+        },
+        "network": {
+          "default": "Hoodi",
+          "title": "network",
+          "type": "string"
+        },
+        "relays": {
+          "default": "https://0xb20c3fe59db9c3655088839ef3d972878d182eb745afd8abb1dd2abf6c14f93cd5934ed4446a5fe1ba039e2bc0cf1011@hoodi-relay.ethgas.com",
+          "title": "relays",
+          "type": "string"
+        },
+        "rpc_url": {
+          "default": "https://ethereum-hoodi-rpc.publicnode.com",
+          "title": "rpc_url",
+          "type": "string"
+        },
+        "signer": {
+          "default": "[signer.dirk]\ncert_path = \"/certs/dirk.crt\"\nkey_path = \"/certs/dirk.key\"\nca_cert_path = \"/certs/ca.crt\"\nsecrets_path = \"/secrets/dirk/secrets\"\n\n[[signer.dirk.hosts]]\nurl = \"https://dirk0:8881\"\nwallets = [\"Validators\"]\n\n[[signer.dirk.hosts]]\nurl = \"https://dirk1:8881\"\nwallets = [\"Validators\"]\n\n[[signer.dirk.hosts]]\nurl = \"https://dirk2:8881\"\nwallets = [\"Validators\"]\n",
+          "title": "signer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "network",
+        "rpc_url",
+        "relays",
+        "entity_name",
+        "eoa_signing_key",
+        "exchange_api_base",
+        "collateral_contract",
+        "signer"
+      ],
+      "title": "ethgas",
+      "type": "object"
+    },
+    "externalSecrets": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "description": "Individual key mappings for external secrets.",
+          "items": {
+            "required": []
+          },
+          "title": "data",
+          "type": "array"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "secretStoreRef": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "default": "SecretStore",
+              "title": "kind",
+              "type": "string"
+            },
+            "name": {
+              "default": "secretStoreRef",
+              "title": "name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "kind"
+          ],
+          "title": "secretStoreRef",
+          "type": "object"
+        }
+      },
+      "required": [
+        "enabled",
+        "secretStoreRef",
+        "data"
+      ],
+      "title": "externalSecrets",
+      "type": "object"
+    },
+    "extraArgs": {
+      "description": "Extra arguments to pass to the ethgas binary.",
+      "items": {
+        "required": []
+      },
+      "title": "extraArgs",
+      "type": "array"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "common": {
+      "additionalProperties": true,
+      "title": "common",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "ethgas_commit": {
+          "additionalProperties": false,
+          "properties": {
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "title": "pullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "ghcr.io/ethgas-developer/commitboost_ethgas_commit",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "v1.0.3",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [
+            "repository",
+            "pullPolicy",
+            "tag"
+          ],
+          "title": "ethgas_commit",
+          "type": "object"
+        },
+        "initContainer": {
+          "additionalProperties": false,
+          "properties": {
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "title": "pullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "alpine",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "3.12",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [
+            "repository",
+            "pullPolicy",
+            "tag"
+          ],
+          "title": "initContainer",
+          "type": "object"
+        },
+        "pbs": {
+          "additionalProperties": false,
+          "properties": {
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "title": "pullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "ghcr.io/commit-boost/pbs",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "v0.9.2",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [
+            "repository",
+            "pullPolicy",
+            "tag"
+          ],
+          "title": "pbs",
+          "type": "object"
+        },
+        "signer": {
+          "additionalProperties": false,
+          "properties": {
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "title": "pullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "ghcr.io/commit-boost/signer",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "v0.9.2",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [
+            "repository",
+            "pullPolicy",
+            "tag"
+          ],
+          "title": "signer",
+          "type": "object"
+        }
+      },
+      "required": [
+        "initContainer",
+        "pbs",
+        "signer",
+        "ethgas_commit"
+      ],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/",
+      "items": {
+        "required": []
+      },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "ingress": {
+      "additionalProperties": false,
+      "description": "This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/",
+      "properties": {
+        "annotations": {
+          "additionalProperties": false,
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "className": {
+          "default": "",
+          "title": "className",
+          "type": "string"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "hosts": {
+          "description": "kubernetes.io/ingress.class: nginx\nkubernetes.io/tls-acme: \"true\"",
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "host": {
+                    "default": "chart-example.local",
+                    "title": "host",
+                    "type": "string"
+                  },
+                  "paths": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "path": {
+                              "default": "/",
+                              "title": "path",
+                              "type": "string"
+                            },
+                            "pathType": {
+                              "default": "ImplementationSpecific",
+                              "title": "pathType",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "path",
+                            "pathType"
+                          ],
+                          "type": "object"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "paths",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "host",
+                  "paths"
+                ],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "title": "hosts",
+          "type": "array"
+        },
+        "tls": {
+          "items": {
+            "required": []
+          },
+          "title": "tls",
+          "type": "array"
+        }
+      },
+      "required": [
+        "enabled",
+        "className",
+        "annotations",
+        "hosts",
+        "tls"
+      ],
+      "title": "ingress",
+      "type": "object"
+    },
+    "livenessProbe": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/probe"
+        }
+      ],
+      "description": "This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
+      "title": "livenessProbe",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "This is to override the chart name.",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "namespaceOverride": {
+      "default": "",
+      "title": "namespaceOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "additionalProperties": false,
+      "required": [],
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "podAnnotations": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/kubernetesAnnotations"
+        }
+      ],
+      "description": "This is for setting Kubernetes Annotations to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/",
+      "required": [],
+      "title": "podAnnotations",
+      "type": "object"
+    },
+    "podLabels": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/kubernetesLabels"
+        }
+      ],
+      "description": "This is for setting Kubernetes Labels to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/",
+      "required": [],
+      "title": "podLabels",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "additionalProperties": false,
+      "required": [],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "readinessProbe": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/probe"
+        }
+      ],
+      "description": "This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
+      "title": "readinessProbe",
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": 1,
+      "description": "This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/",
+      "title": "replicaCount",
+      "type": "integer"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "ethgasCommit": {
+          "$ref": "#/definitions/resourceRequirements",
+          "description": "limits:\n  cpu: 100m\n  memory: 256Mi\nrequests:\n  cpu: 50m\n  memory: 128Mi",
+          "title": "ethgasCommit",
+          "type": "object"
+        },
+        "pbs": {
+          "$ref": "#/definitions/resourceRequirements",
+          "title": "pbs",
+          "type": "object"
+        },
+        "signer": {
+          "$ref": "#/definitions/resourceRequirements",
+          "description": "limits:\n  cpu: 100m\n  memory: 256Mi\nrequests:\n  cpu: 50m\n  memory: 128Mi",
+          "title": "signer",
+          "type": "object"
+        }
+      },
+      "required": [
+        "pbs",
+        "signer",
+        "ethgasCommit"
+      ],
+      "title": "resources",
+      "type": "object"
+    },
+    "securityContext": {
+      "$ref": "#/definitions/securityContext",
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "additionalProperties": false,
+      "description": "This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/",
+      "properties": {
+        "port": {
+          "additionalProperties": false,
+          "description": "This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports",
+          "properties": {
+            "ethgas_commit": {
+              "additionalProperties": false,
+              "properties": {
+                "metrics": {
+                  "default": 10002,
+                  "title": "metrics",
+                  "minimum": 1,
+                  "maximum": 65535,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "metrics"
+              ],
+              "title": "ethgas_commit",
+              "type": "object"
+            },
+            "pbs": {
+              "additionalProperties": false,
+              "properties": {
+                "http": {
+                  "default": 18550,
+                  "title": "http",
+                  "minimum": 1,
+                  "maximum": 65535,
+                  "type": "integer"
+                },
+                "metrics": {
+                  "default": 10000,
+                  "title": "metrics",
+                  "minimum": 1,
+                  "maximum": 65535,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "http",
+                "metrics"
+              ],
+              "title": "pbs",
+              "type": "object"
+            },
+            "signer": {
+              "additionalProperties": false,
+              "properties": {
+                "http": {
+                  "default": 20000,
+                  "title": "http",
+                  "minimum": 1,
+                  "maximum": 65535,
+                  "type": "integer"
+                },
+                "metrics": {
+                  "default": 10001,
+                  "title": "metrics",
+                  "minimum": 1,
+                  "maximum": 65535,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "http",
+                "metrics"
+              ],
+              "title": "signer",
+              "type": "object"
+            }
+          },
+          "required": [
+            "pbs",
+            "signer",
+            "ethgas_commit"
+          ],
+          "title": "port",
+          "type": "object"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "description": "This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "port"
+      ],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "description": "This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/",
+      "properties": {
+        "annotations": {
+          "additionalProperties": false,
+          "description": "Annotations to add to the service account",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "automount": {
+          "default": true,
+          "description": "Automatically mount a ServiceAccount's API credentials?",
+          "title": "automount",
+          "type": "boolean"
+        },
+        "create": {
+          "default": true,
+          "description": "Specifies whether a service account should be created",
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "description": "The name of the service account to use.\nIf not set and create is true, a name is generated using the fullname template",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "create",
+        "automount",
+        "annotations",
+        "name"
+      ],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "tolerations": {
+      "items": {
+        "required": []
+      },
+      "title": "tolerations",
+      "type": "array"
+    },
+    "volumeMounts": {
+      "description": "Additional volumeMounts on the output Deployment definition.",
+      "items": {
+        "$ref": "#/definitions/volumeMount"
+      },
+      "title": "volumeMounts",
+      "type": "array"
+    },
+    "volumes": {
+      "description": "Additional volumes on the output Deployment definition.",
+      "items": {
+        "$ref": "#/definitions/volume"
+      },
+      "title": "volumes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "nameOverride",
+    "fullnameOverride",
+    "namespaceOverride",
+    "replicaCount",
+    "imagePullSecrets",
+    "image",
+    "ethgas",
+    "extraArgs",
+    "serviceAccount",
+    "podAnnotations",
+    "podLabels",
+    "podSecurityContext",
+    "securityContext",
+    "service",
+    "ingress",
+    "resources",
+    "livenessProbe",
+    "readinessProbe",
+    "autoscaling",
+    "volumes",
+    "volumeMounts",
+    "envFrom",
+    "nodeSelector",
+    "tolerations",
+    "affinity",
+    "externalSecrets"
+  ],
+  "type": "object"
+}
