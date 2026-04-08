@@ -2,14 +2,33 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
   "definitions": {
-    "resourceList": {
-      "additionalProperties": false,
-      "properties": {
-        "cpu": {
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. 100m, 256Mi, 1Gi)",
+      "oneOf": [
+        {
           "type": "string"
         },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "resourceList": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^hugepages-.*$": {
+          "$ref": "#/definitions/resourceQuantity"
+        }
+      },
+      "properties": {
+        "cpu": {
+          "$ref": "#/definitions/resourceQuantity"
+        },
         "memory": {
-          "type": "string"
+          "$ref": "#/definitions/resourceQuantity"
+        },
+        "ephemeral-storage": {
+          "$ref": "#/definitions/resourceQuantity"
         }
       },
       "type": "object"
@@ -23,6 +42,130 @@
         "requests": {
           "$ref": "#/definitions/resourceList"
         }
+      },
+      "type": "object"
+    },
+    "portOrName": {
+      "oneOf": [
+        {
+          "minimum": 1,
+          "maximum": 65535,
+          "type": "integer"
+        },
+        {
+          "minLength": 1,
+          "type": "string"
+        }
+      ]
+    },
+    "httpGetAction": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "port": {
+          "$ref": "#/definitions/portOrName"
+        },
+        "host": {
+          "type": "string"
+        },
+        "scheme": {
+          "enum": ["HTTP", "HTTPS"],
+          "type": "string"
+        },
+        "httpHeaders": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "value"],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["path", "port"],
+      "type": "object"
+    },
+    "probe": {
+      "additionalProperties": false,
+      "properties": {
+        "httpGet": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/httpGetAction"
+            }
+          ],
+          "properties": {
+            "path": {
+              "default": "/"
+            },
+            "port": {
+              "default": "http"
+            }
+          }
+        },
+        "initialDelaySeconds": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "periodSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "timeoutSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "successThreshold": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "failureThreshold": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "terminationGracePeriodSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": ["httpGet"],
+      "type": "object"
+    },
+    "kubernetesQualifiedName": {
+      "description": "Kubernetes qualified name used for label/annotation keys.",
+      "maxLength": 317,
+      "pattern": "^(([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?[A-Za-z0-9]([A-Za-z0-9_.-]{0,61}[A-Za-z0-9])?)$",
+      "type": "string"
+    },
+    "kubernetesLabelValue": {
+      "description": "Kubernetes label value (empty string or up to 63 chars, alphanumeric boundaries).",
+      "pattern": "^(([A-Za-z0-9][-A-Za-z0-9_.]{0,61}[A-Za-z0-9])?)$",
+      "type": "string"
+    },
+    "kubernetesAnnotations": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "$ref": "#/definitions/kubernetesQualifiedName"
+      },
+      "type": "object"
+    },
+    "kubernetesLabels": {
+      "additionalProperties": {
+        "$ref": "#/definitions/kubernetesLabelValue"
+      },
+      "propertyNames": {
+        "$ref": "#/definitions/kubernetesQualifiedName"
       },
       "type": "object"
     },
@@ -258,6 +401,7 @@
       "additionalProperties": false,
       "properties": {
         "data": {
+          "description": "Individual key mappings for external secrets.",
           "items": {
             "required": []
           },
@@ -312,10 +456,9 @@
       "title": "fullnameOverride",
       "type": "string"
     },
-    "global": {
-      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
-      "required": [],
-      "title": "global",
+    "common": {
+      "additionalProperties": true,
+      "title": "common",
       "type": "object"
     },
     "image": {
@@ -540,34 +683,12 @@
       "type": "object"
     },
     "livenessProbe": {
-      "additionalProperties": false,
-      "description": "This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
-      "properties": {
-        "httpGet": {
-          "additionalProperties": false,
-          "properties": {
-            "path": {
-              "default": "/",
-              "title": "path",
-              "type": "string"
-            },
-            "port": {
-              "default": "http",
-              "title": "port",
-              "type": "string"
-            }
-          },
-          "required": [
-            "path",
-            "port"
-          ],
-          "title": "httpGet",
-          "type": "object"
+      "allOf": [
+        {
+          "$ref": "#/definitions/probe"
         }
-      },
-      "required": [
-        "httpGet"
       ],
+      "description": "This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
       "title": "livenessProbe",
       "type": "object"
     },
@@ -589,14 +710,22 @@
       "type": "object"
     },
     "podAnnotations": {
-      "additionalProperties": false,
+      "allOf": [
+        {
+          "$ref": "#/definitions/kubernetesAnnotations"
+        }
+      ],
       "description": "This is for setting Kubernetes Annotations to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/",
       "required": [],
       "title": "podAnnotations",
       "type": "object"
     },
     "podLabels": {
-      "additionalProperties": false,
+      "allOf": [
+        {
+          "$ref": "#/definitions/kubernetesLabels"
+        }
+      ],
       "description": "This is for setting Kubernetes Labels to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/",
       "required": [],
       "title": "podLabels",
@@ -609,33 +738,12 @@
       "type": "object"
     },
     "readinessProbe": {
-      "additionalProperties": false,
-      "properties": {
-        "httpGet": {
-          "additionalProperties": false,
-          "properties": {
-            "path": {
-              "default": "/",
-              "title": "path",
-              "type": "string"
-            },
-            "port": {
-              "default": "http",
-              "title": "port",
-              "type": "string"
-            }
-          },
-          "required": [
-            "path",
-            "port"
-          ],
-          "title": "httpGet",
-          "type": "object"
+      "allOf": [
+        {
+          "$ref": "#/definitions/probe"
         }
-      },
-      "required": [
-        "httpGet"
       ],
+      "description": "This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
       "title": "readinessProbe",
       "type": "object"
     },
@@ -693,6 +801,8 @@
                 "metrics": {
                   "default": 10002,
                   "title": "metrics",
+                  "minimum": 1,
+                  "maximum": 65535,
                   "type": "integer"
                 }
               },
@@ -708,11 +818,15 @@
                 "http": {
                   "default": 18550,
                   "title": "http",
+                  "minimum": 1,
+                  "maximum": 65535,
                   "type": "integer"
                 },
                 "metrics": {
                   "default": 10000,
                   "title": "metrics",
+                  "minimum": 1,
+                  "maximum": 65535,
                   "type": "integer"
                 }
               },
@@ -729,11 +843,15 @@
                 "http": {
                   "default": 20000,
                   "title": "http",
+                  "minimum": 1,
+                  "maximum": 65535,
                   "type": "integer"
                 },
                 "metrics": {
                   "default": 10001,
                   "title": "metrics",
+                  "minimum": 1,
+                  "maximum": 65535,
                   "type": "integer"
                 }
               },
