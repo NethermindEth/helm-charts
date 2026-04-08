@@ -55,6 +55,14 @@
                               "title": "for",
                               "type": "string"
                             },
+                            "annotations": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "required": [],
+                              "title": "annotations",
+                              "type": "object"
+                            },
                             "labels": {
                               "additionalProperties": {
                                 "type": "string"
@@ -119,7 +127,6 @@
     }
   },
   "required": [
-    "defaultAlertLabels",
     "spec"
   ],
   "type": "object"
