@@ -1,0 +1,3392 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "annotations": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "resourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "cpu": {
+          "$ref": "#/definitions/resourceQuantity"
+        },
+        "memory": {
+          "$ref": "#/definitions/resourceQuantity"
+        },
+        "ephemeral-storage": {
+          "$ref": "#/definitions/resourceQuantity"
+        }
+      },
+      "type": "object"
+    },
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "containerResources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": {
+          "$ref": "#/definitions/resourceSpec"
+        },
+        "requests": {
+          "$ref": "#/definitions/resourceSpec"
+        }
+      },
+      "type": "object"
+    },
+    "portOrName": {
+      "type": [
+        "string",
+        "integer"
+      ]
+    },
+    "probe": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "initialDelaySeconds": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "periodSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "timeoutSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "successThreshold": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "failureThreshold": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "port": {
+              "$ref": "#/definitions/portOrName"
+            },
+            "scheme": {
+              "enum": [
+                "HTTP",
+                "HTTPS"
+              ],
+              "type": "string"
+            },
+            "httpHeaders": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "path",
+            "port"
+          ],
+          "type": "object"
+        },
+        "tcpSocket": {
+          "additionalProperties": false,
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "$ref": "#/definitions/portOrName"
+            }
+          },
+          "required": [
+            "port"
+          ],
+          "type": "object"
+        },
+        "grpc": {
+          "additionalProperties": false,
+          "properties": {
+            "port": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            },
+            "service": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "port"
+          ],
+          "type": "object"
+        },
+        "exec": {
+          "additionalProperties": false,
+          "properties": {
+            "command": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "command"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "gatewayParentRef": {
+      "additionalProperties": false,
+      "properties": {
+        "group": {
+          "default": "gateway.networking.k8s.io",
+          "type": "string"
+        },
+        "kind": {
+          "default": "Gateway",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "port": {
+          "minimum": 1,
+          "maximum": 65535,
+          "type": "integer"
+        },
+        "sectionName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "namespace"
+      ],
+      "type": "object"
+    },
+    "gatewayBackendRef": {
+      "additionalProperties": false,
+      "properties": {
+        "group": {
+          "default": "",
+          "type": "string"
+        },
+        "kind": {
+          "default": "Service",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "port": {
+          "minimum": 1,
+          "maximum": 65535,
+          "type": "integer"
+        },
+        "weight": {
+          "default": 1,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "port"
+      ],
+      "type": "object"
+    },
+    "httpPathMatch": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "Exact",
+            "PathPrefix",
+            "RegularExpression"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "type": "object"
+    },
+    "httpHeaderMatch": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "Exact",
+            "RegularExpression"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "httpQueryParamMatch": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "Exact",
+            "RegularExpression"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "httpRouteMatch": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "$ref": "#/definitions/httpPathMatch"
+        },
+        "method": {
+          "enum": [
+            "GET",
+            "HEAD",
+            "POST",
+            "PUT",
+            "DELETE",
+            "CONNECT",
+            "OPTIONS",
+            "TRACE",
+            "PATCH"
+          ],
+          "type": "string"
+        },
+        "headers": {
+          "items": {
+            "$ref": "#/definitions/httpHeaderMatch"
+          },
+          "type": "array"
+        },
+        "queryParams": {
+          "items": {
+            "$ref": "#/definitions/httpQueryParamMatch"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
+    "httpHeaderModifier": {
+      "additionalProperties": false,
+      "properties": {
+        "set": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "add": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "remove": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "httpRequestRedirect": {
+      "additionalProperties": false,
+      "properties": {
+        "scheme": {
+          "enum": [
+            "http",
+            "https"
+          ],
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "path": {
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "ReplaceFullPath",
+                "ReplacePrefixMatch"
+              ],
+              "type": "string"
+            },
+            "replaceFullPath": {
+              "type": "string"
+            },
+            "replacePrefixMatch": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "port": {
+          "minimum": 1,
+          "maximum": 65535,
+          "type": "integer"
+        },
+        "statusCode": {
+          "enum": [
+            301,
+            302,
+            303,
+            307,
+            308
+          ],
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "httpURLRewrite": {
+      "additionalProperties": false,
+      "properties": {
+        "hostname": {
+          "type": "string"
+        },
+        "path": {
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "ReplaceFullPath",
+                "ReplacePrefixMatch"
+              ],
+              "type": "string"
+            },
+            "replaceFullPath": {
+              "type": "string"
+            },
+            "replacePrefixMatch": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "httpRouteFilter": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "RequestHeaderModifier",
+            "ResponseHeaderModifier",
+            "RequestRedirect",
+            "URLRewrite"
+          ],
+          "type": "string"
+        },
+        "requestHeaderModifier": {
+          "$ref": "#/definitions/httpHeaderModifier"
+        },
+        "responseHeaderModifier": {
+          "$ref": "#/definitions/httpHeaderModifier"
+        },
+        "requestRedirect": {
+          "$ref": "#/definitions/httpRequestRedirect"
+        },
+        "urlRewrite": {
+          "$ref": "#/definitions/httpURLRewrite"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "httpRouteRule": {
+      "additionalProperties": false,
+      "properties": {
+        "backendRefs": {
+          "items": {
+            "$ref": "#/definitions/gatewayBackendRef"
+          },
+          "type": "array"
+        },
+        "matches": {
+          "items": {
+            "$ref": "#/definitions/httpRouteMatch"
+          },
+          "type": "array"
+        },
+        "filters": {
+          "items": {
+            "$ref": "#/definitions/httpRouteFilter"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "matches",
+        "backendRefs"
+      ],
+      "type": "object"
+    },
+    "httpRoute": {
+      "additionalProperties": false,
+      "description": "# HTTP Route, for the ports that can actually go through HTTP\n#",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        },
+        "parentRefs": {
+          "items": {
+            "$ref": "#/definitions/gatewayParentRef"
+          },
+          "title": "parentRefs",
+          "type": "array"
+        },
+        "hostnames": {
+          "items": {
+            "type": "string"
+          },
+          "title": "hostnames",
+          "type": "array"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/definitions/httpRouteRule"
+          },
+          "title": "rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "enabled",
+        "annotations",
+        "parentRefs",
+        "hostnames",
+        "rules"
+      ],
+      "title": "HTTPRoute",
+      "type": "object"
+    },
+    "tcpRouteRule": {
+      "additionalProperties": false,
+      "properties": {
+        "backendRefs": {
+          "items": {
+            "$ref": "#/definitions/gatewayBackendRef"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "backendRefs"
+      ],
+      "type": "object"
+    },
+    "tcpRoute": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "type": "boolean"
+        },
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        },
+        "parentRefs": {
+          "items": {
+            "$ref": "#/definitions/gatewayParentRef"
+          },
+          "type": "array"
+        },
+        "hostnames": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/definitions/tcpRouteRule"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "type": "object"
+    },
+    "ingressPath": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "pathType": {
+          "enum": [
+            "ImplementationSpecific",
+            "Exact",
+            "Prefix"
+          ],
+          "type": "string"
+        },
+        "backend": {
+          "additionalProperties": false,
+          "properties": {
+            "service": {
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "port": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "number": {
+                      "minimum": 1,
+                      "maximum": 65535,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "required": [
+                "name",
+                "port"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "service"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "path",
+        "pathType",
+        "backend"
+      ],
+      "type": "object"
+    },
+    "ingress": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "type": "boolean"
+        },
+        "className": {
+          "type": "string"
+        },
+        "annotations": {
+          "$ref": "#/definitions/annotations"
+        },
+        "hosts": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "paths": {
+                "items": {
+                  "$ref": "#/definitions/ingressPath"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "host",
+              "paths"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "tls": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "secretName": {
+                "type": "string"
+              },
+              "hosts": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "secretName"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "HTTPRoute": {
+      "$ref": "#/definitions/httpRoute"
+    },
+    "TCPRoute": {
+      "$ref": "#/definitions/tcpRoute"
+    },
+    "ingress": {
+      "$ref": "#/definitions/ingress"
+    },
+    "JWTSecret": {
+      "default": "",
+      "title": "JWTSecret",
+      "type": "string"
+    },
+    "JWTSecretKey": {
+      "default": "JWT_SECRET",
+      "title": "JWTSecretKey",
+      "type": "string"
+    },
+    "JWTSecretName": {
+      "default": "",
+      "description": "# JSON Web Token (JWT) authentication is used to secure the communication\n# between the beacon node and execution client. You can generate a JWT using\n# a command line tool, for example:\n# openssl rand -hex 32 \u003e token.txt\n#\n# Option 1: Auto-detect from envFrom (recommended):\n#   Just specify the key name in your secret, chart will auto-use the first secretRef from envFrom\n#   JWTSecretKey: \"JWT_SECRET\"\n#\n# Option 2: Explicitly specify secret name:\n#   JWTSecretName: \"my-secret\"\n#   JWTSecretKey: \"JWT_SECRET\"\n#\n# Option 3: Provide JWT inline (creates a Secret):\n#   JWTSecret: \"0x123abc...\"\n#",
+      "title": "JWTSecretName",
+      "type": "string"
+    },
+    "affinity": {
+      "additionalProperties": false,
+      "description": "# Affinity for pod assignment\n# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity\n#\n# Example:\n# affinity:\n#   podAntiAffinity:\n#     requiredDuringSchedulingIgnoredDuringExecution:\n#     - labelSelector:\n#         matchExpressions:\n#         - key: app.kubernetes.io/name\n#           operator: In\n#           values:\n#           - prysm\n#       topologyKey: kubernetes.io/hostname\n#",
+      "properties": {
+        "nodeAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "additionalProperties": false,
+              "properties": {
+                "nodeSelectorTerms": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "matchExpressions": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "operator": {
+                              "enum": [
+                                "In",
+                                "NotIn",
+                                "Exists",
+                                "DoesNotExist",
+                                "Gt",
+                                "Lt"
+                              ],
+                              "type": "string"
+                            },
+                            "values": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "matchFields": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "operator": {
+                              "enum": [
+                                "In",
+                                "NotIn",
+                                "Exists",
+                                "DoesNotExist",
+                                "Gt",
+                                "Lt"
+                              ],
+                              "type": "string"
+                            },
+                            "values": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "nodeSelectorTerms"
+              ],
+              "type": "object"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": {
+                    "minimum": 1,
+                    "maximum": 100,
+                    "type": "integer"
+                  },
+                  "preference": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "matchExpressions": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "operator": {
+                              "enum": [
+                                "In",
+                                "NotIn",
+                                "Exists",
+                                "DoesNotExist",
+                                "Gt",
+                                "Lt"
+                              ],
+                              "type": "string"
+                            },
+                            "values": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "matchFields": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "operator": {
+                              "enum": [
+                                "In",
+                                "NotIn",
+                                "Exists",
+                                "DoesNotExist",
+                                "Gt",
+                                "Lt"
+                              ],
+                              "type": "string"
+                            },
+                            "values": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "weight",
+                  "preference"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "labelSelector": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "matchLabels": {
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "type": "object"
+                      },
+                      "matchExpressions": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "operator": {
+                              "enum": [
+                                "In",
+                                "NotIn",
+                                "Exists",
+                                "DoesNotExist"
+                              ],
+                              "type": "string"
+                            },
+                            "values": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "namespaces": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "topologyKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "topologyKey"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": {
+                    "minimum": 1,
+                    "maximum": 100,
+                    "type": "integer"
+                  },
+                  "podAffinityTerm": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "labelSelector": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "matchLabels": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "matchExpressions": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "enum": [
+                                    "In",
+                                    "NotIn",
+                                    "Exists",
+                                    "DoesNotExist"
+                                  ],
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "namespaces": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "topologyKey": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "topologyKey"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "weight",
+                  "podAffinityTerm"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "labelSelector": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "matchLabels": {
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "type": "object"
+                      },
+                      "matchExpressions": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "operator": {
+                              "enum": [
+                                "In",
+                                "NotIn",
+                                "Exists",
+                                "DoesNotExist"
+                              ],
+                              "type": "string"
+                            },
+                            "values": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "namespaces": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "topologyKey": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "topologyKey"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": {
+                    "minimum": 1,
+                    "maximum": 100,
+                    "type": "integer"
+                  },
+                  "podAffinityTerm": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "labelSelector": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "matchLabels": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "matchExpressions": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "enum": [
+                                    "In",
+                                    "NotIn",
+                                    "Exists",
+                                    "DoesNotExist"
+                                  ],
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "namespaces": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "topologyKey": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "topologyKey"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "weight",
+                  "podAffinityTerm"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "affinity",
+      "type": "object"
+    },
+    "beacon": {
+      "additionalProperties": false,
+      "description": "# Beacon client configuration\n#",
+      "properties": {
+        "builderEndpoint": {
+          "default": "",
+          "description": "# MEV Boost endpoint\n#",
+          "title": "builderEndpoint",
+          "type": "string"
+        },
+        "checkPointSync": {
+          "additionalProperties": false,
+          "description": "# To get Beacon node up and running in only a few minutes\n# from a recent finalized checkpoint state rather than syncing from genesis.\n#",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "trustedSourceUrl": {
+              "default": "",
+              "title": "trustedSourceUrl",
+              "type": "string"
+            },
+            "url": {
+              "default": "https://mainnet-checkpoint-sync.attestant.io",
+              "title": "url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "url",
+            "trustedSourceUrl"
+          ],
+          "title": "checkPointSync",
+          "type": "object"
+        },
+        "client": {
+          "default": "nimbus",
+          "title": "client",
+          "type": "string"
+        },
+        "env": {
+          "description": "# Additional env to add into the beacon container\n#",
+          "items": {
+            "required": []
+          },
+          "title": "env",
+          "type": "array"
+        },
+        "envFrom": {
+          "description": "# Additional envFrom to add into the beacon container\n#",
+          "items": {
+            "required": []
+          },
+          "title": "envFrom",
+          "type": "array"
+        },
+        "extraFlags": {
+          "description": "# Extra flags to pass to the node\n#",
+          "items": {
+            "required": []
+          },
+          "title": "extraFlags",
+          "type": "array"
+        },
+        "grpc": {
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "host": {
+              "default": "0.0.0.0",
+              "title": "host",
+              "type": "string"
+            },
+            "port": {
+              "default": 4000,
+              "maximum": 65535,
+              "minimum": 0,
+              "title": "port",
+              "type": "integer"
+            },
+            "portName": {
+              "default": "rpc",
+              "title": "portName",
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "host",
+            "portName"
+          ],
+          "title": "grpc",
+          "type": "object"
+        },
+        "initChownData": {
+          "default": true,
+          "description": "# If false, data ownership will not be reset at startup\n# This allows the beacon node to be run with an arbitrary user\n#",
+          "title": "initChownData",
+          "type": "boolean"
+        },
+        "l1Beacon": {
+          "default": "",
+          "title": "l1Beacon",
+          "type": "string"
+        },
+        "l1Ws": {
+          "default": "",
+          "title": "l1Ws",
+          "type": "string"
+        },
+        "metrics": {
+          "additionalProperties": false,
+          "properties": {
+            "annotations": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "categories": {
+              "description": "# Monitoring\n# Teku Metric categories to enable",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "required": []
+              },
+              "title": "categories",
+              "type": "array"
+            },
+            "enabled": {
+              "default": true,
+              "description": "# Whether to enable metrics collection or not\n#",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "host": {
+              "default": "0.0.0.0",
+              "title": "host",
+              "type": "string"
+            },
+            "hostAllowList": {
+              "description": "List of hostnames to allow, or * to allow any host",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  }
+                ],
+                "required": []
+              },
+              "title": "hostAllowList",
+              "type": "array"
+            },
+            "port": {
+              "default": 9090,
+              "maximum": 65535,
+              "minimum": 0,
+              "title": "port",
+              "type": "integer"
+            },
+            "prometheusRule": {
+              "additionalProperties": false,
+              "description": "# Custom PrometheusRule to be defined\n# ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions\n#",
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "description": "# Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator\n#",
+                  "title": "enabled",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "enabled"
+              ],
+              "title": "prometheusRule",
+              "type": "object"
+            },
+            "serviceMonitor": {
+              "additionalProperties": false,
+              "description": "# Prometheus Service Monitor\n# ref: https://github.com/coreos/prometheus-operator\n#      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint\n#",
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "description": "# Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator\n#",
+                  "title": "enabled",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "enabled"
+              ],
+              "title": "serviceMonitor",
+              "type": "object"
+            },
+            "svcAnnotations": {
+              "additionalProperties": false,
+              "required": [],
+              "title": "svcAnnotations",
+              "type": "object"
+            }
+          },
+          "required": [
+            "enabled",
+            "host",
+            "categories",
+            "hostAllowList",
+            "serviceMonitor",
+            "svcAnnotations",
+            "prometheusRule"
+          ],
+          "title": "metrics",
+          "type": "object"
+        },
+        "persistence": {
+          "additionalProperties": false,
+          "description": "# Whether or not to allocate persistent volume disk for the data directory.\n# In case of node failure, the node data directory will still persist.\n#",
+          "properties": {
+            "accessModes": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  }
+                ],
+                "required": []
+              },
+              "title": "accessModes",
+              "type": "array"
+            },
+            "annotations": {
+              "additionalProperties": false,
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "enabled": {
+              "default": true,
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "size": {
+              "default": "100Gi",
+              "title": "size",
+              "type": "string"
+            },
+            "storageClassName": {
+              "default": "",
+              "title": "storageClassName",
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "storageClassName",
+            "accessModes",
+            "size",
+            "annotations"
+          ],
+          "title": "persistence",
+          "type": "object"
+        },
+        "proposerOnly": {
+          "default": false,
+          "description": "Lighthouse specific setting",
+          "title": "proposerOnly",
+          "type": "boolean"
+        },
+        "resources": {
+          "$ref": "#/definitions/containerResources",
+          "title": "resources",
+          "type": "object"
+        },
+        "restApi": {
+          "additionalProperties": false,
+          "description": "Rest API Settings",
+          "properties": {
+            "corsOrigins": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  }
+                ],
+                "required": []
+              },
+              "title": "corsOrigins",
+              "type": "array"
+            },
+            "enabled": {
+              "default": true,
+              "description": "Enables Beacon Rest API",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "host": {
+              "default": "0.0.0.0",
+              "title": "host",
+              "type": "string"
+            },
+            "hostAllowList": {
+              "description": "Comma-separated list of hostnames to allow, or *\nto allow any host",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  }
+                ],
+                "required": []
+              },
+              "title": "hostAllowList",
+              "type": "array"
+            },
+            "portMap": {
+              "additionalProperties": false,
+              "description": "Port number of Beacon Rest API",
+              "properties": {
+                "lighthouse": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "lodestar": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "nimbus": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "prysm": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "teku": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "portMap",
+              "type": "object"
+            }
+          },
+          "required": [
+            "enabled",
+            "host",
+            "hostAllowList",
+            "corsOrigins"
+          ],
+          "title": "restApi",
+          "type": "object"
+        },
+        "suggestedFeeRecipient": {
+          "default": "",
+          "description": "# Post bellatrix, this address will receive the transaction fees produced\n# by any blocks from this node. Default to junk whilst bellatrix is in development state.\n# Validator client can override this value through the preparebeaconproposer api.\n#",
+          "title": "suggestedFeeRecipient",
+          "type": "string"
+        },
+        "taikoAnchor": {
+          "default": "",
+          "title": "taikoAnchor",
+          "type": "string"
+        },
+        "taikoChainspecURL": {
+          "default": "https://raw.githubusercontent.com/NethermindEth/Surge/refs/heads/main/spec/surge-staging-devnet/chainspec.json",
+          "description": "Taiko specific settings",
+          "title": "taikoChainspecURL",
+          "type": "string"
+        },
+        "taikoInbox": {
+          "default": "",
+          "title": "taikoInbox",
+          "type": "string"
+        },
+        "targetPeers": {
+          "default": 50,
+          "title": "targetPeers",
+          "type": "integer"
+        },
+        "targetPeersMin": {
+          "default": 40,
+          "title": "targetPeersMin",
+          "type": "integer"
+        },
+        "totalDifficultyOverride": {
+          "default": "",
+          "description": "# Sets the total difficulty to manual overrides the default\n# TERMINAL_TOTAL_DIFFICULTY value. WARNING: This flag should be used only if you\n# have a clear understanding that community has decided to override the terminal difficulty.\n# Incorrect usage will result in your node experience consensus failure.",
+          "title": "totalDifficultyOverride",
+          "type": "string"
+        },
+        "volumeMounts": {
+          "description": "# Additional volumes to mount into the beacon container\n#",
+          "items": {
+            "required": []
+          },
+          "title": "volumeMounts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "client",
+        "persistence",
+        "initChownData",
+        "metrics",
+        "checkPointSync",
+        "suggestedFeeRecipient",
+        "proposerOnly",
+        "taikoChainspecURL",
+        "taikoInbox",
+        "taikoAnchor",
+        "l1Ws",
+        "l1Beacon",
+        "builderEndpoint",
+        "restApi",
+        "grpc",
+        "targetPeers",
+        "targetPeersMin",
+        "totalDifficultyOverride",
+        "extraFlags",
+        "volumeMounts",
+        "env",
+        "envFrom"
+      ],
+      "title": "beacon",
+      "type": "object"
+    },
+    "common": {
+      "additionalProperties": true,
+      "title": "common",
+      "type": "object"
+    },
+    "env": {
+      "description": "# Additional env to add into the execution and beacon containers\n#",
+      "items": {
+        "required": []
+      },
+      "title": "env",
+      "type": "array"
+    },
+    "envFrom": {
+      "description": "# Additional envFrom to add into the execution and beacon containers\n#",
+      "items": {
+        "required": []
+      },
+      "title": "envFrom",
+      "type": "array"
+    },
+    "ethsider": {
+      "additionalProperties": false,
+      "description": "# Ethsider sidecar container configuration\n#",
+      "properties": {
+        "bindAddr": {
+          "default": 3000,
+          "maximum": 65535,
+          "minimum": 0,
+          "title": "bindAddr",
+          "type": "integer"
+        },
+        "enabled": {
+          "default": true,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "livenessProbe": {
+          "$ref": "#/definitions/probe",
+          "description": "# Configure liveness and readiness probes\n# ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/\n# NB! readinessProbe and livenessProbe must be disabled before genesis\n#",
+          "required": [],
+          "title": "livenessProbe",
+          "type": "object"
+        },
+        "probes": {
+          "additionalProperties": false,
+          "description": "# Configure ethsider probe flags\n# ref: https://github.com/NethermindEth/ethsider\n#",
+          "properties": {
+            "eth1BlockSync": {
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "title": "enabled",
+                  "type": "boolean"
+                },
+                "referenceEndpoint": {
+                  "default": "",
+                  "title": "referenceEndpoint",
+                  "type": "string"
+                },
+                "threshold": {
+                  "default": 0,
+                  "title": "threshold",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "enabled",
+                "referenceEndpoint",
+                "threshold"
+              ],
+              "title": "eth1BlockSync",
+              "type": "object"
+            },
+            "eth1Peers": {
+              "default": true,
+              "title": "eth1Peers",
+              "type": "boolean"
+            },
+            "eth1Syncing": {
+              "default": true,
+              "title": "eth1Syncing",
+              "type": "boolean"
+            },
+            "eth2Health": {
+              "default": true,
+              "title": "eth2Health",
+              "type": "boolean"
+            },
+            "eth2PeersCount": {
+              "default": true,
+              "title": "eth2PeersCount",
+              "type": "boolean"
+            },
+            "eth2Syncing": {
+              "default": true,
+              "title": "eth2Syncing",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "eth1Syncing",
+            "eth1Peers",
+            "eth2Syncing",
+            "eth2PeersCount",
+            "eth2Health",
+            "eth1BlockSync"
+          ],
+          "title": "probes",
+          "type": "object"
+        },
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "readinessProbe": {
+          "$ref": "#/definitions/probe",
+          "required": [],
+          "title": "readinessProbe",
+          "type": "object"
+        },
+        "repository": {
+          "default": "nethermindeth/ethsider",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "v1.1.1",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "enabled",
+        "repository",
+        "tag",
+        "pullPolicy",
+        "probes"
+      ],
+      "title": "ethsider",
+      "type": "object"
+    },
+    "execution": {
+      "additionalProperties": false,
+      "description": "# Execution client configuration\n#",
+      "properties": {
+        "client": {
+          "default": "nethermind",
+          "title": "client",
+          "type": "string"
+        },
+        "enableDiscoveryV5": {
+          "default": true,
+          "description": "# Reth-specific: Enable Discovery v5 protocol for better peer discovery\n# Only applicable when using Reth as execution client\n# Discovery v5 port is automatically set to P2P_PORT + 2 to avoid conflicts with multiple replicas\n# Example: Pod 0: P2P=30303, Discovery v5=30305\n#          Pod 1: P2P=30305, Discovery v5=30307\n#",
+          "title": "enableDiscoveryV5",
+          "type": "boolean"
+        },
+        "env": {
+          "description": "# Additional env to add into the execution container\n#",
+          "items": {
+            "required": []
+          },
+          "title": "env",
+          "type": "array"
+        },
+        "envFrom": {
+          "description": "# Additional envFrom to add into the execution container\n#",
+          "items": {
+            "required": []
+          },
+          "title": "envFrom",
+          "type": "array"
+        },
+        "externalCl": {
+          "default": true,
+          "description": "Erigon specific setting, whether to use external client or use caplin",
+          "title": "externalCl",
+          "type": "boolean"
+        },
+        "extraFlags": {
+          "description": "# Extra flags to pass to the node\n#",
+          "items": {
+            "required": []
+          },
+          "title": "extraFlags",
+          "type": "array"
+        },
+        "healthchecks": {
+          "additionalProperties": false,
+          "description": "Nethermind HealthChecks module",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "lowStorageSpaceShutdownThreshold": {
+              "default": 0,
+              "title": "lowStorageSpaceShutdownThreshold",
+              "type": "integer"
+            },
+            "lowStorageSpaceWarningThreshold": {
+              "default": 5,
+              "title": "lowStorageSpaceWarningThreshold",
+              "type": "integer"
+            },
+            "pollingInterval": {
+              "default": 5,
+              "title": "pollingInterval",
+              "type": "integer"
+            },
+            "slug": {
+              "default": "/health",
+              "title": "slug",
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "slug",
+            "pollingInterval",
+            "lowStorageSpaceShutdownThreshold",
+            "lowStorageSpaceWarningThreshold"
+          ],
+          "title": "healthchecks",
+          "type": "object"
+        },
+        "initChownData": {
+          "default": true,
+          "description": "# If false, data ownership will not be reset at startup\n# This allows the execution node to be run with an arbitrary user\n#",
+          "title": "initChownData",
+          "type": "boolean"
+        },
+        "jsonrpc": {
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "engine": {
+              "additionalProperties": false,
+              "properties": {
+                "corsOrigins": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "corsOrigins",
+                  "type": "array"
+                },
+                "hostAllowList": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "hostAllowList",
+                  "type": "array"
+                },
+                "port": {
+                  "default": 8551,
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "title": "port",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "hostAllowList",
+                "corsOrigins"
+              ],
+              "title": "engine",
+              "type": "object"
+            },
+            "grpc": {
+              "additionalProperties": false,
+              "properties": {
+                "port": {
+                  "default": 8655,
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "title": "port",
+                  "type": "integer"
+                }
+              },
+              "required": [],
+              "title": "grpc",
+              "type": "object"
+            },
+            "host": {
+              "default": "0.0.0.0",
+              "title": "host",
+              "type": "string"
+            },
+            "http": {
+              "additionalProperties": false,
+              "properties": {
+                "corsOrigins": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "corsOrigins",
+                  "type": "array"
+                },
+                "hostAllowList": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "hostAllowList",
+                  "type": "array"
+                },
+                "port": {
+                  "default": 8545,
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "title": "port",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "corsOrigins",
+                "hostAllowList"
+              ],
+              "title": "http",
+              "type": "object"
+            },
+            "namespaces": {
+              "additionalProperties": false,
+              "properties": {
+                "erigon": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "erigon",
+                  "type": "array"
+                },
+                "geth": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "geth",
+                  "type": "array"
+                },
+                "nethermind": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "nethermind",
+                  "type": "array"
+                },
+                "reth": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "reth",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "nethermind",
+                "geth",
+                "erigon",
+                "reth"
+              ],
+              "title": "namespaces",
+              "type": "object"
+            },
+            "websocket": {
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "title": "enabled",
+                  "type": "boolean"
+                },
+                "origins": {
+                  "default": "*",
+                  "title": "origins",
+                  "type": "string"
+                },
+                "port": {
+                  "default": 8546,
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "title": "port",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "enabled",
+                "origins"
+              ],
+              "title": "websocket",
+              "type": "object"
+            }
+          },
+          "required": [
+            "enabled",
+            "namespaces",
+            "host",
+            "grpc",
+            "http",
+            "websocket",
+            "engine"
+          ],
+          "title": "jsonrpc",
+          "type": "object"
+        },
+        "metrics": {
+          "additionalProperties": false,
+          "description": "# Monitoring\n# Additional settings could be made in non-global section.\n#",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "description": "# Whether to enable metrics collection or not\n#",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "host": {
+              "default": "0.0.0.0",
+              "title": "host",
+              "type": "string"
+            },
+            "port": {
+              "default": 8008,
+              "maximum": 65535,
+              "minimum": 0,
+              "title": "port",
+              "type": "integer"
+            },
+            "prometheusRule": {
+              "additionalProperties": false,
+              "description": "# Custom PrometheusRule to be defined\n# ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions\n#",
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "description": "# Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator\n#",
+                  "title": "enabled",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "enabled"
+              ],
+              "title": "prometheusRule",
+              "type": "object"
+            },
+            "serviceMonitor": {
+              "additionalProperties": false,
+              "description": "# Prometheus Service Monitor\n# ref: https://github.com/coreos/prometheus-operator\n#      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint\n#",
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "description": "# Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator\n#",
+                  "title": "enabled",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "enabled"
+              ],
+              "title": "serviceMonitor",
+              "type": "object"
+            },
+            "svcAnnotations": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "required": [],
+              "title": "svcAnnotations",
+              "type": "object"
+            }
+          },
+          "required": [
+            "enabled",
+            "host",
+            "serviceMonitor",
+            "prometheusRule"
+          ],
+          "title": "metrics",
+          "type": "object"
+        },
+        "persistence": {
+          "additionalProperties": false,
+          "description": "# Whether or not to allocate persistent volume disk for the data directory.\n# In case of node failure, the node data directory will still persist.\n#",
+          "properties": {
+            "accessModes": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  }
+                ],
+                "required": []
+              },
+              "title": "accessModes",
+              "type": "array"
+            },
+            "annotations": {
+              "additionalProperties": false,
+              "required": [],
+              "title": "annotations",
+              "type": "object"
+            },
+            "enabled": {
+              "default": true,
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "size": {
+              "default": "100Gi",
+              "title": "size",
+              "type": "string"
+            },
+            "storageClassName": {
+              "default": "",
+              "title": "storageClassName",
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "storageClassName",
+            "accessModes",
+            "size",
+            "annotations"
+          ],
+          "title": "persistence",
+          "type": "object"
+        },
+        "privateApiAddr": {
+          "default": "127.0.0.1:9090",
+          "description": "private api network address, for example: 127.0.0.1:9090,\nempty string means not to start the listener.\nDo not expose to public network.\nServes remote database interface (default: \"127.0.0.1:9090\")",
+          "title": "privateApiAddr",
+          "type": "string"
+        },
+        "resources": {
+          "$ref": "#/definitions/containerResources",
+          "title": "resources",
+          "type": "object"
+        },
+        "snapshot": {
+          "additionalProperties": false,
+          "description": "# Reth snapshot download configuration\n# This allows downloading a pre-synced database snapshot to speed up initial sync\n# Only applicable when using Reth as execution client\n#",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "description": "# Whether to enable snapshot downloading\n#",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "force": {
+              "default": false,
+              "description": "# Force snapshot download even if data directory already exists\n# If true, existing data will be backed up before downloading snapshot\n#",
+              "title": "force",
+              "type": "boolean"
+            },
+            "image": {
+              "additionalProperties": false,
+              "description": "# Container image for snapshot init container\n# This image needs curl and compression tools (lz4, zstd, tar, gzip)\n# We use alpine as base and install necessary tools in the script\n#",
+              "properties": {
+                "pullPolicy": {
+                  "default": "IfNotPresent",
+                  "title": "pullPolicy",
+                  "type": "string"
+                },
+                "repository": {
+                  "default": "alpine",
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "3.20",
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "repository",
+                "tag",
+                "pullPolicy"
+              ],
+              "title": "image",
+              "type": "object"
+            },
+            "url": {
+              "default": "",
+              "description": "# Snapshot URL to download from\n# Supported formats: .tar.lz4, .tar.zst, .tar.gz, .tar\n# Example URLs:\n#   - https://snapshots.publicnode.com/ethereum-reth-23546967.tar.lz4\n#   - https://your-custom-snapshot-url.com/reth-snapshot.tar.zst\n#",
+              "title": "url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "url",
+            "force",
+            "image"
+          ],
+          "title": "snapshot",
+          "type": "object"
+        },
+        "targetPeers": {
+          "default": 50,
+          "title": "targetPeers",
+          "type": "integer"
+        },
+        "terminalTotalDifficulty": {
+          "default": "",
+          "description": "# -------------------------- Execution node specific settings -----------------------------------------\nManually specify TerminalTotalDifficulty, overriding the bundled setting",
+          "title": "terminalTotalDifficulty",
+          "type": "string"
+        },
+        "volumeMounts": {
+          "description": "# Additional volumes to mount into the execution container\n#",
+          "items": {
+            "required": []
+          },
+          "title": "volumeMounts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "client",
+        "persistence",
+        "initChownData",
+        "privateApiAddr",
+        "externalCl",
+        "metrics",
+        "terminalTotalDifficulty",
+        "jsonrpc",
+        "healthchecks",
+        "targetPeers",
+        "enableDiscoveryV5",
+        "snapshot",
+        "extraFlags",
+        "volumeMounts",
+        "env",
+        "envFrom"
+      ],
+      "title": "execution",
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "# Provide a name to substitute for the full names of resources\n#",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "additionalProperties": false,
+      "description": "# Global values that can be shared across multiple charts\n#",
+      "properties": {
+        "imagePullSecrets": {
+          "description": "# Global image pull secrets (merged with chart-level imagePullSecrets)\n# ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/\n#",
+          "items": {
+            "required": []
+          },
+          "title": "imagePullSecrets",
+          "type": "array"
+        },
+        "initContainerSecurityContext": {
+          "additionalProperties": false,
+          "description": "# Security settings for init containers\n# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/\n#",
+          "properties": {
+            "capabilities": {
+              "additionalProperties": false,
+              "properties": {
+                "add": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "add",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "add"
+              ],
+              "title": "capabilities",
+              "type": "object"
+            },
+            "readOnlyRootFilesystem": {
+              "default": false,
+              "title": "readOnlyRootFilesystem",
+              "type": "boolean"
+            },
+            "runAsGroup": {
+              "default": 0,
+              "title": "runAsGroup",
+              "type": "integer"
+            },
+            "runAsNonRoot": {
+              "default": false,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 0,
+              "title": "runAsUser",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "readOnlyRootFilesystem",
+            "capabilities",
+            "runAsNonRoot",
+            "runAsUser",
+            "runAsGroup"
+          ],
+          "title": "initContainerSecurityContext",
+          "type": "object"
+        },
+        "podSecurityContext": {
+          "additionalProperties": false,
+          "description": "# Global pod security context (applied at pod level)\n# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/\n#",
+          "properties": {
+            "fsGroup": {
+              "default": 1000,
+              "title": "fsGroup",
+              "type": "integer"
+            },
+            "runAsGroup": {
+              "default": 1000,
+              "title": "runAsGroup",
+              "type": "integer"
+            },
+            "runAsNonRoot": {
+              "default": true,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 1000,
+              "title": "runAsUser",
+              "type": "integer"
+            },
+            "seccompProfile": {
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "default": "RuntimeDefault",
+                  "title": "type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "title": "seccompProfile",
+              "type": "object"
+            }
+          },
+          "required": [
+            "fsGroup",
+            "runAsNonRoot",
+            "runAsUser",
+            "runAsGroup",
+            "seccompProfile"
+          ],
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "securityContext": {
+          "additionalProperties": false,
+          "description": "# Global container security context (applied to containers)\n# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/\n#",
+          "properties": {
+            "allowPrivilegeEscalation": {
+              "default": false,
+              "title": "allowPrivilegeEscalation",
+              "type": "boolean"
+            },
+            "capabilities": {
+              "additionalProperties": false,
+              "properties": {
+                "drop": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "drop",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "drop"
+              ],
+              "title": "capabilities",
+              "type": "object"
+            },
+            "readOnlyRootFilesystem": {
+              "default": false,
+              "title": "readOnlyRootFilesystem",
+              "type": "boolean"
+            },
+            "runAsGroup": {
+              "default": 1000,
+              "title": "runAsGroup",
+              "type": "integer"
+            },
+            "runAsNonRoot": {
+              "default": true,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 1000,
+              "title": "runAsUser",
+              "type": "integer"
+            },
+            "seccompProfile": {
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "default": "RuntimeDefault",
+                  "title": "type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "title": "seccompProfile",
+              "type": "object"
+            }
+          },
+          "required": [
+            "capabilities",
+            "readOnlyRootFilesystem",
+            "runAsNonRoot",
+            "runAsUser",
+            "runAsGroup",
+            "allowPrivilegeEscalation",
+            "seccompProfile"
+          ],
+          "title": "securityContext",
+          "type": "object"
+        }
+      },
+      "required": [
+        "imagePullSecrets",
+        "securityContext",
+        "podSecurityContext",
+        "initContainerSecurityContext"
+      ],
+      "title": "global",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "description": "# Container image configuration\n# Images are automatically selected based on execution.client and beacon.client values\n# You can override the repository if needed (e.g., for custom builds or registries)\n#\n# Execution client images (auto-selected):\n#   nethermind -\u003e nethermind/nethermind\n#   geth       -\u003e ethereum/client-go\n#   besu       -\u003e hyperledger/besu\n#   erigon     -\u003e erigontech/erigon\n#   reth       -\u003e ghcr.io/paradigmxyz/reth\n#\n# Beacon client images (auto-selected):\n#   prysm      -\u003e gcr.io/prylabs-dev/prysm/beacon-chain\n#   teku       -\u003e consensys/teku\n#   lighthouse -\u003e sigp/lighthouse\n#   nimbus     -\u003e statusim/nimbus-eth2\n#   lodestar   -\u003e chainsafe/lodestar\n#",
+      "properties": {
+        "beacon": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {
+              "default": "",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "multiarch-v25.9.2",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [
+            "repository",
+            "tag"
+          ],
+          "title": "beacon",
+          "type": "object"
+        },
+        "execution": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {
+              "default": "",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "1.34.0",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [
+            "repository",
+            "tag"
+          ],
+          "title": "execution",
+          "type": "object"
+        },
+        "imagePullPolicy": {
+          "default": "IfNotPresent",
+          "title": "imagePullPolicy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "imagePullPolicy",
+        "execution",
+        "beacon"
+      ],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "# Credentials to fetch images from private registry\n# ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/\n#",
+      "items": {
+        "required": []
+      },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "initImage": {
+      "additionalProperties": false,
+      "description": "# Init image is used to chown data volume, initialise genesis, etc.\n#",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "bitnamilegacy/kubectl",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "1.33.4",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "tag",
+        "pullPolicy"
+      ],
+      "title": "initImage",
+      "type": "object"
+    },
+    "metrics": {
+      "additionalProperties": false,
+      "description": "# Monitoring\n#",
+      "properties": {
+        "annotations": {
+          "additionalProperties": false,
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "enabled": {
+          "default": true,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "prometheusRule": {
+          "additionalProperties": false,
+          "description": "# Custom PrometheusRule to be defined\n# ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions\n#",
+          "properties": {
+            "additionalLabels": {
+              "additionalProperties": false,
+              "description": "# Additional labels for the prometheusRule\n#",
+              "required": [],
+              "title": "additionalLabels",
+              "type": "object"
+            },
+            "default": {
+              "default": true,
+              "description": "# Create a default set of Alerts\n#",
+              "title": "default",
+              "type": "boolean"
+            },
+            "namespace": {
+              "default": "",
+              "description": "# The namespace in which the prometheusRule will be created\n#",
+              "title": "namespace",
+              "type": "string"
+            },
+            "rules": {
+              "description": "# Custom Prometheus rules\n#",
+              "items": {
+                "required": []
+              },
+              "title": "rules",
+              "type": "array"
+            },
+            "severity": {
+              "default": "critical",
+              "description": "# The value of the `severity` label, commonly used to mark severity, set to empty string or null to omit\n#",
+              "title": "severity",
+              "type": "string"
+            }
+          },
+          "required": [
+            "default",
+            "namespace",
+            "severity",
+            "additionalLabels",
+            "rules"
+          ],
+          "title": "prometheusRule",
+          "type": "object"
+        },
+        "serviceMonitor": {
+          "additionalProperties": false,
+          "description": "# Prometheus Service Monitor\n# ref: https://github.com/coreos/prometheus-operator\n#      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint\n#",
+          "properties": {
+            "additionalLabels": {
+              "additionalProperties": false,
+              "description": "# Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus\n#",
+              "required": [],
+              "title": "additionalLabels",
+              "type": "object"
+            },
+            "honorLabels": {
+              "default": false,
+              "description": "# Specify honorLabels parameter to add the scrape endpoint\n#",
+              "title": "honorLabels",
+              "type": "boolean"
+            },
+            "interval": {
+              "default": "30s",
+              "description": "# The interval at which metrics should be scraped\n#",
+              "title": "interval",
+              "type": "string"
+            },
+            "metricRelabelings": {
+              "description": "# Metrics RelabelConfigs to apply to samples before ingestion.\n#",
+              "items": {
+                "required": []
+              },
+              "title": "metricRelabelings",
+              "type": "array"
+            },
+            "namespace": {
+              "default": "",
+              "description": "# The namespace in which the ServiceMonitor will be created\n#",
+              "title": "namespace",
+              "type": "string"
+            },
+            "relabellings": {
+              "description": "# Metrics RelabelConfigs to apply to samples before scraping.\n#",
+              "items": {
+                "required": []
+              },
+              "title": "relabellings",
+              "type": "array"
+            },
+            "scrapeTimeout": {
+              "default": "",
+              "description": "# The timeout after which the scrape is ended\n#",
+              "title": "scrapeTimeout",
+              "type": "string"
+            }
+          },
+          "required": [
+            "namespace",
+            "interval",
+            "scrapeTimeout",
+            "relabellings",
+            "metricRelabelings",
+            "honorLabels",
+            "additionalLabels"
+          ],
+          "title": "serviceMonitor",
+          "type": "object"
+        }
+      },
+      "required": [
+        "enabled",
+        "annotations",
+        "serviceMonitor",
+        "prometheusRule"
+      ],
+      "title": "metrics",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "# Provide a name in place of execution-beacon for `app:` labels\n#",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "network": {
+      "default": "mainnet",
+      "description": "# Ethereum network\n#",
+      "title": "network",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "# Node labels for pod assignment\n# ref: https://kubernetes.io/docs/user-guide/node-selection/\n#",
+      "required": [],
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "p2pNodePort": {
+      "additionalProperties": false,
+      "description": "# When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.\n# This will generate a service for each replica, with a port binding via NodePort.\n# This is useful if you want to expose and announce your node to the Internet.\n#",
+      "properties": {
+        "annotations": {
+          "additionalProperties": false,
+          "description": "#\n#",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "enabled": {
+          "default": false,
+          "description": "#\n#",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "replicaToNodePort": {
+          "additionalProperties": false,
+          "description": "#\n#",
+          "required": [],
+          "title": "replicaToNodePort",
+          "type": "object"
+        },
+        "startAtBeacon": {
+          "default": 31200,
+          "maximum": 65535,
+          "minimum": 0,
+          "title": "startAtBeacon",
+          "type": "integer"
+        },
+        "startAtExecution": {
+          "default": 31100,
+          "description": "#\n#",
+          "maximum": 65535,
+          "minimum": 0,
+          "title": "startAtExecution",
+          "type": "integer"
+        },
+        "type": {
+          "default": "NodePort",
+          "description": "#\n# Options: NodePort, LoadBalancer",
+          "enum": [
+            "NodePort",
+            "LoadBalancer"
+          ],
+          "required": [],
+          "title": "type"
+        }
+      },
+      "required": [
+        "enabled",
+        "annotations",
+        "replicaToNodePort"
+      ],
+      "title": "p2pNodePort",
+      "type": "object"
+    },
+    "podManagementPolicy": {
+      "default": "Parallel",
+      "description": "# Pod management policy for the StatefulSet\n#",
+      "title": "podManagementPolicy",
+      "type": "string"
+    },
+    "priorityClassName": {
+      "default": "",
+      "description": "# Used to assign priority to pods\n# ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/\n#",
+      "title": "priorityClassName",
+      "type": "string"
+    },
+    "rbac": {
+      "additionalProperties": false,
+      "description": "# RBAC configuration.\n# ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/\n#",
+      "properties": {
+        "clusterRules": {
+          "description": "# Required ClusterRole rules\n#",
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "apiGroups",
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "resources",
+                    "type": "array"
+                  },
+                  "verbs": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "verbs",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "apiGroups",
+                  "resources",
+                  "verbs"
+                ],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "title": "clusterRules",
+          "type": "array"
+        },
+        "create": {
+          "default": true,
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "description": "The name of the cluster role to use.\nIf not set and create is true, a name is generated using the fullname template",
+          "title": "name",
+          "type": "string"
+        },
+        "rules": {
+          "description": "# Required Role rules\n#",
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "apiGroups",
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "resources",
+                    "type": "array"
+                  },
+                  "verbs": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "title": "verbs",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "apiGroups",
+                  "resources",
+                  "verbs"
+                ],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "title": "rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "create",
+        "name",
+        "clusterRules",
+        "rules"
+      ],
+      "title": "rbac",
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": 1,
+      "description": "# Number of replicas\n#",
+      "title": "replicaCount",
+      "type": "integer"
+    },
+    "service": {
+      "additionalProperties": false,
+      "description": "# Service configuration\n#",
+      "properties": {
+        "ports": {
+          "additionalProperties": false,
+          "properties": {
+            "executionJsonrpc": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            },
+            "executionEngine": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            },
+            "executionWebsocket": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            },
+            "executionGrpc": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            },
+            "executionMetrics": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            },
+            "beaconGrpc": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            },
+            "beaconRestApi": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            },
+            "beaconMetrics": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            }
+          },
+          "title": "ports",
+          "type": "object"
+        },
+        "svcHeadless": {
+          "default": true,
+          "title": "svcHeadless",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "svcHeadless"
+      ],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "description": "# Service account\n# ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/\n#",
+      "properties": {
+        "annotations": {
+          "additionalProperties": false,
+          "description": "Annotations to add to the service account",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "create": {
+          "default": true,
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "description": "The name of the service account to use.\nIf not set and create is true, a name is generated using the fullname template",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "create",
+        "annotations",
+        "name"
+      ],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "sessionAffinity": {
+      "additionalProperties": false,
+      "description": "# Session affinity configuration\n#",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Whether to enable session affinity or not",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "timeoutSeconds": {
+          "default": 86400,
+          "description": "The session duration in seconds",
+          "title": "timeoutSeconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "enabled",
+        "timeoutSeconds"
+      ],
+      "title": "sessionAffinity",
+      "type": "object"
+    },
+    "sharedPersistence": {
+      "additionalProperties": false,
+      "description": "# Whether or not to allocate persistent volume disk for the data directory.\n# In case of node failure, the node data directory will still persist.\n#",
+      "properties": {
+        "accessModes": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              }
+            ],
+            "required": []
+          },
+          "title": "accessModes",
+          "type": "array"
+        },
+        "annotations": {
+          "additionalProperties": false,
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "size": {
+          "default": "300Gi",
+          "title": "size",
+          "type": "string"
+        },
+        "storageClassName": {
+          "default": "",
+          "title": "storageClassName",
+          "type": "string"
+        }
+      },
+      "required": [
+        "enabled",
+        "storageClassName",
+        "accessModes",
+        "size",
+        "annotations"
+      ],
+      "title": "sharedPersistence",
+      "type": "object"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": 120,
+      "description": "# Termination Grace Period\n# ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods\n#",
+      "title": "terminationGracePeriodSeconds",
+      "type": "integer"
+    },
+    "tolerations": {
+      "description": "# Tolerations for pod assignment\n# ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/\n#",
+      "items": {
+        "required": []
+      },
+      "title": "tolerations",
+      "type": "array"
+    },
+    "volumeMounts": {
+      "description": "# Additional volume mounts to create\n#",
+      "items": {
+        "required": []
+      },
+      "title": "volumeMounts",
+      "type": "array"
+    },
+    "volumes": {
+      "description": "# Additional volumes to create\n#",
+      "items": {
+        "required": []
+      },
+      "title": "volumes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "global",
+    "nameOverride",
+    "fullnameOverride",
+    "replicaCount",
+    "podManagementPolicy",
+    "network",
+    "image",
+    "JWTSecretName",
+    "JWTSecretKey",
+    "JWTSecret",
+    "imagePullSecrets",
+    "nodeSelector",
+    "tolerations",
+    "affinity",
+    "priorityClassName",
+    "sharedPersistence",
+    "env",
+    "envFrom",
+    "ethsider",
+    "service",
+    "sessionAffinity",
+    "serviceAccount",
+    "rbac",
+    "terminationGracePeriodSeconds",
+    "initImage",
+    "metrics",
+    "p2pNodePort",
+    "volumes",
+    "volumeMounts",
+    "execution",
+    "beacon",
+    "HTTPRoute"
+  ],
+  "type": "object"
+}
