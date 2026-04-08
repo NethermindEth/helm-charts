@@ -1,129 +1,141 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
-  "properties": {
-    "defaultAlertLabels": {
+  "definitions": {
+    "stringMap": {
+      "type": "object",
       "additionalProperties": {
         "type": "string"
-      },
-      "required": [],
-      "title": "defaultAlertLabels",
-      "type": "object"
+      }
     },
-    "global": {
-      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
-      "required": [],
-      "title": "global",
-      "type": "object"
+    "prometheusDuration": {
+      "type": "string",
+      "pattern": "^(?:[0-9]+(?:ms|s|m|h|d|w|y))+$"
+    },
+    "prometheusExpr": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "alert": {
+          "type": "string",
+          "minLength": 1,
+          "default": "ExampleAlert"
+        },
+        "record": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expr": {
+          "$ref": "#/definitions/prometheusExpr",
+          "default": "Vector(1)"
+        },
+        "for": {
+          "$ref": "#/definitions/prometheusDuration",
+          "default": "5m"
+        },
+        "keep_firing_for": {
+          "$ref": "#/definitions/prometheusDuration"
+        },
+        "labels": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/stringMap"
+            }
+          ],
+          "properties": {
+            "severity": {
+              "type": "string",
+              "default": "warning",
+              "description": "The severity label is mandatory for alerts (not records). We recommend either warning or critical"
+            }
+          }
+        },
+        "annotations": {
+          "$ref": "#/definitions/stringMap"
+        }
+      },
+      "required": [
+        "expr"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "alert"
+          ]
+        },
+        {
+          "required": [
+            "record"
+          ]
+        }
+      ]
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "default": "./example.rules"
+        },
+        "labels": {
+          "$ref": "#/definitions/stringMap",
+          "description": "Labels to add or overwrite before storing results for rules in this group. Rule-level labels take precedence."
+        },
+        "interval": {
+          "$ref": "#/definitions/prometheusDuration"
+        },
+        "query_offset": {
+          "$ref": "#/definitions/prometheusDuration",
+          "description": "Offset the rule evaluation timestamp into the past for this group."
+        },
+        "partial_response_strategy": {
+          "type": "string",
+          "description": "Used by ThanosRuler and ignored by Prometheus instances."
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/rule"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "name",
+        "rules"
+      ]
+    }
+  },
+  "properties": {
+    "defaultAlertLabels": {
+      "$ref": "#/definitions/stringMap",
+      "default": {}
     },
     "spec": {
+      "type": "object",
       "additionalProperties": false,
       "properties": {
         "groups": {
+          "type": "array",
           "items": {
-            "anyOf": [
-              {
-                "additionalProperties": false,
-                "properties": {
-                  "name": {
-                    "default": "./example.rules",
-                    "title": "name",
-                    "type": "string"
-                  },
-                  "rules": {
-                    "items": {
-                      "anyOf": [
-                        {
-                          "additionalProperties": false,
-                          "properties": {
-                            "alert": {
-                              "default": "ExampleAlert",
-                              "title": "alert",
-                              "type": "string"
-                            },
-                            "record": {
-                              "title": "record",
-                              "type": "string"
-                            },
-                            "expr": {
-                              "default": "Vector(1)",
-                              "title": "expr",
-                              "type": "string"
-                            },
-                            "for": {
-                              "default": "5m",
-                              "title": "for",
-                              "type": "string"
-                            },
-                            "annotations": {
-                              "additionalProperties": {
-                                "type": "string"
-                              },
-                              "required": [],
-                              "title": "annotations",
-                              "type": "object"
-                            },
-                            "labels": {
-                              "additionalProperties": {
-                                "type": "string"
-                              },
-                              "properties": {
-                                "severity": {
-                                  "default": "warning",
-                                  "description": "The severity label is mandatory for alerts (not records). We recommend either warning or critical",
-                                  "title": "severity",
-                                  "type": "string"
-                                }
-                              },
-                              "required": [
-                              ],
-                              "minProperties": 0,
-                              "title": "labels",
-                              "type": "object"
-                            }
-                          },
-                          "required": [
-                            "expr"
-                          ],
-                          "oneOf": [
-                            {
-                              "required": [
-                                "alert"
-                              ]
-                            },
-                            {
-                              "required": [
-                                "record"
-                              ]
-                            }
-                          ],
-                          "type": "object"
-                        }
-                      ],
-                      "required": []
-                    },
-                    "title": "rules",
-                    "type": "array"
-                  }
-                },
-                "required": [
-                  "name",
-                  "rules"
-                ],
-                "type": "object"
-              }
-            ],
-            "required": []
+            "$ref": "#/definitions/group"
           },
-          "title": "groups",
-          "type": "array"
+          "minItems": 1
         }
       },
       "required": [
         "groups"
-      ],
-      "title": "spec",
-      "type": "object"
+      ]
     }
   },
   "required": [
