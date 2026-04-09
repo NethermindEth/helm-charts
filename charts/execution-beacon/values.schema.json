@@ -1534,10 +1534,7 @@
               "type": "array"
             },
             "annotations": {
-              "additionalProperties": false,
-              "required": [],
-              "title": "annotations",
-              "type": "object"
+              "$ref": "#/definitions/annotations"
             },
             "enabled": {
               "default": true,
@@ -2313,10 +2310,7 @@
               "type": "array"
             },
             "annotations": {
-              "additionalProperties": false,
-              "required": [],
-              "title": "annotations",
-              "type": "object"
+              "$ref": "#/definitions/annotations"
             },
             "enabled": {
               "default": true,
@@ -3292,10 +3286,7 @@
           "type": "array"
         },
         "annotations": {
-          "additionalProperties": false,
-          "required": [],
-          "title": "annotations",
-          "type": "object"
+          "$ref": "#/definitions/annotations"
         },
         "enabled": {
           "default": false,
