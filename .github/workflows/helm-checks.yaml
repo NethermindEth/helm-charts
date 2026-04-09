@@ -73,6 +73,40 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --config ct.yaml
 
+  helm-template:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.3.1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          check-latest: true
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.7.0
+
+      - name: Run helm template on changed charts
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -z "$changed" ]]; then
+            echo "No changed charts, skipping."
+            exit 0
+          fi
+          while IFS= read -r chart; do
+            echo "Updating dependencies for $chart"
+            helm dependency update "$chart"
+            echo "Running helm template on $chart"
+            helm template "$(basename "$chart")" "$chart"
+          done <<< "$changed"
+
   helm-unittest:
     runs-on: ubuntu-latest
     permissions:
