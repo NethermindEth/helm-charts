@@ -73,7 +73,7 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --config ct.yaml
 
-  helm-unittest:
+  helm-validate:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
@@ -108,3 +108,11 @@ jobs:
         with:
           install-mode: "if-not-present"
           charts: "${{ steps.changed-charts.outputs.changed_charts }}"
+
+      - name: Helm template
+        if: steps.changed-charts.outputs.changed_charts != ''
+        run: |
+          for chart in ${{ steps.changed-charts.outputs.changed_charts }}; do
+            helm dependency build "$chart"
+            helm template "$chart" --debug
+          done
