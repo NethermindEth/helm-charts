@@ -595,8 +595,11 @@
       "description": "This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/",
       "properties": {
         "annotations": {
-          "additionalProperties": false,
-          "required": [],
+          "allOf": [
+            {
+              "$ref": "#/definitions/kubernetesAnnotations"
+            }
+          ],
           "title": "annotations",
           "type": "object"
         },
@@ -890,9 +893,12 @@
       "description": "This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/",
       "properties": {
         "annotations": {
-          "additionalProperties": false,
+          "allOf": [
+            {
+              "$ref": "#/definitions/kubernetesAnnotations"
+            }
+          ],
           "description": "Annotations to add to the service account",
-          "required": [],
           "title": "annotations",
           "type": "object"
         },
