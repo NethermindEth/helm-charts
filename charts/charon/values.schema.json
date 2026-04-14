@@ -1,0 +1,934 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" }
+      ]
+    },
+    "resourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "cpu": { "$ref": "#/definitions/resourceQuantity" },
+        "memory": { "$ref": "#/definitions/resourceQuantity" },
+        "ephemeral-storage": { "$ref": "#/definitions/resourceQuantity" }
+      },
+      "type": "object"
+    },
+    "labelMap": {
+      "additionalProperties": { "type": "string" },
+      "type": "object"
+    },
+    "toleration": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "enum": ["Exists", "Equal"], "type": "string" },
+        "value": { "type": "string" },
+        "effect": { "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"], "type": "string" },
+        "tolerationSeconds": { "minimum": 0, "type": "integer" }
+      },
+      "type": "object"
+    },
+    "nodeSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "enum": ["In", "NotIn", "Exists", "DoesNotExist", "Gt", "Lt"], "type": "string" },
+        "values": { "items": { "type": "string" }, "type": "array" }
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "enum": ["In", "NotIn", "Exists", "DoesNotExist"], "type": "string" },
+        "values": { "items": { "type": "string" }, "type": "array" }
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "matchLabels": { "$ref": "#/definitions/labelMap" },
+        "matchExpressions": {
+          "items": { "$ref": "#/definitions/labelSelectorRequirement" },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "podAffinityTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "labelSelector": { "$ref": "#/definitions/labelSelector" },
+        "namespaces": { "items": { "type": "string" }, "type": "array" },
+        "topologyKey": { "type": "string" }
+      },
+      "required": ["topologyKey"],
+      "type": "object"
+    },
+    "nodeSelectorTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "matchExpressions": {
+          "items": { "$ref": "#/definitions/nodeSelectorRequirement" },
+          "type": "array"
+        },
+        "matchFields": {
+          "items": { "$ref": "#/definitions/nodeSelectorRequirement" },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "affinity": {
+      "additionalProperties": false,
+      "properties": {
+        "nodeAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "additionalProperties": false,
+              "properties": {
+                "nodeSelectorTerms": {
+                  "items": { "$ref": "#/definitions/nodeSelectorTerm" },
+                  "type": "array"
+                }
+              },
+              "required": ["nodeSelectorTerms"],
+              "type": "object"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "preference": { "$ref": "#/definitions/nodeSelectorTerm" }
+                },
+                "required": ["weight", "preference"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": { "$ref": "#/definitions/podAffinityTerm" },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "podAffinityTerm": { "$ref": "#/definitions/podAffinityTerm" }
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": { "$ref": "#/definitions/podAffinityTerm" },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "podAffinityTerm": { "$ref": "#/definitions/podAffinityTerm" }
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": { "$ref": "#/definitions/resourceSpec" },
+        "requests": { "$ref": "#/definitions/resourceSpec" }
+      },
+      "type": "object"
+    },
+    "rbacRule": {
+      "additionalProperties": false,
+      "properties": {
+        "apiGroups": { "items": { "type": "string" }, "title": "apiGroups", "type": "array" },
+        "resources": { "items": { "type": "string" }, "title": "resources", "type": "array" },
+        "verbs": { "items": { "type": "string" }, "title": "verbs", "type": "array" }
+      },
+      "required": ["apiGroups", "resources", "verbs"],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "affinity": {
+      "$ref": "#/definitions/affinity",
+      "description": "Affinity for pod assignment\nref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity",
+      "title": "affinity"
+    },
+    "centralMonitoring": {
+      "additionalProperties": false,
+      "description": "Central Monitoring",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Specifies whether central monitoring should be enabled",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "promEndpoint": {
+          "default": "https://vm.monitoring.gcp.obol.tech/write",
+          "description": "https endpoint to obol central prometheus",
+          "title": "promEndpoint",
+          "type": "string"
+        },
+        "scrapeConfig": {
+          "additionalProperties": false,
+          "description": "Scrape config overrides for the Prometheus job",
+          "properties": {
+            "relabelConfigs": {
+              "description": "Additional relabel configs appended to the charon scrape job",
+              "items": { "additionalProperties": true, "type": "object" },
+              "title": "relabelConfigs",
+              "type": "array"
+            }
+          },
+          "required": ["relabelConfigs"],
+          "title": "scrapeConfig",
+          "type": "object"
+        },
+        "resources": {
+          "$ref": "#/definitions/resources",
+          "title": "resources"
+        },
+        "secretName": {
+          "default": "prometheus-monitoring-token",
+          "description": "Name of the Kubernetes Secret containing the Prometheus remote-write token.\nThe secret must have a key named `PROM_REMOTE_WRITE_TOKEN`.",
+          "title": "secretName",
+          "type": "string"
+        }
+      },
+      "required": ["enabled", "promEndpoint", "secretName", "scrapeConfig"],
+      "title": "centralMonitoring",
+      "type": "object"
+    },
+    "config": {
+      "additionalProperties": false,
+      "description": "Charon command line options\nref: https://docs.obol.tech/docs/charon/charon_cli_reference",
+      "properties": {
+        "beaconNodeEndpoints": {
+          "default": "http://localhost:5051",
+          "description": "Comma separated list of one or more beacon node endpoint URLs.",
+          "title": "beaconNodeEndpoints",
+          "type": "string"
+        },
+        "builderApi": {
+          "default": "",
+          "description": "Enables the builder api. Will only produce builder blocks.",
+          "title": "builderApi",
+          "type": "string"
+        },
+        "fallbackBeaconNodes": {
+          "default": "",
+          "description": "Comma separated list of fallback beacon node endpoints",
+          "title": "fallbackBeaconNodes",
+          "type": "string"
+        },
+        "featureSet": {
+          "default": "stable",
+          "description": "Minimum feature set to enable by default: alpha, beta, or stable.",
+          "enum": ["alpha", "beta", "stable"],
+          "title": "featureSet",
+          "type": "string"
+        },
+        "featureSetDisable": {
+          "default": "",
+          "description": "Comma-separated list of features to disable, overriding the default minimum feature set.",
+          "title": "featureSetDisable",
+          "type": "string"
+        },
+        "featureSetEnable": {
+          "default": "",
+          "description": "Comma-separated list of features to enable, overriding the default minimum feature set.",
+          "title": "featureSetEnable",
+          "type": "string"
+        },
+        "jaegerAddress": {
+          "default": "",
+          "description": "Listening address for jaeger tracing.",
+          "title": "jaegerAddress",
+          "type": "string"
+        },
+        "jaegerService": {
+          "default": "charon",
+          "description": "Service name used for jaeger tracing.",
+          "title": "jaegerService",
+          "type": "string"
+        },
+        "lockFile": {
+          "default": "/charon/cluster-lock.json",
+          "description": "The path to the cluster lock file defining distributed validator cluster.",
+          "title": "lockFile",
+          "type": "string"
+        },
+        "logFormat": {
+          "default": "json",
+          "description": "Log format; console, logfmt or json",
+          "enum": ["console", "logfmt", "json"],
+          "title": "logFormat",
+          "type": "string"
+        },
+        "logLevel": {
+          "default": "info",
+          "description": "Log level; debug, info, warn or error",
+          "enum": ["debug", "info", "warn", "error"],
+          "title": "logLevel",
+          "type": "string"
+        },
+        "lokiAddresses": {
+          "default": "",
+          "description": "Enables sending of logfmt structured logs to these Loki log aggregation server addresses.",
+          "title": "lokiAddresses",
+          "type": "string"
+        },
+        "lokiService": {
+          "default": "charon",
+          "description": "Service label sent with logs to Loki.",
+          "title": "lokiService",
+          "type": "string"
+        },
+        "monitoringAddress": {
+          "default": "0.0.0.0",
+          "description": "Listening address (ip and port) for the monitoring API (prometheus, pprof).",
+          "title": "monitoringAddress",
+          "type": "string"
+        },
+        "nickname": {
+          "default": "",
+          "description": "Optional Charon nickname for identification in logs and metrics",
+          "title": "nickname",
+          "type": "string"
+        },
+        "noVerify": {
+          "default": false,
+          "description": "Disables cluster definition and lock file verification.",
+          "title": "noVerify",
+          "type": "boolean"
+        },
+        "p2pAllowlist": {
+          "default": "",
+          "description": "Comma-separated list of CIDR subnets for allowing only certain peer connections.",
+          "title": "p2pAllowlist",
+          "type": "string"
+        },
+        "p2pDenylist": {
+          "default": "",
+          "description": "Comma-separated list of CIDR subnets for disallowing certain peer connections.",
+          "title": "p2pDenylist",
+          "type": "string"
+        },
+        "p2pDisableReuseport": {
+          "default": "",
+          "description": "Disables TCP port reuse for outgoing libp2p connections.",
+          "title": "p2pDisableReuseport",
+          "type": "string"
+        },
+        "p2pExternalHostname": {
+          "default": "",
+          "description": "The DNS hostname advertised by libp2p.",
+          "title": "p2pExternalHostname",
+          "type": "string"
+        },
+        "p2pRelays": {
+          "default": "https://0.relay.obol.tech/enr",
+          "description": "Comma-separated list of libp2p relay URLs or multiaddrs.",
+          "title": "p2pRelays",
+          "type": "string"
+        },
+        "p2pTcpAddress": {
+          "default": "0.0.0.0",
+          "description": "Comma-separated list of listening TCP addresses (ip and port) for libP2P traffic.",
+          "title": "p2pTcpAddress",
+          "type": "string"
+        },
+        "privateKeyFile": {
+          "default": "/charon/charon-enr-private-key",
+          "description": "The path to the charon enr private key file.",
+          "title": "privateKeyFile",
+          "type": "string"
+        },
+        "simnetBeaconMock": {
+          "default": "",
+          "description": "Enables an internal mock beacon node for running a simnet.",
+          "title": "simnetBeaconMock",
+          "type": "string"
+        },
+        "simnetValidatorKeysDir": {
+          "default": "",
+          "description": "The directory containing the simnet validator key shares.",
+          "title": "simnetValidatorKeysDir",
+          "type": "string"
+        },
+        "simnetValidatorMock": {
+          "default": "",
+          "description": "Enables an internal mock validator client when running a simnet.",
+          "title": "simnetValidatorMock",
+          "type": "string"
+        },
+        "syntheticBlockProposals": {
+          "default": "",
+          "description": "Enables additional synthetic block proposal duties.",
+          "title": "syntheticBlockProposals",
+          "type": "string"
+        },
+        "validatorApiAddress": {
+          "default": "0.0.0.0",
+          "description": "Listening address (ip and port) for validator-facing traffic proxying the beacon-node API.",
+          "title": "validatorApiAddress",
+          "type": "string"
+        }
+      },
+      "required": [
+        "beaconNodeEndpoints",
+        "builderApi",
+        "featureSet",
+        "featureSetDisable",
+        "featureSetEnable",
+        "jaegerAddress",
+        "jaegerService",
+        "lockFile",
+        "logFormat",
+        "logLevel",
+        "lokiAddresses",
+        "lokiService",
+        "monitoringAddress",
+        "noVerify",
+        "p2pAllowlist",
+        "p2pDenylist",
+        "p2pDisableReuseport",
+        "p2pExternalHostname",
+        "p2pRelays",
+        "p2pTcpAddress",
+        "privateKeyFile",
+        "simnetBeaconMock",
+        "simnetValidatorKeysDir",
+        "simnetValidatorMock",
+        "syntheticBlockProposals",
+        "validatorApiAddress",
+        "nickname",
+        "fallbackBeaconNodes"
+      ],
+      "title": "config",
+      "type": "object"
+    },
+    "containerSecurityContext": {
+      "additionalProperties": false,
+      "description": "The security context for containers\nref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+      "properties": {
+        "allowPrivilegeEscalation": { "title": "allowPrivilegeEscalation", "type": "boolean" },
+        "capabilities": {
+          "additionalProperties": false,
+          "properties": {
+            "add": { "items": { "type": "string" }, "title": "add", "type": "array" },
+            "drop": { "items": { "type": "string" }, "title": "drop", "type": "array" }
+          },
+          "title": "capabilities",
+          "type": "object"
+        },
+        "readOnlyRootFilesystem": { "title": "readOnlyRootFilesystem", "type": "boolean" },
+        "runAsGroup": { "minimum": 0, "title": "runAsGroup", "type": "integer" },
+        "runAsNonRoot": { "title": "runAsNonRoot", "type": "boolean" },
+        "runAsUser": { "minimum": 0, "title": "runAsUser", "type": "integer" },
+        "seccompProfile": {
+          "additionalProperties": false,
+          "properties": {
+            "type": { "enum": ["Unconfined", "RuntimeDefault", "Localhost"], "type": "string" },
+            "localhostProfile": { "type": "string" }
+          },
+          "required": ["type"],
+          "type": "object"
+        }
+      },
+      "title": "containerSecurityContext",
+      "type": "object"
+    },
+    "extraContainers": {
+      "description": "Additional containers",
+      "items": { "additionalProperties": true, "type": "object" },
+      "title": "extraContainers",
+      "type": "array"
+    },
+    "extraEnv": {
+      "description": "Additional env variables",
+      "items": { "additionalProperties": true, "type": "object" },
+      "title": "extraEnv",
+      "type": "array"
+    },
+    "extraPorts": {
+      "description": "Additional ports. Useful when using extraContainers",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "containerPort": { "maximum": 65535, "minimum": 1, "type": "integer" },
+          "hostPort": { "maximum": 65535, "minimum": 1, "type": "integer" },
+          "name": { "type": "string" },
+          "protocol": { "enum": ["TCP", "UDP", "SCTP"], "type": "string" }
+        },
+        "required": ["containerPort"],
+        "type": "object"
+      },
+      "title": "extraPorts",
+      "type": "array"
+    },
+    "extraVolumeMounts": {
+      "description": "Additional volume mounts",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "mountPath": { "type": "string" },
+          "mountPropagation": { "type": "string" },
+          "name": { "type": "string" },
+          "readOnly": { "type": "boolean" },
+          "subPath": { "type": "string" }
+        },
+        "required": ["name", "mountPath"],
+        "type": "object"
+      },
+      "title": "extraVolumeMounts",
+      "type": "array"
+    },
+    "extraVolumes": {
+      "description": "Additional volumes",
+      "items": { "additionalProperties": true, "type": "object" },
+      "title": "extraVolumes",
+      "type": "array"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "Provide a name to substitute for the full names of resources",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "additionalProperties": true,
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "title": "global",
+      "type": "object"
+    },
+    "httpPort": {
+      "default": 3600,
+      "description": "HTTP Port",
+      "maximum": 65535,
+      "minimum": 1,
+      "title": "httpPort",
+      "type": "integer"
+    },
+    "image": {
+      "additionalProperties": false,
+      "description": "Charon image repository, pull policy, and tag version",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": ["IfNotPresent", "Always", "Never"],
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": { "default": "obolnetwork/charon", "title": "repository", "type": "string" },
+        "tag": { "default": "v1.8.2", "title": "tag", "type": "string" }
+      },
+      "required": ["repository", "pullPolicy", "tag"],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "Credentials to fetch images from private registry\nref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/",
+      "items": { "additionalProperties": true, "type": "object" },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "initContainers": {
+      "description": "Additional init containers",
+      "items": { "additionalProperties": true, "type": "object" },
+      "title": "initContainers",
+      "type": "array"
+    },
+    "initImage": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": ["IfNotPresent", "Always", "Never"],
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": { "default": "alpine/kubectl", "title": "repository", "type": "string" },
+        "tag": { "default": "1.35.1", "title": "tag", "type": "string" }
+      },
+      "required": ["repository", "tag", "pullPolicy"],
+      "title": "initImage",
+      "type": "object"
+    },
+    "jaegerPort": {
+      "default": 6831,
+      "description": "Jaeger Port",
+      "maximum": 65535,
+      "minimum": 1,
+      "title": "jaegerPort",
+      "type": "integer"
+    },
+    "livenessProbe": {
+      "additionalProperties": false,
+      "description": "Configure liveness probes\nref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
+      "properties": {
+        "enabled": { "default": true, "title": "enabled", "type": "boolean" },
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": { "default": "/readyz", "title": "path", "type": "string" },
+            "port": { "$ref": "#/definitions/resourceQuantity", "default": "monitoring", "title": "port" }
+          },
+          "required": ["path", "port"],
+          "title": "httpGet",
+          "type": "object"
+        },
+        "initialDelaySeconds": { "default": 60, "minimum": 0, "title": "initialDelaySeconds", "type": "integer" },
+        "periodSeconds": { "default": 120, "minimum": 1, "title": "periodSeconds", "type": "integer" }
+      },
+      "required": ["enabled", "initialDelaySeconds", "periodSeconds", "httpGet"],
+      "title": "livenessProbe",
+      "type": "object"
+    },
+    "monitoringPort": {
+      "default": 3620,
+      "description": "Monitoring Port",
+      "maximum": 65535,
+      "minimum": 1,
+      "title": "monitoringPort",
+      "type": "integer"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "Provide a name in place of lighthouse for `app:` labels",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "$ref": "#/definitions/labelMap",
+      "description": "Node labels for pod assignment\nref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/",
+      "title": "nodeSelector"
+    },
+    "p2pPort": {
+      "additionalProperties": false,
+      "description": "When p2pPort.type is NodePort, your P2P port will be exposed via service type NodePort.",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "title": "annotations"
+        },
+        "nodePort": { "default": 32000, "maximum": 65535, "minimum": 1, "title": "nodePort", "type": "integer" },
+        "port": { "default": 3610, "maximum": 65535, "minimum": 1, "title": "port", "type": "integer" },
+        "type": {
+          "default": "NodePort",
+          "description": "Options: NodePort, LoadBalancer, ClusterIP",
+          "enum": ["NodePort", "LoadBalancer", "ClusterIP"],
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": ["annotations", "type", "nodePort", "port"],
+      "title": "p2pPort",
+      "type": "object"
+    },
+    "podAnnotations": {
+      "$ref": "#/definitions/labelMap",
+      "description": "Pod annotations",
+      "title": "podAnnotations"
+    },
+    "podDisruptionBudget": {
+      "additionalProperties": false,
+      "description": "Enable and configure pod disruption budget\nref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/",
+      "properties": {
+        "enabled": { "default": false, "title": "enabled", "type": "boolean" },
+        "maxUnavailable": {
+          "default": 1,
+          "description": "Maximum number or percentage of pods that can be unavailable",
+          "oneOf": [
+            { "minimum": 0, "type": "integer" },
+            { "pattern": "^[0-9]+%$", "type": "string" }
+          ],
+          "title": "maxUnavailable"
+        },
+        "minAvailable": {
+          "description": "Minimum number or percentage of pods that must be available",
+          "oneOf": [
+            { "minimum": 0, "type": "integer" },
+            { "pattern": "^[0-9]+%$", "type": "string" }
+          ],
+          "title": "minAvailable"
+        }
+      },
+      "required": ["enabled", "maxUnavailable"],
+      "title": "podDisruptionBudget",
+      "type": "object"
+    },
+    "priorityClassName": {
+      "default": "",
+      "description": "Used to assign priority to pods\nref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/",
+      "title": "priorityClassName",
+      "type": "string"
+    },
+    "rbac": {
+      "additionalProperties": false,
+      "description": "RBAC configuration.\nref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/",
+      "properties": {
+        "clusterRules": {
+          "description": "Required ClusterRole rules",
+          "items": { "$ref": "#/definitions/rbacRule" },
+          "title": "clusterRules",
+          "type": "array"
+        },
+        "enabled": { "default": true, "description": "Specifies whether RBAC resources are to be created", "title": "enabled", "type": "boolean" },
+        "name": { "default": "", "description": "The name of the cluster role to use.", "title": "name", "type": "string" },
+        "rules": {
+          "description": "Required Role rules",
+          "items": { "$ref": "#/definitions/rbacRule" },
+          "title": "rules",
+          "type": "array"
+        }
+      },
+      "required": ["enabled", "name", "clusterRules", "rules"],
+      "title": "rbac",
+      "type": "object"
+    },
+    "readinessProbe": {
+      "additionalProperties": false,
+      "description": "Configure readiness probes\nref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
+      "properties": {
+        "enabled": { "default": true, "title": "enabled", "type": "boolean" },
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": { "default": "/readyz", "title": "path", "type": "string" },
+            "port": { "$ref": "#/definitions/resourceQuantity", "default": "monitoring", "title": "port" }
+          },
+          "required": ["path", "port"],
+          "title": "httpGet",
+          "type": "object"
+        },
+        "initialDelaySeconds": { "default": 10, "minimum": 0, "title": "initialDelaySeconds", "type": "integer" },
+        "periodSeconds": { "default": 10, "minimum": 1, "title": "periodSeconds", "type": "integer" }
+      },
+      "required": ["enabled", "initialDelaySeconds", "periodSeconds", "httpGet"],
+      "title": "readinessProbe",
+      "type": "object"
+    },
+    "resources": {
+      "$ref": "#/definitions/resources",
+      "description": "Pod resources limits and requests\nref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+      "title": "resources"
+    },
+    "secrets": {
+      "additionalProperties": false,
+      "description": "Kubernetes secrets names",
+      "properties": {
+        "charon": {
+          "default": "charon-enr-private-key",
+          "description": "Name of the Kubernetes Secret containing the Charon ENR private key (always required).\nThe secret must have a key named `charon-enr-private-key`.",
+          "title": "charon",
+          "type": "string"
+        }
+      },
+      "required": ["charon"],
+      "title": "secrets",
+      "type": "object"
+    },
+    "securityContext": {
+      "additionalProperties": false,
+      "description": "The security context for pods\nref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+      "properties": {
+        "fsGroup": { "minimum": 0, "title": "fsGroup", "type": "integer" },
+        "fsGroupChangePolicy": { "enum": ["OnRootMismatch", "Always"], "title": "fsGroupChangePolicy", "type": "string" },
+        "runAsGroup": { "minimum": 0, "title": "runAsGroup", "type": "integer" },
+        "runAsNonRoot": { "title": "runAsNonRoot", "type": "boolean" },
+        "runAsUser": { "minimum": 0, "title": "runAsUser", "type": "integer" },
+        "supplementalGroups": { "items": { "minimum": 0, "type": "integer" }, "title": "supplementalGroups", "type": "array" },
+        "seccompProfile": {
+          "additionalProperties": false,
+          "properties": {
+            "type": { "enum": ["Unconfined", "RuntimeDefault", "Localhost"], "type": "string" },
+            "localhostProfile": { "type": "string" }
+          },
+          "required": ["type"],
+          "type": "object"
+        }
+      },
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "default": "ClusterIP",
+          "description": "Service type\nref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"],
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": ["type"],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "description": "Service account\nref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Annotations to add to the service account",
+          "title": "annotations"
+        },
+        "enabled": { "default": true, "description": "Specifies whether a service account should be created", "title": "enabled", "type": "boolean" },
+        "name": { "default": "", "description": "The name of the service account to use.", "title": "name", "type": "string" }
+      },
+      "required": ["enabled", "annotations", "name"],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "serviceMonitor": {
+      "additionalProperties": false,
+      "description": "Prometheus Service Monitor\nref: https://github.com/coreos/prometheus-operator",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Additional ServiceMonitor annotations",
+          "title": "annotations"
+        },
+        "enabled": { "default": false, "description": "If true, a ServiceMonitor CRD is created for a prometheus operator.", "title": "enabled", "type": "boolean" },
+        "interval": { "default": "1m", "description": "ServiceMonitor scrape interval", "title": "interval", "type": "string" },
+        "labels": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Additional ServiceMonitor labels",
+          "title": "labels"
+        },
+        "namespace": {
+          "description": "Alternative namespace for ServiceMonitor",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "null" }
+          ],
+          "title": "namespace"
+        },
+        "path": { "default": "/metrics", "description": "Path to scrape", "title": "path", "type": "string" },
+        "relabelings": {
+          "description": "ServiceMonitor relabelings",
+          "items": { "additionalProperties": true, "type": "object" },
+          "title": "relabelings",
+          "type": "array"
+        },
+        "scheme": {
+          "default": "http",
+          "description": "ServiceMonitor scheme",
+          "enum": ["http", "https"],
+          "title": "scheme",
+          "type": "string"
+        },
+        "scrapeTimeout": { "default": "30s", "description": "ServiceMonitor scrape timeout", "title": "scrapeTimeout", "type": "string" },
+        "tlsConfig": {
+          "additionalProperties": false,
+          "description": "ServiceMonitor TLS configuration",
+          "properties": {
+            "caFile": { "type": "string" },
+            "certFile": { "type": "string" },
+            "insecureSkipVerify": { "type": "boolean" },
+            "keyFile": { "type": "string" },
+            "serverName": { "type": "string" }
+          },
+          "title": "tlsConfig",
+          "type": "object"
+        }
+      },
+      "required": ["enabled", "path", "namespace", "labels", "annotations", "interval", "scheme", "tlsConfig", "scrapeTimeout", "relabelings"],
+      "title": "serviceMonitor",
+      "type": "object"
+    },
+    "tolerations": {
+      "description": "Tolerations for pod assignment\nref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/",
+      "oneOf": [
+        {
+          "items": { "$ref": "#/definitions/toleration" },
+          "type": "array"
+        },
+        {
+          "maxProperties": 0,
+          "type": "object"
+        }
+      ],
+      "title": "tolerations",
+      "type": ["array", "object"]
+    }
+  },
+  "required": [
+    "image",
+    "initImage",
+    "imagePullSecrets",
+    "nameOverride",
+    "fullnameOverride",
+    "podAnnotations",
+    "serviceAccount",
+    "securityContext",
+    "containerSecurityContext",
+    "rbac",
+    "resources",
+    "nodeSelector",
+    "tolerations",
+    "affinity",
+    "priorityClassName",
+    "service",
+    "podDisruptionBudget",
+    "httpPort",
+    "monitoringPort",
+    "p2pPort",
+    "jaegerPort",
+    "config",
+    "secrets",
+    "initContainers",
+    "extraContainers",
+    "extraVolumes",
+    "extraVolumeMounts",
+    "extraPorts",
+    "extraEnv",
+    "serviceMonitor",
+    "livenessProbe",
+    "readinessProbe",
+    "centralMonitoring"
+  ],
+  "type": "object"
+}
