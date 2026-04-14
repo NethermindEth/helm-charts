@@ -1,0 +1,55 @@
+suite: configmap and statefulset tests
+templates:
+  - configmap.yaml
+  - statefulset.yaml
+tests:
+  - it: given default vouch values then configmap name contains a content hash suffix
+    template: configmap.yaml
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vouch-b19c0733
+
+  - it: given vouch values change then configmap name hash changes
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      vouch.loglevel: info
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vouch-0764e220
+
+  - it: given vouchFullConfig is set then configmap name hash is derived from vouchFullConfig
+    template: configmap.yaml
+    documentIndex: 0
+    set:
+      vouchFullConfig:
+        beacon-node-address: custom:5052
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vouch-2ab7d26d
+
+  - it: given default vouch values then statefulset config volume references the hashed configmap name
+    template: statefulset.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: config
+            configMap:
+              name: RELEASE-NAME-vouch-b19c0733
+
+  - it: given vouch values change then statefulset config volume references the updated hashed configmap name
+    template: statefulset.yaml
+    set:
+      vouch.loglevel: info
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: config
+            configMap:
+              name: RELEASE-NAME-vouch-0764e220
