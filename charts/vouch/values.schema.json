@@ -1149,11 +1149,7 @@
     },
     "vouchFullConfig": {
       "description": "use vouchFullConfig: to provide all vouch.yaml values\nuse vouch: to populate good defaults and to do minimal changes",
-      "title": "vouchFullConfig",
-      "oneOf": [
-        { "type": "string" },
-        { "type": "null" }
-      ]
+      "title": "vouchFullConfig"
     }
   },
   "required": [
