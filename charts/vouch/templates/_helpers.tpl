@@ -1,20 +1,13 @@
 {{/*
-Compute a short checksum of the vouch ConfigMap data.
+Compute a sha256 checksum of the vouch ConfigMap data.
 Using vouchFullConfig when provided, otherwise vouch values.
-This is appended to the ConfigMap name so any change to the config
-produces a new name, forcing a Pod restart.
+This is injected as a pod annotation so any change to the config
+triggers a rolling restart of the StatefulSet.
 */}}
-{{- define "vouch.configChecksum" -}}
+{{- define "vouch.configmap.hash" -}}
 {{- if .Values.vouchFullConfig -}}
-{{- toYaml .Values.vouchFullConfig | sha256sum | trunc 8 -}}
+{{- toYaml .Values.vouchFullConfig | sha256sum -}}
 {{- else -}}
-{{- toYaml .Values.vouch | sha256sum | trunc 8 -}}
+{{- toYaml .Values.vouch | sha256sum -}}
 {{- end -}}
-{{- end -}}
-
-{{/*
-Full name of the vouch ConfigMap, including a content hash suffix.
-*/}}
-{{- define "vouch.configmap.name" -}}
-{{- printf "%s-%s" (include "common.names.fullname" .) (include "vouch.configChecksum" .) -}}
 {{- end -}}
