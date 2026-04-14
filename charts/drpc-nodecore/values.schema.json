@@ -1,0 +1,514 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" }
+      ]
+    },
+    "resourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "cpu": { "$ref": "#/definitions/resourceQuantity" },
+        "memory": { "$ref": "#/definitions/resourceQuantity" },
+        "ephemeral-storage": { "$ref": "#/definitions/resourceQuantity" }
+      },
+      "type": "object"
+    },
+    "labelMap": {
+      "additionalProperties": { "type": "string" },
+      "type": "object"
+    },
+    "toleration": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "enum": ["Exists", "Equal"], "type": "string" },
+        "value": { "type": "string" },
+        "effect": { "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"], "type": "string" },
+        "tolerationSeconds": { "minimum": 0, "type": "integer" }
+      },
+      "type": "object"
+    },
+    "nodeSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "enum": ["In", "NotIn", "Exists", "DoesNotExist", "Gt", "Lt"], "type": "string" },
+        "values": { "items": { "type": "string" }, "type": "array" }
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "enum": ["In", "NotIn", "Exists", "DoesNotExist"], "type": "string" },
+        "values": { "items": { "type": "string" }, "type": "array" }
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "matchLabels": { "$ref": "#/definitions/labelMap" },
+        "matchExpressions": {
+          "items": { "$ref": "#/definitions/labelSelectorRequirement" },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "podAffinityTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "labelSelector": { "$ref": "#/definitions/labelSelector" },
+        "namespaces": { "items": { "type": "string" }, "type": "array" },
+        "topologyKey": { "type": "string" }
+      },
+      "required": ["topologyKey"],
+      "type": "object"
+    },
+    "nodeSelectorTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "matchExpressions": {
+          "items": { "$ref": "#/definitions/nodeSelectorRequirement" },
+          "type": "array"
+        },
+        "matchFields": {
+          "items": { "$ref": "#/definitions/nodeSelectorRequirement" },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "affinity": {
+      "additionalProperties": false,
+      "properties": {
+        "nodeAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "additionalProperties": false,
+              "properties": {
+                "nodeSelectorTerms": {
+                  "items": { "$ref": "#/definitions/nodeSelectorTerm" },
+                  "type": "array"
+                }
+              },
+              "required": ["nodeSelectorTerms"],
+              "type": "object"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "preference": { "$ref": "#/definitions/nodeSelectorTerm" }
+                },
+                "required": ["weight", "preference"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": { "$ref": "#/definitions/podAffinityTerm" },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "podAffinityTerm": { "$ref": "#/definitions/podAffinityTerm" }
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": { "$ref": "#/definitions/podAffinityTerm" },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "podAffinityTerm": { "$ref": "#/definitions/podAffinityTerm" }
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "autoscaling": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "default": false, "title": "enabled", "type": "boolean" },
+        "minReplicas": { "default": 1, "minimum": 1, "title": "minReplicas", "type": "integer" },
+        "maxReplicas": { "default": 10, "minimum": 1, "title": "maxReplicas", "type": "integer" },
+        "targetCPUUtilizationPercentage": { "default": 80, "minimum": 1, "maximum": 100, "title": "targetCPUUtilizationPercentage", "type": "integer" },
+        "targetMemoryUtilizationPercentage": { "minimum": 1, "maximum": 100, "title": "targetMemoryUtilizationPercentage", "type": "integer" }
+      },
+      "required": ["enabled", "minReplicas", "maxReplicas", "targetCPUUtilizationPercentage"],
+      "type": "object"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": { "$ref": "#/definitions/resourceSpec" },
+        "requests": { "$ref": "#/definitions/resourceSpec" }
+      },
+      "type": "object"
+    },
+    "serviceMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "default": true, "title": "enabled", "type": "boolean" },
+        "interval": { "default": "30s", "title": "interval", "type": "string" },
+        "namespace": { "title": "namespace", "type": "string" },
+        "labels": { "$ref": "#/definitions/labelMap", "title": "labels" },
+        "annotations": { "$ref": "#/definitions/labelMap", "title": "annotations" },
+        "scrapeTimeout": { "title": "scrapeTimeout", "type": "string" },
+        "relabelings": { "items": { "additionalProperties": true, "type": "object" }, "title": "relabelings", "type": "array" },
+        "metricRelabelings": { "items": { "additionalProperties": true, "type": "object" }, "title": "metricRelabelings", "type": "array" }
+      },
+      "required": ["enabled", "interval"],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "defaults": {
+      "additionalProperties": false,
+      "description": "──────────────────────────────────────────\nShared defaults (inherited by all projects unless overridden)\n──────────────────────────────────────────",
+      "properties": {
+        "affinity": {
+          "$ref": "#/definitions/affinity",
+          "title": "affinity"
+        },
+        "deployment": {
+          "additionalProperties": false,
+          "properties": {
+            "autoscaling": { "$ref": "#/definitions/autoscaling", "title": "autoscaling" },
+            "enabled": { "default": true, "title": "enabled", "type": "boolean" },
+            "restartOnChanges": { "default": true, "title": "restartOnChanges", "type": "boolean" },
+            "strategy": {
+              "additionalProperties": true,
+              "title": "strategy",
+              "type": "object"
+            }
+          },
+          "required": ["enabled", "strategy", "restartOnChanges", "autoscaling"],
+          "title": "deployment",
+          "type": "object"
+        },
+        "initContainerSecurityContext": {
+          "additionalProperties": false,
+          "properties": {
+            "allowPrivilegeEscalation": { "default": false, "title": "allowPrivilegeEscalation", "type": "boolean" },
+            "capabilities": {
+              "additionalProperties": false,
+              "properties": {
+                "drop": {
+                  "items": { "type": "string" },
+                  "title": "drop",
+                  "type": "array"
+                }
+              },
+              "required": ["drop"],
+              "title": "capabilities",
+              "type": "object"
+            },
+            "readOnlyRootFilesystem": { "default": false, "title": "readOnlyRootFilesystem", "type": "boolean" },
+            "runAsGroup": { "default": 0, "minimum": 0, "title": "runAsGroup", "type": "integer" },
+            "runAsNonRoot": { "default": false, "title": "runAsNonRoot", "type": "boolean" },
+            "runAsUser": { "default": 0, "minimum": 0, "title": "runAsUser", "type": "integer" },
+            "seccompProfile": {
+              "additionalProperties": false,
+              "properties": {
+                "type": { "enum": ["Unconfined", "RuntimeDefault", "Localhost"], "title": "type", "type": "string" }
+              },
+              "required": ["type"],
+              "title": "seccompProfile",
+              "type": "object"
+            }
+          },
+          "required": ["allowPrivilegeEscalation", "capabilities", "readOnlyRootFilesystem", "runAsGroup", "runAsNonRoot", "runAsUser", "seccompProfile"],
+          "title": "initContainerSecurityContext",
+          "type": "object"
+        },
+        "livenessProbe": {
+          "additionalProperties": false,
+          "properties": {
+            "failureThreshold": { "default": 3, "title": "failureThreshold", "type": "integer" },
+            "initialDelaySeconds": { "default": 30, "title": "initialDelaySeconds", "type": "integer" },
+            "periodSeconds": { "default": 10, "title": "periodSeconds", "type": "integer" },
+            "successThreshold": { "default": 1, "title": "successThreshold", "type": "integer" },
+            "tcpSocket": {
+              "additionalProperties": false,
+              "properties": {
+                "port": { "default": 9090, "title": "port", "type": "integer" }
+              },
+              "required": ["port"],
+              "title": "tcpSocket",
+              "type": "object"
+            },
+            "timeoutSeconds": { "default": 1, "title": "timeoutSeconds", "type": "integer" }
+          },
+          "required": ["tcpSocket", "initialDelaySeconds", "periodSeconds", "timeoutSeconds", "failureThreshold", "successThreshold"],
+          "title": "livenessProbe",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "$ref": "#/definitions/labelMap",
+          "title": "nodeSelector"
+        },
+        "podSecurityContext": {
+          "additionalProperties": false,
+          "properties": {
+            "fsGroup": { "default": 1000, "minimum": 0, "title": "fsGroup", "type": "integer" },
+            "runAsGroup": { "default": 1000, "minimum": 0, "title": "runAsGroup", "type": "integer" },
+            "runAsNonRoot": { "default": true, "title": "runAsNonRoot", "type": "boolean" },
+            "runAsUser": { "default": 1000, "minimum": 0, "title": "runAsUser", "type": "integer" },
+            "seccompProfile": {
+              "additionalProperties": false,
+              "properties": {
+                "type": { "enum": ["Unconfined", "RuntimeDefault", "Localhost"], "title": "type", "type": "string" }
+              },
+              "required": ["type"],
+              "title": "seccompProfile",
+              "type": "object"
+            }
+          },
+          "required": ["fsGroup", "runAsNonRoot", "runAsUser", "runAsGroup", "seccompProfile"],
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "readinessProbe": {
+          "additionalProperties": false,
+          "properties": {
+            "failureThreshold": { "default": 2, "title": "failureThreshold", "type": "integer" },
+            "httpGet": {
+              "additionalProperties": false,
+              "properties": {
+                "path": { "default": "/metrics", "title": "path", "type": "string" },
+                "port": { "default": 9093, "title": "port", "type": "integer" }
+              },
+              "required": ["path", "port"],
+              "title": "httpGet",
+              "type": "object"
+            },
+            "initialDelaySeconds": { "default": 10, "title": "initialDelaySeconds", "type": "integer" },
+            "periodSeconds": { "default": 5, "title": "periodSeconds", "type": "integer" },
+            "successThreshold": { "default": 1, "title": "successThreshold", "type": "integer" },
+            "timeoutSeconds": { "default": 5, "title": "timeoutSeconds", "type": "integer" }
+          },
+          "required": ["httpGet", "initialDelaySeconds", "periodSeconds", "timeoutSeconds", "failureThreshold", "successThreshold"],
+          "title": "readinessProbe",
+          "type": "object"
+        },
+        "replicaCount": { "default": 1, "minimum": 1, "title": "replicaCount", "type": "integer" },
+        "resources": {
+          "$ref": "#/definitions/resources",
+          "title": "resources"
+        },
+        "securityContext": {
+          "additionalProperties": false,
+          "properties": {
+            "allowPrivilegeEscalation": { "default": false, "title": "allowPrivilegeEscalation", "type": "boolean" },
+            "capabilities": {
+              "additionalProperties": false,
+              "properties": {
+                "drop": {
+                  "items": { "type": "string" },
+                  "title": "drop",
+                  "type": "array"
+                }
+              },
+              "required": ["drop"],
+              "title": "capabilities",
+              "type": "object"
+            },
+            "readOnlyRootFilesystem": { "default": false, "title": "readOnlyRootFilesystem", "type": "boolean" },
+            "runAsGroup": { "default": 0, "minimum": 0, "title": "runAsGroup", "type": "integer" },
+            "runAsNonRoot": { "default": false, "title": "runAsNonRoot", "type": "boolean" },
+            "runAsUser": { "default": 0, "minimum": 0, "title": "runAsUser", "type": "integer" },
+            "seccompProfile": {
+              "additionalProperties": false,
+              "properties": {
+                "type": { "enum": ["Unconfined", "RuntimeDefault", "Localhost"], "title": "type", "type": "string" }
+              },
+              "required": ["type"],
+              "title": "seccompProfile",
+              "type": "object"
+            }
+          },
+          "required": ["allowPrivilegeEscalation", "capabilities", "readOnlyRootFilesystem", "runAsGroup", "runAsNonRoot", "runAsUser", "seccompProfile"],
+          "title": "securityContext",
+          "type": "object"
+        },
+        "serviceMonitor": {
+          "$ref": "#/definitions/serviceMonitor",
+          "title": "serviceMonitor"
+        },
+        "terminationGracePeriodSeconds": { "default": 30, "minimum": 0, "title": "terminationGracePeriodSeconds", "type": "integer" },
+        "tolerations": {
+          "items": { "$ref": "#/definitions/toleration" },
+          "title": "tolerations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "replicaCount",
+        "deployment",
+        "resources",
+        "readinessProbe",
+        "livenessProbe",
+        "nodeSelector",
+        "tolerations",
+        "affinity",
+        "podSecurityContext",
+        "securityContext",
+        "initContainerSecurityContext",
+        "serviceMonitor",
+        "terminationGracePeriodSeconds"
+      ],
+      "title": "defaults",
+      "type": "object"
+    },
+    "fullnameOverride": { "default": "", "title": "fullnameOverride", "type": "string" },
+    "global": {
+      "additionalProperties": true,
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "title": "global",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "description": "NodeCore container image",
+      "properties": {
+        "pullPolicy": { "default": "IfNotPresent", "title": "pullPolicy", "type": "string" },
+        "repository": { "default": "drpcorg/nodecore", "title": "repository", "type": "string" },
+        "tag": { "default": "0.1.6", "title": "tag", "type": "string" }
+      },
+      "required": ["repository", "pullPolicy", "tag"],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "Secrets for pulling images from a private registry",
+      "items": { "type": "object", "additionalProperties": true },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "initImage": {
+      "additionalProperties": false,
+      "description": "Image used for the envsubst init container",
+      "properties": {
+        "repository": { "default": "bhgedigital/envsubst", "title": "repository", "type": "string" },
+        "tag": { "default": "v1.0-alpine3.6", "title": "tag", "type": "string" }
+      },
+      "required": ["repository", "tag"],
+      "title": "initImage",
+      "type": "object"
+    },
+    "nameOverride": { "default": "", "description": "This is to override the chart name.", "title": "nameOverride", "type": "string" },
+    "projects": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "secretRef": { "title": "secretRef", "type": "string" },
+          "authTokenEnvVar": { "title": "authTokenEnvVar", "type": "string" },
+          "env": { "items": { "additionalProperties": true, "type": "object" }, "title": "env", "type": "array" },
+          "envFrom": { "items": { "additionalProperties": true, "type": "object" }, "title": "envFrom", "type": "array" },
+          "serviceAnnotations": { "$ref": "#/definitions/labelMap", "title": "serviceAnnotations" },
+          "replicaCount": { "minimum": 1, "title": "replicaCount", "type": "integer" },
+          "resources": { "$ref": "#/definitions/resources", "title": "resources" },
+          "nodeSelector": { "$ref": "#/definitions/labelMap", "title": "nodeSelector" },
+          "tolerations": { "items": { "$ref": "#/definitions/toleration" }, "title": "tolerations", "type": "array" },
+          "affinity": { "$ref": "#/definitions/affinity", "title": "affinity" },
+          "deployment": {
+            "additionalProperties": false,
+            "properties": {
+              "autoscaling": { "$ref": "#/definitions/autoscaling", "title": "autoscaling" }
+            },
+            "title": "deployment",
+            "type": "object"
+          },
+          "nodecoreConfig": {
+            "additionalProperties": true,
+            "title": "nodecoreConfig",
+            "type": "object"
+          },
+          "upstreams": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": { "title": "id", "type": "string" },
+                "chain": { "title": "chain", "type": "string" },
+                "connectors": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "type": { "title": "type", "type": "string" },
+                      "url": { "title": "url", "type": "string" }
+                    },
+                    "required": ["type", "url"],
+                    "type": "object"
+                  },
+                  "title": "connectors",
+                  "type": "array"
+                }
+              },
+              "required": ["id", "chain", "connectors"],
+              "type": "object"
+            },
+            "title": "upstreams",
+            "type": "array"
+          },
+          "serviceMonitor": { "$ref": "#/definitions/serviceMonitor", "title": "serviceMonitor" }
+        },
+        "type": "object"
+      },
+      "description": "──────────────────────────────────────────\nProjects\n──────────────────────────────────────────\nEach key is a project name (must be a valid K8s DNS label: lowercase, alphanumeric, hyphens).\nEach project produces: Deployment, Service, ConfigMap, (optional) HPA, ServiceMonitor.\n\nSecrets are managed out-of-band (InfisicalSecret CRD or ExternalSecret CRD).\nThe chart references the resulting K8s Secret by name via `secretRef`.",
+      "title": "projects",
+      "type": "object"
+    }
+  },
+  "required": [
+    "nameOverride",
+    "fullnameOverride",
+    "image",
+    "initImage",
+    "imagePullSecrets",
+    "defaults",
+    "projects"
+  ],
+  "type": "object"
+}
