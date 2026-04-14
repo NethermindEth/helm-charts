@@ -3788,6 +3788,30 @@ entries:
   vouch:
   - apiVersion: v2
     appVersion: 1.11.1
+    created: "2026-04-14T12:05:09.78677769Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: A Helm chart for installing and configuring Vouch validator client
+      for large scale ETH staking infrastructure on top of the Kubernetes
+    digest: 7d8656245449f559f6d2a4c9999117b22f6d0e5b9e6a1a6c67e10ad46363e5f5
+    home: https://nethermind.io
+    keywords:
+    - ethereum
+    - blockchain
+    - validator
+    maintainers:
+    - name: matilote
+    - name: aivarasko
+    - name: adriantpaez
+    name: vouch
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/vouch-0.1.1/vouch-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.11.1
     created: "2025-10-03T14:33:19.160647404Z"
     dependencies:
     - name: common
@@ -4160,4 +4184,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-04-09T17:18:04.995136394Z"
+generated: "2026-04-14T12:05:09.787131684Z"
