@@ -1,0 +1,801 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "resourceQuantity": {
+      "oneOf": [{"type": "string"}, {"type": "number"}]
+    },
+    "resourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "cpu": {"$ref": "#/definitions/resourceQuantity"},
+        "memory": {"$ref": "#/definitions/resourceQuantity"},
+        "ephemeral-storage": {"$ref": "#/definitions/resourceQuantity"}
+      },
+      "type": "object"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": {"$ref": "#/definitions/resourceSpec"},
+        "requests": {"$ref": "#/definitions/resourceSpec"}
+      },
+      "type": "object"
+    },
+    "labelMap": {
+      "additionalProperties": {"type": "string"},
+      "type": "object"
+    },
+    "seccompProfile": {
+      "additionalProperties": false,
+      "description": "ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#seccompprofile-v1-core",
+      "properties": {
+        "type": {
+          "enum": ["RuntimeDefault", "Unconfined", "Localhost"],
+          "type": "string"
+        },
+        "localhostProfile": {"type": "string"}
+      },
+      "required": ["type"],
+      "type": "object"
+    },
+    "toleration": {
+      "additionalProperties": false,
+      "description": "ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#toleration-v1-core",
+      "properties": {
+        "key": {"type": "string"},
+        "operator": {"enum": ["Exists", "Equal"], "type": "string"},
+        "value": {"type": "string"},
+        "effect": {"enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"], "type": "string"},
+        "tolerationSeconds": {"type": "integer"}
+      },
+      "type": "object"
+    },
+    "rbacRule": {
+      "additionalProperties": false,
+      "description": "ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#policyrule-v1-rbac-authorization-k8s-io",
+      "properties": {
+        "apiGroups": {"items": {"type": "string"}, "type": "array"},
+        "resources": {"items": {"type": "string"}, "type": "array"},
+        "verbs": {"items": {"type": "string"}, "type": "array"},
+        "resourceNames": {"items": {"type": "string"}, "type": "array"},
+        "nonResourceURLs": {"items": {"type": "string"}, "type": "array"}
+      },
+      "type": "object"
+    },
+    "nodeSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {"type": "string"},
+        "operator": {"enum": ["In", "NotIn", "Exists", "DoesNotExist", "Gt", "Lt"], "type": "string"},
+        "values": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {"type": "string"},
+        "operator": {"enum": ["In", "NotIn", "Exists", "DoesNotExist"], "type": "string"},
+        "values": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "matchLabels": {"$ref": "#/definitions/labelMap"},
+        "matchExpressions": {"items": {"$ref": "#/definitions/labelSelectorRequirement"}, "type": "array"}
+      },
+      "type": "object"
+    },
+    "podAffinityTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "labelSelector": {"$ref": "#/definitions/labelSelector"},
+        "namespaceSelector": {"$ref": "#/definitions/labelSelector"},
+        "namespaces": {"items": {"type": "string"}, "type": "array"},
+        "topologyKey": {"type": "string"}
+      },
+      "required": ["topologyKey"],
+      "type": "object"
+    },
+    "nodeSelectorTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "matchExpressions": {"items": {"$ref": "#/definitions/nodeSelectorRequirement"}, "type": "array"},
+        "matchFields": {"items": {"$ref": "#/definitions/nodeSelectorRequirement"}, "type": "array"}
+      },
+      "type": "object"
+    },
+    "affinity": {
+      "additionalProperties": false,
+      "description": "ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#affinity-v1-core",
+      "properties": {
+        "nodeAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "additionalProperties": false,
+              "properties": {
+                "nodeSelectorTerms": {"items": {"$ref": "#/definitions/nodeSelectorTerm"}, "type": "array"}
+              },
+              "required": ["nodeSelectorTerms"],
+              "type": "object"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "preference": {"$ref": "#/definitions/nodeSelectorTerm"},
+                  "weight": {"maximum": 100, "minimum": 1, "type": "integer"}
+                },
+                "required": ["weight", "preference"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {"items": {"$ref": "#/definitions/podAffinityTerm"}, "type": "array"},
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "podAffinityTerm": {"$ref": "#/definitions/podAffinityTerm"},
+                  "weight": {"maximum": 100, "minimum": 1, "type": "integer"}
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {"items": {"$ref": "#/definitions/podAffinityTerm"}, "type": "array"},
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "podAffinityTerm": {"$ref": "#/definitions/podAffinityTerm"},
+                  "weight": {"maximum": 100, "minimum": 1, "type": "integer"}
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "probeHttpGet": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {"type": "string"},
+        "port": {"type": "string"},
+        "scheme": {"enum": ["HTTP", "HTTPS"], "type": "string"}
+      },
+      "required": ["path", "port", "scheme"],
+      "type": "object"
+    },
+    "probe": {
+      "additionalProperties": false,
+      "properties": {
+        "failureThreshold": {"type": "integer"},
+        "httpGet": {"$ref": "#/definitions/probeHttpGet"},
+        "initialDelaySeconds": {"type": "integer"},
+        "periodSeconds": {"type": "integer"},
+        "successThreshold": {"type": "integer"},
+        "timeoutSeconds": {"type": "integer"}
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "affinity": {
+      "$ref": "#/definitions/affinity",
+      "description": "Affinity for pod assignment\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#affinity-v1-core\n"
+    },
+    "beaconChainRpcEndpoints": {
+      "description": "List of Beacon Chain node addresses\n",
+      "items": {"type": "string"},
+      "title": "beaconChainRpcEndpoints",
+      "type": "array"
+    },
+    "beaconChainRpcEndpointsRandomized": {
+      "description": "Randomize endpoints if specified\n",
+      "items": {"type": "string"},
+      "title": "beaconChainRpcEndpointsRandomized",
+      "type": "array"
+    },
+    "cliImage": {
+      "additionalProperties": false,
+      "description": "CLI image is used to fetch private keys.\n",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "nethermindeth/keystores-cli",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "v1.0.14",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": ["repository", "tag", "pullPolicy"],
+      "title": "cliImage",
+      "type": "object"
+    },
+    "debug": {
+      "default": false,
+      "description": "Enable debug mode for init containers\n",
+      "title": "debug",
+      "type": "boolean"
+    },
+    "dvt": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        }
+      },
+      "required": ["enabled"],
+      "title": "dvt",
+      "type": "object"
+    },
+    "enableBuilder": {
+      "default": false,
+      "description": "Whether a builder should be used for proposalConfig",
+      "title": "enableBuilder",
+      "type": "boolean"
+    },
+    "enabled": {
+      "default": true,
+      "description": "Whether to enable validator statefulset or not\n",
+      "title": "enabled",
+      "type": "boolean"
+    },
+    "env": {
+      "description": "This is for setting container environment variables",
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "name": {"type": "string"},
+          "value": {"type": "string"},
+          "valueFrom": {"additionalProperties": true, "type": "object"}
+        },
+        "required": ["name"],
+        "type": "object"
+      },
+      "title": "env",
+      "type": "array"
+    },
+    "envFrom": {
+      "description": "envFrom configuration",
+      "items": {"additionalProperties": true, "type": "object"},
+      "title": "envFrom",
+      "type": "array"
+    },
+    "extraFlags": {
+      "additionalProperties": false,
+      "properties": {
+        "lighthouse": {"items": {"type": "string"}, "type": "array"},
+        "lodestar": {"items": {"type": "string"}, "type": "array"},
+        "nimbus": {"items": {"type": "string"}, "type": "array"},
+        "prysm": {"items": {"type": "string"}, "type": "array"},
+        "teku": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["prysm", "lighthouse", "teku", "nimbus", "lodestar"],
+      "title": "extraFlags",
+      "type": "object"
+    },
+    "flags": {
+      "additionalProperties": false,
+      "properties": {
+        "lighthouse": {"items": {"type": "string"}, "type": "array"},
+        "lodestar": {"items": {"type": "string"}, "type": "array"},
+        "nimbus": {"items": {"type": "string"}, "type": "array"},
+        "prysm": {"items": {"type": "string"}, "type": "array"},
+        "teku": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["prysm", "lighthouse", "teku", "nimbus", "lodestar"],
+      "title": "flags",
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "Provide a name to substitute for the full names of resources\n",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "gasLimit": {
+      "default": "45000000",
+      "title": "gasLimit",
+      "type": "string"
+    },
+    "global": {
+      "additionalProperties": false,
+      "description": "Global values that can be shared across multiple charts\n",
+      "properties": {
+        "imagePullSecrets": {
+          "description": "Global image pull secrets\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#localobjectreference-v1-core\n",
+          "items": {"additionalProperties": true, "type": "object"},
+          "title": "imagePullSecrets",
+          "type": "array"
+        },
+        "podSecurityContext": {
+          "additionalProperties": true,
+          "description": "Global pod security context\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podsecuritycontext-v1-core\n",
+          "properties": {
+            "fsGroup": {"type": "integer"},
+            "fsGroupChangePolicy": {"enum": ["Always", "OnRootMismatch"], "type": "string"},
+            "runAsGroup": {"type": "integer"},
+            "runAsNonRoot": {"type": "boolean"},
+            "runAsUser": {"type": "integer"},
+            "seccompProfile": {"$ref": "#/definitions/seccompProfile"},
+            "supplementalGroups": {"items": {"type": "integer"}, "type": "array"}
+          },
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "securityContext": {
+          "additionalProperties": true,
+          "description": "Global container security context\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#securitycontext-v1-core\n",
+          "properties": {
+            "allowPrivilegeEscalation": {"type": "boolean"},
+            "capabilities": {
+              "additionalProperties": false,
+              "properties": {
+                "add": {"items": {"type": "string"}, "type": "array"},
+                "drop": {"items": {"type": "string"}, "type": "array"}
+              },
+              "type": "object"
+            },
+            "readOnlyRootFilesystem": {"type": "boolean"},
+            "runAsGroup": {"type": "integer"},
+            "runAsNonRoot": {"type": "boolean"},
+            "runAsUser": {"type": "integer"},
+            "seccompProfile": {"$ref": "#/definitions/seccompProfile"}
+          },
+          "title": "securityContext",
+          "type": "object"
+        }
+      },
+      "required": ["imagePullSecrets", "securityContext", "podSecurityContext"],
+      "title": "global",
+      "type": "object"
+    },
+    "graffiti": {
+      "default": "",
+      "description": "You can use the graffiti to add a string to your proposed blocks.\n",
+      "title": "graffiti",
+      "type": "string"
+    },
+    "image": {
+      "additionalProperties": false,
+      "description": "Validators image version\n",
+      "properties": {
+        "lighthouse": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {"type": "string"},
+            "tag": {"type": "string"}
+          },
+          "required": ["repository", "tag"],
+          "type": "object"
+        },
+        "lodestar": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {"type": "string"},
+            "tag": {"type": "string"}
+          },
+          "required": ["repository", "tag"],
+          "type": "object"
+        },
+        "nimbus": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {"type": "string"},
+            "tag": {"type": "string"}
+          },
+          "required": ["repository", "tag"],
+          "type": "object"
+        },
+        "prysm": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {"type": "string"},
+            "tag": {"type": "string"}
+          },
+          "required": ["repository", "tag"],
+          "type": "object"
+        },
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "teku": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {"type": "string"},
+            "tag": {"type": "string"}
+          },
+          "required": ["repository", "tag"],
+          "type": "object"
+        }
+      },
+      "required": ["pullPolicy", "prysm", "lighthouse", "teku", "nimbus", "lodestar"],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "Credentials to fetch images from private registry\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#localobjectreference-v1-core\n",
+      "items": {"additionalProperties": true, "type": "object"},
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "initImage": {
+      "additionalProperties": false,
+      "description": "Init image is used to chown data volume, etc.\n",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "busybox",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "1.37.0",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": ["repository", "tag", "pullPolicy"],
+      "title": "initImage",
+      "type": "object"
+    },
+    "livenessProbe": {
+      "additionalProperties": false,
+      "description": "Liveness probes per validator client type\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#probe-v1-core\n",
+      "properties": {
+        "lighthouse": {"$ref": "#/definitions/probe"},
+        "prysm": {"$ref": "#/definitions/probe"},
+        "teku": {"$ref": "#/definitions/probe"}
+      },
+      "required": ["prysm", "lighthouse", "teku"],
+      "title": "livenessProbe",
+      "type": "object"
+    },
+    "metrics": {
+      "additionalProperties": false,
+      "description": "Monitoring configuration\n",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "description": "Whether to enable metrics collection or not",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "flags": {
+          "additionalProperties": false,
+          "properties": {
+            "lighthouse": {"items": {"type": "string"}, "type": "array"},
+            "lodestar": {"items": {"type": "string"}, "type": "array"},
+            "nimbus": {"items": {"type": "string"}, "type": "array"},
+            "prysm": {"items": {"type": "string"}, "type": "array"},
+            "teku": {"items": {"type": "string"}, "type": "array"}
+          },
+          "required": ["prysm", "lighthouse", "teku", "nimbus", "lodestar"],
+          "title": "flags",
+          "type": "object"
+        },
+        "port": {
+          "default": 9090,
+          "description": "Prometheus exporter port",
+          "maximum": 65535,
+          "minimum": 1,
+          "title": "port",
+          "type": "integer"
+        },
+        "prometheusRule": {
+          "additionalProperties": false,
+          "properties": {
+            "additionalLabels": {
+              "$ref": "#/definitions/labelMap",
+              "description": "Additional labels for the prometheusRule",
+              "title": "additionalLabels"
+            },
+            "default": {
+              "default": true,
+              "description": "Create a default set of Alerts",
+              "title": "default",
+              "type": "boolean"
+            },
+            "enabled": {
+              "default": false,
+              "description": "Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "namespace": {
+              "default": "",
+              "description": "The namespace in which the prometheusRule will be created",
+              "title": "namespace",
+              "type": "string"
+            },
+            "rules": {
+              "additionalProperties": true,
+              "description": "Custom Prometheus rules",
+              "title": "rules",
+              "type": "object"
+            }
+          },
+          "required": ["enabled", "default", "namespace", "additionalLabels", "rules"],
+          "title": "prometheusRule",
+          "type": "object"
+        },
+        "serviceMonitor": {
+          "additionalProperties": false,
+          "description": "Prometheus Service Monitor\nref: https://github.com/coreos/prometheus-operator\n",
+          "properties": {
+            "additionalLabels": {
+              "$ref": "#/definitions/labelMap",
+              "description": "Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus",
+              "title": "additionalLabels"
+            },
+            "enabled": {
+              "default": false,
+              "description": "Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator",
+              "title": "enabled",
+              "type": "boolean"
+            },
+            "honorLabels": {
+              "default": false,
+              "description": "Specify honorLabels parameter to add the scrape endpoint",
+              "title": "honorLabels",
+              "type": "boolean"
+            },
+            "interval": {
+              "default": "30s",
+              "description": "The interval at which metrics should be scraped",
+              "title": "interval",
+              "type": "string"
+            },
+            "metricRelabelings": {
+              "description": "Metrics RelabelConfigs to apply to samples before ingestion.",
+              "items": {"additionalProperties": true, "type": "object"},
+              "title": "metricRelabelings",
+              "type": "array"
+            },
+            "namespace": {
+              "default": "",
+              "description": "The namespace in which the ServiceMonitor will be created",
+              "title": "namespace",
+              "type": "string"
+            },
+            "relabelings": {
+              "description": "RelabelConfigs to apply to samples before scraping.",
+              "items": {"additionalProperties": true, "type": "object"},
+              "title": "relabelings",
+              "type": "array"
+            },
+            "scrapeTimeout": {
+              "default": "",
+              "description": "The timeout after which the scrape is ended",
+              "title": "scrapeTimeout",
+              "type": "string"
+            }
+          },
+          "required": ["enabled", "namespace", "interval", "scrapeTimeout", "relabelings", "metricRelabelings", "honorLabels", "additionalLabels"],
+          "title": "serviceMonitor",
+          "type": "object"
+        }
+      },
+      "required": ["enabled", "port", "flags", "serviceMonitor", "prometheusRule"],
+      "title": "metrics",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "Provide a name in place of operator for `app:` labels\n",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "network": {
+      "default": "mainnet",
+      "description": "Network ID\nOptions for Ethereum: mainnet, prater\nOptions for Gnosis: gnosis\n",
+      "title": "network",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "$ref": "#/definitions/labelMap",
+      "description": "Node labels for pod assignment\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#nodeselector-v1-core\n"
+    },
+    "priorityClassName": {
+      "default": "",
+      "description": "Used to assign priority to pods\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podspec-v1-core\n",
+      "title": "priorityClassName",
+      "type": "string"
+    },
+    "rbac": {
+      "additionalProperties": false,
+      "description": "RBAC configuration.\nref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/\n",
+      "properties": {
+        "create": {
+          "default": true,
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "title": "name",
+          "type": "string"
+        },
+        "rules": {
+          "items": {"$ref": "#/definitions/rbacRule"},
+          "title": "rules",
+          "type": "array"
+        }
+      },
+      "required": ["create", "name", "rules"],
+      "title": "rbac",
+      "type": "object"
+    },
+    "readinessProbe": {
+      "additionalProperties": false,
+      "description": "Readiness probes per validator client type\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#probe-v1-core\n",
+      "properties": {
+        "lighthouse": {"$ref": "#/definitions/probe"},
+        "prysm": {"$ref": "#/definitions/probe"},
+        "teku": {"$ref": "#/definitions/probe"}
+      },
+      "required": ["prysm", "lighthouse", "teku"],
+      "title": "readinessProbe",
+      "type": "object"
+    },
+    "resources": {
+      "$ref": "#/definitions/resources",
+      "description": "Configure resource requests and limits.\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcerequirements-v1-core\n"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "description": "Single shared service account for all validator StatefulSets.\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#serviceaccount-v1-core\n",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Annotations to add to the service account",
+          "title": "annotations"
+        },
+        "create": {
+          "default": true,
+          "description": "Specifies whether a service account should be created",
+          "title": "create",
+          "type": "boolean"
+        }
+      },
+      "required": ["create", "annotations"],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "strictFeeRecipientCheck": {
+      "default": false,
+      "description": "Lodestar specific setting\nEnables strict checking of the validator's feeRecipient with the one returned by engine\n",
+      "title": "strictFeeRecipientCheck",
+      "type": "boolean"
+    },
+    "terminationGracePeriodSeconds": {
+      "default": 120,
+      "title": "terminationGracePeriodSeconds",
+      "type": "integer"
+    },
+    "tolerations": {
+      "description": "Tolerations for pod assignment\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#toleration-v1-core\n",
+      "oneOf": [
+        {"items": {"$ref": "#/definitions/toleration"}, "type": "array"},
+        {"maxProperties": 0, "type": "object"}
+      ],
+      "title": "tolerations",
+      "type": ["array", "object"]
+    },
+    "type": {
+      "default": "prysm",
+      "description": "What type of validator to use.\nOptions for Ethereum: prysm, lighthouse, teku\nOptions for Gnosis: prysm, lighthouse\n",
+      "enum": ["prysm", "lighthouse", "teku", "nimbus", "lodestar"],
+      "title": "type",
+      "type": "string"
+    },
+    "validatorsCount": {
+      "default": 0,
+      "description": "How many validators to run\n",
+      "title": "validatorsCount",
+      "type": "integer"
+    },
+    "validatorsKeyIndex": {
+      "default": 0,
+      "description": "Key index to prevent double signing when running multiple validator types\n",
+      "title": "validatorsKeyIndex",
+      "type": "integer"
+    },
+    "validatorsNoOfKeys": {
+      "default": 100,
+      "title": "validatorsNoOfKeys",
+      "type": "integer"
+    },
+    "web3signerEndpoint": {
+      "default": "http://localhost:6174",
+      "description": "Web3Signer Endpoint\n",
+      "title": "web3signerEndpoint",
+      "type": "string"
+    }
+  },
+  "required": [
+    "global",
+    "dvt",
+    "nameOverride",
+    "fullnameOverride",
+    "env",
+    "envFrom",
+    "rbac",
+    "initImage",
+    "cliImage",
+    "enabled",
+    "debug",
+    "type",
+    "validatorsKeyIndex",
+    "validatorsCount",
+    "validatorsNoOfKeys",
+    "enableBuilder",
+    "image",
+    "imagePullSecrets",
+    "terminationGracePeriodSeconds",
+    "serviceAccount",
+    "nodeSelector",
+    "tolerations",
+    "affinity",
+    "priorityClassName",
+    "network",
+    "flags",
+    "extraFlags",
+    "gasLimit",
+    "web3signerEndpoint",
+    "beaconChainRpcEndpoints",
+    "beaconChainRpcEndpointsRandomized",
+    "graffiti",
+    "strictFeeRecipientCheck",
+    "metrics",
+    "resources",
+    "readinessProbe",
+    "livenessProbe"
+  ],
+  "type": "object"
+}
