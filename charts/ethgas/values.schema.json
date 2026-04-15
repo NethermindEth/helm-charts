@@ -595,10 +595,7 @@
       "description": "This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/",
       "properties": {
         "annotations": {
-          "additionalProperties": false,
-          "required": [],
-          "title": "annotations",
-          "type": "object"
+          "$ref": "#/definitions/kubernetesAnnotations"
         },
         "className": {
           "default": "",
@@ -710,26 +707,12 @@
       "type": "object"
     },
     "podAnnotations": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/kubernetesAnnotations"
-        }
-      ],
-      "description": "This is for setting Kubernetes Annotations to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/",
-      "required": [],
-      "title": "podAnnotations",
-      "type": "object"
+      "$ref": "#/definitions/kubernetesAnnotations",
+      "description": "This is for setting Kubernetes Annotations to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/"
     },
     "podLabels": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/kubernetesLabels"
-        }
-      ],
-      "description": "This is for setting Kubernetes Labels to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/",
-      "required": [],
-      "title": "podLabels",
-      "type": "object"
+      "$ref": "#/definitions/kubernetesLabels",
+      "description": "This is for setting Kubernetes Labels to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/"
     },
     "podSecurityContext": {
       "additionalProperties": false,
@@ -890,11 +873,8 @@
       "description": "This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/",
       "properties": {
         "annotations": {
-          "additionalProperties": false,
-          "description": "Annotations to add to the service account",
-          "required": [],
-          "title": "annotations",
-          "type": "object"
+          "$ref": "#/definitions/kubernetesAnnotations",
+          "description": "Annotations to add to the service account"
         },
         "automount": {
           "default": true,

@@ -1,0 +1,48 @@
+suite: configmap and statefulset tests
+templates:
+  - configmap.yaml
+  - statefulset.yaml
+tests:
+  - it: given default vouch values then configmap name is the stable fullname
+    template: configmap.yaml
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-vouch
+
+  - it: given default vouch values then statefulset pod template has a configmap-hash annotation
+    template: statefulset.yaml
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.configmap-hash
+          value: b19c0733cd8dd80d5217a7cce705021e4e792cd8d157443ffd6b2dffd7ce5fcc
+
+  - it: given vouch values change then statefulset configmap-hash annotation changes
+    template: statefulset.yaml
+    set:
+      vouch.loglevel: info
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.configmap-hash
+          value: 0764e2202e33fa5e019e090208861ed9ef276739207b50489dbc7455f8761f62
+
+  - it: given vouchFullConfig is set then statefulset configmap-hash annotation is derived from vouchFullConfig
+    template: statefulset.yaml
+    set:
+      vouchFullConfig:
+        beacon-node-address: custom:5052
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.configmap-hash
+          value: 2ab7d26def246d4880fd183143c59821ea1e15e8115df2581c5667221defa07a
+
+  - it: given default vouch values then statefulset config volume references the stable configmap name
+    template: statefulset.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: config
+            configMap:
+              name: RELEASE-NAME-vouch
