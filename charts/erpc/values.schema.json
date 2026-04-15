@@ -1,0 +1,913 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "resourceQuantity": {
+      "oneOf": [{"type": "string"}, {"type": "number"}]
+    },
+    "resourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "cpu": {"$ref": "#/definitions/resourceQuantity"},
+        "memory": {"$ref": "#/definitions/resourceQuantity"},
+        "ephemeral-storage": {"$ref": "#/definitions/resourceQuantity"}
+      },
+      "type": "object"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": {"$ref": "#/definitions/resourceSpec"},
+        "requests": {"$ref": "#/definitions/resourceSpec"}
+      },
+      "type": "object"
+    },
+    "labelMap": {
+      "additionalProperties": {"type": "string"},
+      "type": "object"
+    },
+    "seccompProfile": {
+      "additionalProperties": false,
+      "description": "ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#seccompprofile-v1-core",
+      "properties": {
+        "type": {
+          "enum": ["RuntimeDefault", "Unconfined", "Localhost"],
+          "type": "string"
+        },
+        "localhostProfile": {"type": "string"}
+      },
+      "required": ["type"],
+      "type": "object"
+    },
+    "toleration": {
+      "additionalProperties": false,
+      "description": "ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#toleration-v1-core",
+      "properties": {
+        "key": {"type": "string"},
+        "operator": {"enum": ["Exists", "Equal"], "type": "string"},
+        "value": {"type": "string"},
+        "effect": {"enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"], "type": "string"},
+        "tolerationSeconds": {"type": "integer"}
+      },
+      "type": "object"
+    },
+    "nodeSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {"type": "string"},
+        "operator": {"enum": ["In", "NotIn", "Exists", "DoesNotExist", "Gt", "Lt"], "type": "string"},
+        "values": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {"type": "string"},
+        "operator": {"enum": ["In", "NotIn", "Exists", "DoesNotExist"], "type": "string"},
+        "values": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "matchLabels": {"$ref": "#/definitions/labelMap"},
+        "matchExpressions": {"items": {"$ref": "#/definitions/labelSelectorRequirement"}, "type": "array"}
+      },
+      "type": "object"
+    },
+    "podAffinityTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "labelSelector": {"$ref": "#/definitions/labelSelector"},
+        "namespaceSelector": {"$ref": "#/definitions/labelSelector"},
+        "namespaces": {"items": {"type": "string"}, "type": "array"},
+        "topologyKey": {"type": "string"}
+      },
+      "required": ["topologyKey"],
+      "type": "object"
+    },
+    "nodeSelectorTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "matchExpressions": {"items": {"$ref": "#/definitions/nodeSelectorRequirement"}, "type": "array"},
+        "matchFields": {"items": {"$ref": "#/definitions/nodeSelectorRequirement"}, "type": "array"}
+      },
+      "type": "object"
+    },
+    "affinity": {
+      "additionalProperties": false,
+      "description": "ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#affinity-v1-core",
+      "properties": {
+        "nodeAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "additionalProperties": false,
+              "properties": {
+                "nodeSelectorTerms": {"items": {"$ref": "#/definitions/nodeSelectorTerm"}, "type": "array"}
+              },
+              "required": ["nodeSelectorTerms"],
+              "type": "object"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "preference": {"$ref": "#/definitions/nodeSelectorTerm"},
+                  "weight": {"maximum": 100, "minimum": 1, "type": "integer"}
+                },
+                "required": ["weight", "preference"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {"items": {"$ref": "#/definitions/podAffinityTerm"}, "type": "array"},
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "podAffinityTerm": {"$ref": "#/definitions/podAffinityTerm"},
+                  "weight": {"maximum": 100, "minimum": 1, "type": "integer"}
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {"items": {"$ref": "#/definitions/podAffinityTerm"}, "type": "array"},
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "podAffinityTerm": {"$ref": "#/definitions/podAffinityTerm"},
+                  "weight": {"maximum": 100, "minimum": 1, "type": "integer"}
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "affinity": {
+      "$ref": "#/definitions/affinity"
+    },
+    "autoscaling": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "maxReplicas": {
+          "default": 100,
+          "title": "maxReplicas",
+          "type": "integer"
+        },
+        "minReplicas": {
+          "default": 1,
+          "title": "minReplicas",
+          "type": "integer"
+        },
+        "targetCPUUtilizationPercentage": {
+          "default": 80,
+          "title": "targetCPUUtilizationPercentage",
+          "type": "integer"
+        },
+        "targetMemoryUtilizationPercentage": {
+          "title": "targetMemoryUtilizationPercentage",
+          "type": "integer"
+        }
+      },
+      "required": ["enabled", "minReplicas", "maxReplicas", "targetCPUUtilizationPercentage"],
+      "title": "autoscaling",
+      "type": "object"
+    },
+    "erpc": {
+      "additionalProperties": false,
+      "properties": {
+        "config": {
+          "additionalProperties": false,
+          "description": "Erpc configuration.\nRef: https://docs.erpc.cloud/config/example",
+          "properties": {
+            "logLevel": {
+              "default": "warn",
+              "description": "Log verbosity level.",
+              "enum": ["trace", "debug", "info", "warn", "error"],
+              "title": "logLevel",
+              "type": "string"
+            },
+            "server": {
+              "additionalProperties": false,
+              "description": "HTTP server settings.\nRef: https://docs.erpc.cloud/config/server",
+              "properties": {
+                "listenV4": {"default": true, "description": "Enable IPv4 listener.", "type": "boolean"},
+                "httpHostV4": {"default": "0.0.0.0", "description": "IPv4 bind address.", "type": "string"},
+                "httpPortV4": {"default": 8080, "description": "IPv4 port.", "maximum": 65535, "minimum": 1, "type": "integer"},
+                "listenV6": {"default": false, "description": "Enable IPv6 listener.", "type": "boolean"},
+                "httpHostV6": {"default": "[::]", "description": "IPv6 bind address.", "type": "string"},
+                "httpPortV6": {"default": 8080, "description": "IPv6 port.", "maximum": 65535, "minimum": 1, "type": "integer"},
+                "maxTimeout": {"description": "Maximum request timeout (e.g. '30s').", "type": "string"},
+                "readTimeout": {"description": "HTTP read timeout (e.g. '5s').", "type": "string"},
+                "writeTimeout": {"description": "HTTP write timeout (e.g. '10s').", "type": "string"},
+                "enableGzip": {"default": false, "description": "Enable gzip response compression.", "type": "boolean"},
+                "waitBeforeShutdown": {"description": "Wait duration before starting shutdown (e.g. '5s').", "type": "string"},
+                "waitAfterShutdown": {"description": "Wait duration after shutdown completes (e.g. '5s').", "type": "string"},
+                "tls": {
+                  "additionalProperties": false,
+                  "description": "TLS configuration for the HTTP server.",
+                  "properties": {
+                    "enabled": {"default": false, "type": "boolean"},
+                    "certFile": {"description": "Path to TLS certificate file.", "type": "string"},
+                    "keyFile": {"description": "Path to TLS key file.", "type": "string"},
+                    "caFile": {"description": "Path to CA certificate file.", "type": "string"},
+                    "insecureSkipVerify": {"default": false, "type": "boolean"}
+                  },
+                  "required": ["enabled"],
+                  "type": "object"
+                }
+              },
+              "title": "server",
+              "type": "object"
+            },
+            "metrics": {
+              "additionalProperties": false,
+              "description": "Prometheus metrics server settings.\nRef: https://docs.erpc.cloud/config/metrics",
+              "properties": {
+                "enabled": {"default": false, "description": "Enable the metrics server.", "type": "boolean"},
+                "listenV4": {"default": true, "description": "Enable IPv4 listener.", "type": "boolean"},
+                "hostV4": {"default": "0.0.0.0", "description": "IPv4 bind address.", "type": "string"},
+                "listenV6": {"default": false, "description": "Enable IPv6 listener.", "type": "boolean"},
+                "hostV6": {"default": "[::]", "description": "IPv6 bind address.", "type": "string"},
+                "port": {"default": 4001, "description": "Metrics server port.", "maximum": 65535, "minimum": 1, "type": "integer"}
+              },
+              "required": ["enabled"],
+              "title": "metrics",
+              "type": "object"
+            },
+            "database": {
+              "additionalProperties": false,
+              "description": "Database configuration for request caching.\nRef: https://docs.erpc.cloud/config/database",
+              "properties": {
+                "evmJsonRpcCache": {
+                  "additionalProperties": false,
+                  "description": "Cache configuration for EVM JSON-RPC responses.",
+                  "properties": {
+                    "connectors": {
+                      "description": "Storage connectors for the cache.",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "id": {"description": "Unique connector identifier.", "type": "string"},
+                          "driver": {
+                            "description": "Storage driver type.",
+                            "enum": ["memory", "redis", "postgresql", "dynamodb"],
+                            "type": "string"
+                          },
+                          "memory": {
+                            "additionalProperties": false,
+                            "description": "In-memory storage settings.",
+                            "properties": {
+                              "maxItems": {"description": "Maximum number of cached items.", "type": "integer"}
+                            },
+                            "type": "object"
+                          },
+                          "redis": {
+                            "additionalProperties": false,
+                            "description": "Redis storage settings.",
+                            "properties": {
+                              "addr": {"description": "Redis address (host:port).", "type": "string"},
+                              "password": {"description": "Redis password.", "type": "string"},
+                              "db": {"description": "Redis database index.", "type": "integer"},
+                              "connPoolSize": {"description": "Connection pool size.", "type": "integer"},
+                              "tls": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "enabled": {"type": "boolean"},
+                                  "insecureSkipVerify": {"type": "boolean"}
+                                },
+                                "required": ["enabled"],
+                                "type": "object"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "postgresql": {
+                            "additionalProperties": false,
+                            "description": "PostgreSQL storage settings.",
+                            "properties": {
+                              "connectionUri": {"description": "PostgreSQL connection URI.", "type": "string"},
+                              "table": {"description": "Table name for the cache.", "type": "string"},
+                              "minConns": {"description": "Minimum connection pool size.", "type": "integer"},
+                              "maxConns": {"description": "Maximum connection pool size.", "type": "integer"},
+                              "initializationTimeout": {"description": "Timeout for initial connection (e.g. '5s').", "type": "string"}
+                            },
+                            "type": "object"
+                          },
+                          "dynamodb": {
+                            "additionalProperties": true,
+                            "description": "DynamoDB storage settings.",
+                            "type": "object"
+                          }
+                        },
+                        "required": ["id", "driver"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "policies": {
+                      "description": "Caching policies controlling what gets cached.",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "network": {"description": "Network pattern to match (e.g. 'evm:*').", "type": "string"},
+                          "method": {"description": "JSON-RPC method pattern to match (e.g. 'eth_*').", "type": "string"},
+                          "finality": {
+                            "description": "Block finality state for caching.",
+                            "enum": ["finalized", "unknown", "unfinalized", "realtime"],
+                            "type": "string"
+                          },
+                          "connector": {"description": "Connector ID to use for this policy.", "type": "string"},
+                          "ttl": {"description": "Cache TTL duration (e.g. '5m', '0' for no expiry).", "type": "string"},
+                          "maxItemSize": {"description": "Maximum item size to cache (e.g. '1mb').", "type": "string"}
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "title": "database",
+              "type": "object"
+            },
+            "projects": {
+              "description": "Erpc projects configuration.\nRef: https://docs.erpc.cloud/config/projects",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {"description": "Unique project identifier.", "type": "string"},
+                  "rateLimitBudget": {"description": "Rate limit budget ID to apply to this project.", "type": "string"},
+                  "auth": {
+                    "additionalProperties": true,
+                    "description": "Authentication configuration for this project.",
+                    "type": "object"
+                  },
+                  "corsDomainsAllowed": {
+                    "description": "Allowed CORS domains.",
+                    "items": {"type": "string"},
+                    "type": "array"
+                  },
+                  "networks": {
+                    "description": "Networks served by this project.",
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "architecture": {
+                          "description": "Network architecture type.",
+                          "enum": ["evm"],
+                          "type": "string"
+                        },
+                        "evm": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "chainId": {"description": "EVM chain ID.", "type": "integer"},
+                            "fallbackFinalityDepth": {"description": "Block depth to consider finalized.", "type": "integer"},
+                            "blockTrackerInterval": {"description": "Interval for block tracker polling (e.g. '5s').", "type": "string"}
+                          },
+                          "type": "object"
+                        },
+                        "rateLimitBudget": {"description": "Rate limit budget ID for this network.", "type": "string"},
+                        "failsafe": {
+                          "additionalProperties": true,
+                          "description": "Failsafe policies (timeout, retry, hedge, circuitBreaker).",
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "upstreams": {
+                    "description": "Upstream RPC providers for this project.",
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {"description": "Unique upstream identifier.", "type": "string"},
+                        "type": {
+                          "description": "Upstream type.",
+                          "enum": ["evm", "evm+alchemy", "evm+drpc", "evm+blastapi", "evm+infura", "evm+envio", "evm+thegraph", "evm+pimlico", "evm+etherspot", "evm+openrpc"],
+                          "type": "string"
+                        },
+                        "endpoint": {"description": "Upstream RPC endpoint URL.", "type": "string"},
+                        "rateLimitBudget": {"description": "Rate limit budget ID for this upstream.", "type": "string"},
+                        "evm": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "chainId": {"description": "EVM chain ID.", "type": "integer"},
+                            "nodeType": {
+                              "description": "Node type.",
+                              "enum": ["full", "archive"],
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "ignoreMethods": {
+                          "description": "JSON-RPC methods to ignore for this upstream.",
+                          "items": {"type": "string"},
+                          "type": "array"
+                        },
+                        "allowMethods": {
+                          "description": "JSON-RPC methods to allow for this upstream.",
+                          "items": {"type": "string"},
+                          "type": "array"
+                        },
+                        "autoIgnoreUnsupportedMethods": {"description": "Auto-ignore methods not supported by this upstream.", "type": "boolean"},
+                        "failsafe": {
+                          "additionalProperties": true,
+                          "description": "Failsafe policies (timeout, retry, hedge, circuitBreaker).",
+                          "type": "object"
+                        }
+                      },
+                      "required": ["id", "endpoint"],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": ["id"],
+                "type": "object"
+              },
+              "title": "projects",
+              "type": "array"
+            },
+            "rateLimiters": {
+              "additionalProperties": false,
+              "description": "Global rate limiter budgets.\nRef: https://docs.erpc.cloud/config/rate-limiters",
+              "properties": {
+                "budgets": {
+                  "description": "Rate limit budget definitions.",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {"description": "Unique budget identifier.", "type": "string"},
+                      "rules": {
+                        "description": "Rate limit rules for this budget.",
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "method": {"description": "JSON-RPC method pattern (e.g. '*', 'eth_call').", "type": "string"},
+                            "maxCount": {"description": "Maximum request count within the period.", "type": "integer"},
+                            "period": {"description": "Time window for the rate limit (e.g. '1s', '1m').", "type": "string"},
+                            "waitTime": {"description": "How long to wait when limit is hit (e.g. '100ms').", "type": "string"}
+                          },
+                          "required": ["method", "maxCount", "period"],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": ["id"],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "title": "rateLimiters",
+              "type": "object"
+            }
+          },
+          "required": ["logLevel", "projects"],
+          "title": "config",
+          "type": "object"
+        },
+        "secret": {
+          "additionalProperties": false,
+          "description": "Erpc secret to use in the pods envFrom\n",
+          "properties": {
+            "name": {
+              "default": "",
+              "title": "name",
+              "type": "string"
+            }
+          },
+          "required": ["name"],
+          "title": "secret",
+          "type": "object"
+        }
+      },
+      "required": ["secret", "config"],
+      "title": "erpc",
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "ghcr.io/erpc/erpc",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "",
+          "description": "Overrides the image tag whose default is the chart appVersion.",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": ["repository", "pullPolicy", "tag"],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "items": {"additionalProperties": true, "type": "object"},
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "ingress": {
+      "additionalProperties": false,
+      "description": "Ingress for the erpc rpc endpoint.",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "title": "annotations"
+        },
+        "className": {
+          "default": "",
+          "title": "className",
+          "type": "string"
+        },
+        "enabled": {
+          "default": false,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "hosts": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "host": {"type": "string"},
+              "paths": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": {"type": "string"},
+                    "pathType": {
+                      "enum": ["ImplementationSpecific", "Exact", "Prefix"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["path", "pathType"],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": ["host", "paths"],
+            "type": "object"
+          },
+          "title": "hosts",
+          "type": "array"
+        },
+        "tls": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "hosts": {"items": {"type": "string"}, "type": "array"},
+              "secretName": {"type": "string"}
+            },
+            "type": "object"
+          },
+          "title": "tls",
+          "type": "array"
+        }
+      },
+      "required": ["enabled", "className", "annotations", "hosts", "tls"],
+      "title": "ingress",
+      "type": "object"
+    },
+    "livenessProbe": {
+      "additionalProperties": true,
+      "description": "Use metrics endpoint as there is no healthcheck endpoint available",
+      "properties": {
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {"default": "/", "title": "path", "type": "string"},
+            "port": {"default": "http", "title": "port", "type": "string"}
+          },
+          "required": ["path", "port"],
+          "title": "httpGet",
+          "type": "object"
+        }
+      },
+      "required": ["httpGet"],
+      "title": "livenessProbe",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "$ref": "#/definitions/labelMap",
+      "description": "Node labels for pod assignment\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#nodeselector-v1-core\n"
+    },
+    "podLabels": {
+      "$ref": "#/definitions/labelMap",
+      "title": "podLabels"
+    },
+    "podSecurityContext": {
+      "additionalProperties": true,
+      "description": "Default security settings for the pod\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podsecuritycontext-v1-core\n",
+      "properties": {
+        "fsGroup": {"type": "integer"},
+        "fsGroupChangePolicy": {"enum": ["Always", "OnRootMismatch"], "type": "string"},
+        "runAsGroup": {"type": "integer"},
+        "runAsNonRoot": {"type": "boolean"},
+        "runAsUser": {"type": "integer"},
+        "seccompProfile": {"$ref": "#/definitions/seccompProfile"},
+        "supplementalGroups": {"items": {"type": "integer"}, "type": "array"}
+      },
+      "required": ["fsGroup", "runAsNonRoot", "runAsUser", "runAsGroup", "seccompProfile"],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "readinessProbe": {
+      "additionalProperties": true,
+      "properties": {
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {"default": "/", "title": "path", "type": "string"},
+            "port": {"default": "http", "title": "port", "type": "string"}
+          },
+          "required": ["path", "port"],
+          "title": "httpGet",
+          "type": "object"
+        }
+      },
+      "required": ["httpGet"],
+      "title": "readinessProbe",
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": 1,
+      "title": "replicaCount",
+      "type": "integer"
+    },
+    "resources": {
+      "$ref": "#/definitions/resources",
+      "description": "Configure resource requests and limits.\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcerequirements-v1-core\n"
+    },
+    "restartOnChanges": {
+      "default": false,
+      "description": "If true, the container will be restarted when the values.yaml file changes.",
+      "title": "restartOnChanges",
+      "type": "boolean"
+    },
+    "securityContext": {
+      "additionalProperties": true,
+      "description": "Default security settings for containers\nref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#securitycontext-v1-core\n",
+      "properties": {
+        "allowPrivilegeEscalation": {"type": "boolean"},
+        "capabilities": {
+          "additionalProperties": false,
+          "properties": {
+            "add": {"items": {"type": "string"}, "type": "array"},
+            "drop": {"items": {"type": "string"}, "type": "array"}
+          },
+          "type": "object"
+        },
+        "readOnlyRootFilesystem": {"type": "boolean"},
+        "runAsGroup": {"type": "integer"},
+        "runAsNonRoot": {"type": "boolean"},
+        "runAsUser": {"type": "integer"},
+        "seccompProfile": {"$ref": "#/definitions/seccompProfile"}
+      },
+      "required": ["capabilities", "readOnlyRootFilesystem", "runAsNonRoot", "runAsUser", "runAsGroup", "allowPrivilegeEscalation", "seccompProfile"],
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "additionalProperties": false,
+      "properties": {
+        "port": {
+          "default": 8080,
+          "maximum": 65535,
+          "minimum": 1,
+          "title": "port",
+          "type": "integer"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"],
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": ["type", "port"],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Annotations to add to the service account",
+          "title": "annotations"
+        },
+        "automount": {
+          "default": true,
+          "description": "Automatically mount a ServiceAccount's API credentials?",
+          "title": "automount",
+          "type": "boolean"
+        },
+        "create": {
+          "default": true,
+          "description": "Specifies whether a service account should be created",
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "description": "The name of the service account to use.\nIf not set and create is true, a name is generated using the fullname template",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": ["create", "automount", "annotations", "name"],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "serviceMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Additional ServiceMonitor annotations",
+          "title": "annotations"
+        },
+        "enabled": {
+          "default": false,
+          "description": "If true, a ServiceMonitor CRD is created for a prometheus operator.",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "interval": {
+          "default": "1m",
+          "description": "ServiceMonitor scrape interval",
+          "title": "interval",
+          "type": "string"
+        },
+        "labels": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Additional ServiceMonitor labels",
+          "title": "labels"
+        },
+        "namespace": {
+          "description": "Alternative namespace for ServiceMonitor",
+          "oneOf": [{"type": "string"}, {"type": "null"}],
+          "title": "namespace"
+        },
+        "path": {
+          "default": "/metrics",
+          "description": "Path to scrape",
+          "title": "path",
+          "type": "string"
+        },
+        "port": {
+          "default": 9000,
+          "description": "Port number",
+          "title": "port",
+          "type": "integer"
+        },
+        "relabelings": {
+          "description": "ServiceMonitor relabelings",
+          "items": {"additionalProperties": true, "type": "object"},
+          "title": "relabelings",
+          "type": "array"
+        },
+        "scheme": {
+          "default": "http",
+          "description": "ServiceMonitor scheme",
+          "enum": ["http", "https"],
+          "title": "scheme",
+          "type": "string"
+        },
+        "scrapeTimeout": {
+          "default": "30s",
+          "description": "ServiceMonitor scrape timeout",
+          "title": "scrapeTimeout",
+          "type": "string"
+        },
+        "tlsConfig": {
+          "additionalProperties": true,
+          "description": "ServiceMonitor TLS configuration",
+          "properties": {
+            "caFile": {"type": "string"},
+            "certFile": {"type": "string"},
+            "insecureSkipVerify": {"type": "boolean"},
+            "keyFile": {"type": "string"},
+            "serverName": {"type": "string"}
+          },
+          "title": "tlsConfig",
+          "type": "object"
+        }
+      },
+      "required": ["enabled", "port", "path", "namespace", "labels", "annotations", "interval", "scheme", "tlsConfig", "scrapeTimeout", "relabelings"],
+      "title": "serviceMonitor",
+      "type": "object"
+    },
+    "tolerations": {
+      "items": {"$ref": "#/definitions/toleration"},
+      "title": "tolerations",
+      "type": "array"
+    },
+    "volumeMounts": {
+      "description": "Additional volumeMounts on the output Deployment definition.",
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "mountPath": {"type": "string"},
+          "name": {"type": "string"},
+          "readOnly": {"type": "boolean"}
+        },
+        "required": ["name", "mountPath"],
+        "type": "object"
+      },
+      "title": "volumeMounts",
+      "type": "array"
+    },
+    "volumes": {
+      "description": "Additional volumes on the output Deployment definition.",
+      "items": {"additionalProperties": true, "type": "object"},
+      "title": "volumes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "replicaCount",
+    "image",
+    "imagePullSecrets",
+    "nameOverride",
+    "fullnameOverride",
+    "erpc",
+    "serviceAccount",
+    "podLabels",
+    "podSecurityContext",
+    "securityContext",
+    "service",
+    "serviceMonitor",
+    "ingress",
+    "resources",
+    "livenessProbe",
+    "readinessProbe",
+    "autoscaling",
+    "volumes",
+    "volumeMounts",
+    "nodeSelector",
+    "tolerations",
+    "affinity",
+    "restartOnChanges"
+  ],
+  "type": "object"
+}
