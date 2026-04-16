@@ -166,6 +166,68 @@
         }
       },
       "type": "object"
+    },
+    "probe": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "exec": {
+          "additionalProperties": false,
+          "properties": {
+            "command": {"items": {"type": "string"}, "type": "array"}
+          },
+          "required": ["command"],
+          "type": "object"
+        },
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "host": {"type": "string"},
+            "httpHeaders": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {"type": "string"},
+                  "value": {"type": "string"}
+                },
+                "required": ["name", "value"],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "path": {"type": "string"},
+            "port": {"type": ["integer", "string"]},
+            "scheme": {"enum": ["HTTP", "HTTPS"], "type": "string"}
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "tcpSocket": {
+          "additionalProperties": false,
+          "properties": {
+            "host": {"type": "string"},
+            "port": {"type": ["integer", "string"]}
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "grpc": {
+          "additionalProperties": false,
+          "properties": {
+            "port": {"type": "integer"},
+            "service": {"type": "string"}
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "initialDelaySeconds": {"minimum": 0, "type": "integer"},
+        "periodSeconds": {"minimum": 1, "type": "integer"},
+        "timeoutSeconds": {"minimum": 1, "type": "integer"},
+        "failureThreshold": {"minimum": 1, "type": "integer"},
+        "successThreshold": {"minimum": 1, "type": "integer"},
+        "terminationGracePeriodSeconds": {"minimum": 0, "type": "integer"}
+      },
+      "type": "object"
     }
   },
   "properties": {
@@ -301,23 +363,9 @@
       "type": "object"
     },
     "livenessProbe": {
-      "additionalProperties": false,
+      "$ref": "#/definitions/probe",
       "description": "This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
-      "properties": {
-        "httpGet": {
-          "additionalProperties": false,
-          "properties": {
-            "path": { "default": "/", "title": "path", "type": "string" },
-            "port": { "$ref": "#/definitions/resourceQuantity", "default": "http", "title": "port" }
-          },
-          "required": ["path", "port"],
-          "title": "httpGet",
-          "type": "object"
-        }
-      },
-      "required": ["httpGet"],
-      "title": "livenessProbe",
-      "type": "object"
+      "title": "livenessProbe"
     },
     "nameOverride": { "default": "", "description": "This is to override the chart name.", "title": "nameOverride", "type": "string" },
     "nodeSelector": {
@@ -371,22 +419,8 @@
       "type": "object"
     },
     "readinessProbe": {
-      "additionalProperties": false,
-      "properties": {
-        "httpGet": {
-          "additionalProperties": false,
-          "properties": {
-            "path": { "default": "/", "title": "path", "type": "string" },
-            "port": { "$ref": "#/definitions/resourceQuantity", "default": "http", "title": "port" }
-          },
-          "required": ["path", "port"],
-          "title": "httpGet",
-          "type": "object"
-        }
-      },
-      "required": ["httpGet"],
-      "title": "readinessProbe",
-      "type": "object"
+      "$ref": "#/definitions/probe",
+      "title": "readinessProbe"
     },
     "replicaCount": {
       "default": 1,
