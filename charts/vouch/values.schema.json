@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
   "definitions": {
+    "labelMap": {
+      "additionalProperties": true,
+      "type": "object"
+    },
     "resourceQuantity": {
       "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
       "oneOf": [
@@ -810,11 +814,9 @@
       "description": "# Prometheus Service Monitor\n# ref: https://github.com/coreos/prometheus-operator\n#      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint\n#",
       "properties": {
         "additionalLabels": {
-          "additionalProperties": false,
+          "$ref": "#/definitions/labelMap",
           "description": "#\n#",
-          "required": [],
-          "title": "additionalLabels",
-          "type": "object"
+          "title": "additionalLabels"
         },
         "enabled": {
           "default": false,
