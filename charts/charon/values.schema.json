@@ -184,6 +184,68 @@
       },
       "required": ["apiGroups", "resources", "verbs"],
       "type": "object"
+    },
+    "probe": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "exec": {
+          "additionalProperties": false,
+          "properties": {
+            "command": {"items": {"type": "string"}, "type": "array"}
+          },
+          "required": ["command"],
+          "type": "object"
+        },
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "host": {"type": "string"},
+            "httpHeaders": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {"type": "string"},
+                  "value": {"type": "string"}
+                },
+                "required": ["name", "value"],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "path": {"type": "string"},
+            "port": {"type": ["integer", "string"]},
+            "scheme": {"enum": ["HTTP", "HTTPS"], "type": "string"}
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "tcpSocket": {
+          "additionalProperties": false,
+          "properties": {
+            "host": {"type": "string"},
+            "port": {"type": ["integer", "string"]}
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "grpc": {
+          "additionalProperties": false,
+          "properties": {
+            "port": {"type": "integer"},
+            "service": {"type": "string"}
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "initialDelaySeconds": {"minimum": 0, "type": "integer"},
+        "periodSeconds": {"minimum": 1, "type": "integer"},
+        "timeoutSeconds": {"minimum": 1, "type": "integer"},
+        "failureThreshold": {"minimum": 1, "type": "integer"},
+        "successThreshold": {"minimum": 1, "type": "integer"},
+        "terminationGracePeriodSeconds": {"minimum": 0, "type": "integer"}
+      },
+      "type": "object"
     }
   },
   "properties": {
@@ -603,26 +665,9 @@
       "type": "integer"
     },
     "livenessProbe": {
-      "additionalProperties": false,
+      "$ref": "#/definitions/probe",
       "description": "Configure liveness probes\nref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
-      "properties": {
-        "enabled": { "default": true, "title": "enabled", "type": "boolean" },
-        "httpGet": {
-          "additionalProperties": false,
-          "properties": {
-            "path": { "default": "/readyz", "title": "path", "type": "string" },
-            "port": { "$ref": "#/definitions/resourceQuantity", "default": "monitoring", "title": "port" }
-          },
-          "required": ["path", "port"],
-          "title": "httpGet",
-          "type": "object"
-        },
-        "initialDelaySeconds": { "default": 60, "minimum": 0, "title": "initialDelaySeconds", "type": "integer" },
-        "periodSeconds": { "default": 120, "minimum": 1, "title": "periodSeconds", "type": "integer" }
-      },
-      "required": ["enabled", "initialDelaySeconds", "periodSeconds", "httpGet"],
-      "title": "livenessProbe",
-      "type": "object"
+      "title": "livenessProbe"
     },
     "monitoringPort": {
       "default": 3620,
@@ -727,26 +772,9 @@
       "type": "object"
     },
     "readinessProbe": {
-      "additionalProperties": false,
+      "$ref": "#/definitions/probe",
       "description": "Configure readiness probes\nref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
-      "properties": {
-        "enabled": { "default": true, "title": "enabled", "type": "boolean" },
-        "httpGet": {
-          "additionalProperties": false,
-          "properties": {
-            "path": { "default": "/readyz", "title": "path", "type": "string" },
-            "port": { "$ref": "#/definitions/resourceQuantity", "default": "monitoring", "title": "port" }
-          },
-          "required": ["path", "port"],
-          "title": "httpGet",
-          "type": "object"
-        },
-        "initialDelaySeconds": { "default": 10, "minimum": 0, "title": "initialDelaySeconds", "type": "integer" },
-        "periodSeconds": { "default": 10, "minimum": 1, "title": "periodSeconds", "type": "integer" }
-      },
-      "required": ["enabled", "initialDelaySeconds", "periodSeconds", "httpGet"],
-      "title": "readinessProbe",
-      "type": "object"
+      "title": "readinessProbe"
     },
     "resources": {
       "$ref": "#/definitions/resources",
