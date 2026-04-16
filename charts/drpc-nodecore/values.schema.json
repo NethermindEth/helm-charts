@@ -187,6 +187,68 @@
       },
       "type": "object"
     },
+    "probe": {
+      "additionalProperties": false,
+      "properties": {
+        "exec": {
+          "additionalProperties": false,
+          "properties": {
+            "command": { "items": { "type": "string" }, "type": "array" }
+          },
+          "required": ["command"],
+          "type": "object"
+        },
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "host": { "type": "string" },
+            "httpHeaders": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": { "type": "string" },
+                  "value": { "type": "string" }
+                },
+                "required": ["name", "value"],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "path": { "type": "string" },
+            "port": { "type": ["integer", "string"] },
+            "scheme": { "enum": ["HTTP", "HTTPS"], "type": "string" }
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "tcpSocket": {
+          "additionalProperties": false,
+          "properties": {
+            "host": { "type": "string" },
+            "port": { "type": ["integer", "string"] }
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "grpc": {
+          "additionalProperties": false,
+          "properties": {
+            "port": { "type": "integer" },
+            "service": { "type": "string" }
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "initialDelaySeconds": { "minimum": 0, "type": "integer" },
+        "periodSeconds": { "minimum": 1, "type": "integer" },
+        "timeoutSeconds": { "minimum": 1, "type": "integer" },
+        "failureThreshold": { "minimum": 1, "type": "integer" },
+        "successThreshold": { "minimum": 1, "type": "integer" },
+        "terminationGracePeriodSeconds": { "minimum": 0, "type": "integer" }
+      },
+      "required": ["initialDelaySeconds", "periodSeconds", "timeoutSeconds", "failureThreshold", "successThreshold"],
+      "type": "object"
+    },
     "serviceMonitor": {
       "additionalProperties": false,
       "properties": {
@@ -264,26 +326,8 @@
           "type": "object"
         },
         "livenessProbe": {
-          "additionalProperties": false,
-          "properties": {
-            "failureThreshold": { "default": 3, "title": "failureThreshold", "type": "integer" },
-            "initialDelaySeconds": { "default": 30, "title": "initialDelaySeconds", "type": "integer" },
-            "periodSeconds": { "default": 10, "title": "periodSeconds", "type": "integer" },
-            "successThreshold": { "default": 1, "title": "successThreshold", "type": "integer" },
-            "tcpSocket": {
-              "additionalProperties": false,
-              "properties": {
-                "port": { "default": 9090, "title": "port", "type": "integer" }
-              },
-              "required": ["port"],
-              "title": "tcpSocket",
-              "type": "object"
-            },
-            "timeoutSeconds": { "default": 1, "title": "timeoutSeconds", "type": "integer" }
-          },
-          "required": ["tcpSocket", "initialDelaySeconds", "periodSeconds", "timeoutSeconds", "failureThreshold", "successThreshold"],
-          "title": "livenessProbe",
-          "type": "object"
+          "$ref": "#/definitions/probe",
+          "title": "livenessProbe"
         },
         "nodeSelector": {
           "$ref": "#/definitions/labelMap",
@@ -311,27 +355,8 @@
           "type": "object"
         },
         "readinessProbe": {
-          "additionalProperties": false,
-          "properties": {
-            "failureThreshold": { "default": 2, "title": "failureThreshold", "type": "integer" },
-            "httpGet": {
-              "additionalProperties": false,
-              "properties": {
-                "path": { "default": "/metrics", "title": "path", "type": "string" },
-                "port": { "default": 9093, "title": "port", "type": "integer" }
-              },
-              "required": ["path", "port"],
-              "title": "httpGet",
-              "type": "object"
-            },
-            "initialDelaySeconds": { "default": 10, "title": "initialDelaySeconds", "type": "integer" },
-            "periodSeconds": { "default": 5, "title": "periodSeconds", "type": "integer" },
-            "successThreshold": { "default": 1, "title": "successThreshold", "type": "integer" },
-            "timeoutSeconds": { "default": 5, "title": "timeoutSeconds", "type": "integer" }
-          },
-          "required": ["httpGet", "initialDelaySeconds", "periodSeconds", "timeoutSeconds", "failureThreshold", "successThreshold"],
-          "title": "readinessProbe",
-          "type": "object"
+          "$ref": "#/definitions/probe",
+          "title": "readinessProbe"
         },
         "replicaCount": { "default": 1, "minimum": 1, "title": "replicaCount", "type": "integer" },
         "resources": {
