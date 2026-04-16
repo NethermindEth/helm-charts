@@ -1,7 +1,7 @@
 
 # web3signer
 
-![Version: 1.0.13](https://img.shields.io/badge/Version-1.0.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.9.1](https://img.shields.io/badge/AppVersion-25.9.1-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.9.1](https://img.shields.io/badge/AppVersion-25.9.1-informational?style=flat-square)
 
 A Helm chart for Web3Signer
 
