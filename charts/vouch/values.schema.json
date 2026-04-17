@@ -1,0 +1,1186 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "labelMap": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "resourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "cpu": {
+          "$ref": "#/definitions/resourceQuantity"
+        },
+        "memory": {
+          "$ref": "#/definitions/resourceQuantity"
+        },
+        "ephemeral-storage": {
+          "$ref": "#/definitions/resourceQuantity"
+        }
+      },
+      "type": "object"
+    },
+    "nodeSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": {
+          "enum": ["In", "NotIn", "Exists", "DoesNotExist", "Gt", "Lt"],
+          "type": "string"
+        },
+        "values": {
+          "items": { "type": "string" },
+          "type": "array"
+        }
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": {
+          "enum": ["In", "NotIn", "Exists", "DoesNotExist"],
+          "type": "string"
+        },
+        "values": {
+          "items": { "type": "string" },
+          "type": "array"
+        }
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "matchLabels": {
+          "additionalProperties": { "type": "string" },
+          "type": "object"
+        },
+        "matchExpressions": {
+          "items": { "$ref": "#/definitions/labelSelectorRequirement" },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "podAffinityTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "labelSelector": { "$ref": "#/definitions/labelSelector" },
+        "namespaces": {
+          "items": { "type": "string" },
+          "type": "array"
+        },
+        "topologyKey": { "type": "string" }
+      },
+      "required": ["topologyKey"],
+      "type": "object"
+    },
+    "nodeSelectorTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "matchExpressions": {
+          "items": { "$ref": "#/definitions/nodeSelectorRequirement" },
+          "type": "array"
+        },
+        "matchFields": {
+          "items": { "$ref": "#/definitions/nodeSelectorRequirement" },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "affinity": {
+      "additionalProperties": false,
+      "description": "# Affinity for pod assignment\n# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity\n#",
+      "properties": {
+        "nodeAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "additionalProperties": false,
+              "properties": {
+                "nodeSelectorTerms": {
+                  "items": { "$ref": "#/definitions/nodeSelectorTerm" },
+                  "type": "array"
+                }
+              },
+              "required": ["nodeSelectorTerms"],
+              "type": "object"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "preference": { "$ref": "#/definitions/nodeSelectorTerm" }
+                },
+                "required": ["weight", "preference"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": { "$ref": "#/definitions/podAffinityTerm" },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "podAffinityTerm": { "$ref": "#/definitions/podAffinityTerm" }
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": { "$ref": "#/definitions/podAffinityTerm" },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "podAffinityTerm": { "$ref": "#/definitions/podAffinityTerm" }
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "affinity",
+      "type": "object"
+    },
+    "blockRelayPort": {
+      "default": 18550,
+      "description": "# By default, Vouch's MEV-boost service listens on port 18550. Beacon nodes used by Vouch should be configured to talk directly to this, rather than other MEV-boost services or directly to relays.",
+      "title": "blockRelayPort",
+      "type": "integer"
+    },
+    "cliImage": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "nethermindeth/keystores-cli",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "v1.0.14",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "tag",
+        "pullPolicy"
+      ],
+      "title": "cliImage",
+      "type": "object"
+    },
+    "env": {
+      "items": {
+        "required": []
+      },
+      "title": "env",
+      "type": "array"
+    },
+    "envFrom": {
+      "items": {
+        "required": []
+      },
+      "title": "envFrom",
+      "type": "array"
+    },
+    "exampleValue": {
+      "default": "common-chart",
+      "description": "# stakewise/common\n# It is required by CI/CD tools and processes.\n#\n#",
+      "title": "exampleValue",
+      "type": "string"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "# Provide a name to substitute for the full names of resources\n#",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "common": {
+      "additionalProperties": true,
+      "description": "Values passed to the common subchart dependency",
+      "title": "common",
+      "type": "object"
+    },
+    "gasLimit": {
+      "title": "gasLimit",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "integer" },
+        { "type": "null" }
+      ]
+    },
+    "global": {
+      "additionalProperties": false,
+      "properties": {
+        "podSecurityContext": {
+          "additionalProperties": false,
+          "description": "# Pod Security Context\n# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/\n#",
+          "properties": {
+            "fsGroup": {
+              "default": 10000,
+              "minimum": 0,
+              "title": "fsGroup",
+              "type": "integer"
+            },
+            "fsGroupChangePolicy": {
+              "enum": [
+                "OnRootMismatch",
+                "Always"
+              ],
+              "title": "fsGroupChangePolicy",
+              "type": "string"
+            },
+            "runAsNonRoot": {
+              "default": true,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsGroup": {
+              "minimum": 0,
+              "title": "runAsGroup",
+              "type": "integer"
+            },
+            "runAsUser": {
+              "default": 10000,
+              "minimum": 0,
+              "title": "runAsUser",
+              "type": "integer"
+            },
+            "seLinuxOptions": {
+              "additionalProperties": false,
+              "properties": {
+                "level": {
+                  "title": "level",
+                  "type": "string"
+                },
+                "role": {
+                  "title": "role",
+                  "type": "string"
+                },
+                "type": {
+                  "title": "type",
+                  "type": "string"
+                },
+                "user": {
+                  "title": "user",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "seLinuxOptions",
+              "type": "object"
+            },
+            "seccompProfile": {
+              "additionalProperties": false,
+              "properties": {
+                "localhostProfile": {
+                  "title": "localhostProfile",
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "Unconfined",
+                    "RuntimeDefault",
+                    "Localhost"
+                  ],
+                  "title": "type",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "seccompProfile",
+              "type": "object"
+            },
+            "supplementalGroups": {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "title": "supplementalGroups",
+              "type": "array"
+            },
+            "supplementalGroupsPolicy": {
+              "enum": [
+                "Merge",
+                "Strict"
+              ],
+              "title": "supplementalGroupsPolicy",
+              "type": "string"
+            },
+            "sysctls": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "title": "name",
+                    "type": "string"
+                  },
+                  "value": {
+                    "title": "value",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ],
+                "type": "object"
+              },
+              "title": "sysctls",
+              "type": "array"
+            },
+            "windowsOptions": {
+              "additionalProperties": false,
+              "properties": {
+                "gmsaCredentialSpec": {
+                  "title": "gmsaCredentialSpec",
+                  "type": "string"
+                },
+                "gmsaCredentialSpecName": {
+                  "title": "gmsaCredentialSpecName",
+                  "type": "string"
+                },
+                "hostProcess": {
+                  "title": "hostProcess",
+                  "type": "boolean"
+                },
+                "runAsUserName": {
+                  "title": "runAsUserName",
+                  "type": "string"
+                }
+              },
+              "required": [],
+              "title": "windowsOptions",
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "podSecurityContext",
+          "type": "object"
+        },
+        "securityContext": {
+          "additionalProperties": false,
+          "properties": {
+            "capabilities": {
+              "additionalProperties": false,
+              "properties": {
+                "drop": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "drop",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "drop"
+              ],
+              "title": "capabilities",
+              "type": "object"
+            },
+            "readOnlyRootFilesystem": {
+              "default": true,
+              "title": "readOnlyRootFilesystem",
+              "type": "boolean"
+            },
+            "runAsNonRoot": {
+              "default": true,
+              "title": "runAsNonRoot",
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "default": 10000,
+              "title": "runAsUser",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "readOnlyRootFilesystem",
+            "runAsNonRoot",
+            "runAsUser",
+            "capabilities"
+          ],
+          "title": "securityContext",
+          "type": "object"
+        },
+        "serviceAccount": {
+          "additionalProperties": false,
+          "properties": {
+            "create": {
+              "default": true,
+              "title": "create",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "create"
+          ],
+          "title": "serviceAccount",
+          "type": "object"
+        }
+      },
+      "required": [
+        "serviceAccount",
+        "podSecurityContext",
+        "securityContext"
+      ],
+      "title": "global",
+      "type": "object"
+    },
+    "httpPort": {
+      "default": 8881,
+      "description": "# Port on which vouch HTTP listens.\n#",
+      "title": "httpPort",
+      "type": "integer"
+    },
+    "image": {
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "attestant/vouch",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "1.11.1",
+          "description": "Overrides the image tag whose default is the chart appVersion.",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "pullPolicy",
+        "tag"
+      ],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "items": {
+        "required": []
+      },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "initImage": {
+      "additionalProperties": false,
+      "description": "# Init image is used to chown data volume, etc.\n#",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": {
+          "default": "nethermindeth/bash",
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "5.2-alpine3.19",
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "tag",
+        "pullPolicy"
+      ],
+      "title": "initImage",
+      "type": "object"
+    },
+    "livenessProbe": {
+      "additionalProperties": false,
+      "properties": {
+        "failureThreshold": {
+          "default": 3,
+          "title": "failureThreshold",
+          "type": "integer"
+        },
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "default": "/metrics",
+              "title": "path",
+              "type": "string"
+            },
+            "port": {
+              "default": "metrics",
+              "title": "port",
+              "type": "string"
+            },
+            "scheme": {
+              "default": "HTTP",
+              "title": "scheme",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "port",
+            "scheme"
+          ],
+          "title": "httpGet",
+          "type": "object"
+        },
+        "initialDelaySeconds": {
+          "default": 60,
+          "title": "initialDelaySeconds",
+          "type": "integer"
+        },
+        "periodSeconds": {
+          "default": 10,
+          "title": "periodSeconds",
+          "type": "integer"
+        },
+        "successThreshold": {
+          "default": 1,
+          "title": "successThreshold",
+          "type": "integer"
+        },
+        "timeoutSeconds": {
+          "default": 3,
+          "title": "timeoutSeconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "initialDelaySeconds",
+        "timeoutSeconds",
+        "periodSeconds",
+        "failureThreshold",
+        "successThreshold",
+        "httpGet"
+      ],
+      "title": "livenessProbe",
+      "type": "object"
+    },
+    "loggingLevel": {
+      "default": "INFO",
+      "description": "# Sets logging verbosity.\n# Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.",
+      "title": "loggingLevel",
+      "type": "string"
+    },
+    "metricsPort": {
+      "default": 8081,
+      "description": "# The port (TCP) on which Prometheus accesses metrics\n#",
+      "title": "metricsPort",
+      "type": "integer"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "# Provide a name in place of operator for `app:` labels\n#",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "# Node labels for pod assignment\n# ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/\n#",
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "podAnnotations": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "podAnnotations",
+      "type": "object"
+    },
+    "readinessProbe": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "failureThreshold": {
+          "default": 3,
+          "title": "failureThreshold",
+          "type": "integer"
+        },
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "default": "/metrics",
+              "title": "path",
+              "type": "string"
+            },
+            "port": {
+              "default": "metrics",
+              "title": "port",
+              "type": "string"
+            },
+            "scheme": {
+              "default": "HTTP",
+              "title": "scheme",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "port",
+            "scheme"
+          ],
+          "title": "httpGet",
+          "type": "object"
+        },
+        "initialDelaySeconds": {
+          "default": 10,
+          "title": "initialDelaySeconds",
+          "type": "integer"
+        },
+        "periodSeconds": {
+          "default": 5,
+          "title": "periodSeconds",
+          "type": "integer"
+        },
+        "successThreshold": {
+          "default": 2,
+          "title": "successThreshold",
+          "type": "integer"
+        },
+        "timeoutSeconds": {
+          "default": 3,
+          "title": "timeoutSeconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "enabled",
+        "initialDelaySeconds",
+        "timeoutSeconds",
+        "periodSeconds",
+        "failureThreshold",
+        "successThreshold",
+        "httpGet"
+      ],
+      "title": "readinessProbe",
+      "type": "object"
+    },
+    "relays": {
+      "items": {
+        "required": []
+      },
+      "title": "relays",
+      "type": "array"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "description": "# Configure resource requests and limits.\n# ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/\n#",
+      "properties": {
+        "limits": {
+          "$ref": "#/definitions/resourceSpec",
+          "title": "limits"
+        },
+        "requests": {
+          "$ref": "#/definitions/resourceSpec",
+          "title": "requests"
+        }
+      },
+      "title": "resources",
+      "type": "object"
+    },
+    "service": {
+      "additionalProperties": false,
+      "properties": {
+        "httpPort": {
+          "default": 8881,
+          "maximum": 65535,
+          "minimum": 1,
+          "title": "httpPort",
+          "type": "integer"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "enum": [
+            "ClusterIP",
+            "NodePort",
+            "LoadBalancer",
+            "ExternalName"
+          ],
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "httpPort"
+      ],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "description": "# ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/\n#",
+      "properties": {
+        "annotations": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Annotations to add to the service account",
+          "title": "annotations",
+          "type": "object"
+        },
+        "create": {
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "description": "The name of the service account to use.\nIf not set and create is true, a name is generated using the fullname template",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "annotations",
+        "name"
+      ],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "serviceMonitor": {
+      "additionalProperties": false,
+      "description": "# Prometheus Service Monitor\n# ref: https://github.com/coreos/prometheus-operator\n#      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint\n#",
+      "properties": {
+        "additionalLabels": {
+          "$ref": "#/definitions/labelMap",
+          "description": "#\n#",
+          "title": "additionalLabels"
+        },
+        "enabled": {
+          "default": false,
+          "description": "#\n#",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "honorLabels": {
+          "default": false,
+          "description": "#\n#",
+          "title": "honorLabels",
+          "type": "boolean"
+        },
+        "interval": {
+          "default": "30s",
+          "description": "#\n#",
+          "title": "interval",
+          "type": "string"
+        },
+        "metricRelabelings": {
+          "description": "#\n#",
+          "items": {
+            "required": []
+          },
+          "title": "metricRelabelings",
+          "type": "array"
+        },
+        "namespace": {
+          "default": "",
+          "description": "#\n#",
+          "title": "namespace",
+          "type": "string"
+        },
+        "relabellings": {
+          "description": "#\n#",
+          "items": {
+            "required": []
+          },
+          "title": "relabellings",
+          "type": "array"
+        },
+        "scrapeTimeout": {
+          "default": "",
+          "description": "#\n#",
+          "title": "scrapeTimeout",
+          "type": "string"
+        }
+      },
+      "required": [
+        "enabled",
+        "namespace",
+        "interval",
+        "scrapeTimeout",
+        "relabellings",
+        "metricRelabelings",
+        "honorLabels",
+        "additionalLabels"
+      ],
+      "title": "serviceMonitor",
+      "type": "object"
+    },
+    "tolerations": {
+      "description": "# Tolerations for pod assignment\n# ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/\n#",
+      "oneOf": [
+        {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "enum": [
+                  "NoSchedule",
+                  "PreferNoSchedule",
+                  "NoExecute"
+                ],
+                "title": "effect",
+                "type": "string"
+              },
+              "key": {
+                "title": "key",
+                "type": "string"
+              },
+              "operator": {
+                "enum": [
+                  "Exists",
+                  "Equal"
+                ],
+                "title": "operator",
+                "type": "string"
+              },
+              "tolerationSeconds": {
+                "minimum": 0,
+                "title": "tolerationSeconds",
+                "type": "integer"
+              },
+              "value": {
+                "title": "value",
+                "type": "string"
+              }
+            },
+            "title": "toleration",
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "maxProperties": 0,
+          "type": "object"
+        }
+      ],
+      "title": "tolerations",
+      "type": [
+        "array",
+        "object"
+      ]
+    },
+    "vouch": {
+      "additionalProperties": false,
+      "properties": {
+        "accountmanager": {
+          "additionalProperties": false,
+          "properties": {
+            "dirk": {
+              "additionalProperties": false,
+              "properties": {
+                "accounts": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "accounts",
+                  "type": "array"
+                },
+                "endpoints": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "required": []
+                  },
+                  "title": "endpoints",
+                  "type": "array"
+                },
+                "timeout": {
+                  "default": "1m",
+                  "title": "timeout",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "endpoints",
+                "accounts",
+                "timeout"
+              ],
+              "title": "dirk",
+              "type": "object"
+            }
+          },
+          "required": [
+            "dirk"
+          ],
+          "title": "accountmanager",
+          "type": "object"
+        },
+        "beaconnodeaddress": {
+          "default": "localhost:5052",
+          "title": "beaconnodeaddress",
+          "type": "string"
+        },
+        "beaconnodeaddresses": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "required": []
+          },
+          "title": "beaconnodeaddresses",
+          "type": "array"
+        },
+        "blockrelay": {
+          "additionalProperties": false,
+          "properties": {
+            "fallbackfeerecipient": {
+              "default": "0x0000000000000000000000000000000000000001",
+              "title": "fallbackfeerecipient",
+              "type": "string"
+            },
+            "listen-address": {
+              "default": "0.0.0.0:18550",
+              "title": "listen-address",
+              "type": "string"
+            }
+          },
+          "required": [
+            "listen-address",
+            "fallbackfeerecipient"
+          ],
+          "title": "blockrelay",
+          "type": "object"
+        },
+        "feerecipient": {
+          "additionalProperties": false,
+          "properties": {
+            "defaultaddress": {
+              "default": "0x0000000000000000000000000000000000000001",
+              "title": "defaultaddress",
+              "type": "string"
+            }
+          },
+          "required": [
+            "defaultaddress"
+          ],
+          "title": "feerecipient",
+          "type": "object"
+        },
+        "graffiti": {
+          "additionalProperties": false,
+          "properties": {
+            "static": {
+              "additionalProperties": false,
+              "properties": {
+                "value": {
+                  "default": "My graffiti",
+                  "title": "value",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "value"
+              ],
+              "title": "static",
+              "type": "object"
+            }
+          },
+          "required": [
+            "static"
+          ],
+          "title": "graffiti",
+          "type": "object"
+        },
+        "loglevel": {
+          "default": "debug",
+          "title": "loglevel",
+          "type": "string"
+        },
+        "metrics": {
+          "additionalProperties": false,
+          "properties": {
+            "prometheus": {
+              "additionalProperties": false,
+              "properties": {
+                "listenaddress": {
+                  "default": "0.0.0.0:8081",
+                  "title": "listenaddress",
+                  "type": "string"
+                },
+                "loglevel": {
+                  "default": "trace",
+                  "title": "loglevel",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "loglevel",
+                "listenaddress"
+              ],
+              "title": "prometheus",
+              "type": "object"
+            }
+          },
+          "required": [
+            "prometheus"
+          ],
+          "title": "metrics",
+          "type": "object"
+        },
+        "strategies": {
+          "title": "strategies",
+          "oneOf": [
+            { "type": "object", "additionalProperties": true },
+            { "type": "null" }
+          ]
+        },
+        "submitter": {
+          "title": "submitter",
+          "oneOf": [
+            { "type": "object", "additionalProperties": true },
+            { "type": "null" }
+          ]
+        },
+        "tracing": {
+          "title": "tracing",
+          "oneOf": [
+            { "type": "object", "additionalProperties": true },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": [
+        "beaconnodeaddress",
+        "beaconnodeaddresses",
+        "loglevel",
+        "graffiti",
+        "accountmanager",
+        "feerecipient",
+        "metrics",
+        "blockrelay"
+      ],
+      "title": "vouch",
+      "type": "object"
+    },
+    "vouchDataDir": {
+      "default": "/data/vouch",
+      "title": "vouchDataDir",
+      "type": "string"
+    },
+    "vouchFullConfig": {
+      "description": "use vouchFullConfig: to provide all vouch.yaml values\nuse vouch: to populate good defaults and to do minimal changes",
+      "title": "vouchFullConfig"
+    }
+  },
+  "required": [
+    "global",
+    "image",
+    "initImage",
+    "cliImage",
+    "vouchDataDir",
+    "vouch",
+    "relays",
+    "imagePullSecrets",
+    "envFrom",
+    "env",
+    "nameOverride",
+    "fullnameOverride",
+    "loggingLevel",
+    "blockRelayPort",
+    "httpPort",
+    "metricsPort",
+    "livenessProbe",
+    "readinessProbe",
+    "serviceAccount",
+    "podAnnotations",
+    "service",
+    "resources",
+    "nodeSelector",
+    "tolerations",
+    "affinity",
+    "serviceMonitor"
+  ],
+  "type": "object"
+}
