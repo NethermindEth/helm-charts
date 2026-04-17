@@ -919,6 +919,23 @@ entries:
   erpc:
   - apiVersion: v2
     appVersion: 0.0.33
+    created: "2026-04-17T12:02:21.186916682Z"
+    description: A Helm chart for deploying Erpc
+    digest: 74c9389af86859f2a108b3cf1c485272325e36d012ee43d80f9c4a9a0cbc6fee
+    home: https://docs.erpc.cloud
+    keywords:
+    - rpcs
+    - erpc
+    maintainers:
+    - name: cbermudez97
+    - name: AntiD2ta
+    name: erpc
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/erpc-1.1.0/erpc-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
+    appVersion: 0.0.33
     created: "2025-06-09T09:50:53.644189925Z"
     description: A Helm chart for deploying Erpc
     digest: 5c7c4ffed7a94bac6e045649fa512405626b052d8cb88e3ed62dc1c55f772dda
@@ -4351,4 +4368,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-04-17T12:01:10.076336401Z"
+generated: "2026-04-17T12:02:21.187459405Z"
