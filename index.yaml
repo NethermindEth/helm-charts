@@ -649,6 +649,26 @@ entries:
   dirk:
   - apiVersion: v2
     appVersion: v22.10.0
+    created: "2026-04-17T12:01:10.075976455Z"
+    description: A Helm chart for installing and configuring large scale ETH staking
+      infrastructure on top of the Kubernetes
+    digest: 55d132e72fb9ab112c58af0619324d01e4c1fc1ea22f8cf6d09c1fa580a11bf9
+    home: https://github.com/attestantio/dirk
+    keywords:
+    - ethereum
+    - blockchain
+    - external-signer
+    - dirk
+    maintainers:
+    - name: matilote
+    - name: aivarasko
+    name: dirk
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/dirk-1.2.0/dirk-1.2.0.tgz
+    version: 1.2.0
+  - apiVersion: v2
+    appVersion: v22.10.0
     created: "2026-02-24T11:22:51.15034025Z"
     description: A Helm chart for installing and configuring large scale ETH staking
       infrastructure on top of the Kubernetes
@@ -4331,4 +4351,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-04-17T12:00:07.096115247Z"
+generated: "2026-04-17T12:01:10.076336401Z"
