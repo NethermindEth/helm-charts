@@ -77,6 +77,13 @@ spec:
       protocol: UDP
       targetPort: {{ $portBeacon }}
       nodePort: {{ $portBeacon }}
+    {{- if eq $.Values.beacon.client "lodestar" }}
+    - name: quic-udp-beacon
+      port: {{ add (include "beacon.p2pPort" $ | int) 1 }}
+      protocol: UDP
+      targetPort: {{ add $portBeacon 1 }}
+      nodePort: {{ add $portBeacon 1 }}
+    {{- end }}
   {{- end }}
   selector:
     {{- include "common.labels.matchLabels" $ | nindent 4 }}
