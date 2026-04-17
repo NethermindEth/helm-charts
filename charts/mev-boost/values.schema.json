@@ -1,0 +1,570 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" }
+      ]
+    },
+    "resourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "cpu": { "$ref": "#/definitions/resourceQuantity" },
+        "memory": { "$ref": "#/definitions/resourceQuantity" },
+        "ephemeral-storage": { "$ref": "#/definitions/resourceQuantity" }
+      },
+      "type": "object"
+    },
+    "labelMap": {
+      "additionalProperties": { "type": "string" },
+      "type": "object"
+    },
+    "toleration": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "enum": ["Exists", "Equal"], "type": "string" },
+        "value": { "type": "string" },
+        "effect": { "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"], "type": "string" },
+        "tolerationSeconds": { "minimum": 0, "type": "integer" }
+      },
+      "type": "object"
+    },
+    "nodeSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "enum": ["In", "NotIn", "Exists", "DoesNotExist", "Gt", "Lt"], "type": "string" },
+        "values": { "items": { "type": "string" }, "type": "array" }
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelectorRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "operator": { "enum": ["In", "NotIn", "Exists", "DoesNotExist"], "type": "string" },
+        "values": { "items": { "type": "string" }, "type": "array" }
+      },
+      "required": ["key", "operator"],
+      "type": "object"
+    },
+    "labelSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "matchLabels": { "$ref": "#/definitions/labelMap" },
+        "matchExpressions": {
+          "items": { "$ref": "#/definitions/labelSelectorRequirement" },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "podAffinityTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "labelSelector": { "$ref": "#/definitions/labelSelector" },
+        "namespaces": { "items": { "type": "string" }, "type": "array" },
+        "topologyKey": { "type": "string" }
+      },
+      "required": ["topologyKey"],
+      "type": "object"
+    },
+    "nodeSelectorTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "matchExpressions": {
+          "items": { "$ref": "#/definitions/nodeSelectorRequirement" },
+          "type": "array"
+        },
+        "matchFields": {
+          "items": { "$ref": "#/definitions/nodeSelectorRequirement" },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "affinity": {
+      "additionalProperties": false,
+      "properties": {
+        "nodeAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "additionalProperties": false,
+              "properties": {
+                "nodeSelectorTerms": {
+                  "items": { "$ref": "#/definitions/nodeSelectorTerm" },
+                  "type": "array"
+                }
+              },
+              "required": ["nodeSelectorTerms"],
+              "type": "object"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "preference": { "$ref": "#/definitions/nodeSelectorTerm" }
+                },
+                "required": ["weight", "preference"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": { "$ref": "#/definitions/podAffinityTerm" },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "podAffinityTerm": { "$ref": "#/definitions/podAffinityTerm" }
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "additionalProperties": false,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "items": { "$ref": "#/definitions/podAffinityTerm" },
+              "type": "array"
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "weight": { "minimum": 1, "maximum": 100, "type": "integer" },
+                  "podAffinityTerm": { "$ref": "#/definitions/podAffinityTerm" }
+                },
+                "required": ["weight", "podAffinityTerm"],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "probe": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "exec": {
+          "additionalProperties": false,
+          "properties": {
+            "command": {"items": {"type": "string"}, "type": "array"}
+          },
+          "required": ["command"],
+          "type": "object"
+        },
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "host": {"type": "string"},
+            "httpHeaders": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {"type": "string"},
+                  "value": {"type": "string"}
+                },
+                "required": ["name", "value"],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "path": {"type": "string"},
+            "port": {"type": ["integer", "string"]},
+            "scheme": {"enum": ["HTTP", "HTTPS"], "type": "string"}
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "tcpSocket": {
+          "additionalProperties": false,
+          "properties": {
+            "host": {"type": "string"},
+            "port": {"type": ["integer", "string"]}
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "grpc": {
+          "additionalProperties": false,
+          "properties": {
+            "port": {"type": "integer"},
+            "service": {"type": "string"}
+          },
+          "required": ["port"],
+          "type": "object"
+        },
+        "initialDelaySeconds": {"minimum": 0, "type": "integer"},
+        "periodSeconds": {"minimum": 1, "type": "integer"},
+        "timeoutSeconds": {"minimum": 1, "type": "integer"},
+        "failureThreshold": {"minimum": 1, "type": "integer"},
+        "successThreshold": {"minimum": 1, "type": "integer"},
+        "terminationGracePeriodSeconds": {"minimum": 0, "type": "integer"}
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "affinity": {
+      "$ref": "#/definitions/affinity",
+      "title": "affinity"
+    },
+    "autoscaling": {
+      "additionalProperties": false,
+      "description": "This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/",
+      "properties": {
+        "enabled": { "default": false, "title": "enabled", "type": "boolean" },
+        "maxReplicas": { "default": 10, "minimum": 1, "title": "maxReplicas", "type": "integer" },
+        "minReplicas": { "default": 1, "minimum": 1, "title": "minReplicas", "type": "integer" },
+        "targetCPUUtilizationPercentage": { "default": 80, "minimum": 1, "maximum": 100, "title": "targetCPUUtilizationPercentage", "type": "integer" },
+        "targetMemoryUtilizationPercentage": { "minimum": 1, "maximum": 100, "title": "targetMemoryUtilizationPercentage", "type": "integer" }
+      },
+      "required": ["enabled", "minReplicas", "maxReplicas", "targetCPUUtilizationPercentage"],
+      "title": "autoscaling",
+      "type": "object"
+    },
+    "config": {
+      "additionalProperties": false,
+      "properties": {
+        "logLevel": { "default": "info", "title": "logLevel", "type": "string" },
+        "network": { "default": "mainnet", "title": "network", "type": "string" },
+        "relays": {
+          "additionalProperties": {
+            "description": "Array of relay URLs for a network",
+            "items": { "format": "uri", "type": "string" },
+            "type": "array"
+          },
+          "description": "Map of network name to relay URL list. Add any network key as needed.",
+          "title": "relays",
+          "type": "object"
+        }
+      },
+      "required": ["network", "logLevel", "relays"],
+      "title": "config",
+      "type": "object"
+    },
+    "extraArgs": {
+      "description": "Extra arguments to pass to the mev-boost binary.",
+      "items": { "type": "string" },
+      "title": "extraArgs",
+      "type": "array"
+    },
+    "fullnameOverride": { "default": "", "title": "fullnameOverride", "type": "string" },
+    "global": {
+      "additionalProperties": true,
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "title": "global",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "description": "This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "description": "This sets the pull policy for images.",
+          "enum": ["IfNotPresent", "Always", "Never"],
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": { "default": "flashbots/mev-boost", "title": "repository", "type": "string" },
+        "tag": { "default": "", "description": "Overrides the image tag whose default is the chart appVersion.", "title": "tag", "type": "string" }
+      },
+      "required": ["repository", "pullPolicy", "tag"],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/",
+      "items": { "additionalProperties": true, "type": "object" },
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "ingress": {
+      "additionalProperties": false,
+      "description": "This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "title": "annotations"
+        },
+        "className": { "default": "", "title": "className", "type": "string" },
+        "enabled": { "default": false, "title": "enabled", "type": "boolean" },
+        "hosts": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "host": { "title": "host", "type": "string" },
+              "paths": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": { "title": "path", "type": "string" },
+                    "pathType": {
+                      "enum": ["ImplementationSpecific", "Exact", "Prefix"],
+                      "title": "pathType",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["path", "pathType"],
+                  "type": "object"
+                },
+                "title": "paths",
+                "type": "array"
+              }
+            },
+            "required": ["host", "paths"],
+            "type": "object"
+          },
+          "title": "hosts",
+          "type": "array"
+        },
+        "tls": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "hosts": { "items": { "type": "string" }, "type": "array" },
+              "secretName": { "type": "string" }
+            },
+            "type": "object"
+          },
+          "title": "tls",
+          "type": "array"
+        }
+      },
+      "required": ["enabled", "className", "annotations", "hosts", "tls"],
+      "title": "ingress",
+      "type": "object"
+    },
+    "livenessProbe": {
+      "$ref": "#/definitions/probe",
+      "description": "This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
+      "title": "livenessProbe"
+    },
+    "nameOverride": { "default": "", "description": "This is to override the chart name.", "title": "nameOverride", "type": "string" },
+    "nodeSelector": {
+      "$ref": "#/definitions/labelMap",
+      "title": "nodeSelector"
+    },
+    "podAnnotations": {
+      "$ref": "#/definitions/labelMap",
+      "description": "This is for setting Kubernetes Annotations to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/",
+      "title": "podAnnotations"
+    },
+    "podLabels": {
+      "$ref": "#/definitions/labelMap",
+      "description": "This is for setting Kubernetes Labels to a Pod.\nFor more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/",
+      "title": "podLabels"
+    },
+    "podSecurityContext": {
+      "additionalProperties": false,
+      "description": "ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+      "properties": {
+        "fsGroup": { "minimum": 0, "title": "fsGroup", "type": "integer" },
+        "fsGroupChangePolicy": { "enum": ["OnRootMismatch", "Always"], "title": "fsGroupChangePolicy", "type": "string" },
+        "runAsGroup": { "minimum": 0, "title": "runAsGroup", "type": "integer" },
+        "runAsNonRoot": { "title": "runAsNonRoot", "type": "boolean" },
+        "runAsUser": { "minimum": 0, "title": "runAsUser", "type": "integer" },
+        "supplementalGroups": { "items": { "minimum": 0, "type": "integer" }, "title": "supplementalGroups", "type": "array" },
+        "sysctls": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "value": { "type": "string" }
+            },
+            "required": ["name", "value"],
+            "type": "object"
+          },
+          "title": "sysctls",
+          "type": "array"
+        },
+        "seccompProfile": {
+          "additionalProperties": false,
+          "properties": {
+            "type": { "enum": ["Unconfined", "RuntimeDefault", "Localhost"], "type": "string" },
+            "localhostProfile": { "type": "string" }
+          },
+          "required": ["type"],
+          "type": "object"
+        }
+      },
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "readinessProbe": {
+      "$ref": "#/definitions/probe",
+      "title": "readinessProbe"
+    },
+    "replicaCount": {
+      "default": 1,
+      "description": "This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/",
+      "minimum": 1,
+      "title": "replicaCount",
+      "type": "integer"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "description": "Configure resource requests and limits. ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+      "properties": {
+        "limits": { "$ref": "#/definitions/resourceSpec" },
+        "requests": { "$ref": "#/definitions/resourceSpec" }
+      },
+      "title": "resources",
+      "type": "object"
+    },
+    "securityContext": {
+      "additionalProperties": false,
+      "description": "ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+      "properties": {
+        "allowPrivilegeEscalation": { "title": "allowPrivilegeEscalation", "type": "boolean" },
+        "capabilities": {
+          "additionalProperties": false,
+          "properties": {
+            "add": { "items": { "type": "string" }, "title": "add", "type": "array" },
+            "drop": { "items": { "type": "string" }, "title": "drop", "type": "array" }
+          },
+          "title": "capabilities",
+          "type": "object"
+        },
+        "readOnlyRootFilesystem": { "title": "readOnlyRootFilesystem", "type": "boolean" },
+        "runAsGroup": { "minimum": 0, "title": "runAsGroup", "type": "integer" },
+        "runAsNonRoot": { "title": "runAsNonRoot", "type": "boolean" },
+        "runAsUser": { "minimum": 0, "title": "runAsUser", "type": "integer" },
+        "seccompProfile": {
+          "additionalProperties": false,
+          "properties": {
+            "type": { "enum": ["Unconfined", "RuntimeDefault", "Localhost"], "type": "string" },
+            "localhostProfile": { "type": "string" }
+          },
+          "required": ["type"],
+          "type": "object"
+        }
+      },
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "additionalProperties": false,
+      "description": "This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/",
+      "properties": {
+        "port": {
+          "default": 18550,
+          "description": "This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports",
+          "maximum": 65535,
+          "minimum": 1,
+          "title": "port",
+          "type": "integer"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "description": "This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"],
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": ["type", "port"],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "description": "This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Annotations to add to the service account",
+          "title": "annotations"
+        },
+        "automount": { "default": true, "description": "Automatically mount a ServiceAccount's API credentials?", "title": "automount", "type": "boolean" },
+        "create": { "default": true, "description": "Specifies whether a service account should be created", "title": "create", "type": "boolean" },
+        "name": { "default": "", "description": "The name of the service account to use.\nIf not set and create is true, a name is generated using the fullname template", "title": "name", "type": "string" }
+      },
+      "required": ["create", "automount", "annotations", "name"],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "tolerations": {
+      "description": "ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/",
+      "items": { "$ref": "#/definitions/toleration" },
+      "title": "tolerations",
+      "type": "array"
+    },
+    "volumeMounts": {
+      "description": "Additional volumeMounts on the output Deployment definition.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "mountPath": { "title": "mountPath", "type": "string" },
+          "mountPropagation": { "title": "mountPropagation", "type": "string" },
+          "name": { "title": "name", "type": "string" },
+          "readOnly": { "title": "readOnly", "type": "boolean" },
+          "subPath": { "title": "subPath", "type": "string" }
+        },
+        "required": ["name", "mountPath"],
+        "type": "object"
+      },
+      "title": "volumeMounts",
+      "type": "array"
+    },
+    "volumes": {
+      "description": "Additional volumes on the output Deployment definition.",
+      "items": { "additionalProperties": true, "type": "object" },
+      "title": "volumes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "nameOverride",
+    "fullnameOverride",
+    "replicaCount",
+    "image",
+    "imagePullSecrets",
+    "config",
+    "extraArgs",
+    "serviceAccount",
+    "podAnnotations",
+    "podLabels",
+    "podSecurityContext",
+    "securityContext",
+    "service",
+    "ingress",
+    "resources",
+    "livenessProbe",
+    "readinessProbe",
+    "autoscaling",
+    "volumes",
+    "volumeMounts",
+    "nodeSelector",
+    "tolerations",
+    "affinity"
+  ],
+  "type": "object"
+}

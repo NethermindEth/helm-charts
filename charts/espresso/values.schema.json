@@ -1,0 +1,650 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "resourceQuantity": {
+      "description": "Kubernetes resource quantity (e.g. '100m', '256Mi', or a number)",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" }
+      ]
+    },
+    "resourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "cpu": { "$ref": "#/definitions/resourceQuantity" },
+        "memory": { "$ref": "#/definitions/resourceQuantity" },
+        "ephemeral-storage": { "$ref": "#/definitions/resourceQuantity" }
+      },
+      "type": "object"
+    },
+    "resources": {
+      "additionalProperties": false,
+      "properties": {
+        "limits": { "$ref": "#/definitions/resourceSpec" },
+        "requests": { "$ref": "#/definitions/resourceSpec" }
+      },
+      "type": "object"
+    },
+    "labelMap": {
+      "additionalProperties": { "type": "string" },
+      "type": "object"
+    },
+    "rbacRule": {
+      "additionalProperties": false,
+      "properties": {
+        "apiGroups": { "items": { "type": "string" }, "type": "array" },
+        "resources": { "items": { "type": "string" }, "type": "array" },
+        "verbs": { "items": { "type": "string" }, "type": "array" }
+      },
+      "required": ["apiGroups", "resources", "verbs"],
+      "type": "object"
+    },
+    "seccompProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "type": { "enum": ["Unconfined", "RuntimeDefault", "Localhost"], "type": "string" },
+        "localhostProfile": { "type": "string" }
+      },
+      "required": ["type"],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "externalSecrets": {
+      "additionalProperties": false,
+      "description": "ExternalSecret configuration",
+      "properties": {
+        "enabled": { "default": false, "title": "enabled", "type": "boolean" },
+        "name": {
+          "default": "eso-espresso-sequencer-secrets",
+          "description": "Name of the ExternalSecret resource",
+          "title": "name",
+          "type": "string"
+        },
+        "secretStoreRef": {
+          "additionalProperties": false,
+          "description": "SecretStore reference",
+          "properties": {
+            "kind": { "default": "SecretStore", "title": "kind", "type": "string" },
+            "name": { "default": "secretStoreRef", "title": "name", "type": "string" }
+          },
+          "required": ["name", "kind"],
+          "title": "secretStoreRef",
+          "type": "object"
+        }
+      },
+      "required": ["enabled", "name", "secretStoreRef"],
+      "title": "externalSecrets",
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "description": "Provide a name to substitute for the full names of resources",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "additionalProperties": false,
+      "properties": {
+        "namespaceOverride": { "default": "", "title": "namespaceOverride", "type": "string" },
+        "networkType": {
+          "default": "",
+          "description": "Network type to be used in Espresso's Node Validator Dashboard for identity purposes.\nValues: Residential, Hosted, AWS, Azure, GCP, Cloud Provider.",
+          "title": "networkType",
+          "type": "string"
+        },
+        "persistence": {
+          "additionalProperties": false,
+          "description": "Whether or not to allocate persistent volume disk for the data directory.\nIn case of node failure, the node data directory will still persist.",
+          "properties": {
+            "accessModes": {
+              "items": { "type": "string" },
+              "title": "accessModes",
+              "type": "array"
+            },
+            "annotations": {
+              "$ref": "#/definitions/labelMap",
+              "title": "annotations"
+            },
+            "size": {
+              "$ref": "#/definitions/resourceQuantity",
+              "default": "150Gi",
+              "title": "size"
+            },
+            "storageClassName": { "default": "", "title": "storageClassName", "type": "string" }
+          },
+          "required": ["storageClassName", "accessModes", "size", "annotations"],
+          "title": "persistence",
+          "type": "object"
+        },
+        "rbac": {
+          "additionalProperties": false,
+          "properties": {
+            "create": {
+              "default": true,
+              "description": "Whether or not to create ClusterRole and ClusterRoleBinding resources",
+              "title": "create",
+              "type": "boolean"
+            }
+          },
+          "required": ["create"],
+          "title": "rbac",
+          "type": "object"
+        }
+      },
+      "required": ["namespaceOverride", "persistence", "rbac", "networkType"],
+      "title": "global",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "description": "Sequencer node image",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": ["IfNotPresent", "Always", "Never"],
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": { "default": "ghcr.io/espressosystems/espresso-sequencer/sequencer", "title": "repository", "type": "string" },
+        "tag": { "default": "main", "title": "tag", "type": "string" }
+      },
+      "required": ["repository", "tag", "pullPolicy"],
+      "title": "image",
+      "type": "object"
+    },
+    "ingress": {
+      "additionalProperties": false,
+      "description": "Ingress for the Sequencer nodes\nref: https://kubernetes.io/docs/concepts/services-networking/ingress/",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "title": "annotations"
+        },
+        "className": { "default": "", "title": "className", "type": "string" },
+        "enabled": { "default": false, "title": "enabled", "type": "boolean" },
+        "hosts": {
+          "description": "Hostnames. Can be provided if Ingress is enabled.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "host": { "title": "host", "type": "string" },
+              "paths": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": { "title": "path", "type": "string" },
+                    "pathType": {
+                      "enum": ["ImplementationSpecific", "Exact", "Prefix"],
+                      "title": "pathType",
+                      "type": "string"
+                    },
+                    "port": { "maximum": 65535, "minimum": 1, "title": "port", "type": "integer" },
+                    "serviceName": { "title": "serviceName", "type": "string" }
+                  },
+                  "required": ["path", "pathType"],
+                  "type": "object"
+                },
+                "title": "paths",
+                "type": "array"
+              }
+            },
+            "required": ["paths"],
+            "type": "object"
+          },
+          "title": "hosts",
+          "type": "array"
+        },
+        "labels": {
+          "$ref": "#/definitions/labelMap",
+          "title": "labels"
+        },
+        "routePrefix": {
+          "default": "/",
+          "description": "Route Prefix. Can skip it if any item of path has the path defined.",
+          "title": "routePrefix",
+          "type": "string"
+        },
+        "tls": {
+          "description": "TLS configuration for Ingress\nSecret must be manually created in the namespace",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "hosts": { "items": { "type": "string" }, "type": "array" },
+              "secretName": { "type": "string" }
+            },
+            "type": "object"
+          },
+          "title": "tls",
+          "type": "array"
+        }
+      },
+      "required": ["enabled", "className", "routePrefix", "annotations", "labels", "hosts", "tls"],
+      "title": "ingress",
+      "type": "object"
+    },
+    "initContainerSecurityContext": {
+      "additionalProperties": false,
+      "description": "Security settings for init containers\nref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+      "properties": {
+        "allowPrivilegeEscalation": { "default": false, "title": "allowPrivilegeEscalation", "type": "boolean" },
+        "capabilities": {
+          "additionalProperties": false,
+          "properties": {
+            "add": { "items": { "type": "string" }, "title": "add", "type": "array" },
+            "drop": { "items": { "type": "string" }, "title": "drop", "type": "array" }
+          },
+          "title": "capabilities",
+          "type": "object"
+        },
+        "readOnlyRootFilesystem": { "default": true, "title": "readOnlyRootFilesystem", "type": "boolean" },
+        "runAsGroup": { "default": 1000, "minimum": 0, "title": "runAsGroup", "type": "integer" },
+        "runAsNonRoot": { "default": true, "title": "runAsNonRoot", "type": "boolean" },
+        "runAsUser": { "default": 1000, "minimum": 0, "title": "runAsUser", "type": "integer" },
+        "seccompProfile": { "$ref": "#/definitions/seccompProfile", "title": "seccompProfile" }
+      },
+      "required": ["capabilities", "readOnlyRootFilesystem", "runAsNonRoot", "runAsUser", "runAsGroup", "allowPrivilegeEscalation"],
+      "title": "initContainerSecurityContext",
+      "type": "object"
+    },
+    "initImage": {
+      "additionalProperties": false,
+      "description": "Init image is used to manage which secrets the pod should use.",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "enum": ["IfNotPresent", "Always", "Never"],
+          "title": "pullPolicy",
+          "type": "string"
+        },
+        "repository": { "default": "bitnami/kubectl", "title": "repository", "type": "string" },
+        "tag": { "default": "1.28", "title": "tag", "type": "string" }
+      },
+      "required": ["repository", "tag", "pullPolicy"],
+      "title": "initImage",
+      "type": "object"
+    },
+    "keystoreCLI": {
+      "additionalProperties": false,
+      "description": "Keystore-CLI settings. Used to manage keys on Secret Store.",
+      "properties": {
+        "db": {
+          "additionalProperties": false,
+          "description": "Postgres DB credentials",
+          "properties": {
+            "host": { "default": "", "title": "host", "type": "string" },
+            "secretId": { "default": "", "title": "secretId", "type": "string" },
+            "user": { "default": "", "title": "user", "type": "string" }
+          },
+          "required": ["secretId", "host", "user"],
+          "title": "db",
+          "type": "object"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "pullPolicy": {
+              "default": "IfNotPresent",
+              "enum": ["IfNotPresent", "Always", "Never"],
+              "title": "pullPolicy",
+              "type": "string"
+            },
+            "repository": { "default": "nethermindeth/espresso-keystore-cli", "title": "repository", "type": "string" },
+            "tag": { "default": "v0.1.1", "title": "tag", "type": "string" }
+          },
+          "required": ["repository", "tag", "pullPolicy"],
+          "title": "image",
+          "type": "object"
+        },
+        "projectId": { "default": "", "title": "projectId", "type": "string" },
+        "pv": {
+          "additionalProperties": false,
+          "description": "Secret ID of the Secret containing the Sequencer's private keys",
+          "properties": {
+            "secretId": { "default": "", "title": "secretId", "type": "string" }
+          },
+          "required": ["secretId"],
+          "title": "pv",
+          "type": "object"
+        }
+      },
+      "required": ["image", "projectId", "pv", "db"],
+      "title": "keystoreCLI",
+      "type": "object"
+    },
+    "logFormat": {
+      "default": "espresso",
+      "description": "Log format for the Sequencer containers. Custom label for Promtail.",
+      "title": "logFormat",
+      "type": "string"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "Provide a name to substitute for the name of the chart",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "nodes": {
+      "additionalProperties": false,
+      "description": "Sequencer node setup configuration for the StatefulSet. Values: normal, da.",
+      "properties": {
+        "da": {
+          "additionalProperties": false,
+          "properties": {
+            "command": {
+              "description": "Command to be used to start the node",
+              "items": { "type": "string" },
+              "title": "command",
+              "type": "array"
+            },
+            "nodeName": {
+              "default": "",
+              "description": "Node name to identify the node in the Espresso's Node Validator Dashboard. The node index will be appended to the node name.",
+              "title": "nodeName",
+              "type": "string"
+            },
+            "replicaCount": { "default": 0, "minimum": 0, "title": "replicaCount", "type": "integer" },
+            "resources": { "$ref": "#/definitions/resources", "title": "resources" },
+            "secrets": {
+              "additionalProperties": false,
+              "description": "Secrets to be used by the node.\nThe secret key must be the same as the one in the Secret resource or ExternalSecret resource.",
+              "properties": {
+                "data": {
+                  "items": { "additionalProperties": true, "type": "object" },
+                  "title": "data",
+                  "type": "array"
+                },
+                "postgresSecretKey": {
+                  "default": "",
+                  "description": "Postgres secret key. Must match the secret key in the Secret resource or ExternalSecret resource for the postgres related secrets.",
+                  "title": "postgresSecretKey",
+                  "type": "string"
+                },
+                "sequencerSecretKey": {
+                  "default": "",
+                  "description": "Sequencer secret key. Must match the secret key in the Secret resource or ExternalSecret resource for the sequencer node secrets.",
+                  "title": "sequencerSecretKey",
+                  "type": "string"
+                }
+              },
+              "required": ["sequencerSecretKey", "postgresSecretKey", "data"],
+              "title": "secrets",
+              "type": "object"
+            },
+            "sqlStorage": { "default": true, "description": "DA nodes will use SQL storage, keep it true", "title": "sqlStorage", "type": "boolean" },
+            "volumeMount": { "default": false, "description": "DA nodes won't use volume mount, keep it false", "title": "volumeMount", "type": "boolean" }
+          },
+          "required": ["replicaCount", "command", "sqlStorage", "volumeMount", "resources", "secrets", "nodeName"],
+          "title": "da",
+          "type": "object"
+        },
+        "normal": {
+          "additionalProperties": false,
+          "properties": {
+            "command": {
+              "description": "Command to be used to start the node",
+              "items": { "type": "string" },
+              "title": "command",
+              "type": "array"
+            },
+            "nodeName": {
+              "default": "",
+              "description": "Node name to identify the node in the Espresso's Node Validator Dashboard. The node index will be appended to the node name.",
+              "title": "nodeName",
+              "type": "string"
+            },
+            "replicaCount": { "default": 1, "minimum": 0, "title": "replicaCount", "type": "integer" },
+            "resources": { "$ref": "#/definitions/resources", "title": "resources" },
+            "secrets": {
+              "additionalProperties": false,
+              "description": "Secrets to be used by the node.\nThe secret key must be the same as the one in the Secret resource or ExternalSecret resource.",
+              "properties": {
+                "data": {
+                  "items": { "additionalProperties": true, "type": "object" },
+                  "title": "data",
+                  "type": "array"
+                },
+                "sequencerSecretKey": {
+                  "default": "",
+                  "description": "Sequencer secret key. Must match the secret key in the Secret resource or ExternalSecret resource for the node type.",
+                  "title": "sequencerSecretKey",
+                  "type": "string"
+                }
+              },
+              "required": ["sequencerSecretKey", "data"],
+              "title": "secrets",
+              "type": "object"
+            },
+            "sqlStorage": { "default": false, "description": "Normal nodes won't use SQL storage, keep it false", "title": "sqlStorage", "type": "boolean" },
+            "volumeMount": { "default": true, "title": "volumeMount", "type": "boolean" }
+          },
+          "required": ["replicaCount", "command", "sqlStorage", "volumeMount", "resources", "secrets", "nodeName"],
+          "title": "normal",
+          "type": "object"
+        }
+      },
+      "required": ["normal", "da"],
+      "title": "nodes",
+      "type": "object"
+    },
+    "nodes_config": {
+      "additionalProperties": false,
+      "description": "Sequencer node configuration for the container.",
+      "properties": {
+        "ESPRESSO_SEQUENCER_API_PORT": { "default": 80, "maximum": 65535, "minimum": 1, "title": "ESPRESSO_SEQUENCER_API_PORT", "type": "integer" },
+        "ESPRESSO_SEQUENCER_CDN_ENDPOINT": { "default": "cdn.decaf.testnet.espresso.network:1737", "title": "ESPRESSO_SEQUENCER_CDN_ENDPOINT", "type": "string" },
+        "ESPRESSO_SEQUENCER_GENESIS_FILE": { "default": "/genesis/decaf.toml", "title": "ESPRESSO_SEQUENCER_GENESIS_FILE", "type": "string" },
+        "ESPRESSO_SEQUENCER_IDENTITY_COMPANY_NAME": { "default": "Nethermind", "title": "ESPRESSO_SEQUENCER_IDENTITY_COMPANY_NAME", "type": "string" },
+        "ESPRESSO_SEQUENCER_IDENTITY_COMPANY_WEBSITE": { "default": "https://nethermind.io", "title": "ESPRESSO_SEQUENCER_IDENTITY_COMPANY_WEBSITE", "type": "string" },
+        "ESPRESSO_SEQUENCER_L1_PROVIDER": { "default": "http://localhost:8545", "description": "JSON-RPC endpoint for Sepolia testnet", "title": "ESPRESSO_SEQUENCER_L1_PROVIDER", "type": "string" },
+        "ESPRESSO_SEQUENCER_LIBP2P_ADVERTISE_ADDRESS": { "default": "0.0.0.0:31000", "title": "ESPRESSO_SEQUENCER_LIBP2P_ADVERTISE_ADDRESS", "type": "string" },
+        "ESPRESSO_SEQUENCER_LIBP2P_BIND_ADDRESS": { "default": "0.0.0.0:31000", "title": "ESPRESSO_SEQUENCER_LIBP2P_BIND_ADDRESS", "type": "string" },
+        "ESPRESSO_SEQUENCER_ORCHESTRATOR_URL": { "default": "https://orchestrator-7BEFB0C9FFC.decaf.testnet.espresso.network", "title": "ESPRESSO_SEQUENCER_ORCHESTRATOR_URL", "type": "string" },
+        "ESPRESSO_SEQUENCER_STATE_PEERS": { "default": "https://query.decaf.testnet.espresso.network", "title": "ESPRESSO_SEQUENCER_STATE_PEERS", "type": "string" },
+        "ESPRESSO_SEQUENCER_STORAGE_PATH": { "default": "/mount/sequencer/store/", "title": "ESPRESSO_SEQUENCER_STORAGE_PATH", "type": "string" },
+        "ESPRESSO_STATE_RELAY_SERVER_URL": { "default": "https://state-relay.decaf.testnet.espresso.network", "title": "ESPRESSO_STATE_RELAY_SERVER_URL", "type": "string" },
+        "RUST_LOG": { "default": "warn,libp2p=off", "description": "Optional parameters", "title": "RUST_LOG", "type": "string" },
+        "RUST_LOG_FORMAT": { "default": "json", "title": "RUST_LOG_FORMAT", "type": "string" }
+      },
+      "required": [
+        "ESPRESSO_SEQUENCER_L1_PROVIDER",
+        "ESPRESSO_SEQUENCER_ORCHESTRATOR_URL",
+        "ESPRESSO_SEQUENCER_CDN_ENDPOINT",
+        "ESPRESSO_STATE_RELAY_SERVER_URL",
+        "ESPRESSO_SEQUENCER_STATE_PEERS",
+        "ESPRESSO_SEQUENCER_GENESIS_FILE",
+        "ESPRESSO_SEQUENCER_LIBP2P_BIND_ADDRESS",
+        "ESPRESSO_SEQUENCER_LIBP2P_ADVERTISE_ADDRESS",
+        "RUST_LOG",
+        "RUST_LOG_FORMAT",
+        "ESPRESSO_SEQUENCER_STORAGE_PATH",
+        "ESPRESSO_SEQUENCER_API_PORT",
+        "ESPRESSO_SEQUENCER_IDENTITY_COMPANY_NAME",
+        "ESPRESSO_SEQUENCER_IDENTITY_COMPANY_WEBSITE"
+      ],
+      "title": "nodes_config",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "additionalProperties": false,
+      "description": "Default security settings for the pod\nref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+      "properties": {
+        "fsGroup": { "default": 1000, "minimum": 0, "title": "fsGroup", "type": "integer" },
+        "fsGroupChangePolicy": { "enum": ["OnRootMismatch", "Always"], "title": "fsGroupChangePolicy", "type": "string" },
+        "runAsGroup": { "default": 1000, "minimum": 0, "title": "runAsGroup", "type": "integer" },
+        "runAsNonRoot": { "default": true, "title": "runAsNonRoot", "type": "boolean" },
+        "runAsUser": { "default": 1000, "minimum": 0, "title": "runAsUser", "type": "integer" },
+        "seccompProfile": { "$ref": "#/definitions/seccompProfile", "title": "seccompProfile" },
+        "supplementalGroups": { "items": { "minimum": 0, "type": "integer" }, "title": "supplementalGroups", "type": "array" }
+      },
+      "required": ["fsGroup", "runAsNonRoot", "runAsUser", "runAsGroup", "seccompProfile"],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "prometheusRule": {
+      "additionalProperties": false,
+      "description": "Custom PrometheusRule to be defined\nref: https://github.com/coreos/prometheus-operator#customresourcedefinitions",
+      "properties": {
+        "additionalLabels": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Additional labels for the prometheusRule",
+          "title": "additionalLabels"
+        },
+        "default": { "default": true, "description": "Create a default set of Alerts", "title": "default", "type": "boolean" },
+        "namespace": { "default": "", "description": "The namespace in which the prometheusRule will be created", "title": "namespace", "type": "string" },
+        "rules": {
+          "description": "Custom Prometheus rules",
+          "items": { "additionalProperties": true, "type": "object" },
+          "title": "rules",
+          "type": "array"
+        }
+      },
+      "required": ["default", "namespace", "additionalLabels", "rules"],
+      "title": "prometheusRule",
+      "type": "object"
+    },
+    "rbac": {
+      "additionalProperties": false,
+      "properties": {
+        "clusterRules": {
+          "description": "Required ClusterRole rules",
+          "items": { "$ref": "#/definitions/rbacRule" },
+          "title": "clusterRules",
+          "type": "array"
+        },
+        "create": { "default": true, "title": "create", "type": "boolean" },
+        "name": {
+          "default": "",
+          "description": "The name of the role to use.\nIf not set and create is true, a name is generated using the fullname template",
+          "title": "name",
+          "type": "string"
+        },
+        "rules": {
+          "description": "Required Role rules",
+          "items": { "$ref": "#/definitions/rbacRule" },
+          "title": "rules",
+          "type": "array"
+        }
+      },
+      "required": ["name", "create", "clusterRules", "rules"],
+      "title": "rbac",
+      "type": "object"
+    },
+    "securityContext": {
+      "additionalProperties": false,
+      "description": "Default security settings for containers\nref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+      "properties": {
+        "allowPrivilegeEscalation": { "default": false, "title": "allowPrivilegeEscalation", "type": "boolean" },
+        "capabilities": {
+          "additionalProperties": false,
+          "properties": {
+            "add": { "items": { "type": "string" }, "title": "add", "type": "array" },
+            "drop": { "items": { "type": "string" }, "title": "drop", "type": "array" }
+          },
+          "title": "capabilities",
+          "type": "object"
+        },
+        "readOnlyRootFilesystem": { "default": true, "title": "readOnlyRootFilesystem", "type": "boolean" },
+        "runAsGroup": { "default": 1000, "minimum": 0, "title": "runAsGroup", "type": "integer" },
+        "runAsNonRoot": { "default": true, "title": "runAsNonRoot", "type": "boolean" },
+        "runAsUser": { "default": 1000, "minimum": 0, "title": "runAsUser", "type": "integer" },
+        "seccompProfile": { "$ref": "#/definitions/seccompProfile", "title": "seccompProfile" }
+      },
+      "required": ["capabilities", "readOnlyRootFilesystem", "runAsNonRoot", "runAsUser", "runAsGroup", "allowPrivilegeEscalation", "seccompProfile"],
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "additionalProperties": false,
+      "description": "Sequencer node Service configuration\nref: https://kubernetes.io/docs/concepts/services-networking/service/",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "title": "annotations"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"],
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": ["type", "annotations"],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "description": "Service account\nref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Annotations to add to the service account",
+          "title": "annotations"
+        },
+        "create": { "default": false, "title": "create", "type": "boolean" },
+        "name": {
+          "default": "",
+          "description": "The name of the service account to use.\nIf not set and create is true, a name is generated using the fullname template",
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": ["create", "annotations", "name"],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "serviceMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "additionalLabels": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus",
+          "title": "additionalLabels"
+        },
+        "honorLabels": { "default": false, "description": "Specify honorLabels parameter to add the scrape endpoint", "title": "honorLabels", "type": "boolean" },
+        "interval": { "description": "The interval at which metrics should be scraped", "title": "interval", "type": "string" },
+        "metricRelabelings": {
+          "description": "Metrics RelabelConfigs to apply to samples before ingestion.",
+          "items": { "additionalProperties": true, "type": "object" },
+          "title": "metricRelabelings",
+          "type": "array"
+        },
+        "namespace": { "default": "", "description": "The namespace in which the ServiceMonitor will be created", "title": "namespace", "type": "string" },
+        "relabellings": {
+          "description": "Metrics RelabelConfigs to apply to samples before scraping.",
+          "items": { "additionalProperties": true, "type": "object" },
+          "title": "relabellings",
+          "type": "array"
+        },
+        "scrapeTimeout": { "default": "", "description": "The timeout after which the scrape is ended", "title": "scrapeTimeout", "type": "string" }
+      },
+      "required": ["namespace", "scrapeTimeout", "relabellings", "metricRelabelings", "honorLabels", "additionalLabels"],
+      "title": "serviceMonitor",
+      "type": "object"
+    }
+  },
+  "required": [
+    "global",
+    "nodes",
+    "nodes_config",
+    "image",
+    "initImage",
+    "keystoreCLI",
+    "service",
+    "serviceMonitor",
+    "prometheusRule",
+    "ingress",
+    "externalSecrets",
+    "fullnameOverride",
+    "nameOverride",
+    "serviceAccount",
+    "rbac",
+    "logFormat",
+    "podSecurityContext",
+    "securityContext",
+    "initContainerSecurityContext"
+  ],
+  "type": "object"
+}

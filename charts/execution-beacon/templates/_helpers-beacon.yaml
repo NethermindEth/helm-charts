@@ -296,12 +296,14 @@ Lodestar beacon client command
   --enr.tcp=$EXTERNAL_BEACON_PORT
   --enr.udp=$EXTERNAL_BEACON_PORT
   --port=$EXTERNAL_BEACON_PORT
+  --quicPort=$(($EXTERNAL_BEACON_PORT + 1))
 {{- else }}
   --nat=true
   --enr.ip=$POD_IP
   --enr.tcp={{ include "beacon.p2pPort" . }}
   --enr.udp={{ include "beacon.p2pPort" . }}
   --port={{ include "beacon.p2pPort" . }}
+  --quicPort={{ add (include "beacon.p2pPort" . | int) 1 }}
 {{- end }}
 {{- if and .Values.metrics.enabled .Values.beacon.metrics.enabled }}
   --metrics
