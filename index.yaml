@@ -3353,6 +3353,19 @@ entries:
   mev-boost:
   - apiVersion: v2
     appVersion: 1.9.0
+    created: "2026-04-17T11:58:33.117412207Z"
+    description: Mev Boost Helm Chart
+    digest: 37a6cb239097ef3b68c47eca59634c326fe9c5695e29deccf34f114da9db1b53
+    maintainers:
+    - name: 0xDones
+    - name: matilote
+    name: mev-boost
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/mev-boost-0.2.0/mev-boost-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.9.0
     created: "2025-05-26T15:41:24.778823513Z"
     description: Mev Boost Helm Chart
     digest: ee3392fa5c365cabd903eabdc8ad196f31b7b48d467d0f5211b01971475c3e08
@@ -4293,4 +4306,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-04-17T11:57:33.463124365Z"
+generated: "2026-04-17T11:58:33.117972283Z"
