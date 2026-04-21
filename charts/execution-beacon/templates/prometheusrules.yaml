@@ -66,14 +66,6 @@ spec:
           annotations:
             summary: Prysm beacon node participation rate less then 66%
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: PrysmBeaconNodeRestarted
-          expr: (time()-process_start_time_seconds{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'})/3600 < 0.1
-          for: 1m
-          labels:
-            severity: warning
-          annotations:
-            summary: Prysm beacon node was restarted
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         {{- else if eq .Values.beacon.client "teku" }}
         - alert: Teku50SlotsBehind
           expr: beacon_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} > 50
