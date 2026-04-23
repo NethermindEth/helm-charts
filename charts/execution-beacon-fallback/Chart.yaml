@@ -1,0 +1,31 @@
+apiVersion: v2
+name: execution-beacon-fallback
+description: A Helm chart for deploying Ethereum execution and consensus clients with HAProxy active-fallback beacon proxy
+type: application
+version: 0.1.0
+keywords:
+  - ethereum
+  - blockchain
+  - nethermind
+  - prysm
+  - reth
+  - lighthouse
+  - nimbus
+  - lodestar
+  - erigon
+  - teku
+  - besu
+  - p2p
+  - taiko
+
+home: https://www.ethereum.org/
+
+maintainers:
+  - name: 0xDones
+  - name: matilote
+  - name: aivarasko
+
+dependencies:
+  - name: common
+    repository: file://../common
+    version: 1.0.0
