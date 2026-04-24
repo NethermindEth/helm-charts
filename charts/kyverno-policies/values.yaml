@@ -1,0 +1,41 @@
+nameOverride: ""
+
+# -- Cluster-scoped ValidatingPolicy resources.
+# Each key is the policy name; value must include title, description, severity, category, and spec.
+validatingPolicies: {}
+# Example:
+#   disallow-capabilities:
+#     title: Disallow Capabilities
+#     description: Disallow pods from using forbidden capabilities
+#     severity: high        # one of: critical, high, medium, low, info
+#     category: Security    # one of: Security, Best Practices, Governance, Misc, Reliability
+#     spec:
+#       rules: []
+
+# -- Cluster-scoped MutatingPolicy resources.
+mutatingPolicies: {}
+
+# -- Cluster-scoped GeneratingPolicy resources.
+generatingPolicies: {}
+
+# -- Cluster-scoped DeletingPolicy resources.
+deletingPolicies: {}
+
+# -- Cluster-scoped ImageValidatingPolicy resources.
+imageValidatingPolicies: {}
+
+# -- Namespaced ValidatingPolicy resources.
+# Optionally set `namespace` per policy; defaults to the release namespace.
+namespacedValidatingPolicies: {}
+
+# -- Namespaced MutatingPolicy resources.
+namespacedMutatingPolicies: {}
+
+# -- Namespaced GeneratingPolicy resources.
+namespacedGeneratingPolicies: {}
+
+# -- Namespaced DeletingPolicy resources.
+namespacedDeletingPolicies: {}
+
+# -- Namespaced ImageValidatingPolicy resources.
+namespacedImageValidatingPolicies: {}
