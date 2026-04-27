@@ -62,7 +62,7 @@ hints (which have no JSON Schema equivalent), and writes `values.schema.json`.
 | generatingPolicies | object | `{}` | Cluster-scoped GeneratingPolicy resources. |
 | imageValidatingPolicies | object | `{}` | Cluster-scoped ImageValidatingPolicy resources. |
 | mutatingPolicies | object | `{}` | Cluster-scoped MutatingPolicy resources. |
-| nameOverride | string | `""` |  |
+| nameOverride | string | `""` | Overrides the chart name, only used for labels |
 | namespacedDeletingPolicies | object | `{}` | Namespaced DeletingPolicy resources. |
 | namespacedGeneratingPolicies | object | `{}` | Namespaced GeneratingPolicy resources. |
 | namespacedImageValidatingPolicies | object | `{}` | Namespaced ImageValidatingPolicy resources. |

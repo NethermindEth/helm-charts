@@ -1,3 +1,4 @@
+# -- Overrides the chart name, only used for labels
 nameOverride: ""
 
 # -- Cluster-scoped ValidatingPolicy resources.
