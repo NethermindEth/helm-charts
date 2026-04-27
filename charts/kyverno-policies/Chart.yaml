@@ -3,3 +3,5 @@ name: kyverno-policies
 description: A helper Helm Chart to install Kyverno policies
 type: application
 version: 0.1.0
+maintainers:
+  - name: Angelin01
