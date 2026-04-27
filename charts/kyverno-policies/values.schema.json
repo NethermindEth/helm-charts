@@ -1,0 +1,2496 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "nameOverride": {
+      "type": "string"
+    },
+    "validatingPolicies": {
+      "$ref": "#/definitions/validatingPoliciesMap"
+    },
+    "mutatingPolicies": {
+      "$ref": "#/definitions/mutatingPoliciesMap"
+    },
+    "generatingPolicies": {
+      "$ref": "#/definitions/generatingPoliciesMap"
+    },
+    "deletingPolicies": {
+      "$ref": "#/definitions/deletingPoliciesMap"
+    },
+    "imageValidatingPolicies": {
+      "$ref": "#/definitions/imageValidatingPoliciesMap"
+    },
+    "namespacedValidatingPolicies": {
+      "$ref": "#/definitions/namespacedValidatingPoliciesMap"
+    },
+    "namespacedMutatingPolicies": {
+      "$ref": "#/definitions/namespacedMutatingPoliciesMap"
+    },
+    "namespacedGeneratingPolicies": {
+      "$ref": "#/definitions/namespacedGeneratingPoliciesMap"
+    },
+    "namespacedDeletingPolicies": {
+      "$ref": "#/definitions/namespacedDeletingPoliciesMap"
+    },
+    "namespacedImageValidatingPolicies": {
+      "$ref": "#/definitions/namespacedImageValidatingPoliciesMap"
+    }
+  },
+  "definitions": {
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "info"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Security",
+        "Best Practices",
+        "Governance",
+        "Misc",
+        "Reliability"
+      ]
+    },
+    "validatingPolicySpec": {
+      "properties": {
+        "auditAnnotations": {
+          "items": {
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "valueExpression": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key",
+              "valueExpression"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "autogen": {
+          "properties": {
+            "podControllers": {
+              "properties": {
+                "controllers": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "validatingAdmissionPolicy": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "evaluation": {
+          "properties": {
+            "admission": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "background": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "mode": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "failurePolicy": {
+          "enum": [
+            "Ignore",
+            "Fail"
+          ],
+          "type": "string"
+        },
+        "matchConditions": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "matchConstraints": {
+          "properties": {
+            "excludeResourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            },
+            "matchPolicy": {
+              "type": "string"
+            },
+            "namespaceSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "objectSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "resourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "validationActions": {
+          "items": {
+            "enum": [
+              "Deny",
+              "Audit",
+              "Warn"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "validations": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "messageExpression": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "variables": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "webhookConfiguration": {
+          "properties": {
+            "timeoutSeconds": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "mutatingPolicySpec": {
+      "properties": {
+        "autogen": {
+          "properties": {
+            "mutatingAdmissionPolicy": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "podControllers": {
+              "properties": {
+                "controllers": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "evaluation": {
+          "properties": {
+            "admission": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "background": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "mode": {
+              "type": "string"
+            },
+            "mutateExisting": {
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "failurePolicy": {
+          "enum": [
+            "Ignore",
+            "Fail"
+          ],
+          "type": "string"
+        },
+        "matchConditions": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "matchConstraints": {
+          "properties": {
+            "excludeResourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            },
+            "matchPolicy": {
+              "type": "string"
+            },
+            "namespaceSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "objectSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "resourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "mutations": {
+          "items": {
+            "properties": {
+              "applyConfiguration": {
+                "properties": {
+                  "expression": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "jsonPatch": {
+                "properties": {
+                  "expression": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "patchType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "patchType"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "reinvocationPolicy": {
+          "type": "string"
+        },
+        "targetMatchConstraints": {
+          "properties": {
+            "excludeResourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            },
+            "expression": {
+              "type": "string"
+            },
+            "matchPolicy": {
+              "type": "string"
+            },
+            "namespaceSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "objectSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "resourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "variables": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "webhookConfiguration": {
+          "properties": {
+            "timeoutSeconds": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "generatingPolicySpec": {
+      "properties": {
+        "evaluation": {
+          "properties": {
+            "admission": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "generateExisting": {
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "orphanDownstreamOnPolicyDelete": {
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "synchronize": {
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "generate": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              }
+            },
+            "type": "object",
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "matchConditions": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "matchConstraints": {
+          "properties": {
+            "excludeResourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            },
+            "matchPolicy": {
+              "type": "string"
+            },
+            "namespaceSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "objectSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "resourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "variables": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "webhookConfiguration": {
+          "properties": {
+            "timeoutSeconds": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "generate"
+      ],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "deletingPolicySpec": {
+      "properties": {
+        "conditions": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "deletionPropagationPolicy": {
+          "enum": [
+            "Foreground",
+            "Background",
+            "Orphan"
+          ],
+          "type": "string"
+        },
+        "matchConstraints": {
+          "properties": {
+            "excludeResourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            },
+            "matchPolicy": {
+              "type": "string"
+            },
+            "namespaceSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "objectSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "resourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "schedule": {
+          "type": "string"
+        },
+        "variables": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schedule"
+      ],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "imageValidatingPolicySpec": {
+      "properties": {
+        "attestations": {
+          "items": {
+            "properties": {
+              "intoto": {
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object",
+                "additionalProperties": false
+              },
+              "name": {
+                "type": "string"
+              },
+              "referrer": {
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object",
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "attestors": {
+          "items": {
+            "oneOf": [
+              {
+                "required": [
+                  "cosign"
+                ]
+              },
+              {
+                "required": [
+                  "notary"
+                ]
+              }
+            ],
+            "properties": {
+              "cosign": {
+                "properties": {
+                  "annotations": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "certificate": {
+                    "properties": {
+                      "cert": {
+                        "oneOf": [
+                          {
+                            "required": [
+                              "value"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "expression"
+                            ]
+                          }
+                        ],
+                        "properties": {
+                          "expression": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object",
+                        "additionalProperties": false
+                      },
+                      "certChain": {
+                        "oneOf": [
+                          {
+                            "required": [
+                              "value"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "expression"
+                            ]
+                          }
+                        ],
+                        "properties": {
+                          "expression": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object",
+                        "additionalProperties": false
+                      }
+                    },
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "ctlog": {
+                    "properties": {
+                      "ctLogPubKey": {
+                        "type": "string"
+                      },
+                      "insecureIgnoreSCT": {
+                        "type": "boolean"
+                      },
+                      "insecureIgnoreTlog": {
+                        "type": "boolean"
+                      },
+                      "rekorPubKey": {
+                        "type": "string"
+                      },
+                      "tsaCertChain": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "key": {
+                    "properties": {
+                      "data": {
+                        "type": "string"
+                      },
+                      "expression": {
+                        "type": "string"
+                      },
+                      "hashAlgorithm": {
+                        "type": "string"
+                      },
+                      "kms": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "keyless": {
+                    "properties": {
+                      "identities": {
+                        "items": {
+                          "properties": {
+                            "issuer": {
+                              "type": "string"
+                            },
+                            "issuerRegExp": {
+                              "type": "string"
+                            },
+                            "subject": {
+                              "type": "string"
+                            },
+                            "subjectRegExp": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object",
+                          "additionalProperties": false
+                        },
+                        "type": "array"
+                      },
+                      "roots": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "identities"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "source": {
+                    "properties": {
+                      "PullSecrets": {
+                        "items": {
+                          "properties": {
+                            "name": {
+                              "default": "",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object",
+                          "additionalProperties": false
+                        },
+                        "type": "array"
+                      },
+                      "repository": {
+                        "type": "string"
+                      },
+                      "tagPrefix": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "tuf": {
+                    "properties": {
+                      "mirror": {
+                        "type": "string"
+                      },
+                      "root": {
+                        "properties": {
+                          "data": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object",
+                        "additionalProperties": false
+                      }
+                    },
+                    "type": "object",
+                    "additionalProperties": false
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "name": {
+                "type": "string"
+              },
+              "notary": {
+                "properties": {
+                  "certs": {
+                    "oneOf": [
+                      {
+                        "required": [
+                          "value"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "expression"
+                        ]
+                      }
+                    ],
+                    "properties": {
+                      "expression": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "tsaCerts": {
+                    "oneOf": [
+                      {
+                        "required": [
+                          "value"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "expression"
+                        ]
+                      }
+                    ],
+                    "properties": {
+                      "expression": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object",
+                    "additionalProperties": false
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "auditAnnotations": {
+          "items": {
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "valueExpression": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key",
+              "valueExpression"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "autogen": {
+          "properties": {
+            "podControllers": {
+              "properties": {
+                "controllers": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "credentials": {
+          "properties": {
+            "allowInsecureRegistry": {
+              "type": "boolean"
+            },
+            "providers": {
+              "items": {
+                "enum": [
+                  "default",
+                  "amazon",
+                  "azure",
+                  "google",
+                  "github"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "secrets": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "evaluation": {
+          "properties": {
+            "admission": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "background": {
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "type": "boolean"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "mode": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "failurePolicy": {
+          "enum": [
+            "Ignore",
+            "Fail"
+          ],
+          "type": "string"
+        },
+        "images": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "matchConditions": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "matchConstraints": {
+          "properties": {
+            "excludeResourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            },
+            "matchPolicy": {
+              "type": "string"
+            },
+            "namespaceSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "objectSelector": {
+              "properties": {
+                "matchExpressions": {
+                  "items": {
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false
+                  },
+                  "type": "array"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "additionalProperties": false
+            },
+            "resourceRules": {
+              "items": {
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "apiVersions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "operations": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resourceNames": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "additionalProperties": false
+              },
+              "type": "array"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "matchImageReferences": {
+          "items": {
+            "oneOf": [
+              {
+                "required": [
+                  "glob"
+                ]
+              },
+              {
+                "required": [
+                  "expression"
+                ]
+              }
+            ],
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "glob": {
+                "type": "string"
+              }
+            },
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "validationActions": {
+          "items": {
+            "enum": [
+              "Deny",
+              "Audit",
+              "Warn"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "validationConfigurations": {
+          "default": {},
+          "properties": {
+            "mutateDigest": {
+              "default": true,
+              "type": "boolean"
+            },
+            "required": {
+              "default": true,
+              "type": "boolean"
+            },
+            "verifyDigest": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
+        "validations": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "messageExpression": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "variables": {
+          "items": {
+            "properties": {
+              "expression": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expression",
+              "name"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": "array"
+        },
+        "webhookConfiguration": {
+          "properties": {
+            "timeoutSeconds": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "attestors",
+        "validations"
+      ],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "validatingPolicyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/validatingPolicySpec"
+        }
+      }
+    },
+    "validatingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/validatingPolicyEntry"
+      }
+    },
+    "mutatingPolicyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/mutatingPolicySpec"
+        }
+      }
+    },
+    "mutatingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/mutatingPolicyEntry"
+      }
+    },
+    "generatingPolicyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/generatingPolicySpec"
+        }
+      }
+    },
+    "generatingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/generatingPolicyEntry"
+      }
+    },
+    "deletingPolicyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/deletingPolicySpec"
+        }
+      }
+    },
+    "deletingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/deletingPolicyEntry"
+      }
+    },
+    "imageValidatingPolicyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/imageValidatingPolicySpec"
+        }
+      }
+    },
+    "imageValidatingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/imageValidatingPolicyEntry"
+      }
+    },
+    "validatingPolicyNamespacedEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/validatingPolicySpec"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "namespacedValidatingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/validatingPolicyNamespacedEntry"
+      }
+    },
+    "mutatingPolicyNamespacedEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/mutatingPolicySpec"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "namespacedMutatingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/mutatingPolicyNamespacedEntry"
+      }
+    },
+    "generatingPolicyNamespacedEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/generatingPolicySpec"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "namespacedGeneratingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/generatingPolicyNamespacedEntry"
+      }
+    },
+    "deletingPolicyNamespacedEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/deletingPolicySpec"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "namespacedDeletingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/deletingPolicyNamespacedEntry"
+      }
+    },
+    "imageValidatingPolicyNamespacedEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "description",
+        "severity",
+        "category",
+        "spec"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "category": {
+          "$ref": "#/definitions/category"
+        },
+        "spec": {
+          "$ref": "#/definitions/imageValidatingPolicySpec"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "namespacedImageValidatingPoliciesMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/imageValidatingPolicyNamespacedEntry"
+      }
+    }
+  }
+}

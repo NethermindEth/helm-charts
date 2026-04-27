@@ -3,79 +3,75 @@ templates:
   - policies.yaml
 
 tests:
-  - it: given missing title then render fails
+  - it: given realistic policy specs then schema and rendering are valid
     set:
       validatingPolicies:
-        test-policy:
-          description: A test policy
+        disallow-privileged-containers:
+          title: Disallow Privileged Containers
+          description: Disallow pods from running privileged containers
           severity: high
           category: Security
-          spec: {}
+          spec:
+            matchConstraints:
+              resourceRules:
+                - apiGroups: [""]
+                  apiVersions: ["v1"]
+                  resources: ["pods"]
+                  operations: ["CREATE", "UPDATE"]
+            validations:
+              - expression: >-
+                  object.spec.containers.all(c,
+                    !has(c.securityContext) ||
+                    !has(c.securityContext.privileged) ||
+                    c.securityContext.privileged == false)
+                message: Privileged containers are not allowed
+      mutatingPolicies:
+        add-default-labels:
+          title: Add Default Labels
+          description: Adds a managed-by label to all pods
+          severity: low
+          category: Best Practices
+          spec:
+            matchConstraints:
+              resourceRules:
+                - apiGroups: [""]
+                  apiVersions: ["v1"]
+                  resources: ["pods"]
+                  operations: ["CREATE"]
+            mutations:
+              - patchType: ApplyConfiguration
+                applyConfiguration:
+                  expression: >-
+                    Object{
+                      metadata: ObjectMeta{
+                        labels: {"managed-by": "kyverno"}
+                      }
+                    }
+      namespacedValidatingPolicies:
+        require-resource-limits:
+          title: Require Resource Limits
+          description: Require all containers to define CPU and memory limits
+          severity: medium
+          category: Reliability
+          namespace: production
+          spec:
+            matchConstraints:
+              resourceRules:
+                - apiGroups: [""]
+                  apiVersions: ["v1"]
+                  resources: ["pods"]
+                  operations: ["CREATE", "UPDATE"]
+            validations:
+              - expression: >-
+                  object.spec.containers.all(c,
+                    has(c.resources) &&
+                    has(c.resources.limits) &&
+                    has(c.resources.limits.cpu) &&
+                    has(c.resources.limits.memory))
+                message: CPU and memory limits are required for all containers
     asserts:
-      - failedTemplate:
-          errorMessage: "Policy 'test-policy' is missing required field: title"
-
-  - it: given missing description then render fails
-    set:
-      validatingPolicies:
-        test-policy:
-          title: Test Policy
-          severity: high
-          category: Security
-          spec: {}
-    asserts:
-      - failedTemplate:
-          errorMessage: "Policy 'test-policy' is missing required field: description"
-
-  - it: given missing severity then render fails
-    set:
-      validatingPolicies:
-        test-policy:
-          title: Test Policy
-          description: A test policy
-          category: Security
-          spec: {}
-    asserts:
-      - failedTemplate:
-          errorMessage: "Policy 'test-policy' is missing required field: severity"
-
-  - it: given missing category then render fails
-    set:
-      validatingPolicies:
-        test-policy:
-          title: Test Policy
-          description: A test policy
-          severity: high
-          spec: {}
-    asserts:
-      - failedTemplate:
-          errorMessage: "Policy 'test-policy' is missing required field: category"
-
-  - it: given unsupported severity then render fails with allowed values and guidance
-    set:
-      validatingPolicies:
-        test-policy:
-          title: Test Policy
-          description: A test policy
-          severity: urgent
-          category: Security
-          spec: {}
-    asserts:
-      - failedTemplate:
-          errorMessage: "Policy 'test-policy' has unsupported severity 'urgent'. Allowed values: critical, high, medium, low, info. To add support for a new severity, please open an issue or PR against the chart."
-
-  - it: given unsupported category then render fails with allowed values and guidance
-    set:
-      validatingPolicies:
-        test-policy:
-          title: Test Policy
-          description: A test policy
-          severity: high
-          category: Networking
-          spec: {}
-    asserts:
-      - failedTemplate:
-          errorMessage: "Policy 'test-policy' has unsupported category 'Networking'. Allowed values: Security, Best Practices, Governance, Misc, Reliability. To add support for a new category, please open an issue or PR against the chart."
+      - hasDocuments:
+          count: 3
 
   - it: given valid policy then annotations are rendered correctly
     set:
@@ -99,20 +95,6 @@ tests:
       - equal:
           path: metadata.annotations["policies.kyverno.io/category"]
           value: Security
-
-  - it: given severity in uppercase then it is normalised to lowercase in the annotation
-    set:
-      validatingPolicies:
-        test-policy:
-          title: Test Policy
-          description: A test policy
-          severity: HIGH
-          category: Security
-          spec: {}
-    asserts:
-      - equal:
-          path: metadata.annotations["policies.kyverno.io/severity"]
-          value: high
 
   - it: given namespacedValidatingPolicy with explicit namespace then that namespace is used
     set:

@@ -21,3 +21,6 @@
 .idea/
 *.tmproj
 .vscode/
+
+# Chart development files
+scripts/
