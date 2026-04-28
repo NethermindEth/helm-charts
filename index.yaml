@@ -3415,6 +3415,18 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/juno-0.0.1/juno-0.0.1.tgz
     version: 0.0.1
+  kyverno-policies:
+  - apiVersion: v2
+    created: "2026-04-28T13:44:59.303305199Z"
+    description: A helper Helm Chart to install Kyverno policies
+    digest: d9ec6b6b40f8a325486c27581324ce43517eeca739aa36defff366f2c9f0852b
+    maintainers:
+    - name: Angelin01
+    name: kyverno-policies
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/kyverno-policies-0.1.0/kyverno-policies-0.1.0.tgz
+    version: 0.1.0
   lodestar-vc:
   - apiVersion: v2
     created: "2025-01-23T15:51:12.624291269Z"
@@ -4423,4 +4435,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-04-21T16:18:52.611756969Z"
+generated: "2026-04-28T13:44:59.303624468Z"
