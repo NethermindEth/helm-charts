@@ -1,0 +1,112 @@
+suite: policies tests
+templates:
+  - policies.yaml
+
+tests:
+  - it: given realistic policy specs then schema and rendering are valid
+    set:
+      validatingPolicies:
+        disallow-privileged-containers:
+          title: Disallow Privileged Containers
+          description: Disallow pods from running privileged containers
+          severity: high
+          category: Security
+          spec:
+            matchConstraints:
+              resourceRules:
+                - apiGroups: [""]
+                  apiVersions: ["v1"]
+                  resources: ["pods"]
+                  operations: ["CREATE", "UPDATE"]
+            validations:
+              - expression: >-
+                  object.spec.containers.all(c,
+                    !has(c.securityContext) ||
+                    !has(c.securityContext.privileged) ||
+                    c.securityContext.privileged == false)
+                message: Privileged containers are not allowed
+      mutatingPolicies:
+        add-default-labels:
+          title: Add Default Labels
+          description: Adds a managed-by label to all pods
+          severity: low
+          category: Best Practices
+          spec:
+            matchConstraints:
+              resourceRules:
+                - apiGroups: [""]
+                  apiVersions: ["v1"]
+                  resources: ["pods"]
+                  operations: ["CREATE"]
+            mutations:
+              - patchType: ApplyConfiguration
+                applyConfiguration:
+                  expression: >-
+                    Object{
+                      metadata: ObjectMeta{
+                        labels: {"managed-by": "kyverno"}
+                      }
+                    }
+      namespacedValidatingPolicies:
+        require-resource-limits:
+          title: Require Resource Limits
+          description: Require all containers to define CPU and memory limits
+          severity: medium
+          category: Reliability
+          namespace: production
+          spec:
+            matchConstraints:
+              resourceRules:
+                - apiGroups: [""]
+                  apiVersions: ["v1"]
+                  resources: ["pods"]
+                  operations: ["CREATE", "UPDATE"]
+            validations:
+              - expression: >-
+                  object.spec.containers.all(c,
+                    has(c.resources) &&
+                    has(c.resources.limits) &&
+                    has(c.resources.limits.cpu) &&
+                    has(c.resources.limits.memory))
+                message: CPU and memory limits are required for all containers
+    asserts:
+      - hasDocuments:
+          count: 3
+
+  - it: given valid policy then annotations are rendered correctly
+    set:
+      validatingPolicies:
+        test-policy:
+          title: Test Policy
+          description: A test policy
+          severity: high
+          category: Security
+          spec: {}
+    asserts:
+      - equal:
+          path: metadata.annotations["policies.kyverno.io/title"]
+          value: Test Policy
+      - equal:
+          path: metadata.annotations["policies.kyverno.io/description"]
+          value: A test policy
+      - equal:
+          path: metadata.annotations["policies.kyverno.io/severity"]
+          value: high
+      - equal:
+          path: metadata.annotations["policies.kyverno.io/category"]
+          value: Security
+
+  - it: given namespacedValidatingPolicy with explicit namespace then that namespace is used
+    set:
+      namespacedValidatingPolicies:
+        test-policy:
+          title: Test Policy
+          description: A test policy
+          severity: high
+          category: Security
+          namespace: custom-ns
+          spec: {}
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: custom-ns

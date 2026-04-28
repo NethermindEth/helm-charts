@@ -1,0 +1,62 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+{{ template "chart.maintainersSection" . }}
+{{ template "chart.sourcesSection" . }}
+{{ template "chart.requirementsSection" . }}
+
+## Usage
+
+Policies are declared under top-level keys that correspond to their Kyverno kind.
+Each policy name becomes the Kubernetes resource name. Cluster-scoped and namespaced
+variants are both supported:
+
+```yaml
+validatingPolicies:
+  disallow-privileged-containers:
+    title: Disallow Privileged Containers
+    description: Disallow pods from running privileged containers
+    severity: high        # one of: critical, high, medium, low, info
+    category: Security    # one of: Security, Best Practices, Governance, Misc, Reliability
+    spec:
+      matchConstraints:
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: ["v1"]
+            resources: ["pods"]
+            operations: ["CREATE", "UPDATE"]
+      validations:
+        - expression: "object.spec.containers.all(c, !has(c.securityContext.privileged))"
+          message: Privileged containers are not allowed
+
+namespacedValidatingPolicies:
+  require-resource-limits:
+    title: Require Resource Limits
+    description: Require CPU and memory limits on all containers
+    severity: medium
+    category: Reliability
+    namespace: production   # optional, defaults to the release namespace
+    spec: {}  # Some spec here
+```
+
+See the values file or section for more options.
+
+## Updating the values schema
+
+`values.schema.json` is generated from the [datreeio/CRDs-catalog](https://github.com/datreeio/CRDs-catalog) community
+schemas and should be refreshed when a new Kyverno version ships significant CRD changes. To regenerate it, run from the
+chart root:
+
+```bash
+./scripts/update-schemas.py
+```
+
+The script fetches the `v1` schemas for all five policy kinds, strips verbose descriptions and `x-kubernetes-*` merge
+hints (which have no JSON Schema equivalent), and writes `values.schema.json`.
+
+{{ template "chart.valuesSection" . }}
+{{ template "helm-docs.versionFooter" . }}
