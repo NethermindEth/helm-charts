@@ -91,3 +91,34 @@ tests:
     asserts:
       - isEmpty:
           path: spec.template.spec.affinity
+
+  - it: given resources then they are set at pod level and not at container level
+    set:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+    asserts:
+      - equal:
+          path: spec.template.spec.resources
+          value:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+      - notExists:
+          path: spec.template.spec.containers[0].resources
+
+  - it: given empty resources then pod-level resources are not set
+    set:
+      resources: {}
+    asserts:
+      - notExists:
+          path: spec.template.spec.resources
+      - notExists:
+          path: spec.template.spec.containers[0].resources
