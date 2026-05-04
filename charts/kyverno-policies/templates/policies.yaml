@@ -1,0 +1,47 @@
+{{/*
+  Render all Kyverno policies from values.
+  Supported keys (cluster-scoped):
+    validatingPolicies, mutatingPolicies, generatingPolicies,
+    deletingPolicies, imageValidatingPolicies
+  Supported keys (namespaced):
+    namespacedValidatingPolicies, namespacedMutatingPolicies,
+    namespacedGeneratingPolicies, namespacedDeletingPolicies,
+    namespacedImageValidatingPolicies
+*/}}
+
+{{- $policyKeys := list
+    "validatingPolicies"
+    "mutatingPolicies"
+    "generatingPolicies"
+    "deletingPolicies"
+    "imageValidatingPolicies"
+    "namespacedValidatingPolicies"
+    "namespacedMutatingPolicies"
+    "namespacedGeneratingPolicies"
+    "namespacedDeletingPolicies"
+    "namespacedImageValidatingPolicies"
+-}}
+
+{{- range $policyKey := $policyKeys }}
+{{- $policies := get $.Values $policyKey }}
+{{- if $policies }}
+  {{- $kind := include "kyverno-policies.kindFromKey" $policyKey }}
+  {{- $isNamespaced := eq (include "kyverno-policies.isNamespaced" $policyKey) "true" }}
+  {{- range $name, $policy := $policies }}
+---
+apiVersion: policies.kyverno.io/v1
+kind: {{ $kind }}
+metadata:
+  name: {{ $name }}
+  {{- if and $isNamespaced $policy.namespace }}
+  namespace: {{ $policy.namespace }}
+  {{- end }}
+  labels:
+    {{- include "kyverno-policies.labels" $ | nindent 4 }}
+  annotations:
+    {{- include "kyverno-policies.policyAnnotations" (dict "name" $name "policy" $policy) | nindent 4 }}
+spec:
+  {{- toYaml $policy.spec | nindent 2 }}
+  {{- end }}
+{{- end }}
+{{- end }}
