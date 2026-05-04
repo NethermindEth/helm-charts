@@ -46,9 +46,19 @@ spec:
             summary: Lighthouse beacon node is out of sync
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         {{- else if eq .Values.beacon.client "prysm" }}
-        - alert: Prysm50SlotsBehind
-          expr: beacon_clock_time_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} > 50
+        - alert: Prysm500SlotsBehind
+          expr: beacon_clock_time_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} > 500
           for: 2m
+          labels:
+            {{- with .Values.metrics.prometheusRule.severity }}
+            severity: {{ quote . }}
+            {{- end }}
+          annotations:
+            summary: Prysm beacon node is out of sync
+            description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: Prysm50SlotsBehind
+          expr: beacon_clock_time_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}', namespace='{{ .Release.Namespace }}'} > 25
+          for: 8m
           labels:
             {{- with .Values.metrics.prometheusRule.severity }}
             severity: {{ quote . }}
