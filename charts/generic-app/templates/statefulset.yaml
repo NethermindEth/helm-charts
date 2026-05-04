@@ -28,7 +28,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.resources }}
+      {{- with .Values.podResources }}
       resources:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -83,6 +83,8 @@ spec:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
           envFrom:
             - configMapRef:
                 name: {{ include "generic-app.fullname" . }}-env-cm

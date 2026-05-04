@@ -259,6 +259,19 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# Pod-level resources (spec.resources). Requires the PodLevelResources feature gate
+# (alpha in K8s 1.32, beta and enabled by default in 1.34+). When set, the kubelet
+# treats these as the resource budget for the whole pod; container-level `resources`
+# may still be set and act as per-container overrides within the pod budget.
+# Ref: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/#PodLevelResources
+podResources: {}
+  # limits:
+  #   cpu: 200m
+  #   memory: 256Mi
+  # requests:
+  #   cpu: 200m
+  #   memory: 256Mi
+
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe: null
   # httpGet:
