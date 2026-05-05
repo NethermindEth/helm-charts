@@ -15,7 +15,7 @@ Receives the Helm root context as its parameter
   expr: |
     {{ $upAlertExpr }}
     and on() ({{ $isNotUpdatingAlertExpr }})
-  for: 5m
+  for: 12m
   labels:
     {{- with $root.Values.metrics.prometheusRule.severity }}
     severity: {{ quote . }}
@@ -27,7 +27,7 @@ Receives the Helm root context as its parameter
   expr: |
     {{ $upAlertExpr }}
     unless on() ({{ $isNotUpdatingAlertExpr }})
-  for: 10m
+  for: 16m
   labels:
     {{- with $root.Values.metrics.prometheusRule.severity }}
     severity: {{ quote . }}

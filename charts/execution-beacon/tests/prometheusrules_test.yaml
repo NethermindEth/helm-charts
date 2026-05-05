@@ -36,7 +36,7 @@ tests:
             expr: |
               up{job='some-full-name', namespace='some-namespace'} == 0
               and on() (kube_statefulset_status_current_revision{statefulset='some-full-name', namespace='some-namespace'} == kube_statefulset_status_update_revision{statefulset='some-full-name', namespace='some-namespace'})
-            for: 5m
+            for: 12m
             labels:
               severity: banana
             annotations:
@@ -49,7 +49,7 @@ tests:
             expr: |
               up{job='some-full-name', namespace='some-namespace'} == 0
               unless on() (kube_statefulset_status_current_revision{statefulset='some-full-name', namespace='some-namespace'} == kube_statefulset_status_update_revision{statefulset='some-full-name', namespace='some-namespace'})
-            for: 10m
+            for: 16m
             labels:
               severity: banana
             annotations:
