@@ -28,6 +28,10 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      {{- with .Values.podResources }}
+      resources:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.dnsConfig }}
       dnsConfig:
         {{- toYaml . | nindent 8 }}

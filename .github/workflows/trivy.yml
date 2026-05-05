@@ -50,13 +50,13 @@ jobs:
           ls -la "$TRIVY_CHARTS_DIR"
 
       - name: Manual Trivy Setup
-        uses: aquasecurity/setup-trivy@ff1b8b060f23b650436d419b5e13f67f5d4c3087 #v0.2.2
+        uses: aquasecurity/setup-trivy@e07451d2e059ed86c2870430ea286b3a9e0bf241 #v0.2.6
         with:
           cache: true
-          version: v0.57.1
+          version: v0.70.0
 
       - name: Generate Trivy SARIF Report
-        uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 #v0.31.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: "fs"
           scan-ref: "${{ github.workspace }}/charts"

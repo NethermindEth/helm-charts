@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 2.1.0](https://img.shields.io/badge/Version-2.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -241,6 +241,7 @@ statefulSet:
 | podDisruptionBudget.enabled | bool | `false` | If true, create a PodDisruptionBudget |
 | podDisruptionBudget.minAvailable | int | `1` | Minimum number/percentage of pods that must remain available |
 | podLabels | object | `{}` |  |
+| podResources | object | `{}` |  |
 | podSecurityContext.fsGroup | int | `1000` |  |
 | podSecurityContext.runAsGroup | int | `1000` |  |
 | podSecurityContext.runAsNonRoot | bool | `true` |  |
