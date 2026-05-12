@@ -105,6 +105,8 @@ jobs:
 
       - name: Helm Unit Tests
         uses: d3adb5/helm-unittest-action@v2.5.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           install-mode: "if-not-present"
           charts: "${{ steps.changed-charts.outputs.changed_charts }}"
