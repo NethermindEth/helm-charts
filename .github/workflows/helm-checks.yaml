@@ -106,10 +106,10 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v4.3.1
         with:
-          version: v3.18.4
+          version: v4.1.4
 
       - name: Install helm-unittest plugin
-        run: helm plugin install https://github.com/helm-unittest/helm-unittest --version v1.1.0
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest --version v1.1.0 --verify=false
 
       - name: Helm Unit Tests
         if: steps.changed-charts.outputs.changed_charts != ''
