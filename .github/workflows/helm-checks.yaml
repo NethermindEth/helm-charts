@@ -103,10 +103,18 @@ jobs:
           done
           echo "changed_charts=$changedCharts" >> "$GITHUB_OUTPUT"
 
-      - name: Helm Unit Tests
-        uses: d3adb5/helm-unittest-action@v2.5.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.3.1
         with:
-          install-mode: "if-not-present"
-          charts: "${{ steps.changed-charts.outputs.changed_charts }}"
+          version: v4.1.4
+
+      - name: Install helm-unittest plugin
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest --version v1.1.0 --verify=false
+
+      - name: Helm Unit Tests
+        if: steps.changed-charts.outputs.changed_charts != ''
+        run: |
+          for chart in ${{ steps.changed-charts.outputs.changed_charts }}; do
+            echo "Running helm unittest on $chart"
+            helm unittest "$chart"
+          done
