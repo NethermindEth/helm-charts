@@ -903,7 +903,7 @@
           "type": "object"
         }
       },
-      "required": ["enabled", "path", "namespace", "labels", "annotations", "interval", "scheme", "tlsConfig", "scrapeTimeout", "relabelings"],
+      "required": ["enabled", "path", "labels", "annotations", "interval", "scheme", "tlsConfig", "scrapeTimeout", "relabelings"],
       "title": "serviceMonitor",
       "type": "object"
     },
