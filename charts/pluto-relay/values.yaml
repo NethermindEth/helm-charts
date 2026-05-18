@@ -32,8 +32,11 @@ persistence:
   size: 1Gi
   annotations: {}
 
-# Pluto invocation. The image entrypoint is /app/bin/pluto, so we only pass the subcommand and flags.
+# Pluto invocation. We override the image ENTRYPOINT with a shell wrapper that sources /shared/env
+# (for per-pod env vars), so the binary path must be explicit — the Pluto image's ENTRYPOINT is
+# /app/bin/pluto, and "relay" is its subcommand.
 command:
+  - /app/bin/pluto
   - relay
 args: []
 
