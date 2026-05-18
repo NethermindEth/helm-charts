@@ -1,7 +1,7 @@
 
 # pluto-relay
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.2](https://img.shields.io/badge/AppVersion-0.1.2-informational?style=flat-square)
+![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.2](https://img.shields.io/badge/AppVersion-0.1.2-informational?style=flat-square)
 
 A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEth/pluto)
 
@@ -29,7 +29,8 @@ A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEt
 | affinity | object | `{}` |  |
 | antiAffinityPreset | string | `"soft"` |  |
 | args | list | `[]` |  |
-| command[0] | string | `"relay"` |  |
+| command[0] | string | `"/app/bin/pluto"` |  |
+| command[1] | string | `"relay"` |  |
 | config.CHARON_DATA_DIR | string | `"/data"` |  |
 | config.PLUTO_AUTO_P2PKEY | string | `"true"` |  |
 | config.PLUTO_HTTP_ADDRESS | string | `"0.0.0.0:3640"` |  |
