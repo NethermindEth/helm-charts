@@ -117,7 +117,7 @@ jobs:
           for chart in ${{ steps.changed-charts.outputs.changed_charts }}; do
             if [ -f "$chart/Chart.lock" ] || grep -q '^dependencies:' "$chart/Chart.yaml"; then
               echo "Updating dependencies for $chart"
-              helm dependency update "$chart"
+              helm dependency build "$chart"
             fi
           done
 
