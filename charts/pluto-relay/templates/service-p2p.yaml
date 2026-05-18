@@ -1,0 +1,39 @@
+{{- if .Values.p2p.enabled }}
+{{- $basePort := int .Values.p2p.basePort }}
+{{- range $i := until (int .Values.replicaCount) }}
+{{- $port := add $basePort $i }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pluto-relay.fullname" $ }}-p2p-{{ $i }}
+  labels:
+    type: p2p
+    pod: {{ include "pluto-relay.fullname" $ }}-{{ $i }}
+    {{- include "pluto-relay.labels" $ | nindent 4 }}
+  {{- with $.Values.p2p.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.p2p.serviceType }}
+  ports:
+    - name: p2p-tcp
+      port: {{ $port }}
+      targetPort: {{ $port }}
+      protocol: TCP
+      {{- if eq $.Values.p2p.serviceType "NodePort" }}
+      nodePort: {{ $port }}
+      {{- end }}
+    - name: p2p-udp
+      port: {{ $port }}
+      targetPort: {{ $port }}
+      protocol: UDP
+      {{- if eq $.Values.p2p.serviceType "NodePort" }}
+      nodePort: {{ $port }}
+      {{- end }}
+  selector:
+    statefulset.kubernetes.io/pod-name: {{ include "pluto-relay.fullname" $ }}-{{ $i }}
+    {{- include "pluto-relay.selectorLabels" $ | nindent 4 }}
+{{- end }}
+{{- end }}

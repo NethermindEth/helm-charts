@@ -1,0 +1,152 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "pluto-relay.fullname" . }}
+  labels:
+    {{- include "pluto-relay.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "pluto-relay.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "pluto-relay.fullname" . }}
+  template:
+    metadata:
+      annotations:
+        configmap-hash: {{ include "pluto-relay.configHash" . }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "pluto-relay.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pluto-relay.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init
+          image: bitnamilegacy/kubectl:1.32
+          securityContext:
+            {{- toYaml .Values.initContainerSecurityContext | nindent 12 }}
+          command: ["sh", "-c", "/scripts/init.sh"]
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: BASE_PORT
+              value: {{ .Values.p2p.basePort | quote }}
+            - name: HOSTNAME_PATTERN
+              value: {{ .Values.hostnamePattern | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+            - name: shared
+              mountPath: /shared
+        {{- range $container := .Values.initContainers }}
+        - {{- with $container }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
+      containers:
+        {{- with .Values.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - >
+              if [ -f /shared/env ]; then echo "Sourcing environment variables from /shared/env"; . /shared/env; fi;
+              echo "Executing command: {{ join " " (concat .Values.command .Values.args) }}";
+              exec {{ join " " (concat .Values.command .Values.args) }}
+          ports:
+            - name: http
+              containerPort: 3640
+              protocol: TCP
+            - name: metrics
+              containerPort: 3620
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "pluto-relay.fullname" . }}-env-cm
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: shared
+              mountPath: /shared
+            {{- if .Values.persistence.enabled }}
+            - name: data
+              mountPath: {{ .Values.persistence.mountPath }}
+            {{- end }}
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ include "pluto-relay.fullname" . }}-scripts
+            defaultMode: 0777
+        - name: shared
+          emptyDir: {}
+        {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        {{- include "pluto-relay.affinity" . | nindent 8 }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if .Values.persistence.enabled }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+        labels:
+          {{- include "pluto-relay.labels" . | nindent 10 }}
+        {{- with .Values.persistence.annotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      spec:
+        storageClassName: {{ .Values.persistence.storageClassName | quote }}
+        accessModes: {{- .Values.persistence.accessModes | toYaml | nindent 10 }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}
+  {{- end }}
