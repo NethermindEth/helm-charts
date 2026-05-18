@@ -3615,6 +3615,28 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/mev-boost-0.1.0/mev-boost-0.1.0.tgz
     version: 0.1.0
+  pluto-relay:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-05-18T17:02:32.674107393Z"
+    description: A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEth/pluto)
+    digest: 356dfb1f142677af92016167616f22b1915c9bffe0510726a99b29f20650dc99
+    home: https://github.com/NethermindEth/pluto
+    keywords:
+    - pluto
+    - libp2p
+    - relay
+    - dvt
+    - charon
+    maintainers:
+    - name: cbermudez97
+    name: pluto-relay
+    sources:
+    - https://github.com/NethermindEth/pluto
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/pluto-relay-0.1.0/pluto-relay-0.1.0.tgz
+    version: 0.1.0
   prometheus-rules:
   - apiVersion: v2
     created: "2026-04-08T13:48:42.714152321Z"
@@ -4567,4 +4589,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-05-18T16:48:36.57637622Z"
+generated: "2026-05-18T17:02:32.674477709Z"
