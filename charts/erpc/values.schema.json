@@ -887,7 +887,7 @@
           "type": "object"
         }
       },
-      "required": ["enabled", "port", "path", "namespace", "labels", "annotations", "interval", "scheme", "tlsConfig", "scrapeTimeout", "relabelings"],
+      "required": ["enabled", "port", "path", "labels", "annotations", "interval", "scheme", "tlsConfig", "scrapeTimeout", "relabelings"],
       "title": "serviceMonitor",
       "type": "object"
     },
