@@ -11,7 +11,7 @@ A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEt
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| nethermind-devops |  |  |
+| cbermudez97 |  |  |
 
 ## Source Code
 

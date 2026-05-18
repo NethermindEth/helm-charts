@@ -8,7 +8,7 @@ home: https://github.com/NethermindEth/pluto
 sources:
   - https://github.com/NethermindEth/pluto
 maintainers:
-  - name: nethermind-devops
+  - name: cbermudez97
 keywords:
   - pluto
   - libp2p
