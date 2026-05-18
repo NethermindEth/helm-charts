@@ -3618,6 +3618,27 @@ entries:
   pluto-relay:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2026-05-18T17:46:55.755985936Z"
+    description: A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEth/pluto)
+    digest: b651445956d7f553e472d869f4701d8459eb5f9784917491c846818f8076a85a
+    home: https://github.com/NethermindEth/pluto
+    keywords:
+    - pluto
+    - libp2p
+    - relay
+    - dvt
+    - charon
+    maintainers:
+    - name: cbermudez97
+    name: pluto-relay
+    sources:
+    - https://github.com/NethermindEth/pluto
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/pluto-relay-0.2.0/pluto-relay-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2026-05-18T17:02:32.674107393Z"
     description: A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEth/pluto)
     digest: 356dfb1f142677af92016167616f22b1915c9bffe0510726a99b29f20650dc99
@@ -4589,4 +4610,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-05-18T17:02:32.674477709Z"
+generated: "2026-05-18T17:46:55.756362159Z"
