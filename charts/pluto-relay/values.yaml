@@ -10,6 +10,14 @@ image:
   pullPolicy: IfNotPresent
   tag: ""   # defaults to .Chart.AppVersion
 
+# Init container image. Must be statically linked (musl) so its /bin/busybox can be copied
+# into /shared and used as `sh` by the main container (the Pluto image is distroless and
+# has no shell of its own).
+initImage:
+  repository: busybox
+  tag: "1.37.0-musl"
+  pullPolicy: IfNotPresent
+
 imagePullSecrets: []
 
 replicaCount: 1
@@ -64,17 +72,23 @@ p2p:
   # externalTrafficPolicy intentionally unset (defaults to Cluster) so any node can route to the right pod.
   annotations: {}
 
-# Init script — runs in an init container, writes env exports to /shared/env which the main container sources.
+# Init script. Runs inside the busybox init container. Computes per-pod env from POD_NAME +
+# BASE_PORT + HOSTNAME_PATTERN, then copies busybox into /shared so the main container can use
+# it as `sh`.
 initScript: |
-  #!/usr/bin/env bash
-  set -euo pipefail
-  echo "Init: pod=${POD_NAME} node=${NODE_NAME}"
+  #!/bin/sh
+  set -eu
+  echo "Init: pod=${POD_NAME}"
+
+  # Stage a static shell for the main container (Pluto image is distroless).
+  cp /bin/busybox /shared/busybox
+  ln -sf busybox /shared/sh
+  chmod +x /shared/busybox
+
   touch /shared/env
 
   REPLICA_INDEX=$(echo "${POD_NAME}" | awk -F'-' '{print $NF}')
   P2P_PORT=$((BASE_PORT + REPLICA_INDEX))
-
-  EXTERNAL_NODE_IP=$(kubectl get node "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null || echo "")
 
   EXTERNAL_HOSTNAME=""
   if [ -n "${HOSTNAME_PATTERN:-}" ]; then
@@ -83,12 +97,10 @@ initScript: |
 
   echo "REPLICA_INDEX=${REPLICA_INDEX}"
   echo "P2P_PORT=${P2P_PORT}"
-  echo "EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}"
   echo "EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}"
 
   {
     echo "export REPLICA_INDEX=${REPLICA_INDEX}"
-    echo "export EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}"
     echo "export PLUTO_P2P_TCP_ADDRESS=0.0.0.0:${P2P_PORT}"
     echo "export PLUTO_P2P_UDP_ADDRESS=0.0.0.0:${P2P_PORT}"
     if [ -n "${EXTERNAL_HOSTNAME}" ]; then
@@ -136,6 +148,14 @@ HTTPRoute:
   rules: []
 
 resources: {}
+
+# Resources applied to the built-in init container.
+initContainerResources:
+  requests:
+    cpu: 10m
+    memory: 16Mi
+  limits:
+    memory: 32Mi
 
 livenessProbe:
   httpGet:

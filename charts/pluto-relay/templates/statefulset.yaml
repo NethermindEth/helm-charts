@@ -33,15 +33,12 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init
-          image: bitnamilegacy/kubectl:1.32
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             {{- toYaml .Values.initContainerSecurityContext | nindent 12 }}
-          command: ["sh", "-c", "/scripts/init.sh"]
+          command: ["/bin/sh", "-c", "/scripts/init.sh"]
           env:
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -50,6 +47,8 @@ spec:
               value: {{ .Values.p2p.basePort | quote }}
             - name: HOSTNAME_PATTERN
               value: {{ .Values.hostnamePattern | quote }}
+          resources:
+            {{- toYaml .Values.initContainerResources | nindent 12 }}
           volumeMounts:
             - name: scripts
               mountPath: /scripts
@@ -70,7 +69,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - sh
+            - /shared/sh
             - -c
             - >
               if [ -f /shared/env ]; then echo "Sourcing environment variables from /shared/env"; . /shared/env; fi;

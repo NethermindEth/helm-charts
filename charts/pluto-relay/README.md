@@ -1,7 +1,7 @@
 
 # pluto-relay
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.2](https://img.shields.io/badge/AppVersion-0.1.2-informational?style=flat-square)
 
 A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEth/pluto)
 
@@ -48,6 +48,9 @@ A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEt
 | image.repository | string | `"nethermindeth/pluto"` |  |
 | image.tag | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
+| initContainerResources.limits.memory | string | `"32Mi"` |  |
+| initContainerResources.requests.cpu | string | `"10m"` |  |
+| initContainerResources.requests.memory | string | `"16Mi"` |  |
 | initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
@@ -55,7 +58,10 @@ A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEt
 | initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
 | initContainerSecurityContext.runAsUser | int | `1000` |  |
 | initContainers | list | `[]` |  |
-| initScript | string | `"#!/usr/bin/env bash\nset -euo pipefail\necho \"Init: pod=${POD_NAME} node=${NODE_NAME}\"\ntouch /shared/env\n\nREPLICA_INDEX=$(echo \"${POD_NAME}\" | awk -F'-' '{print $NF}')\nP2P_PORT=$((BASE_PORT + REPLICA_INDEX))\n\nEXTERNAL_NODE_IP=$(kubectl get node \"${NODE_NAME}\" -o jsonpath='{.status.addresses[?(@.type==\"ExternalIP\")].address}' 2>/dev/null || echo \"\")\n\nEXTERNAL_HOSTNAME=\"\"\nif [ -n \"${HOSTNAME_PATTERN:-}\" ]; then\n  EXTERNAL_HOSTNAME=$(echo \"${HOSTNAME_PATTERN}\" | sed \"s/{i}/${REPLICA_INDEX}/g\")\nfi\n\necho \"REPLICA_INDEX=${REPLICA_INDEX}\"\necho \"P2P_PORT=${P2P_PORT}\"\necho \"EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\"\necho \"EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}\"\n\n{\n  echo \"export REPLICA_INDEX=${REPLICA_INDEX}\"\n  echo \"export EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}\"\n  echo \"export PLUTO_P2P_TCP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  echo \"export PLUTO_P2P_UDP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  if [ -n \"${EXTERNAL_HOSTNAME}\" ]; then\n    echo \"export PLUTO_P2P_EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}\"\n  fi\n} >> /shared/env\n"` |  |
+| initImage.pullPolicy | string | `"IfNotPresent"` |  |
+| initImage.repository | string | `"busybox"` |  |
+| initImage.tag | string | `"1.37.0-musl"` |  |
+| initScript | string | `"#!/bin/sh\nset -eu\necho \"Init: pod=${POD_NAME}\"\n\n# Stage a static shell for the main container (Pluto image is distroless).\ncp /bin/busybox /shared/busybox\nln -sf busybox /shared/sh\nchmod +x /shared/busybox\n\ntouch /shared/env\n\nREPLICA_INDEX=$(echo \"${POD_NAME}\" | awk -F'-' '{print $NF}')\nP2P_PORT=$((BASE_PORT + REPLICA_INDEX))\n\nEXTERNAL_HOSTNAME=\"\"\nif [ -n \"${HOSTNAME_PATTERN:-}\" ]; then\n  EXTERNAL_HOSTNAME=$(echo \"${HOSTNAME_PATTERN}\" | sed \"s/{i}/${REPLICA_INDEX}/g\")\nfi\n\necho \"REPLICA_INDEX=${REPLICA_INDEX}\"\necho \"P2P_PORT=${P2P_PORT}\"\necho \"EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}\"\n\n{\n  echo \"export REPLICA_INDEX=${REPLICA_INDEX}\"\n  echo \"export PLUTO_P2P_TCP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  echo \"export PLUTO_P2P_UDP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  if [ -n \"${EXTERNAL_HOSTNAME}\" ]; then\n    echo \"export PLUTO_P2P_EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}\"\n  fi\n} >> /shared/env\n"` |  |
 | livenessProbe.failureThreshold | int | `5` |  |
 | livenessProbe.httpGet.path | string | `"/"` |  |
 | livenessProbe.httpGet.port | string | `"http"` |  |
