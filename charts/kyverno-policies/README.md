@@ -5,6 +5,12 @@
 
 A helper Helm Chart to install Kyverno policies
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Angelin01 |  |  |
+
 ## Usage
 
 Policies are declared under top-level keys that correspond to their Kyverno kind.
