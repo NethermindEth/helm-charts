@@ -21,6 +21,10 @@ spec:
       annotations:
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
+      {{- with .Values.podResources }}
+      resources:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

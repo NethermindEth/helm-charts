@@ -2988,6 +2988,26 @@
       "title": "podManagementPolicy",
       "type": "string"
     },
+    "podResources": {
+      "type": "object",
+      "description": "Pod-level resource requests and limits (spec.resources). Requires the PodLevelResources feature gate (alpha in K8s 1.32, beta and enabled by default in 1.34+).",
+      "properties": {
+        "limits": {
+          "type": "object",
+          "properties": {
+            "cpu": { "$ref": "#/definitions/resourceQuantity" },
+            "memory": { "$ref": "#/definitions/resourceQuantity" }
+          }
+        },
+        "requests": {
+          "type": "object",
+          "properties": {
+            "cpu": { "$ref": "#/definitions/resourceQuantity" },
+            "memory": { "$ref": "#/definitions/resourceQuantity" }
+          }
+        }
+      }
+    },
     "priorityClassName": {
       "default": "",
       "description": "# Used to assign priority to pods\n# ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/\n#",
