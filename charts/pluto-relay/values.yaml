@@ -1,0 +1,207 @@
+############################################
+# Pluto Relay
+############################################
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: nethermindeth/pluto
+  pullPolicy: IfNotPresent
+  tag: ""   # defaults to .Chart.AppVersion
+
+imagePullSecrets: []
+
+replicaCount: 1
+
+# Pluto's data dir holds the auto-generated p2p key. Must survive restarts.
+persistence:
+  enabled: true
+  storageClassName: ""
+  mountPath: /data
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+  annotations: {}
+
+# Pluto invocation. The image entrypoint is /app/bin/pluto, so we only pass the subcommand and flags.
+command:
+  - relay
+args: []
+
+# Static env vars baked into the env ConfigMap. Per-pod values (listen addresses, external hostname)
+# are exported by the init script into /shared/env which the container sources before exec.
+config:
+  PLUTO_HTTP_ADDRESS: "0.0.0.0:3640"
+  PLUTO_MONITORING_ADDRESS: "0.0.0.0:3620"
+  PLUTO_AUTO_P2PKEY: "true"
+  PLUTO_LOG_FORMAT: "json"
+  PLUTO_LOG_LEVEL: "info"
+  PLUTO_P2P_MAX_CONNECTIONS: "16384"
+  PLUTO_P2P_MAX_RESERVATIONS: "512"
+  PLUTO_P2P_RELAY_LOGLEVEL: "info"
+  PLUTO_P2P_ADVERTISE_PRIVATE_ADDRESSES: "false"
+  # Pluto inherited the data-dir env var name from Charon.
+  CHARON_DATA_DIR: "/data"
+
+# Per-pod external hostname pattern. `{i}` is substituted with the replica index by the init script.
+# Example: "pluto-relay-{i}.ovh.dev-nethermind.xyz"
+hostnamePattern: ""
+
+# libp2p exposure. Pluto advertises the listen port verbatim, so each pod must listen on a unique
+# port matching its assigned NodePort. The Service template assigns nodePort = basePort + replica index;
+# the init script exports PLUTO_P2P_TCP_ADDRESS/PLUTO_P2P_UDP_ADDRESS to listen on the same port.
+p2p:
+  enabled: true
+  serviceType: NodePort
+  basePort: 32610
+  # externalTrafficPolicy intentionally unset (defaults to Cluster) so any node can route to the right pod.
+  annotations: {}
+
+# Init script — runs in an init container, writes env exports to /shared/env which the main container sources.
+initScript: |
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "Init: pod=${POD_NAME} node=${NODE_NAME}"
+  touch /shared/env
+
+  REPLICA_INDEX=$(echo "${POD_NAME}" | awk -F'-' '{print $NF}')
+  P2P_PORT=$((BASE_PORT + REPLICA_INDEX))
+
+  EXTERNAL_NODE_IP=$(kubectl get node "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null || echo "")
+
+  EXTERNAL_HOSTNAME=""
+  if [ -n "${HOSTNAME_PATTERN:-}" ]; then
+    EXTERNAL_HOSTNAME=$(echo "${HOSTNAME_PATTERN}" | sed "s/{i}/${REPLICA_INDEX}/g")
+  fi
+
+  echo "REPLICA_INDEX=${REPLICA_INDEX}"
+  echo "P2P_PORT=${P2P_PORT}"
+  echo "EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}"
+  echo "EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}"
+
+  {
+    echo "export REPLICA_INDEX=${REPLICA_INDEX}"
+    echo "export EXTERNAL_NODE_IP=${EXTERNAL_NODE_IP}"
+    echo "export PLUTO_P2P_TCP_ADDRESS=0.0.0.0:${P2P_PORT}"
+    echo "export PLUTO_P2P_UDP_ADDRESS=0.0.0.0:${P2P_PORT}"
+    if [ -n "${EXTERNAL_HOSTNAME}" ]; then
+      echo "export PLUTO_P2P_EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}"
+    fi
+  } >> /shared/env
+
+# extraInitScript — appended after initScript.
+extraInitScript: |
+  exit 0
+
+# Extra init containers (the chart already runs a built-in `init` container that executes
+# `initScript` + `extraInitScript`; entries here are appended after it).
+initContainers: []
+
+extraContainers: []
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+# Main service: HTTP (ENR endpoint) and Prometheus metrics. Per-pod copies of this service are
+# auto-created with pod-name selectors so HTTPRoute can route by hostname to a specific pod.
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3640
+      protocol: TCP
+    - name: metrics
+      port: 3620
+      protocol: TCP
+
+# Gateway-API HTTPRoute for per-pod public HTTP exposure. Recommended when running behind Istio.
+HTTPRoute:
+  enabled: false
+  annotations: {}
+  parentRefs: []
+  hostnames: []
+  rules: []
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  failureThreshold: 5
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 3
+
+volumes: []
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+
+# "soft" or "hard"; "" disables. Ignored if `affinity` is set.
+antiAffinityPreset: "soft"
+affinity: {}
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  # maxUnavailable: "50%"
+
+serviceMonitor:
+  enabled: true
+  port: metrics
+  path: /metrics
+  namespace: null
+  labels: {}
+  annotations: {}
+  interval: 30s
+  scheme: http
+  tlsConfig: {}
+  scrapeTimeout: 10s
+  relabelings: []
+  metricRelabelings: []
+
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault
+
+initContainerSecurityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
