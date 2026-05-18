@@ -44,8 +44,14 @@ config:
   # Pluto inherited the data-dir env var name from Charon.
   CHARON_DATA_DIR: "/data"
 
-# Per-pod external hostname pattern. `{i}` is substituted with the replica index by the init script.
-# Example: "pluto-relay-{i}.ovh.dev-nethermind.xyz"
+# Per-pod libp2p external hostname pattern. `{i}` is substituted with the replica index.
+# Used for two things:
+#   1. PLUTO_P2P_EXTERNAL_HOSTNAME — what the relay advertises in its multiaddr.
+#   2. external-dns annotation on the per-pod p2p Service — so ExternalDNS publishes A records
+#      to the worker node IPs (where the NodePort is reachable).
+# This MUST be a different hostname than any HTTPRoute hostname, because HTTPRoute hostnames
+# resolve to the Istio Gateway IP (which does not expose libp2p NodePorts).
+# Example: "pluto-relay-{i}-p2p.ovh.dev-nethermind.xyz"
 hostnamePattern: ""
 
 # libp2p exposure. Pluto advertises the listen port verbatim, so each pod must listen on a unique

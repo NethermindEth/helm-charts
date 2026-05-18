@@ -1,7 +1,12 @@
 {{- if .Values.p2p.enabled }}
 {{- $basePort := int .Values.p2p.basePort }}
+{{- $hostnamePattern := .Values.hostnamePattern }}
 {{- range $i := until (int .Values.replicaCount) }}
 {{- $port := add $basePort $i }}
+{{- $hostname := "" }}
+{{- if $hostnamePattern }}
+{{- $hostname = $hostnamePattern | replace "{i}" (toString $i) }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -11,10 +16,13 @@ metadata:
     type: p2p
     pod: {{ include "pluto-relay.fullname" $ }}-{{ $i }}
     {{- include "pluto-relay.labels" $ | nindent 4 }}
-  {{- with $.Values.p2p.annotations }}
   annotations:
+    {{- if $hostname }}
+    external-dns.alpha.kubernetes.io/hostname: {{ $hostname | quote }}
+    {{- end }}
+    {{- with $.Values.p2p.annotations }}
     {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- end }}
 spec:
   type: {{ $.Values.p2p.serviceType }}
   ports:
