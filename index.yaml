@@ -944,6 +944,23 @@ entries:
   erpc:
   - apiVersion: v2
     appVersion: 0.0.33
+    created: "2026-05-18T16:48:36.129694286Z"
+    description: A Helm chart for deploying Erpc
+    digest: 80cb50010df0bc8db82c29cad8fb25e2c298030456d95efa74715df29a367f04
+    home: https://docs.erpc.cloud
+    keywords:
+    - rpcs
+    - erpc
+    maintainers:
+    - name: cbermudez97
+    - name: AntiD2ta
+    name: erpc
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/erpc-1.1.1/erpc-1.1.1.tgz
+    version: 1.1.1
+  - apiVersion: v2
+    appVersion: 0.0.33
     created: "2026-04-17T12:02:21.186916682Z"
     description: A Helm chart for deploying Erpc
     digest: 74c9389af86859f2a108b3cf1c485272325e36d012ee43d80f9c4a9a0cbc6fee
@@ -3202,6 +3219,17 @@ entries:
     version: 0.1.0
   generic-app-p2p:
   - apiVersion: v2
+    created: "2026-05-18T16:48:36.282154057Z"
+    description: A Helm chart for Kubernetes generic apps (P2P)
+    digest: ad6be61c74bf03121050dbd13e8244a30b53a7984d768146853e4a141021b2dc
+    maintainers:
+    - name: 0xDones
+    name: generic-app-p2p
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-app-p2p-1.2.0/generic-app-p2p-1.2.0.tgz
+    version: 1.2.0
+  - apiVersion: v2
     created: "2026-04-03T17:05:38.817273556Z"
     description: A Helm chart for Kubernetes generic apps (P2P)
     digest: c0b988d8878bf2ca14645090092660c03ddb8d4e259b2264ace371f8480614f6
@@ -3474,6 +3502,17 @@ entries:
     version: 0.1.0
   juno:
   - apiVersion: v2
+    created: "2026-05-18T16:48:36.425325712Z"
+    description: Helm chart for Juno Starknet node with optional staking service
+    digest: 109d58aa9bc220a160d8da6ce03fd9fdbd0fda3e8b535ebb2959e2047fe3959c
+    maintainers:
+    - name: brbrr
+    name: juno
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/juno-0.0.2/juno-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
     created: "2026-03-12T13:56:57.738083354Z"
     description: Helm chart for Juno Starknet node with optional staking service
     digest: 1f6ecd490bb01b6415c5ae1fb012bb6bf83bcd1b738796882b2b3935de3b54bf
@@ -3485,6 +3524,17 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/juno-0.0.1/juno-0.0.1.tgz
     version: 0.0.1
   kyverno-policies:
+  - apiVersion: v2
+    created: "2026-05-18T16:48:36.575936107Z"
+    description: A helper Helm Chart to install Kyverno policies
+    digest: 6a7cea7217f892112258f4d016d73366519f2fcdf395ad512cb5000ecd8bfac7
+    maintainers:
+    - name: Angelin01
+    name: kyverno-policies
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/kyverno-policies-0.1.1/kyverno-policies-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     created: "2026-04-28T13:44:59.303305199Z"
     description: A helper Helm Chart to install Kyverno policies
@@ -4517,4 +4567,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-05-12T15:04:19.65750026Z"
+generated: "2026-05-18T16:48:36.57637622Z"
