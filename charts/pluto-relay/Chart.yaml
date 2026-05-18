@@ -1,0 +1,17 @@
+apiVersion: v2
+name: pluto-relay
+description: A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEth/pluto)
+type: application
+version: 0.2.0
+appVersion: "0.1.0"
+home: https://github.com/NethermindEth/pluto
+sources:
+  - https://github.com/NethermindEth/pluto
+maintainers:
+  - name: cbermudez97
+keywords:
+  - pluto
+  - libp2p
+  - relay
+  - dvt
+  - charon
