@@ -5,6 +5,9 @@ metadata:
   name: {{ include "prometheus-rules.fullname" . }}
   labels:
     {{- include "prometheus-rules.labels" . | nindent 4 }}
+    {{- with .Values.defaultAlertLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   groups:
   {{- range .Values.spec.groups }}
