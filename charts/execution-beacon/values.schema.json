@@ -2987,20 +2987,26 @@
           "title": "type"
         }
       },
-      "anyOf": [
-        {
-          "properties": {
-            "startAtExecution": { "type": "integer" },
-            "startAtBeacon": { "type": "integer" }
+      "if": {
+        "properties": { "enabled": { "const": true } },
+        "required": ["enabled"]
+      },
+      "then": {
+        "anyOf": [
+          {
+            "properties": {
+              "startAtExecution": { "type": "integer" },
+              "startAtBeacon": { "type": "integer" }
+            }
+          },
+          {
+            "properties": {
+              "replicaToNodePortExecution": { "minProperties": 1 },
+              "replicaToNodePortBeacon": { "minProperties": 1 }
+            }
           }
-        },
-        {
-          "properties": {
-            "replicaToNodePortExecution": { "minProperties": 1 },
-            "replicaToNodePortBeacon": { "minProperties": 1 }
-          }
-        }
-      ],
+        ]
+      },
       "required": [
         "enabled",
         "annotations"
