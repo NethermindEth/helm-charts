@@ -372,14 +372,19 @@ p2pNodePort:
   ## Options: NodePort, LoadBalancer
   type: NodePort
   ## @param p2pNodePort.startAt The ports allocation will start from this value
+  ## Required when replicaToNodePortExecution/replicaToNodePortBeacon are not set
   ##
-  startAtExecution: 31100
-  startAtBeacon: 31200
-  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
-  ## @default -- See `values.yaml` for example
-  replicaToNodePort: {}
-  #  "0": 32345
-  #  "3": 32348
+  startAtExecution: ~
+  startAtBeacon: ~
+  ## @param p2pNodePort.replicaToNodePortExecution Overwrite the execution p2p port for specific replicas
+  replicaToNodePortExecution: {}
+  #  "0": 32386
+  #  "1": 32226
+  ## @param p2pNodePort.replicaToNodePortBeacon Overwrite the beacon p2p port for specific replicas
+  ## Takes precedence over replicaToNodePort for beacon services
+  replicaToNodePortBeacon: {}
+  #  "0": 32396
+  #  "1": 32236
 
 ## Additional volumes to create
 ##
@@ -694,6 +699,12 @@ beacon:
   ## have a clear understanding that community has decided to override the terminal difficulty.
   ## Incorrect usage will result in your node experience consensus failure.
   totalDifficultyOverride: ""
+
+  ## Shell script to run before the beacon client command, after init-nodeport.
+  ## Useful for per-replica configuration using POD_NAME ordinal.
+  ## Must be a single line (semicolon-separated statements).
+  ## Example: ordinal="${POD_NAME##*-}"; case "$ordinal" in 0) PEER=foo ;; 1) PEER=bar ;; *) exit 2 ;; esac
+  preExecScript: ""
 
   ## Extra flags to pass to the node
   ##

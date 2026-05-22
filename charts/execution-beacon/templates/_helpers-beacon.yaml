@@ -95,6 +95,9 @@ Teku beacon client command
 {{- if .Values.p2pNodePort.enabled }}
   . /env/init-nodeport;
 {{- end }}
+{{- if .Values.beacon.preExecScript }}
+  {{ .Values.beacon.preExecScript }};
+{{- end }}
   exec /opt/teku/bin/teku
   --network={{ .Values.network }}
   --data-beacon-path=/data/beacon/teku
@@ -153,6 +156,9 @@ Lighthouse beacon client command
 {{- if .Values.p2pNodePort.enabled }}
   . /env/init-nodeport;
 {{- end }}
+{{- if .Values.beacon.preExecScript }}
+  {{ .Values.beacon.preExecScript }};
+{{- end }}
   exec lighthouse
   bn
   --staking
@@ -209,6 +215,9 @@ Nimbus beacon client command
 {{- if .Values.p2pNodePort.enabled }}
   . /env/init-nodeport;
 {{- end }}
+{{- if .Values.beacon.preExecScript }}
+  {{ .Values.beacon.preExecScript }};
+{{- end }}
 {{- if or (eq .Values.network "gnosis") (eq .Values.network "chiado") }}
   exec /home/user/nimbus_beacon_node
 {{- else }}
@@ -234,7 +243,7 @@ Nimbus beacon client command
   --rest-address={{ .Values.beacon.restApi.host }}
   --rest-allow-origin={{ .Values.beacon.restApi.corsOrigins | join "," }}
 {{- end }}
-  --max-peers={{ .Values.beacon.targetPeers }}
+  --max-peers=${TARGET_PEERS:-{{ .Values.beacon.targetPeers }}}
 {{- if .Values.p2pNodePort.enabled }}
   --nat=extip:$EXTERNAL_IP
   --tcp-port=$EXTERNAL_BEACON_PORT
@@ -263,6 +272,9 @@ Lodestar beacon client command
 - >
 {{- if .Values.p2pNodePort.enabled }}
   . /env/init-nodeport;
+{{- end }}
+{{- if .Values.beacon.preExecScript }}
+  {{ .Values.beacon.preExecScript }};
 {{- end }}
   exec node
   ./packages/cli/bin/lodestar
