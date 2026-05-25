@@ -374,8 +374,8 @@ p2pNodePort:
   ## @param p2pNodePort.startAt The ports allocation will start from this value
   ## Required when replicaToNodePortExecution/replicaToNodePortBeacon are not set
   ##
-  startAtExecution: ~
-  startAtBeacon: ~
+  startAtExecution: 31100
+  startAtBeacon: 31200
   ## @param p2pNodePort.replicaToNodePortExecution Overwrite the execution p2p port for specific replicas
   replicaToNodePortExecution: {}
   #  "0": 32386

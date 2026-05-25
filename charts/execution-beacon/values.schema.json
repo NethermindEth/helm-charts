@@ -2967,14 +2967,14 @@
           "maximum": 65535,
           "minimum": 0,
           "title": "startAtBeacon",
-          "type": ["integer", "null"]
+          "type": "integer"
         },
         "startAtExecution": {
           "description": "#\n#",
           "maximum": 65535,
           "minimum": 0,
           "title": "startAtExecution",
-          "type": ["integer", "null"]
+          "type": "integer"
         },
         "type": {
           "default": "NodePort",
@@ -2986,26 +2986,6 @@
           "required": [],
           "title": "type"
         }
-      },
-      "if": {
-        "properties": { "enabled": { "const": true } },
-        "required": ["enabled"]
-      },
-      "then": {
-        "anyOf": [
-          {
-            "properties": {
-              "startAtExecution": { "type": "integer" },
-              "startAtBeacon": { "type": "integer" }
-            }
-          },
-          {
-            "properties": {
-              "replicaToNodePortExecution": { "minProperties": 1 },
-              "replicaToNodePortBeacon": { "minProperties": 1 }
-            }
-          }
-        ]
       },
       "required": [
         "enabled",
