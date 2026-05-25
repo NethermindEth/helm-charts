@@ -1,10 +1,20 @@
 {{- if .Values.p2pNodePort.enabled -}}
 {{- range $i, $e := until (int .Values.replicaCount) }}
-{{- $portExecution := add $.Values.p2pNodePort.startAtExecution $i -}}
-{{- $portBeacon := add $.Values.p2pNodePort.startAtBeacon $i -}}
-{{- if hasKey $.Values.p2pNodePort.replicaToNodePort ($i | toString) -}}
-  {{ $portExecution = index $.Values.p2pNodePort.replicaToNodePort ($i | toString) }}
-  {{ $portBeacon = index $.Values.p2pNodePort.replicaToNodePort ($i | toString) }}
+{{- $portExecution := 0 -}}
+{{- $portBeacon := 0 -}}
+{{- if hasKey $.Values.p2pNodePort.replicaToNodePortExecution ($i | toString) -}}
+  {{ $portExecution = index $.Values.p2pNodePort.replicaToNodePortExecution ($i | toString) }}
+{{- else if $.Values.p2pNodePort.startAtExecution -}}
+  {{ $portExecution = add $.Values.p2pNodePort.startAtExecution $i }}
+{{- else -}}
+  {{ fail "p2pNodePort: either startAtExecution or replicaToNodePortExecution must be set" }}
+{{- end }}
+{{- if hasKey $.Values.p2pNodePort.replicaToNodePortBeacon ($i | toString) -}}
+  {{ $portBeacon = index $.Values.p2pNodePort.replicaToNodePortBeacon ($i | toString) }}
+{{- else if $.Values.p2pNodePort.startAtBeacon -}}
+  {{ $portBeacon = add $.Values.p2pNodePort.startAtBeacon $i }}
+{{- else -}}
+  {{ fail "p2pNodePort: either startAtBeacon or replicaToNodePortBeacon must be set" }}
 {{- end }}
 
 ---

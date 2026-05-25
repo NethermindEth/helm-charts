@@ -1320,6 +1320,12 @@
           "title": "extraFlags",
           "type": "array"
         },
+        "preExecScript": {
+          "default": "",
+          "description": "# Shell script injected before the beacon client command, after init-nodeport.\n# Must be a single line (semicolon-separated). Useful for per-replica config via POD_NAME ordinal.\n#",
+          "title": "preExecScript",
+          "type": "string"
+        },
         "grpc": {
           "additionalProperties": false,
           "properties": {
@@ -2941,11 +2947,20 @@
           "title": "enabled",
           "type": "boolean"
         },
-        "replicaToNodePort": {
-          "additionalProperties": false,
-          "description": "#\n#",
-          "required": [],
-          "title": "replicaToNodePort",
+        "replicaToNodePortExecution": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "description": "Overwrite the execution p2p port for specific replicas. Takes precedence over replicaToNodePort.",
+          "title": "replicaToNodePortExecution",
+          "type": "object"
+        },
+        "replicaToNodePortBeacon": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "description": "Overwrite the beacon p2p port for specific replicas. Takes precedence over replicaToNodePort.",
+          "title": "replicaToNodePortBeacon",
           "type": "object"
         },
         "startAtBeacon": {
@@ -2976,8 +2991,7 @@
       },
       "required": [
         "enabled",
-        "annotations",
-        "replicaToNodePort"
+        "annotations"
       ],
       "title": "p2pNodePort",
       "type": "object"

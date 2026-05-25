@@ -210,6 +210,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -319,6 +323,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
