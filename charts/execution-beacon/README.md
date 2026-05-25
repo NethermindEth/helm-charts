@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.8.0](https://img.shields.io/badge/Version-1.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.9.1](https://img.shields.io/badge/Version-1.9.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -76,6 +76,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.persistence.enabled | bool | `true` |  |
 | beacon.persistence.size | string | `"100Gi"` |  |
 | beacon.persistence.storageClassName | string | `""` |  |
+| beacon.preExecScript | string | `""` |  |
 | beacon.proposerOnly | bool | `false` |  |
 | beacon.resources | object | `{}` |  |
 | beacon.restApi.corsOrigins[0] | string | `"*"` |  |
@@ -240,7 +241,8 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | nodeSelector | object | `{}` |  |
 | p2pNodePort.annotations | object | `{}` |  |
 | p2pNodePort.enabled | bool | `false` |  |
-| p2pNodePort.replicaToNodePort | object | `{}` |  |
+| p2pNodePort.replicaToNodePortBeacon | object | `{}` |  |
+| p2pNodePort.replicaToNodePortExecution | object | `{}` |  |
 | p2pNodePort.startAtBeacon | int | `31200` |  |
 | p2pNodePort.startAtExecution | int | `31100` |  |
 | p2pNodePort.type | string | `"NodePort"` |  |

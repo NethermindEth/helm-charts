@@ -25,8 +25,25 @@ export EXTERNAL_BEACON_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "clien
 export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 {{- else }}
 echo "==> Getting NodePort configuration..."
-export EXTERNAL_EXECUTION_PORT=$(kubectl get services -l "client=execution,pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}')
-export EXTERNAL_BEACON_PORT=$(kubectl get services -l "client=beacon,pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}')
+RETRIES=30
+RETRY_INTERVAL=5
+i=0
+until [ $i -ge $RETRIES ]; do
+  EXTERNAL_EXECUTION_PORT=$(kubectl get services -l "client=execution,pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}' 2>/dev/null)
+  EXTERNAL_BEACON_PORT=$(kubectl get services -l "client=beacon,pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}' 2>/dev/null)
+  if [ -n "$EXTERNAL_EXECUTION_PORT" ] && [ -n "$EXTERNAL_BEACON_PORT" ]; then
+    break
+  fi
+  i=$((i + 1))
+  echo "NodePort services not ready yet, retrying... ($i/$RETRIES)"
+  sleep $RETRY_INTERVAL
+done
+if [ -z "$EXTERNAL_EXECUTION_PORT" ] || [ -z "$EXTERNAL_BEACON_PORT" ]; then
+  echo "ERROR: Failed to get NodePort configuration after $RETRIES attempts" >&2
+  exit 1
+fi
+export EXTERNAL_EXECUTION_PORT
+export EXTERNAL_BEACON_PORT
 export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}')
 {{- end }}
 
