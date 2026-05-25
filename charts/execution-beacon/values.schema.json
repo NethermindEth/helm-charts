@@ -2964,12 +2964,14 @@
           "type": "object"
         },
         "startAtBeacon": {
+          "default": 31200,
           "maximum": 65535,
           "minimum": 0,
           "title": "startAtBeacon",
           "type": "integer"
         },
         "startAtExecution": {
+          "default": 31100,
           "description": "#\n#",
           "maximum": 65535,
           "minimum": 0,
