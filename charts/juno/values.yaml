@@ -56,7 +56,14 @@ juno:
 
   initContainers: []
   extraContainers: []
-  securityContext: {}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
 
 # -- Starknet staking service configuration
 staking:
@@ -106,7 +113,14 @@ staking:
 
   initContainers: []
   extraContainers: []
-  securityContext: {}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
 
 # -- Service type for all services
 service:

@@ -1,7 +1,7 @@
 
 # lodestar-vc
 
-![Version: 0.1.4](https://img.shields.io/badge/Version-0.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
 
@@ -49,7 +49,10 @@ A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
 | readinessProbe | string | `nil` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | `{}` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | service.ports.http | int | `9596` |  |
 | service.ports.metrics | int | `5064` |  |
 | service.ports.p2p | int | `9000` |  |
