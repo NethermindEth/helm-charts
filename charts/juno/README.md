@@ -1,6 +1,6 @@
 # juno
 
-![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Helm chart for Juno Starknet node with optional staking service
 
@@ -176,7 +176,7 @@ serviceMonitor:
 | imagePullSecrets | list | `[]` |  |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"Prefix"}]}],"tls":[]}` | Ingress for exposing Juno RPC externally |
 | ingress.hosts | list | `[{"host":"chart-example.local","paths":[{"path":"/","pathType":"Prefix"}]}]` | Each path can optionally set servicePort to route to a specific Juno port. Defaults to juno.service.ports.rpc (6060). Set servicePort: 6061 for WebSocket. To expose both RPC and WS, use separate hosts:   - host: rpc.example.com     paths:       - path: /         pathType: Prefix   - host: ws.example.com     paths:       - path: /         pathType: Prefix         servicePort: 6061 |
-| juno | object | `{"command":[],"enabled":true,"extraArgs":[],"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"nethermind/juno","tag":"v0.15.18"},"initContainers":[],"loglevel":"info","network":"sepolia","persistence":{"accessModes":["ReadWriteOnce"],"size":"1Ti","storageClassName":""},"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/ready","port":"rpc"},"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{},"securityContext":{},"service":{"ports":{"metrics":8080,"rpc":6060,"ws":6061}}}` | Juno Starknet node configuration |
+| juno | object | `{"command":[],"enabled":true,"extraArgs":[],"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"nethermind/juno","tag":"v0.15.18"},"initContainers":[],"loglevel":"info","network":"sepolia","persistence":{"accessModes":["ReadWriteOnce"],"size":"1Ti","storageClassName":""},"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/ready","port":"rpc"},"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"service":{"ports":{"metrics":8080,"rpc":6060,"ws":6061}}}` | Juno Starknet node configuration |
 | juno.network | string | `"sepolia"` | mainnet, sepolia, sepolia-integration |
 | juno.resources | object | `{}` | Resource requests and limits for juno container Example:   requests:     cpu: "1"     memory: "4Gi"   limits:     cpu: "2"     memory: "8Gi" |
 | nameOverride | string | `""` |  |
@@ -196,7 +196,7 @@ serviceMonitor:
 | serviceMonitor.scheme | string | `"http"` | ServiceMonitor scheme |
 | serviceMonitor.scrapeTimeout | string | `nil` | ServiceMonitor scrape timeout (leave empty for Prometheus operator default) |
 | serviceMonitor.tlsConfig | object | `{}` | ServiceMonitor TLS configuration |
-| staking | object | `{"command":[],"config":{"data":{},"existingSecret":""},"enabled":false,"extraArgs":[],"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"nethermind/starknet-staking-v2","tag":"v0.3.0"},"initContainers":[],"loglevel":"info","readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/metrics","port":"metrics"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5},"resources":{},"securityContext":{},"service":{"ports":{"metrics":8081}}}` | Starknet staking service configuration |
+| staking | object | `{"command":[],"config":{"data":{},"existingSecret":""},"enabled":false,"extraArgs":[],"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"nethermind/starknet-staking-v2","tag":"v0.3.0"},"initContainers":[],"loglevel":"info","readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/metrics","port":"metrics"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5},"resources":{},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"service":{"ports":{"metrics":8081}}}` | Starknet staking service configuration |
 | staking.config.data | object | `{}` | Inline config data (creates a Secret from this; use for dev/test only) Example:   data:     signer:       privateKey: "0x..."       operationalAddress: "0x..." |
 | staking.config.existingSecret | string | `""` | Use an existing secret for staking config (recommended for production) |
 | staking.extraArgs | list | `[]` | Extra CLI args passed to the staking validator (list of strings) |

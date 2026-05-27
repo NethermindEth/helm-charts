@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.0](https://img.shields.io/badge/Version-2.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -229,9 +229,10 @@ statefulSet:
 | initContainerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | initContainerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | initContainerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
-| initContainerSecurityContext.runAsGroup | int | `1000` |  |
+| initContainerSecurityContext.runAsGroup | int | `10001` |  |
 | initContainerSecurityContext.runAsNonRoot | bool | `true` |  |
-| initContainerSecurityContext.runAsUser | int | `1000` |  |
+| initContainerSecurityContext.runAsUser | int | `10001` |  |
+| initContainerSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | initContainers | list | `[]` | Init containers |
 | livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
@@ -242,10 +243,10 @@ statefulSet:
 | podDisruptionBudget.minAvailable | int | `1` | Minimum number/percentage of pods that must remain available |
 | podLabels | object | `{}` |  |
 | podResources | object | `{}` |  |
-| podSecurityContext.fsGroup | int | `1000` |  |
-| podSecurityContext.runAsGroup | int | `1000` |  |
+| podSecurityContext.fsGroup | int | `10001` |  |
+| podSecurityContext.runAsGroup | int | `10001` |  |
 | podSecurityContext.runAsNonRoot | bool | `true` |  |
-| podSecurityContext.runAsUser | int | `1000` |  |
+| podSecurityContext.runAsUser | int | `10001` |  |
 | podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | readinessProbe | string | `nil` |  |
 | replicaCount | int | `1` |  |
@@ -254,9 +255,9 @@ statefulSet:
 | securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | securityContext.readOnlyRootFilesystem | bool | `true` |  |
-| securityContext.runAsGroup | int | `1000` |  |
+| securityContext.runAsGroup | int | `10001` |  |
 | securityContext.runAsNonRoot | bool | `true` |  |
-| securityContext.runAsUser | int | `1000` |  |
+| securityContext.runAsUser | int | `10001` |  |
 | securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | service.annotations | object | `{}` |  |
 | service.extraContainersPorts | list | `[]` |  |

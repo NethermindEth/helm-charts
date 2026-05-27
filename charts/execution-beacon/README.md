@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 1.9.1](https://img.shields.io/badge/Version-1.9.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.10.0](https://img.shields.io/badge/Version-1.10.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -201,6 +201,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | global.initContainerSecurityContext.runAsGroup | int | `0` |  |
 | global.initContainerSecurityContext.runAsNonRoot | bool | `false` |  |
 | global.initContainerSecurityContext.runAsUser | int | `0` |  |
+| global.initContainerSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | global.podSecurityContext.fsGroup | int | `1000` |  |
 | global.podSecurityContext.runAsGroup | int | `1000` |  |
 | global.podSecurityContext.runAsNonRoot | bool | `true` |  |

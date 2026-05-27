@@ -346,10 +346,10 @@ serviceMonitor:
 
 # Default security settings for the pod
 podSecurityContext:
-  fsGroup: 1000
+  fsGroup: 10001
   runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
+  runAsUser: 10001
+  runAsGroup: 10001
   seccompProfile:
     type: RuntimeDefault
 
@@ -360,8 +360,8 @@ securityContext:
     - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
+  runAsUser: 10001
+  runAsGroup: 10001
   allowPrivilegeEscalation: false
   seccompProfile:
     type: RuntimeDefault
@@ -373,9 +373,11 @@ initContainerSecurityContext:
     - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
+  runAsUser: 10001
+  runAsGroup: 10001
   allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault
 
 # -- Default termination grace period for the pod
 terminationGracePeriodSeconds: 30
