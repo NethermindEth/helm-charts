@@ -1523,6 +1523,38 @@ entries:
     version: 0.1.0
   execution-beacon:
   - apiVersion: v2
+    created: "2026-05-27T16:23:40.517470449Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: A Helm chart for deploying Ethereum execution and consensus clients
+    digest: 890ff96d30088a71f0126c43a4a267880d9a493a55d19eeb329ab5f57cf23c76
+    home: https://www.ethereum.org/
+    keywords:
+    - ethereum
+    - blockchain
+    - nethermind
+    - prysm
+    - reth
+    - lighthouse
+    - nimbus
+    - lodestar
+    - erigon
+    - teku
+    - besu
+    - p2p
+    - taiko
+    maintainers:
+    - name: 0xDones
+    - name: matilote
+    - name: aivarasko
+    name: execution-beacon
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/execution-beacon-1.10.0/execution-beacon-1.10.0.tgz
+    version: 1.10.0
+  - apiVersion: v2
     created: "2026-05-25T14:05:18.421770869Z"
     dependencies:
     - name: common
@@ -2904,6 +2936,18 @@ entries:
     version: 1.0.0
   generic-app:
   - apiVersion: v2
+    created: "2026-05-27T16:23:40.716203202Z"
+    description: A Helm chart for Kubernetes generic app
+    digest: 64618111270b15a2faf2ce84bb9626cb046cc04f3d2311dd2c99e6a89bb74243
+    maintainers:
+    - name: 0xDones
+    - name: gehlotanish
+    name: generic-app
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-app-2.3.0/generic-app-2.3.0.tgz
+    version: 2.3.0
+  - apiVersion: v2
     created: "2026-05-05T17:32:26.004803886Z"
     description: A Helm chart for Kubernetes generic app
     digest: 1261520f5bf370d6f7b071891247910b3ecdce0d2852b171a4536f408e698c30
@@ -3598,6 +3642,17 @@ entries:
     version: 0.1.0
   juno:
   - apiVersion: v2
+    created: "2026-05-27T16:23:40.901541031Z"
+    description: Helm chart for Juno Starknet node with optional staking service
+    digest: 20637aa559bf2e895f1b2ac67b93bf195271c371b998e3a4df23c389a3b536e7
+    maintainers:
+    - name: brbrr
+    name: juno
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/juno-0.1.0/juno-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
     created: "2026-05-18T16:48:36.425325712Z"
     description: Helm chart for Juno Starknet node with optional staking service
     digest: 109d58aa9bc220a160d8da6ce03fd9fdbd0fda3e8b535ebb2959e2047fe3959c
@@ -3643,6 +3698,20 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/kyverno-policies-0.1.0/kyverno-policies-0.1.0.tgz
     version: 0.1.0
   lodestar-vc:
+  - apiVersion: v2
+    created: "2026-05-27T16:23:41.125619187Z"
+    description: A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
+    digest: 5843edba5ed1c89252f2df62ddd6568c6ca6801b82d03c6c7068eca6b7a1f610
+    maintainers:
+    - name: matilote
+    - name: aivarasko
+    - name: stdevMac
+    - name: 0xDones
+    name: lodestar-vc
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/lodestar-vc-0.2.0/lodestar-vc-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     created: "2025-01-23T15:51:12.624291269Z"
     description: A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
@@ -3923,6 +3992,19 @@ entries:
     - https://github.com/NethermindEth/helm-charts/releases/download/slos-0.1.0/slos-0.1.0.tgz
     version: 0.1.0
   validator-ejector:
+  - apiVersion: v2
+    created: "2026-05-27T16:23:41.300734682Z"
+    description: A Helm chart for Lido Validator Ejector
+    digest: f7a95cf9180b9296f01ac34f4e8774ff2b3e747bf281996cb267468be4c41df8
+    maintainers:
+    - name: 0xDones
+    - name: aivarasko
+    - name: matilote
+    name: validator-ejector
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/validator-ejector-0.2.0/validator-ejector-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     created: "2025-06-04T15:58:56.549210486Z"
     description: A Helm chart for Lido Validator Ejector
@@ -4748,4 +4830,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-05-25T14:05:18.422349011Z"
+generated: "2026-05-27T16:23:41.301465365Z"
