@@ -346,10 +346,10 @@ serviceMonitor:
 
 # Default security settings for the pod
 podSecurityContext:
-  fsGroup: 10001
+  fsGroup: 1000
   runAsNonRoot: true
-  runAsUser: 10001
-  runAsGroup: 10001
+  runAsUser: 1000
+  runAsGroup: 1000
   seccompProfile:
     type: RuntimeDefault
 
@@ -360,8 +360,8 @@ securityContext:
     - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 10001
-  runAsGroup: 10001
+  runAsUser: 1000
+  runAsGroup: 1000
   allowPrivilegeEscalation: false
   seccompProfile:
     type: RuntimeDefault
@@ -373,8 +373,8 @@ initContainerSecurityContext:
     - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 10001
-  runAsGroup: 10001
+  runAsUser: 1000
+  runAsGroup: 1000
   allowPrivilegeEscalation: false
   seccompProfile:
     type: RuntimeDefault
