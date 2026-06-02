@@ -376,7 +376,14 @@ p2pNodePort:
   ## Options: NodePort, LoadBalancer
   type: NodePort
   ## @param p2pNodePort.startAt The ports allocation will start from this value
-  ## Required when replicaToNodePortExecution/replicaToNodePortBeacon are not set
+  ## Required when replicaToNodePortExecution/replicaToNodePortBeacon are not set.
+  ## Ports are assigned per replica using a client-aware stride so that clients
+  ## exposing multiple consecutive ports per replica do not collide:
+  ##   - lodestar beacon uses 2 ports/replica (p2p + quic), stride 2
+  ##   - reth execution with discovery v5 uses 3 ports/replica, stride 3
+  ##   - all other clients use 1 port/replica, stride 1
+  ## Leave enough headroom between startAtExecution and startAtBeacon for
+  ## replicaCount * stride ports.
   ##
   startAtExecution: 31100
   startAtBeacon: 31200
