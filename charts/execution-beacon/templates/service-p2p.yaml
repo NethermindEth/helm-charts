@@ -1,18 +1,34 @@
 {{- if .Values.p2pNodePort.enabled -}}
+{{- /*
+  Some clients expose more than one consecutive nodePort per replica, so the
+  auto-allocation stride (startAt* mode) must match the number of ports each
+  service below actually defines, otherwise adjacent replicas collide:
+    - reth + discovery v5: portExecution and portExecution+2 -> 3 slots
+    - lodestar:            portBeacon (tcp/udp) and portBeacon+1 (quic) -> 2 slots
+  Keep these strides in sync with the port lists further down.
+*/ -}}
+{{- $executionStride := 1 -}}
+{{- if and (eq $.Values.execution.client "reth") $.Values.execution.enableDiscoveryV5 -}}
+  {{- $executionStride = 3 -}}
+{{- end -}}
+{{- $beaconStride := 1 -}}
+{{- if eq $.Values.beacon.client "lodestar" -}}
+  {{- $beaconStride = 2 -}}
+{{- end -}}
 {{- range $i, $e := until (int .Values.replicaCount) }}
 {{- $portExecution := 0 -}}
 {{- $portBeacon := 0 -}}
 {{- if hasKey $.Values.p2pNodePort.replicaToNodePortExecution ($i | toString) -}}
   {{ $portExecution = index $.Values.p2pNodePort.replicaToNodePortExecution ($i | toString) }}
 {{- else if $.Values.p2pNodePort.startAtExecution -}}
-  {{ $portExecution = add $.Values.p2pNodePort.startAtExecution $i }}
+  {{ $portExecution = add $.Values.p2pNodePort.startAtExecution (mul $i $executionStride) }}
 {{- else -}}
   {{ fail "p2pNodePort: either startAtExecution or replicaToNodePortExecution must be set" }}
 {{- end }}
 {{- if hasKey $.Values.p2pNodePort.replicaToNodePortBeacon ($i | toString) -}}
   {{ $portBeacon = index $.Values.p2pNodePort.replicaToNodePortBeacon ($i | toString) }}
 {{- else if $.Values.p2pNodePort.startAtBeacon -}}
-  {{ $portBeacon = add $.Values.p2pNodePort.startAtBeacon $i }}
+  {{ $portBeacon = add $.Values.p2pNodePort.startAtBeacon (mul $i $beaconStride) }}
 {{- else -}}
   {{ fail "p2pNodePort: either startAtBeacon or replicaToNodePortBeacon must be set" }}
 {{- end }}
