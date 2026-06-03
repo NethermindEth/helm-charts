@@ -766,6 +766,12 @@
       "title": "JWTSecretName",
       "type": "string"
     },
+    "antiAffinityPreset": {
+      "description": "# Pod Anti affinity presets to use for production, use either \"soft\" or \"hard\" as values\n# Soft uses preferredDuringSchedulingIgnoredDuringExecution while hard uses requiredDuringSchedulingIgnoredDuringExecution\n# See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity\n# Ignored if affinity is configured\n#",
+      "enum": ["", "soft", "hard"],
+      "title": "antiAffinityPreset",
+      "type": "string"
+    },
     "affinity": {
       "additionalProperties": false,
       "description": "# Affinity for pod assignment\n# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity\n#\n# Example:\n# affinity:\n#   podAntiAffinity:\n#     requiredDuringSchedulingIgnoredDuringExecution:\n#     - labelSelector:\n#         matchExpressions:\n#         - key: app.kubernetes.io/name\n#           operator: In\n#           values:\n#           - prysm\n#       topologyKey: kubernetes.io/hostname\n#",
@@ -3408,6 +3414,7 @@
     "imagePullSecrets",
     "nodeSelector",
     "tolerations",
+    "antiAffinityPreset",
     "affinity",
     "priorityClassName",
     "sharedPersistence",

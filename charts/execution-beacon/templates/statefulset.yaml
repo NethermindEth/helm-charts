@@ -29,9 +29,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+    {{- with (include "execution-beacon.affinity" .) }}
       affinity:
-        {{ toYaml . | nindent 8 | trim }}
+        {{ . | nindent 8 | trim }}
     {{- end }}
     {{- with .Values.tolerations }}
       tolerations:
