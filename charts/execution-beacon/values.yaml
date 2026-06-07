@@ -158,6 +158,21 @@ antiAffinityPreset: ""
 ##
 affinity: {}
 
+## Pod topology spread constraints to control how pods are spread across topology domains (e.g. zones, nodes)
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+##
+## Example:
+## topologySpreadConstraints:
+##   - maxSkew: 1
+##     minDomains: 1            # optional
+##     topologyKey: topology.kubernetes.io/zone
+##     whenUnsatisfiable: DoNotSchedule
+##     labelSelector:
+##       matchLabels:
+##         app.kubernetes.io/name: prysm
+##
+topologySpreadConstraints: []
+
 ## Used to assign priority to pods
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
 ##
