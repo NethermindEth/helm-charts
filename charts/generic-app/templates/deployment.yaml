@@ -117,10 +117,15 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.topologySpreadConstraints }}
-      {{- $s := dict "labelSelector" (dict "matchLabels" ((include "generic-app.selectorLabels" $) | fromYaml)) }}
+      {{- $defaultLabelSelector := include "generic-app.selectorLabels" $ | fromYaml | set (dict) "matchLabels" }}
       topologySpreadConstraints:
-        {{- $cs := list }}{{- range . }}{{- $cs = append $cs (ternary . (merge (deepCopy .) $s) (hasKey . "labelSelector")) }}{{- end }}
-        {{- toYaml $cs | nindent 8 }}
+        {{- range . }}
+        {{- $constraint := . | deepCopy }}
+        {{- if not (hasKey $constraint "labelSelector") }}
+        {{- $_ := set $constraint "labelSelector" $defaultLabelSelector }}
+        {{- end }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+        {{- end }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       {{- with .Values.runtimeClassName }}
