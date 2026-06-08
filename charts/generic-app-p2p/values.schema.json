@@ -480,6 +480,104 @@
       "type": "object",
       "description": "Pod affinity/anti-affinity rules (overrides antiAffinityPreset)"
     },
+    "topologySpreadConstraints": {
+      "description": "# Pod topology spread constraints to control how pods are spread across topology domains (e.g. zones, nodes)\n# ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/\n#\n# Example:\n# topologySpreadConstraints:\n#   - maxSkew: 1\n#     topologyKey: topology.kubernetes.io/zone\n#     whenUnsatisfiable: DoNotSchedule\n#     labelSelector:\n#       matchLabels:\n#         app.kubernetes.io/name: prysm\n#",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "labelSelector": {
+            "additionalProperties": false,
+            "properties": {
+              "matchExpressions": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "operator": {
+                      "enum": [
+                        "In",
+                        "NotIn",
+                        "Exists",
+                        "DoesNotExist"
+                      ],
+                      "type": "string"
+                    },
+                    "values": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "operator"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "matchLabels": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "matchLabelKeys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "maxSkew": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "minDomains": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "nodeAffinityPolicy": {
+            "enum": [
+              "Honor",
+              "Ignore"
+            ],
+            "type": "string"
+          },
+          "nodeTaintsPolicy": {
+            "enum": [
+              "Honor",
+              "Ignore"
+            ],
+            "type": "string"
+          },
+          "topologyKey": {
+            "type": "string"
+          },
+          "whenUnsatisfiable": {
+            "enum": [
+              "DoNotSchedule",
+              "ScheduleAnyway"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "maxSkew",
+          "topologyKey",
+          "whenUnsatisfiable",
+          "labelSelector"
+        ],
+        "type": "object"
+      },
+      "title": "topologySpreadConstraints",
+      "type": "array"
+    },
     "podDisruptionBudget": {
       "type": "object",
       "description": "PodDisruptionBudget configuration",
