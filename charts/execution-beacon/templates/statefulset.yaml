@@ -41,6 +41,10 @@ spec:
       nodeSelector:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
+    {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
     {{- if .Values.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
     {{- end }}
