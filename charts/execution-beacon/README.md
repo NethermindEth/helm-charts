@@ -1,7 +1,6 @@
-
 # execution-beacon
 
-![Version: 1.10.1](https://img.shields.io/badge/Version-1.10.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.12.0](https://img.shields.io/badge/Version-1.12.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -34,6 +33,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | JWTSecretKey | string | `"JWT_SECRET"` |  |
 | JWTSecretName | string | `""` |  |
 | affinity | object | `{}` |  |
+| antiAffinityPreset | string | `""` |  |
 | beacon.builderEndpoint | string | `""` |  |
 | beacon.checkPointSync.enabled | bool | `true` |  |
 | beacon.checkPointSync.trustedSourceUrl | string | `""` |  |
@@ -276,6 +276,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | sharedPersistence.storageClassName | string | `""` |  |
 | terminationGracePeriodSeconds | int | `120` |  |
 | tolerations | list | `[]` |  |
+| topologySpreadConstraints | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |
 
