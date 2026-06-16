@@ -570,8 +570,7 @@
         "required": [
           "maxSkew",
           "topologyKey",
-          "whenUnsatisfiable",
-          "labelSelector"
+          "whenUnsatisfiable"
         ],
         "type": "object"
       },
