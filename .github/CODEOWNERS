@@ -13,8 +13,3 @@
 /.github/workflows/ @0xDones
 
 /charts/ @role_angkor_devops
-
-/charts/generic-app/ @0xDones
-/charts/generic-app-p2p/ @0xDones
-/charts/erpc/ @angkor-eigen-operator
-/charts/slos/ @Angelin01
