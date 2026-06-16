@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 2.3.0](https://img.shields.io/badge/Version-2.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.4.0](https://img.shields.io/badge/Version-2.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -285,6 +285,7 @@ statefulSet:
 | statefulSet.persistence | object | `{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
 | terminationGracePeriodSeconds | int | `30` | Default termination grace period for the pod |
 | tolerations | list | `[]` |  |
+| topologySpreadConstraints | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |
 | workingDir | string | `""` | Working directory for the container. If not set, the container's default will be used. |
