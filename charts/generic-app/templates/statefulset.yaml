@@ -116,6 +116,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      {{- $defaultLabelSelector := include "generic-app.selectorLabels" $ | fromYaml | set (dict) "matchLabels" }}
+      topologySpreadConstraints:
+        {{- range . }}
+        {{- $constraint := . | deepCopy }}
+        {{- if not (hasKey $constraint "labelSelector") }}
+        {{- $_ := set $constraint "labelSelector" $defaultLabelSelector }}
+        {{- end }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+        {{- end }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       {{- with .Values.runtimeClassName }}
       runtimeClassName: {{ . | quote }}

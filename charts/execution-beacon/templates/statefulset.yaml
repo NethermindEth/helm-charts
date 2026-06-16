@@ -41,6 +41,17 @@ spec:
       nodeSelector:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
+    {{- with .Values.topologySpreadConstraints }}
+    {{- $defaultLabelSelector := include "common.labels.matchLabels" $ | fromYaml | set (dict) "matchLabels" }}
+      topologySpreadConstraints:
+        {{- range . }}
+        {{- $constraint := . | deepCopy }}
+        {{- if not (hasKey $constraint "labelSelector") }}
+        {{- $_ := set $constraint "labelSelector" $defaultLabelSelector }}
+        {{- end }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+        {{- end }}
+    {{- end }}
     {{- if .Values.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
     {{- end }}

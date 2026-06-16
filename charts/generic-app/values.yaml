@@ -307,6 +307,19 @@ antiAffinityPreset: ""
 
 affinity: {}
 
+# Pod topology spread constraints to control how pods are spread across topology domains (e.g. zones, nodes)
+# See https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+# Example:
+# topologySpreadConstraints:
+#   - maxSkew: 1
+#     minDomains: 1            # optional
+#     topologyKey: topology.kubernetes.io/zone
+#     whenUnsatisfiable: DoNotSchedule
+#     labelSelector:
+#       matchLabels:
+#         app.kubernetes.io/name: my-app
+topologySpreadConstraints: []
+
 # -- PodDisruptionBudget configuration
 podDisruptionBudget:
   # -- If true, create a PodDisruptionBudget
