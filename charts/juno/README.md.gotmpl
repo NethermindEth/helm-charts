@@ -80,6 +80,23 @@ staking:
       memory: "4Gi"
 ```
 
+### Pruning
+
+The juno node can prune block data and state history to keep disk usage bounded. Pruning auto-enables when `staking.enabled` is `true` (validators do not need archival history); set `juno.pruning.enabled` explicitly to override.
+
+Pruning requires L1 verification, so you **must** provide an L1 Ethereum node via `juno.ethNode` (a `ws://` or `wss://` endpoint) whenever pruning is enabled. The chart fails fast if pruning is on but `juno.ethNode` is empty. `juno.ethNode` is mutually exclusive with `--disable-l1-verification`.
+
+```yaml
+juno:
+  ethNode: "wss://your-eth-node/ws"   # required when pruning is enabled
+  pruning:
+    enabled: null   # null = auto-enable when staking.enabled; true/false to override
+    mode: 128       # blocks to retain below the pivot (--prune-mode=N)
+    minAge: 1h      # protect blocks younger than this (--prune-min-age); "" to omit
+```
+
+> **Note:** Pruning is irreversible. Blocks below the retained window are deleted permanently.
+
 ### Container and Service Ports
 
 Juno exposes RPC, WebSocket, and metrics ports. The staking service exposes a separate metrics port.

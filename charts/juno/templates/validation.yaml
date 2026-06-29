@@ -4,3 +4,6 @@
 {{- if and .Values.staking.enabled (not .Values.juno.enabled) }}
 {{- fail "staking requires juno to be enabled (staking.enabled=true but juno.enabled=false)" }}
 {{- end }}
+{{- if and (eq (include "juno.pruningEnabled" .) "true") (not .Values.juno.ethNode) }}
+{{- fail "juno pruning requires L1 verification: set juno.ethNode to a ws:// or wss:// endpoint (pruning auto-enables when staking.enabled=true; set juno.pruning.enabled=false to disable)" }}
+{{- end }}
