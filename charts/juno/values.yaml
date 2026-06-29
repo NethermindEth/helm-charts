@@ -20,13 +20,26 @@ juno:
   extraArgs: []
   image:
     repository: nethermind/juno
-    tag: "v0.15.18"
+    tag: "v0.16.4"
     pullPolicy: IfNotPresent
   persistence:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
     size: 1Ti
+
+  # -- WebSocket endpoint of the L1 Ethereum node (ws:// or wss://). Required when pruning
+  # is enabled, since pruning needs L1 verification. Mutually exclusive with --disable-l1-verification.
+  ethNode: ""
+
+  # -- Block-data and state-history pruning for the juno node
+  pruning:
+    # -- Enable pruning. null (default) auto-enables pruning when staking.enabled is true; set true/false to override.
+    enabled: null
+    # -- Blocks to retain below the pivot (juno --prune-mode=N)
+    mode: 128
+    # -- Protect blocks younger than this from pruning (juno --prune-min-age). Empty omits the flag (juno default 1h applies). Requires pruning.
+    minAge: 1h
 
   # -- Resource requests and limits for juno container
   # Example:

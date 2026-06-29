@@ -68,6 +68,15 @@ spec:
             - --ws-host=0.0.0.0
             - --log-level={{ .Values.juno.loglevel }}
             - --network={{ .Values.juno.network }}
+            {{- with .Values.juno.ethNode }}
+            - --eth-node={{ . }}
+            {{- end }}
+            {{- if eq (include "juno.pruningEnabled" .) "true" }}
+            - --prune-mode={{ .Values.juno.pruning.mode }}
+            {{- with .Values.juno.pruning.minAge }}
+            - --prune-min-age={{ . }}
+            {{- end }}
+            {{- end }}
             {{- with .Values.juno.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

@@ -1,6 +1,6 @@
 # juno
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Helm chart for Juno Starknet node with optional staking service
 
@@ -80,6 +80,23 @@ staking:
       cpu: "1"
       memory: "4Gi"
 ```
+
+### Pruning
+
+The juno node can prune block data and state history to keep disk usage bounded. Pruning auto-enables when `staking.enabled` is `true` (validators do not need archival history); set `juno.pruning.enabled` explicitly to override.
+
+Pruning requires L1 verification, so you **must** provide an L1 Ethereum node via `juno.ethNode` (a `ws://` or `wss://` endpoint) whenever pruning is enabled. The chart fails fast if pruning is on but `juno.ethNode` is empty. `juno.ethNode` is mutually exclusive with `--disable-l1-verification`.
+
+```yaml
+juno:
+  ethNode: "wss://your-eth-node/ws"   # required when pruning is enabled
+  pruning:
+    enabled: null   # null = auto-enable when staking.enabled; true/false to override
+    mode: 128       # blocks to retain below the pivot (--prune-mode=N)
+    minAge: 1h      # protect blocks younger than this (--prune-min-age); "" to omit
+```
+
+> **Note:** Pruning is irreversible. Blocks below the retained window are deleted permanently.
 
 ### Container and Service Ports
 
@@ -176,8 +193,11 @@ serviceMonitor:
 | imagePullSecrets | list | `[]` |  |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"Prefix"}]}],"tls":[]}` | Ingress for exposing Juno RPC externally |
 | ingress.hosts | list | `[{"host":"chart-example.local","paths":[{"path":"/","pathType":"Prefix"}]}]` | Each path can optionally set servicePort to route to a specific Juno port. Defaults to juno.service.ports.rpc (6060). Set servicePort: 6061 for WebSocket. To expose both RPC and WS, use separate hosts:   - host: rpc.example.com     paths:       - path: /         pathType: Prefix   - host: ws.example.com     paths:       - path: /         pathType: Prefix         servicePort: 6061 |
-| juno | object | `{"command":[],"enabled":true,"extraArgs":[],"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"nethermind/juno","tag":"v0.15.18"},"initContainers":[],"loglevel":"info","network":"sepolia","persistence":{"accessModes":["ReadWriteOnce"],"size":"1Ti","storageClassName":""},"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/ready","port":"rpc"},"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"service":{"ports":{"metrics":8080,"rpc":6060,"ws":6061}}}` | Juno Starknet node configuration |
+| juno | object | `{"command":[],"enabled":true,"ethNode":"","extraArgs":[],"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"nethermind/juno","tag":"v0.16.4"},"initContainers":[],"loglevel":"info","network":"sepolia","persistence":{"accessModes":["ReadWriteOnce"],"size":"1Ti","storageClassName":""},"pruning":{"enabled":null,"minAge":"1h","mode":128},"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/ready","port":"rpc"},"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"service":{"ports":{"metrics":8080,"rpc":6060,"ws":6061}}}` | Juno Starknet node configuration |
+| juno.ethNode | string | `""` | WebSocket endpoint of the L1 Ethereum node (ws:// or wss://). Required when pruning is enabled, since pruning needs L1 verification. Mutually exclusive with --disable-l1-verification. |
 | juno.network | string | `"sepolia"` | mainnet, sepolia, sepolia-integration |
+| juno.pruning | object | `{"enabled":null,"minAge":"1h","mode":128}` | Block-data and state-history pruning for the juno node |
+| juno.pruning.enabled | string | `nil` | Enable pruning. null (default) auto-enables pruning when staking.enabled is true; set true/false to override. |
 | juno.resources | object | `{}` | Resource requests and limits for juno container Example:   requests:     cpu: "1"     memory: "4Gi"   limits:     cpu: "2"     memory: "8Gi" |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
