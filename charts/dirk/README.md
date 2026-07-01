@@ -1,7 +1,7 @@
 
 # dirk
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v22.10.0](https://img.shields.io/badge/AppVersion-v22.10.0-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v22.10.0](https://img.shields.io/badge/AppVersion-v22.10.0-informational?style=flat-square)
 
 A Helm chart for installing and configuring large scale ETH staking infrastructure on top of the Kubernetes
 
