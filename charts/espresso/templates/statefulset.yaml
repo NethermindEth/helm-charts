@@ -8,7 +8,7 @@ metadata:
   namespace: {{ . }}
   {{- end }}
 spec:
-  serviceName: "{{ include "espresso.fullname" $ }}-{{ $type }}"
+  serviceName: "{{ include "espresso.fullname" $ }}-{{ $type }}-headless"
   replicas: {{ $specs.replicaCount }}
   selector:
     matchLabels:
