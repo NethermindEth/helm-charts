@@ -1606,12 +1606,6 @@
               ],
               "title": "serviceMonitor",
               "type": "object"
-            },
-            "svcAnnotations": {
-              "additionalProperties": false,
-              "required": [],
-              "title": "svcAnnotations",
-              "type": "object"
             }
           },
           "required": [
@@ -1620,7 +1614,6 @@
             "categories",
             "hostAllowList",
             "serviceMonitor",
-            "svcAnnotations",
             "prometheusRule"
           ],
           "title": "metrics",
@@ -2382,14 +2375,6 @@
                 "enabled"
               ],
               "title": "serviceMonitor",
-              "type": "object"
-            },
-            "svcAnnotations": {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "required": [],
-              "title": "svcAnnotations",
               "type": "object"
             }
           },
@@ -3307,61 +3292,23 @@
       "additionalProperties": false,
       "description": "# Service configuration\n#",
       "properties": {
-        "ports": {
-          "additionalProperties": false,
-          "properties": {
-            "executionJsonrpc": {
-              "minimum": 1,
-              "maximum": 65535,
-              "type": "integer"
-            },
-            "executionEngine": {
-              "minimum": 1,
-              "maximum": 65535,
-              "type": "integer"
-            },
-            "executionWebsocket": {
-              "minimum": 1,
-              "maximum": 65535,
-              "type": "integer"
-            },
-            "executionGrpc": {
-              "minimum": 1,
-              "maximum": 65535,
-              "type": "integer"
-            },
-            "executionMetrics": {
-              "minimum": 1,
-              "maximum": 65535,
-              "type": "integer"
-            },
-            "beaconGrpc": {
-              "minimum": 1,
-              "maximum": 65535,
-              "type": "integer"
-            },
-            "beaconRestApi": {
-              "minimum": 1,
-              "maximum": 65535,
-              "type": "integer"
-            },
-            "beaconMetrics": {
-              "minimum": 1,
-              "maximum": 65535,
-              "type": "integer"
-            }
-          },
-          "title": "ports",
-          "type": "object"
-        },
-        "svcHeadless": {
+        "enabled": {
           "default": true,
-          "title": "svcHeadless",
+          "description": "# Whether to deploy a ClusterIP Service in addition to the always-present headless Service\n#",
+          "title": "enabled",
           "type": "boolean"
+        },
+        "annotations": {
+          "additionalProperties": true,
+          "description": "# Annotations to add to the Service\n#",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
         }
       },
       "required": [
-        "svcHeadless"
+        "enabled",
+        "annotations"
       ],
       "title": "service",
       "type": "object"
