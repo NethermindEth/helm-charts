@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       {{- include "pluto-relay.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "pluto-relay.fullname" . }}
+  serviceName: {{ include "pluto-relay.fullname" . }}-headless
   template:
     metadata:
       annotations:
