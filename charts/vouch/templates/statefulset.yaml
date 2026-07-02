@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
-  serviceName: {{ include "common.names.fullname" . }}
+  serviceName: {{ include "common.names.fullname" . }}-headless
   template:
     metadata:
       annotations:
