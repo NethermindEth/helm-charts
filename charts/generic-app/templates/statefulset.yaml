@@ -11,7 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "generic-app.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "generic-app.fullname" . }}
+  serviceName: {{ include "generic-app.fullname" . }}-headless
   template:
     metadata:
       annotations:
