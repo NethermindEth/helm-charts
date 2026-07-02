@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       {{- include "validator-ejector.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "validator-ejector.fullname" . }}
+  serviceName: {{ include "validator-ejector.fullname" . }}-headless
   template:
     metadata:
       annotations:
