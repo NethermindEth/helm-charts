@@ -3910,6 +3910,20 @@ entries:
     version: 0.1.0
   lodestar-vc:
   - apiVersion: v2
+    created: "2026-07-03T16:42:47.216113116Z"
+    description: A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
+    digest: 65f435bc6c8e895277577132aa6f6a0d4c4c56174e163e88686a02ef11855c27
+    maintainers:
+    - name: matilote
+    - name: aivarasko
+    - name: stdevMac
+    - name: 0xDones
+    name: lodestar-vc
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/lodestar-vc-0.3.0/lodestar-vc-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     created: "2026-05-27T16:23:41.125619187Z"
     description: A Helm chart to deploy the Lodestar Consensus Client using Kubernetes
     digest: 5843edba5ed1c89252f2df62ddd6568c6ca6801b82d03c6c7068eca6b7a1f610
@@ -5041,4 +5055,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-03T16:40:55.388094575Z"
+generated: "2026-07-03T16:42:47.216489236Z"
