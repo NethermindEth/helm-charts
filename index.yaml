@@ -1203,6 +1203,23 @@ entries:
   espresso:
   - apiVersion: v2
     appVersion: 20240925-patch1
+    created: "2026-07-03T16:29:18.509260198Z"
+    description: A Helm chart for deploying Espresso Sequencer
+    digest: 7831c75c14198987520309302b0e7d49041ebfe8fa40979f49915c7c9bface0b
+    home: https://docs.espressosys.com/sequencer
+    keywords:
+    - espresso
+    - sequencer
+    maintainers:
+    - email: miguel@nethermind.io
+      name: AntiD2ta
+    name: espresso
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/espresso-2.0.0/espresso-2.0.0.tgz
+    version: 2.0.0
+  - apiVersion: v2
+    appVersion: 20240925-patch1
     created: "2026-04-16T12:02:34.192654833Z"
     description: A Helm chart for deploying Espresso Sequencer
     digest: 6cf262a2bca943643fa5afe7ea1b759f4ea7974a38513aa648184742ff309cec
@@ -4969,4 +4986,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-03T16:27:12.086926436Z"
+generated: "2026-07-03T16:29:18.509663394Z"
