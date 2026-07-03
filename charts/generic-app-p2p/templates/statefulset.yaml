@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       {{- include "generic-app-p2p.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "generic-app-p2p.fullname" . }}
+  serviceName: {{ include "generic-app-p2p.fullname" . }}-headless
   template:
     metadata:
       annotations:
