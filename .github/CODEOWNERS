@@ -8,8 +8,6 @@
 
 # Unless a later match takes precedence, they will be requested for review when someone opens a pull request
 
-* @role_angkor_admin
+* @NethermindEth/role_angkor_admin
 
-/.github/workflows/ @0xDones
-
-/charts/ @role_angkor_devops
+/charts/ @NethermindEth/role_angkor_devops
