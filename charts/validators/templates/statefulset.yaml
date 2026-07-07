@@ -30,7 +30,7 @@ spec:
   selector:
     matchLabels:
       {{- include "validators.selectorLabels" $root | nindent 6 }}
-  serviceName: {{ template "validators.fullname" $root }}
+  serviceName: {{ template "validators.fullname" $root }}-headless
   template:
     metadata:
       labels:

@@ -1,6 +1,7 @@
+
 # execution-beacon
 
-![Version: 1.12.0](https://img.shields.io/badge/Version-1.12.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -70,7 +71,6 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.metrics.port | int | `9090` |  |
 | beacon.metrics.prometheusRule.enabled | bool | `true` |  |
 | beacon.metrics.serviceMonitor.enabled | bool | `true` |  |
-| beacon.metrics.svcAnnotations | object | `{}` |  |
 | beacon.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | beacon.persistence.annotations | object | `{}` |  |
 | beacon.persistence.enabled | bool | `true` |  |
@@ -175,7 +175,6 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.metrics.port | int | `8008` |  |
 | execution.metrics.prometheusRule.enabled | bool | `true` |  |
 | execution.metrics.serviceMonitor.enabled | bool | `true` |  |
-| execution.metrics.svcAnnotations | object | `{}` |  |
 | execution.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | execution.persistence.annotations | object | `{}` |  |
 | execution.persistence.enabled | bool | `true` |  |
@@ -263,7 +262,8 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | rbac.rules[0].verbs[1] | string | `"list"` |  |
 | rbac.rules[0].verbs[2] | string | `"watch"` |  |
 | replicaCount | int | `1` |  |
-| service.svcHeadless | bool | `true` |  |
+| service.annotations | object | `{}` | Annotations to add to the Service |
+| service.enabled | bool | `true` | Whether to deploy a ClusterIP Service in addition to the always-present headless Service |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
