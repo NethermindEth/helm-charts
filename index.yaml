@@ -3853,6 +3853,17 @@ entries:
     version: 0.1.0
   juno:
   - apiVersion: v2
+    created: "2026-07-08T10:31:07.125078329Z"
+    description: Helm chart for Juno Starknet node with optional staking service
+    digest: 468d4a426c98a2548ba6f070d6e14424bf1593efeca3ec14535eb1f29a627b58
+    maintainers:
+    - name: brbrr
+    name: juno
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/juno-0.2.0/juno-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2026-05-27T16:23:40.901541031Z"
     description: Helm chart for Juno Starknet node with optional staking service
     digest: 20637aa559bf2e895f1b2ac67b93bf195271c371b998e3a4df23c389a3b536e7
@@ -5159,4 +5170,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-07-03T16:55:59.096788584Z"
+generated: "2026-07-08T10:31:07.12558127Z"
