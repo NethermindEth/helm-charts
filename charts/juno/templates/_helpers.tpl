@@ -83,3 +83,16 @@ Name of the secret holding staking config
 {{- include "juno.fullname" . }}-staking-config
 {{- end }}
 {{- end }}
+
+{{/*
+Resolve whether juno node pruning is enabled.
+null (default) auto-enables pruning when staking is on; an explicit bool overrides.
+Renders the string "true" or "false".
+*/}}
+{{- define "juno.pruningEnabled" -}}
+{{- if kindIs "bool" .Values.juno.pruning.enabled -}}
+{{- .Values.juno.pruning.enabled -}}
+{{- else -}}
+{{- .Values.staking.enabled -}}
+{{- end -}}
+{{- end -}}
