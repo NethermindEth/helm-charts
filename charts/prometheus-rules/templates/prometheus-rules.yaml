@@ -23,6 +23,9 @@ spec:
       {{- with .record }}
       record: {{ . }}
       {{- end }}
+      {{- with .keep_firing_for }}
+      keep_firing_for: {{ . }}
+      {{- end }}
       {{- with .annotations }}
       annotations:
         {{- . | toYaml | nindent 8 }}
