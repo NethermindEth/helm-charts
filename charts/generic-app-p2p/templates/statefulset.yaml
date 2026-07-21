@@ -71,6 +71,8 @@ spec:
               containerPort: {{ $port.port }}
               protocol: {{ $port.protocol }}
           {{- end }}
+          startupProbe:
+            {{- toYaml .Values.startupProbe | nindent 12 }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:

@@ -293,6 +293,10 @@ readinessProbe: null
   # httpGet:
   #   path: /
   #   port: http
+startupProbe: null
+  # httpGet:
+  #   path: /
+  #   port: http
 
 # Additional volumes on the output Deployment definition.
 volumes: []

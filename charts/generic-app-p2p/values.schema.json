@@ -2,6 +2,70 @@
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
   "additionalProperties": false,
+  "definitions": {
+    "probe": {
+      "type": "object",
+      "description": "Kubernetes container probe",
+      "properties": {
+        "httpGet": {
+          "type": "object",
+          "properties": {
+            "path": { "type": "string" },
+            "port": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "integer" }
+              ]
+            },
+            "scheme": { "type": "string" },
+            "httpHeaders": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "value": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "tcpSocket": {
+          "type": "object",
+          "properties": {
+            "port": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "integer" }
+              ]
+            }
+          }
+        },
+        "exec": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "grpc": {
+          "type": "object",
+          "properties": {
+            "port": { "type": "integer" },
+            "service": { "type": "string" }
+          }
+        },
+        "initialDelaySeconds": { "type": "integer", "minimum": 0 },
+        "periodSeconds": { "type": "integer", "minimum": 1 },
+        "timeoutSeconds": { "type": "integer", "minimum": 1 },
+        "successThreshold": { "type": "integer", "minimum": 1 },
+        "failureThreshold": { "type": "integer", "minimum": 1 },
+        "terminationGracePeriodSeconds": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
   "properties": {
     "nameOverride": {
       "type": "string",
@@ -433,14 +497,21 @@
       "description": "Liveness probe configuration",
       "oneOf": [
         { "type": "null" },
-        { "type": "object" }
+        { "$ref": "#/definitions/probe" }
       ]
     },
     "readinessProbe": {
       "description": "Readiness probe configuration",
       "oneOf": [
         { "type": "null" },
-        { "type": "object" }
+        { "$ref": "#/definitions/probe" }
+      ]
+    },
+    "startupProbe": {
+      "description": "Startup probe configuration",
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/definitions/probe" }
       ]
     },
     "volumes": {
