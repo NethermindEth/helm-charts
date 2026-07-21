@@ -1,6 +1,6 @@
 # generic-app-p2p
 
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.1.0](https://img.shields.io/badge/Version-2.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic apps (P2P)
 
@@ -263,6 +263,7 @@ persistence:
 | serviceMonitor.scheme | string | `"http"` | ServiceMonitor scheme |
 | serviceMonitor.scrapeTimeout | string | `"30s"` | ServiceMonitor scrape timeout |
 | serviceMonitor.tlsConfig | object | `{}` | ServiceMonitor TLS configuration |
+| startupProbe | string | `nil` |  |
 | tolerations | list | `[]` |  |
 | topologySpreadConstraints | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
