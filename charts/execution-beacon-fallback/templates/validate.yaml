@@ -1,0 +1,8 @@
+{{- if and .Values.haproxy.enabled (not .Values.haproxy.fallback.existingSecret) }}
+{{- fail "haproxy.fallback.existingSecret must be set when haproxy.enabled is true" }}
+{{- end }}
+{{- $jwtSecret := .Values.JWTSecret }}
+{{- $regex := "^[0-9a-f]{64}$" }}
+{{- if and $jwtSecret (not (regexMatch $regex $jwtSecret)) }}
+{{- fail "global.JWTSecret must be a 32-byte long hex string" }}
+{{- end }}

@@ -1,0 +1,177 @@
+suite: haproxy tests
+
+templates:
+  - haproxy-configmap.yaml
+  - haproxy-deployment.yaml
+  - haproxy-service.yaml
+  - haproxy-servicemonitor.yaml
+  - haproxy-ingress.yaml
+  - service.yaml
+
+set:
+  fullnameOverride: test-node
+  execution:
+    client: nethermind
+  beacon:
+    client: lighthouse
+  haproxy:
+    enabled: true
+    fallback:
+      existingSecret: "my-secret"
+      secretKey: "FALLBACK_BEACON_URL"
+
+tests:
+  - it: when haproxy enabled then configmap is created
+    template: haproxy-configmap.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: test-node-haproxy
+
+  - it: when haproxy disabled then no configmap
+    template: haproxy-configmap.yaml
+    set:
+      haproxy.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: when haproxy enabled then deployment is created
+    template: haproxy-deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: metadata.name
+          value: test-node-haproxy
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: envsubst
+
+  - it: when haproxy disabled then no deployment
+    template: haproxy-deployment.yaml
+    set:
+      haproxy.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: when existingSecret set then init container has envFrom secretRef
+    template: haproxy-deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].envFrom[0].secretRef.name
+          value: my-secret
+
+  - it: haproxy container mounts rendered config from emptydir
+    template: haproxy-deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: haproxy-config
+            mountPath: /usr/local/etc/haproxy/haproxy.cfg
+            subPath: haproxy.cfg
+            readOnly: true
+
+  - it: when haproxy enabled then service is created
+    template: haproxy-service.yaml
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: test-node-haproxy
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports[0].port
+          value: 5052
+      - equal:
+          path: spec.ports[0].name
+          value: beacon
+
+  - it: when haproxy disabled then no service
+    template: haproxy-service.yaml
+    set:
+      haproxy.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: when servicemonitor disabled then no servicemonitor
+    template: haproxy-servicemonitor.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: when servicemonitor enabled then servicemonitor is created
+    template: haproxy-servicemonitor.yaml
+    set:
+      haproxy.serviceMonitor.enabled: true
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - equal:
+          path: metadata.name
+          value: test-node-haproxy
+
+  - it: when ingress disabled then no ingress
+    template: haproxy-ingress.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: when ingress enabled then ingress is created
+    template: haproxy-ingress.yaml
+    set:
+      haproxy.ingress.enabled: true
+      haproxy.ingress.hosts[0].host: beacon.example.com
+      haproxy.ingress.hosts[0].paths[0].path: /
+      haproxy.ingress.hosts[0].paths[0].pathType: Prefix
+    asserts:
+      - isKind:
+          of: Ingress
+
+  - it: deployment pod template has checksum/config annotation
+    template: haproxy-deployment.yaml
+    asserts:
+      - isNotEmpty:
+          path: spec.template.metadata.annotations["checksum/config"]
+
+  - it: service has stats port on 8404
+    template: haproxy-service.yaml
+    asserts:
+      - contains:
+          path: spec.ports
+          content:
+            name: stats
+            port: 8404
+            targetPort: stats
+            protocol: TCP
+
+  - it: servicemonitor scrapes stats port with prometheus metrics path
+    template: haproxy-servicemonitor.yaml
+    set:
+      haproxy.serviceMonitor.enabled: true
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: stats
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+
+  - it: when haproxy enabled beacon service has internal annotation
+    template: service.yaml
+    set:
+      execution.client: nethermind
+      beacon.client: lighthouse
+      haproxy.enabled: true
+    asserts:
+      - equal:
+          path: metadata.annotations["execution-beacon-fallback/internal"]
+          value: "true"
