@@ -553,36 +553,34 @@ execution:
   ##
   enableDiscoveryV5: true
 
-  ## Reth snapshot download configuration
-  ## This allows downloading a pre-synced database snapshot to speed up initial sync
-  ## Only applicable when using Reth as execution client
+  ## Snapshot download via `reth download`, to skip the initial sync
+  ## Reth only, ignored for nethermind, geth, besu and erigon
+  ## Runs as an init container on image.execution.*, which must be a reth v2.x
+  ## tag: storage v2 and `reth download` were both added in reth v2.0.0
+  ## ref: https://reth.rs/run/storage/snapshots/
   ##
   snapshot:
-    ## Whether to enable snapshot downloading
-    ##
     enabled: false
 
-    ## Snapshot URL to download from
-    ## Supported formats: .tar.lz4, .tar.zst, .tar.gz, .tar
-    ## Example URLs:
-    ##   - https://snapshots.publicnode.com/ethereum-reth-23546967.tar.lz4
-    ##   - https://your-custom-snapshot-url.com/reth-snapshot.tar.zst
+    ## Components to fetch: minimal, full or archive
+    ##
+    profile: full
+
+    ## Snapshot URL. Leave empty to let reth pick the latest, which it only
+    ## does for mainnet, other chains require an explicit URL
+    ## ref: https://snapshots.reth.rs
     ##
     url: ""
 
-    ## Force snapshot download even if data directory already exists
-    ## If true, existing data will be backed up before downloading snapshot
+    ## Discard existing data and download again
+    ## WARNING: removes db/, rocksdb/, static_files/ and reth.toml, with no
+    ## backup. One-shot, set back to false once the snapshot has landed
     ##
     force: false
 
-    ## Container image for snapshot init container
-    ## This image needs curl and compression tools (lz4, zstd, tar, gzip)
-    ## We use alpine as base and install necessary tools in the script
+    ## Extra flags for `reth download`, e.g. --with-receipts-distance=100000
     ##
-    image:
-      repository: "alpine"
-      tag: "3.20"
-      pullPolicy: IfNotPresent
+    extraFlags: []
 
   ## Extra flags to pass to the node
   ##

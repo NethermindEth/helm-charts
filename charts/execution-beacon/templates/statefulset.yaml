@@ -61,8 +61,8 @@ spec:
       initContainers:
       {{- if and (eq .Values.execution.client "reth") .Values.execution.snapshot.enabled }}
         - name: init-snapshot
-          image: "{{ .Values.execution.snapshot.image.repository }}:{{ .Values.execution.snapshot.image.tag }}"
-          imagePullPolicy: {{ .Values.execution.snapshot.image.pullPolicy }}
+          image: {{ include "execution.image" . }}
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
           securityContext:
             {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
           env:

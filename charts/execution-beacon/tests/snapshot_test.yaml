@@ -1,0 +1,120 @@
+suite: statefulset and configmap reth snapshot tests
+
+release:
+  name: some-release
+
+set:
+  execution.client: reth
+  beacon.client: prysm
+  execution.snapshot.enabled: true
+
+templates:
+  - statefulset.yaml
+  - configmap.yaml
+
+tests:
+  - it: given snapshot enabled with a non-reth execution client then no snapshot init container is rendered
+    template: statefulset.yaml
+    set:
+      execution.client: geth
+      execution.snapshot.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: init
+
+  - it: given snapshot enabled with a non-reth execution client then the snapshot script is not rendered
+    template: configmap.yaml
+    set:
+      execution.client: geth
+      execution.snapshot.enabled: true
+    asserts:
+      - notExists:
+          path: data["init-snapshot.sh"]
+
+  - it: given snapshot enabled with reth then the init container reuses the execution client image so the snapshot layout matches the binary
+    template: statefulset.yaml
+    set:
+      execution.client: reth
+      execution.snapshot.enabled: true
+      image.execution.tag: v2.4.1
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: ghcr.io/paradigmxyz/reth:v2.4.1
+
+  - it: given force disabled then the script aborts instead of overwriting an existing datadir
+    template: configmap.yaml
+    set:
+      execution.snapshot.force: false
+    asserts:
+      - matchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: 'Skipping snapshot download[\s\S]*exit 0'
+      - notMatchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: '--force'
+
+  - it: given force disabled then an interrupted download is resumed rather than mistaken for existing node data
+    template: configmap.yaml
+    set:
+      execution.snapshot.force: false
+    asserts:
+      - matchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: '\.download-cache[\s\S]*Found an interrupted download, resuming[\s\S]*Skipping snapshot download'
+
+  - it: given force disabled then a completed download is skipped via the marker written after reth download succeeds
+    template: configmap.yaml
+    set:
+      execution.snapshot.force: false
+    asserts:
+      - matchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: 'if \[ -f "\$COMPLETE_MARKER" \]; then\n  echo "==> Snapshot already downloaded. Nothing to do."\n  exit 0'
+      - matchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: '--non-interactive\n\ntouch "\$COMPLETE_MARKER"'
+
+  - it: given force enabled then reth download is passed --force and the abort is not rendered
+    template: configmap.yaml
+    set:
+      execution.snapshot.force: true
+    asserts:
+      - matchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: '--full \\\n  --force \\\n  --non-interactive'
+      - notMatchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: 'exit 0'
+
+  - it: given no snapshot url then reth download is left to propose one
+    template: configmap.yaml
+    set:
+      execution.snapshot.url: ""
+    asserts:
+      - notMatchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: '--url'
+
+  - it: given a snapshot url then it is passed to reth download
+    template: configmap.yaml
+    set:
+      execution.snapshot.url: https://snapshots.example.com/manifest.json
+    asserts:
+      - matchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: '--url "https://snapshots\.example\.com/manifest\.json"'
+
+  - it: given a snapshot profile and extra flags then both are passed to reth download
+    template: configmap.yaml
+    set:
+      network: mainnet
+      execution.snapshot.profile: archive
+      execution.snapshot.extraFlags:
+        - --without-rocksdb
+        - --download-concurrency=4
+    asserts:
+      - matchRegex:
+          path: data["init-snapshot.sh"]
+          pattern: 'reth download \\\n  --datadir "\$DATADIR" \\\n  --chain mainnet \\\n  --archive \\\n  --without-rocksdb \\\n  --download-concurrency=4 \\\n  --non-interactive'
