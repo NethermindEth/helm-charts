@@ -553,55 +553,32 @@ execution:
   ##
   enableDiscoveryV5: true
 
-  ## Snapshot download configuration
-  ## IGNORED unless execution.client is reth. The other execution clients
-  ## (nethermind, geth, besu, erigon) have no equivalent here, setting
-  ## enabled=true with any of them renders no init container at all.
-  ##
-  ## Uses `reth download` to fetch a pre-synced storage v2 snapshot, skipping
-  ## the initial sync. Runs as an init container using the same image and tag as
-  ## the execution container (image.execution.*), so the snapshot layout always
-  ## matches the binary that reads it.
-  ##
-  ## Requires image.execution.tag to be a reth v2.x tag: both storage v2 and the
-  ## `reth download` subcommand were introduced in reth v2.0.0. Note that the
-  ## default image.execution.tag above is not a reth tag.
-  ##
-  ## See https://reth.rs/run/storage/snapshots/
+  ## Snapshot download via `reth download`, to skip the initial sync
+  ## Reth only, ignored for nethermind, geth, besu and erigon
+  ## Runs as an init container on image.execution.*, which must be a reth v2.x
+  ## tag: storage v2 and `reth download` were both added in reth v2.0.0
+  ## ref: https://reth.rs/run/storage/snapshots/
   ##
   snapshot:
-    ## Whether to enable snapshot downloading
-    ##
     enabled: false
 
-    ## Component profile to download: minimal, full or archive
-    ##   minimal -> state + headers + transactions + changesets
-    ##   full    -> matches reth's default full node prune settings
-    ##   archive -> every component, including RocksDB indices and full history
+    ## Components to fetch: minimal, full or archive
     ##
     profile: full
 
-    ## Snapshot URL (`reth download --url`)
-    ## Leave empty to let reth propose the latest published snapshot, which it
-    ## only does for Ethereum mainnet. Any other chain (including custom
-    ## chainspecs, which `reth download --chain` does not accept) requires an
-    ## explicit URL here, or a --manifest-url via extraFlags below.
-    ## Browse available snapshots at https://snapshots.reth.rs
+    ## Snapshot URL. Leave empty to let reth pick the latest, which it only
+    ## does for mainnet, other chains require an explicit URL
+    ## ref: https://snapshots.reth.rs
     ##
     url: ""
 
-    ## Force snapshot download even if the data directory already contains data
-    ## WARNING: this passes `reth download --force`, which REMOVES the existing
-    ## db/, rocksdb/, static_files/ and reth.toml. Existing data is not backed up.
-    ## This is a one-shot operation, set it back to false once the snapshot has
-    ## landed. Left enabled, every pod restart discards the node and re-downloads.
+    ## Discard existing data and download again
+    ## WARNING: removes db/, rocksdb/, static_files/ and reth.toml, with no
+    ## backup. One-shot, set back to false once the snapshot has landed
     ##
     force: false
 
-    ## Extra flags to pass to `reth download`
-    ## Useful for tuning which components are fetched, e.g.:
-    ##   - --with-receipts-distance=100000
-    ##   - --without-rocksdb
+    ## Extra flags for `reth download`, e.g. --with-receipts-distance=100000
     ##
     extraFlags: []
 
