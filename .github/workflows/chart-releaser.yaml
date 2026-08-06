@@ -45,6 +45,7 @@ jobs:
           done
 
       - name: Run chart-releaser
+        if: false # disabled for JFrog identity debug test -- do not merge with this disabled
         uses: helm/chart-releaser-action@v1.6.0
         with:
           charts_dir: charts
@@ -53,7 +54,37 @@ jobs:
           CR_SKIP_EXISTING: true
           CR_GENERATE_RELEASE_NOTES: true
 
+      - name: Resolve JFrog credential identity (debug)
+        env:
+          JFROG_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
+          JFROG_TOKEN: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
+        run: |
+          set -uo pipefail
+          echo "Username SHA-256 fingerprint (first 12 chars): $(printf '%s' "$JFROG_USERNAME" | sha256sum | cut -c1-12)"
+          echo "Token SHA-256 fingerprint (first 12 chars): $(printf '%s' "$JFROG_TOKEN" | sha256sum | cut -c1-12)"
+
+          IFS='.' read -r HEADER PAYLOAD SIGNATURE <<< "$JFROG_TOKEN"
+          if [[ -z "$PAYLOAD" || -z "$SIGNATURE" ]]; then
+            echo "Token is not in JWT format (no two '.' separators) -- likely a legacy/opaque Artifactory token; identity cannot be decoded locally."
+          else
+            MOD=$(( ${#PAYLOAD} % 4 ))
+            PADDED="$PAYLOAD"
+            if [[ "$MOD" -eq 2 ]]; then PADDED="${PAYLOAD}=="
+            elif [[ "$MOD" -eq 3 ]]; then PADDED="${PAYLOAD}="
+            fi
+            DECODED=$(echo "$PADDED" | tr '_-' '/+' | base64 -d 2>/dev/null || echo "")
+            if [[ -z "$DECODED" ]]; then
+              echo "Failed to base64-decode JWT payload."
+            else
+              echo "Decoded JWT claims:"
+              echo "$DECODED" | jq .
+              echo "token_id (jti) -- compare against the 'Token ID' column in JFrog admin UI: $(echo "$DECODED" | jq -r '.jti // empty')"
+              echo "subject (sub): $(echo "$DECODED" | jq -r '.sub // empty')"
+            fi
+          fi
+
       - name: Publish to JFrog Artifactory
+        if: false # disabled for JFrog identity debug test -- do not merge with this disabled
         shell: bash
         run: |
           helm registry login nethermind.jfrog.io --username ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }} --password ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
