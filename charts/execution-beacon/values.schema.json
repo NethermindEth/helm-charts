@@ -1981,6 +1981,12 @@
       "additionalProperties": false,
       "description": "# Execution client configuration\n#",
       "properties": {
+        "archive": {
+          "default": false,
+          "description": "# Retain all historical state instead of pruning it\n# Nethermind and Geth only; Nethermind additionally requires the network to\n# ship a <network>_archive config preset\n#",
+          "title": "archive",
+          "type": "boolean"
+        },
         "client": {
           "default": "nethermind",
           "title": "client",
@@ -2516,6 +2522,7 @@
       },
       "required": [
         "client",
+        "archive",
         "persistence",
         "initChownData",
         "privateApiAddr",

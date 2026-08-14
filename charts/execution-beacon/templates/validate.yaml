@@ -3,3 +3,7 @@
 {{- if and $jwtSecret (not (regexMatch $regex $jwtSecret)) }}
 {{- fail "global.JWTSecret must be a 32-byte long hex string" }}
 {{- end }}
+
+{{- if and .Values.execution.archive (not (has .Values.execution.client (list "nethermind" "geth"))) }}
+{{- fail "execution.archive is only supported for the nethermind and geth execution clients" }}
+{{- end }}

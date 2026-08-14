@@ -3,7 +3,7 @@ Nethermind execution client arguments
 */}}
 {{- define "execution-args-nethermind" -}}
 exec /nethermind/Nethermind.Runner
---config={{ .Values.network }}
+--config={{ .Values.network }}{{ if .Values.execution.archive }}_archive{{ end }}
 --datadir=/data/execution
 {{- if .Values.execution.jsonrpc.enabled }}
 --JsonRpc.Enabled={{ .Values.execution.jsonrpc.enabled }}
@@ -52,7 +52,12 @@ Geth execution client arguments
 */}}
 {{- define "execution-args-geth" -}}
 exec geth
+{{- if .Values.execution.archive }}
+--syncmode=full
+--gcmode=archive
+{{- else }}
 --syncmode=snap
+{{- end }}
 --datadir=/data/execution
 --ipcdisable
 --{{ .Values.network }}
