@@ -1,0 +1,78 @@
+suite: statefulset and validate archive tests
+
+release:
+  name: some-release
+
+set:
+  execution.client: nethermind
+  beacon.client: prysm
+  execution.archive: true
+  network: mainnet
+
+templates:
+  - statefulset.yaml
+  - configmap.yaml
+  - validate.yaml
+
+tests:
+  - it: given archive enabled with nethermind then the config selects the network archive preset
+    template: statefulset.yaml
+    set:
+      execution.client: nethermind
+      execution.archive: true
+      network: mainnet
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].command[2]
+          pattern: --config=mainnet_archive
+
+  - it: given archive disabled with nethermind then the config stays the plain network
+    template: statefulset.yaml
+    set:
+      execution.client: nethermind
+      execution.archive: false
+      network: mainnet
+    asserts:
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].command[2]
+          pattern: --config=mainnet_archive
+
+  - it: given archive enabled with nethermind then the beacon still targets the plain network
+    template: statefulset.yaml
+    set:
+      execution.client: nethermind
+      execution.archive: true
+      network: mainnet
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[1].args
+          content: --mainnet
+
+  - it: given archive enabled with geth then full sync and archive gcmode are used
+    template: statefulset.yaml
+    set:
+      execution.client: geth
+      execution.archive: true
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].command[2]
+          pattern: --syncmode=full --gcmode=archive
+
+  - it: given archive enabled with geth then snap sync is dropped because it cannot build an archive node
+    template: statefulset.yaml
+    set:
+      execution.client: geth
+      execution.archive: true
+    asserts:
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].command[2]
+          pattern: --syncmode=snap
+
+  - it: given archive enabled with an execution client that has no archive mode then rendering fails
+    template: validate.yaml
+    set:
+      execution.client: reth
+      execution.archive: true
+    asserts:
+      - failedTemplate:
+          errorMessage: execution.archive is only supported for the nethermind and geth execution clients
