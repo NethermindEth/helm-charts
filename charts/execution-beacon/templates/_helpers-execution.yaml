@@ -192,6 +192,9 @@ Reth execution client arguments
 */}}
 {{- define "execution-args-reth" -}}
 exec reth node
+{{- if not .Values.execution.archive }}
+--full
+{{- end }}
 --datadir=/data/execution
 --log.file.directory=/data/execution/logs
 --ipcdisable

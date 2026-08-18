@@ -435,8 +435,10 @@ execution:
   client: nethermind
 
   ## Retain all historical state instead of pruning it
-  ## Nethermind and Geth only; Nethermind additionally requires the network to
-  ## ship a <network>_archive config preset
+  ## Nethermind, Geth and Reth only; Nethermind additionally requires the
+  ## network to ship a <network>_archive config preset
+  ## Reth is an archive node by default, so for Reth it is archive: false that
+  ## adds a flag, --full, and that pruning cannot be undone without a resync
   ##
   archive: false
 
@@ -569,6 +571,8 @@ execution:
     enabled: false
 
     ## Components to fetch: minimal, full or archive
+    ## execution.archive requires archive: the minimal and full snapshots carry
+    ## no history from before the snapshot, so the node never becomes one
     ##
     profile: full
 

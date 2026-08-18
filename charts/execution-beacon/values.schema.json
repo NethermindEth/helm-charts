@@ -1983,7 +1983,7 @@
       "properties": {
         "archive": {
           "default": false,
-          "description": "# Retain all historical state instead of pruning it\n# Nethermind and Geth only; Nethermind additionally requires the network to\n# ship a <network>_archive config preset\n#",
+          "description": "# Retain all historical state instead of pruning it\n# Nethermind, Geth and Reth only; Nethermind additionally requires the\n# network to ship a <network>_archive config preset\n# Reth is an archive node by default, so for Reth it is archive: false that\n# adds a flag, --full, and that pruning cannot be undone without a resync\n#",
           "title": "archive",
           "type": "boolean"
         },
@@ -2474,7 +2474,7 @@
             },
             "profile": {
               "default": "full",
-              "description": "# Components to fetch: minimal, full or archive\n#",
+              "description": "# Components to fetch: minimal, full or archive\n# execution.archive requires archive: the minimal and full snapshots carry\n# no history from before the snapshot, so the node never becomes one\n#",
               "enum": [
                 "minimal",
                 "full",

@@ -68,11 +68,52 @@ tests:
           path: spec.template.spec.containers[0].command[2]
           pattern: --syncmode=snap
 
-  - it: given archive enabled with an execution client that has no archive mode then rendering fails
-    template: validate.yaml
+  - it: given archive enabled with reth then no pruning profile is set, reth is archive by default
+    template: statefulset.yaml
     set:
       execution.client: reth
       execution.archive: true
     asserts:
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].command[2]
+          pattern: --full
+
+  - it: given archive disabled with reth then the full node pruning profile is set
+    template: statefulset.yaml
+    set:
+      execution.client: reth
+      execution.archive: false
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].command[2]
+          pattern: exec reth node --full
+
+  - it: given archive enabled with an execution client that has no archive mode then rendering fails
+    template: validate.yaml
+    set:
+      execution.client: besu
+      execution.archive: true
+    asserts:
       - failedTemplate:
-          errorMessage: execution.archive is only supported for the nethermind and geth execution clients
+          errorMessage: execution.archive is only supported for the nethermind, geth and reth execution clients
+
+  - it: given archive enabled with reth and a snapshot profile that ships no history then rendering fails
+    template: validate.yaml
+    set:
+      execution.client: reth
+      execution.archive: true
+      execution.snapshot.enabled: true
+      execution.snapshot.profile: full
+    asserts:
+      - failedTemplate:
+          errorMessage: execution.archive with a snapshot requires execution.snapshot.profile=archive, the minimal and full profiles ship no pre-snapshot history
+
+  - it: given archive enabled with reth and the archive snapshot profile then rendering succeeds
+    template: validate.yaml
+    set:
+      execution.client: reth
+      execution.archive: true
+      execution.snapshot.enabled: true
+      execution.snapshot.profile: archive
+    asserts:
+      - notFailedTemplate: {}
