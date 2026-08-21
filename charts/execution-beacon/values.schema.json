@@ -468,6 +468,63 @@
       },
       "type": "object"
     },
+    "httpExtensionRef": {
+      "additionalProperties": false,
+      "properties": {
+        "group": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "group",
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "httpRequestMirror": {
+      "additionalProperties": false,
+      "properties": {
+        "backendRef": {
+          "additionalProperties": false,
+          "properties": {
+            "group": {
+              "default": "",
+              "type": "string"
+            },
+            "kind": {
+              "default": "Service",
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            },
+            "port": {
+              "minimum": 1,
+              "maximum": 65535,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "backendRef"
+      ],
+      "type": "object"
+    },
     "httpRouteFilter": {
       "additionalProperties": false,
       "properties": {
@@ -475,8 +532,10 @@
           "enum": [
             "RequestHeaderModifier",
             "ResponseHeaderModifier",
+            "RequestMirror",
             "RequestRedirect",
-            "URLRewrite"
+            "URLRewrite",
+            "ExtensionRef"
           ],
           "type": "string"
         },
@@ -491,6 +550,12 @@
         },
         "urlRewrite": {
           "$ref": "#/definitions/httpURLRewrite"
+        },
+        "requestMirror": {
+          "$ref": "#/definitions/httpRequestMirror"
+        },
+        "extensionRef": {
+          "$ref": "#/definitions/httpExtensionRef"
         }
       },
       "required": [
