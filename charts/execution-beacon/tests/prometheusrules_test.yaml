@@ -40,6 +40,7 @@ tests:
             labels:
               severity: banana
             annotations:
+              runbook_url: "https://app.notion.com/p/nethermind/Execution-Beacon-Alerts-3aa360fc38d080268f64c6a014c25120"
               summary: Node {{ $labels.container }} {{ $labels.job }} down
               description: Node {{ $labels.container }} {{ $labels.job }}, in namespace {{ $labels.namespace }}, is down
       - contains:
@@ -53,5 +54,17 @@ tests:
             labels:
               severity: banana
             annotations:
+              runbook_url: "https://app.notion.com/p/nethermind/Execution-Beacon-Alerts-3aa360fc38d080268f64c6a014c25120"
               summary: Node {{ $labels.container }} {{ $labels.job }} down during update
               description: Node {{ $labels.container }} {{ $labels.job }}, in namespace {{ $labels.namespace }}, was mid update, but has not recovered
+
+  - it: given empty runbookUrl then should omit the runbook_url annotation
+    set:
+      metrics:
+        prometheusRule:
+          rules: []
+          default: true
+          runbookUrl: ""
+    asserts:
+      - notExists:
+          path: .spec.groups[0].rules[0].annotations.runbook_url

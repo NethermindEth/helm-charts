@@ -21,6 +21,9 @@ Receives the Helm root context as its parameter
     severity: {{ quote . }}
     {{- end }}
   annotations:
+    {{- with $root.Values.metrics.prometheusRule.runbookUrl }}
+    runbook_url: {{ quote . }}
+    {{- end }}
     summary: {{ `Node {{ $labels.container }} {{ $labels.job }} down` }}
     description: {{ `Node {{ $labels.container }} {{ $labels.job }}, in namespace {{ $labels.namespace }}, is down` }}
 - alert: EthNodeUpdateFailed
@@ -33,6 +36,9 @@ Receives the Helm root context as its parameter
     severity: {{ quote . }}
     {{- end }}
   annotations:
+    {{- with $root.Values.metrics.prometheusRule.runbookUrl }}
+    runbook_url: {{ quote . }}
+    {{- end }}
     summary: {{ `Node {{ $labels.container }} {{ $labels.job }} down during update` }}
     description: {{ `Node {{ $labels.container }} {{ $labels.job }}, in namespace {{ $labels.namespace }}, was mid update, but has not recovered` }}
 {{- end }}
