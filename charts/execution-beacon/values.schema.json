@@ -2984,6 +2984,12 @@
               "title": "rules",
               "type": "array"
             },
+            "runbookUrl": {
+              "default": "https://app.notion.com/p/nethermind/Execution-Beacon-Alerts-3aa360fc38d080268f64c6a014c25120",
+              "description": "# Runbook URL added as the `runbook_url` annotation on every default alert.\n#",
+              "title": "runbookUrl",
+              "type": "string"
+            },
             "severity": {
               "default": "critical",
               "description": "# The value of the `severity` label, commonly used to mark severity, set to empty string or null to omit\n#",
@@ -2996,7 +3002,8 @@
             "namespace",
             "severity",
             "additionalLabels",
-            "rules"
+            "rules",
+            "runbookUrl"
           ],
           "title": "prometheusRule",
           "type": "object"

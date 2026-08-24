@@ -378,6 +378,11 @@ metrics:
     ## The value of the `severity` label, commonly used to mark severity, set to empty string or null to omit
     ##
     severity: critical
+    ## Runbook URL added as the `runbook_url` annotation on every default alert.
+    ## Required by the `bros-alerts-must-have-runbooks` Kyverno policy.
+    ## Set to an empty string to omit the annotation.
+    ##
+    runbookUrl: "https://app.notion.com/p/nethermind/Execution-Beacon-Alerts-3aa360fc38d080268f64c6a014c25120"
     ## Additional labels for the prometheusRule
     ##
     additionalLabels: {}
