@@ -1,6 +1,6 @@
 # execution-beacon
 
-![Version: 3.3.0](https://img.shields.io/badge/Version-3.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 4.0.0](https://img.shields.io/badge/Version-4.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -68,7 +68,6 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.metrics.host | string | `"0.0.0.0"` |  |
 | beacon.metrics.hostAllowList[0] | string | `"*"` |  |
 | beacon.metrics.port | int | `9090` |  |
-| beacon.metrics.prometheusRule.enabled | bool | `true` |  |
 | beacon.metrics.serviceMonitor.enabled | bool | `true` |  |
 | beacon.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | beacon.persistence.annotations | object | `{}` |  |
@@ -173,7 +172,6 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.metrics.enabled | bool | `true` |  |
 | execution.metrics.host | string | `"0.0.0.0"` |  |
 | execution.metrics.port | int | `8008` |  |
-| execution.metrics.prometheusRule.enabled | bool | `true` |  |
 | execution.metrics.serviceMonitor.enabled | bool | `true` |  |
 | execution.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | execution.persistence.annotations | object | `{}` |  |
@@ -223,12 +221,6 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | initImage.tag | string | `"1.33.4"` |  |
 | metrics.annotations | object | `{}` |  |
 | metrics.enabled | bool | `true` |  |
-| metrics.prometheusRule.additionalLabels | object | `{}` |  |
-| metrics.prometheusRule.default | bool | `true` |  |
-| metrics.prometheusRule.namespace | string | `""` |  |
-| metrics.prometheusRule.rules | list | `[]` |  |
-| metrics.prometheusRule.runbookUrl | string | `"https://app.notion.com/p/nethermind/Execution-Beacon-Alerts-3aa360fc38d080268f64c6a014c25120"` |  |
-| metrics.prometheusRule.severity | string | `"critical"` |  |
 | metrics.serviceMonitor.additionalLabels | object | `{}` |  |
 | metrics.serviceMonitor.honorLabels | bool | `false` |  |
 | metrics.serviceMonitor.interval | string | `"30s"` |  |
