@@ -1638,23 +1638,6 @@
               "title": "port",
               "type": "integer"
             },
-            "prometheusRule": {
-              "additionalProperties": false,
-              "description": "# Custom PrometheusRule to be defined\n# ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions\n#",
-              "properties": {
-                "enabled": {
-                  "default": true,
-                  "description": "# Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator\n#",
-                  "title": "enabled",
-                  "type": "boolean"
-                }
-              },
-              "required": [
-                "enabled"
-              ],
-              "title": "prometheusRule",
-              "type": "object"
-            },
             "serviceMonitor": {
               "additionalProperties": false,
               "description": "# Prometheus Service Monitor\n# ref: https://github.com/coreos/prometheus-operator\n#      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint\n#",
@@ -1678,8 +1661,7 @@
             "host",
             "categories",
             "hostAllowList",
-            "serviceMonitor",
-            "prometheusRule"
+            "serviceMonitor"
           ],
           "title": "metrics",
           "type": "object"
@@ -2414,23 +2396,6 @@
               "title": "port",
               "type": "integer"
             },
-            "prometheusRule": {
-              "additionalProperties": false,
-              "description": "# Custom PrometheusRule to be defined\n# ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions\n#",
-              "properties": {
-                "enabled": {
-                  "default": true,
-                  "description": "# Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator\n#",
-                  "title": "enabled",
-                  "type": "boolean"
-                }
-              },
-              "required": [
-                "enabled"
-              ],
-              "title": "prometheusRule",
-              "type": "object"
-            },
             "serviceMonitor": {
               "additionalProperties": false,
               "description": "# Prometheus Service Monitor\n# ref: https://github.com/coreos/prometheus-operator\n#      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint\n#",
@@ -2452,8 +2417,7 @@
           "required": [
             "enabled",
             "host",
-            "serviceMonitor",
-            "prometheusRule"
+            "serviceMonitor"
           ],
           "title": "metrics",
           "type": "object"
@@ -2953,61 +2917,6 @@
           "title": "enabled",
           "type": "boolean"
         },
-        "prometheusRule": {
-          "additionalProperties": false,
-          "description": "# Custom PrometheusRule to be defined\n# ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions\n#",
-          "properties": {
-            "additionalLabels": {
-              "additionalProperties": false,
-              "description": "# Additional labels for the prometheusRule\n#",
-              "required": [],
-              "title": "additionalLabels",
-              "type": "object"
-            },
-            "default": {
-              "default": true,
-              "description": "# Create a default set of Alerts\n#",
-              "title": "default",
-              "type": "boolean"
-            },
-            "namespace": {
-              "default": "",
-              "description": "# The namespace in which the prometheusRule will be created\n#",
-              "title": "namespace",
-              "type": "string"
-            },
-            "rules": {
-              "description": "# Custom Prometheus rules\n#",
-              "items": {
-                "required": []
-              },
-              "title": "rules",
-              "type": "array"
-            },
-            "runbookUrl": {
-              "default": "https://app.notion.com/p/nethermind/Execution-Beacon-Alerts-3aa360fc38d080268f64c6a014c25120",
-              "description": "# Runbook URL added as the `runbook_url` annotation on every default alert.\n#",
-              "title": "runbookUrl",
-              "type": "string"
-            },
-            "severity": {
-              "default": "critical",
-              "description": "# The value of the `severity` label, commonly used to mark severity, set to empty string or null to omit\n#",
-              "title": "severity",
-              "type": "string"
-            }
-          },
-          "required": [
-            "default",
-            "namespace",
-            "severity",
-            "additionalLabels",
-            "rules",
-            "runbookUrl"
-          ],
-          "title": "prometheusRule",
-          "type": "object"
-        },
         "serviceMonitor": {
           "additionalProperties": false,
           "description": "# Prometheus Service Monitor\n# ref: https://github.com/coreos/prometheus-operator\n#      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint\n#",
@@ -3076,8 +2985,7 @@
       "required": [
         "enabled",
         "annotations",
-        "serviceMonitor",
-        "prometheusRule"
+        "serviceMonitor"
       ],
       "title": "metrics",
       "type": "object"

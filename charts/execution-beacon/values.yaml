@@ -365,30 +365,6 @@ metrics:
     ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
     ##
     additionalLabels: {}
-  ## Custom PrometheusRule to be defined
-  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-  ##
-  prometheusRule:
-    ## Create a default set of Alerts
-    ##
-    default: true
-    ## The namespace in which the prometheusRule will be created
-    ##
-    namespace: ""
-    ## The value of the `severity` label, commonly used to mark severity, set to empty string or null to omit
-    ##
-    severity: critical
-    ## Runbook URL added as the `runbook_url` annotation on every default alert.
-    ## Required by the `bros-alerts-must-have-runbooks` Kyverno policy.
-    ## Set to an empty string to omit the annotation.
-    ##
-    runbookUrl: "https://app.notion.com/p/nethermind/Execution-Beacon-Alerts-3aa360fc38d080268f64c6a014c25120"
-    ## Additional labels for the prometheusRule
-    ##
-    additionalLabels: {}
-    ## Custom Prometheus rules
-    ##
-    rules: []
 
 ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
 ## This will generate a service for each replica, with a port binding via NodePort.
@@ -487,14 +463,6 @@ execution:
     ##
     serviceMonitor:
       ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-      ##
-      enabled: true
-
-    ## Custom PrometheusRule to be defined
-    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-    ##
-    prometheusRule:
-      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
       ##
       enabled: true
 
@@ -667,14 +635,6 @@ beacon:
     ##
     serviceMonitor:
       ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-      ##
-      enabled: true
-
-    ## Custom PrometheusRule to be defined
-    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-    ##
-    prometheusRule:
-      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
       ##
       enabled: true
 
