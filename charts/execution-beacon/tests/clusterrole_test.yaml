@@ -16,7 +16,7 @@ tests:
     asserts:
       - equal:
           path: metadata.name
-          value: some-namespace-some-release-execution-beacon
+          value: some-namespace-some-release
 
   - it: given an rbac name then the cluster role uses it verbatim
     template: clusterrole.yaml
@@ -34,4 +34,4 @@ tests:
     asserts:
       - equal:
           path: roleRef.name
-          value: some-namespace-some-release-execution-beacon
+          value: some-namespace-some-release
