@@ -55,11 +55,13 @@ Override common.names.serviceAccountName to use only top-level serviceAccount
 
 {{/*
 Override common.names.clusterRoleName to use only top-level rbac
-(not global.rbac which was moved out of global scope)
+(not global.rbac which was moved out of global scope) and to prefix the
+namespace, so releases sharing a name across namespaces do not fight over the
+same cluster-scoped object.
 */}}
 {{- define "common.names.clusterRoleName" -}}
 {{- if .Values.rbac.create }}
-{{- default (include "common.names.fullname" .) .Values.rbac.name }}
+{{- default (printf "%s-%s" .Release.Namespace (include "common.names.fullname" .)) .Values.rbac.name }}
 {{- else }}
 {{- default "default" .Values.rbac.name }}
 {{- end }}

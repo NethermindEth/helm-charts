@@ -1,0 +1,37 @@
+suite: clusterrole and clusterrolebinding tests
+
+release:
+  name: some-release
+  namespace: some-namespace
+
+templates:
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+
+tests:
+  - it: given no rbac name then the cluster role name is prefixed with the release namespace
+    template: clusterrole.yaml
+    set:
+      rbac.name: ""
+    asserts:
+      - equal:
+          path: metadata.name
+          value: some-namespace-some-release-execution-beacon
+
+  - it: given an rbac name then the cluster role uses it verbatim
+    template: clusterrole.yaml
+    set:
+      rbac.name: shared-node-reader
+    asserts:
+      - equal:
+          path: metadata.name
+          value: shared-node-reader
+
+  - it: given no rbac name then the cluster role binding references the namespace-prefixed cluster role
+    template: clusterrolebinding.yaml
+    set:
+      rbac.name: ""
+    asserts:
+      - equal:
+          path: roleRef.name
+          value: some-namespace-some-release-execution-beacon
