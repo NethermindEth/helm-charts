@@ -3183,7 +3183,7 @@
         },
         "name": {
           "default": "",
-          "description": "The name of the cluster role to use.\nIf not set and create is true, a name is generated as <namespace>-<fullname>,\nwhich keeps releases sharing a name across namespaces from colliding",
+          "description": "The name of the cluster role to use.\nIf not set and create is true, a name is generated as <namespace>-<release>,\nwhich keeps releases sharing a name across namespaces from colliding",
           "title": "name",
           "type": "string"
         },

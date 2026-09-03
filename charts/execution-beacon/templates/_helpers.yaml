@@ -61,7 +61,7 @@ same cluster-scoped object.
 */}}
 {{- define "common.names.clusterRoleName" -}}
 {{- if .Values.rbac.create }}
-{{- default (printf "%s-%s" .Release.Namespace (include "common.names.fullname" .)) .Values.rbac.name }}
+{{- default (printf "%s-%s" .Release.Namespace .Release.Name) .Values.rbac.name }}
 {{- else }}
 {{- default "default" .Values.rbac.name }}
 {{- end }}
