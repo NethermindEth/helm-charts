@@ -1,6 +1,7 @@
+
 # execution-beacon
 
-![Version: 4.0.0](https://img.shields.io/badge/Version-4.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 4.1.0](https://img.shields.io/badge/Version-4.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -126,7 +127,7 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | ethsider.readinessProbe.successThreshold | int | `3` |  |
 | ethsider.readinessProbe.timeoutSeconds | int | `3` |  |
 | ethsider.repository | string | `"nethermindeth/ethsider"` |  |
-| ethsider.tag | string | `"v1.1.1"` |  |
+| ethsider.tag | string | `"v2.2.0"` |  |
 | execution.archive | bool | `false` |  |
 | execution.client | string | `"nethermind"` |  |
 | execution.enableDiscoveryV5 | bool | `true` |  |

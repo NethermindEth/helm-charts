@@ -202,7 +202,7 @@ envFrom: []
 ethsider:
   enabled: true
   repository: "nethermindeth/ethsider"
-  tag: "v1.1.1"
+  tag: "v2.2.0"
   pullPolicy: IfNotPresent
   bindAddr: 3000
   ## Configure ethsider probe flags

@@ -2009,7 +2009,7 @@
           "type": "string"
         },
         "tag": {
-          "default": "v1.1.1",
+          "default": "v2.2.0",
           "title": "tag",
           "type": "string"
         }
