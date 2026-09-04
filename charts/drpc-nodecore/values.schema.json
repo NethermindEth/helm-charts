@@ -263,6 +263,16 @@
       },
       "required": ["enabled", "interval"],
       "type": "object"
+    },
+    "appStorages": {
+      "description": "Shared storage backends (Redis/Postgres) referenced by cache connectors by name. See https://github.com/drpcorg/nodecore/blob/main/docs/nodecore/07-app-storages.md",
+      "items": { "additionalProperties": true, "type": "object" },
+      "type": "array"
+    },
+    "cache": {
+      "additionalProperties": true,
+      "description": "NodeCore cache connectors and policies. See https://github.com/drpcorg/nodecore/blob/main/docs/nodecore/04-cache.md",
+      "type": "object"
     }
   },
   "properties": {
@@ -274,6 +284,8 @@
           "$ref": "#/definitions/affinity",
           "title": "affinity"
         },
+        "appStorages": { "$ref": "#/definitions/appStorages", "title": "appStorages" },
+        "cache": { "$ref": "#/definitions/cache", "title": "cache" },
         "deployment": {
           "additionalProperties": false,
           "properties": {
@@ -440,7 +452,7 @@
       "properties": {
         "pullPolicy": { "default": "IfNotPresent", "title": "pullPolicy", "type": "string" },
         "repository": { "default": "drpcorg/nodecore", "title": "repository", "type": "string" },
-        "tag": { "default": "0.1.6", "title": "tag", "type": "string" }
+        "tag": { "default": "1.14.0", "title": "tag", "type": "string" }
       },
       "required": ["repository", "pullPolicy", "tag"],
       "title": "image",
@@ -486,6 +498,8 @@
             "title": "deployment",
             "type": "object"
           },
+          "appStorages": { "$ref": "#/definitions/appStorages", "title": "appStorages" },
+          "cache": { "$ref": "#/definitions/cache", "title": "cache" },
           "nodecoreConfig": {
             "additionalProperties": true,
             "title": "nodecoreConfig",

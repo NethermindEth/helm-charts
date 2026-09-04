@@ -10,7 +10,7 @@ fullnameOverride: ""
 image:
   repository: drpcorg/nodecore
   pullPolicy: IfNotPresent
-  tag: "0.1.6"
+  tag: "1.14.0"
 
 # Image used for the envsubst init container
 initImage:
@@ -112,6 +112,35 @@ defaults:
 
   terminationGracePeriodSeconds: 30
 
+  # ──────────────────────────────────────────
+  # Cache (optional, shared by all projects unless overridden)
+  # ──────────────────────────────────────────
+  # Credentials can use ${VAR} placeholders, expanded by the envsubst init
+  # container from the project's `secretRef`.
+  # -- Shared storage backends referenced by cache connectors by name (see https://github.com/drpcorg/nodecore/blob/main/docs/nodecore/07-app-storages.md)
+  appStorages: []
+    # - name: shared-redis
+    #   redis:
+    #     address: "redis-master.redis.svc.cluster.local:6379"
+    #     password: "${REDIS_PASSWORD}"
+    #     db: 0
+
+  # -- Cache connectors and policies (see https://github.com/drpcorg/nodecore/blob/main/docs/nodecore/04-cache.md)
+  cache: {}
+    # receive-timeout: 500ms
+    # connectors:
+    #   - id: redis-cache
+    #     driver: redis
+    #     redis:
+    #       storage-name: shared-redis
+    # policies:
+    #   - id: finalized-blocks
+    #     chain: "*"
+    #     method: "eth_getBlockByNumber"
+    #     connector-id: redis-cache
+    #     finalization-type: finalized
+    #     ttl: 30s
+
 # ──────────────────────────────────────────
 # Projects
 # ──────────────────────────────────────────
@@ -149,6 +178,26 @@ projects: {}
   #       minReplicas: 2
   #       maxReplicas: 8
   #
+  #   # Optional per-project cache override (replaces defaults.appStorages / defaults.cache)
+  #   appStorages:
+  #     - name: shared-redis
+  #       redis:
+  #         address: "redis-master.redis.svc.cluster.local:6379"
+  #         password: "${REDIS_PASSWORD}"
+  #   cache:
+  #     connectors:
+  #       - id: redis-cache
+  #         driver: redis
+  #         redis:
+  #           storage-name: shared-redis
+  #     policies:
+  #       - id: all-finalized
+  #         chain: "*"
+  #         method: "*"
+  #         connector-id: redis-cache
+  #         finalization-type: finalized
+  #         ttl: 10m
+  #
   #   # Optional NodeCore config sections (integrity, failsafe, chain-defaults, scoring)
   #   nodecoreConfig:
   #     integrity:
@@ -178,4 +227,4 @@ projects: {}
   #       chain: ethereum
   #       connectors:
   #         - type: json-rpc
-  #           url: "https://eth.llamarpc.com"
+  #           url: "https://ethereum-rpc.publicnode.com"

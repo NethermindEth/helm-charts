@@ -20,6 +20,16 @@ data:
         token:
           value: {{ printf "${%s}" ($projectConfig.authTokenEnvVar | default "NODECORE_AUTH_TOKEN") | quote }}
     {{- end }}
+    {{- $appStorages := $projectConfig.appStorages | default $.Values.defaults.appStorages }}
+    {{- with $appStorages }}
+    app-storages:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- $cache := $projectConfig.cache | default $.Values.defaults.cache }}
+    {{- with $cache }}
+    cache:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     upstream-config:
       {{- with $projectConfig.nodecoreConfig }}
       {{- with .integrity }}
