@@ -1,7 +1,6 @@
-
 # drpc-nodecore
 
-![Version: 2.1.0](https://img.shields.io/badge/Version-2.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.14.0](https://img.shields.io/badge/AppVersion-1.14.0-informational?style=flat-square)
 
 A Helm chart for dRPC nodeCore application
 
@@ -17,6 +16,8 @@ A Helm chart for dRPC nodeCore application
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | defaults.affinity | object | `{}` |  |
+| defaults.appStorages | list | `[]` | Shared storage backends referenced by cache connectors by name (see https://github.com/drpcorg/nodecore/blob/main/docs/nodecore/07-app-storages.md) |
+| defaults.cache | object | `{}` | Cache connectors and policies (see https://github.com/drpcorg/nodecore/blob/main/docs/nodecore/04-cache.md) |
 | defaults.deployment.autoscaling.enabled | bool | `false` |  |
 | defaults.deployment.autoscaling.maxReplicas | int | `10` |  |
 | defaults.deployment.autoscaling.minReplicas | int | `1` |  |
@@ -66,7 +67,7 @@ A Helm chart for dRPC nodeCore application
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"drpcorg/nodecore"` |  |
-| image.tag | string | `"0.1.6"` |  |
+| image.tag | string | `"1.14.0"` |  |
 | imagePullSecrets | list | `[]` |  |
 | initImage.repository | string | `"bhgedigital/envsubst"` |  |
 | initImage.tag | string | `"v1.0-alpine3.6"` |  |
