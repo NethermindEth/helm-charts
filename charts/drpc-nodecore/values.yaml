@@ -113,7 +113,7 @@ defaults:
   terminationGracePeriodSeconds: 30
 
   # ──────────────────────────────────────────
-  # Cache (optional, shared by all projects unless overridden)
+  # Storage backends & cache (optional, shared by all projects unless overridden)
   # ──────────────────────────────────────────
   # Credentials can use ${VAR} placeholders, expanded by the envsubst init
   # container from the project's `secretRef`.
