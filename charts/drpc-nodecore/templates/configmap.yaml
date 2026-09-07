@@ -20,12 +20,18 @@ data:
         token:
           value: {{ printf "${%s}" ($projectConfig.authTokenEnvVar | default "NODECORE_AUTH_TOKEN") | quote }}
     {{- end }}
-    {{- $appStorages := $projectConfig.appStorages | default $.Values.defaults.appStorages }}
+    {{- $appStorages := $.Values.defaults.appStorages }}
+    {{- if hasKey $projectConfig "appStorages" }}
+    {{- $appStorages = $projectConfig.appStorages }}
+    {{- end }}
     {{- with $appStorages }}
     app-storages:
       {{- toYaml . | nindent 6 }}
     {{- end }}
-    {{- $cache := $projectConfig.cache | default $.Values.defaults.cache }}
+    {{- $cache := $.Values.defaults.cache }}
+    {{- if hasKey $projectConfig "cache" }}
+    {{- $cache = $projectConfig.cache }}
+    {{- end }}
     {{- with $cache }}
     cache:
       {{- toYaml . | nindent 6 }}
