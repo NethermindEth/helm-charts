@@ -1,0 +1,23 @@
+{{- if .Values.haproxy.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" . }}-haproxy
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: haproxy
+spec:
+  type: {{ .Values.haproxy.service.type }}
+  ports:
+    - name: beacon
+      port: {{ .Values.haproxy.service.port }}
+      targetPort: beacon
+      protocol: TCP
+    - name: stats
+      port: 8404
+      targetPort: stats
+      protocol: TCP
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
+    app.kubernetes.io/component: haproxy
+{{- end }}

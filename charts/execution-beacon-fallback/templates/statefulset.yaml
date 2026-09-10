@@ -1,0 +1,507 @@
+---
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.statefulset" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  podManagementPolicy: {{ .Values.podManagementPolicy }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        execution: {{ .Values.execution.client }}
+        beacon: {{ .Values.beacon.client }}
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+    {{- end }}
+      securityContext:
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
+      initContainers:
+      {{- if and (eq .Values.execution.client "reth") .Values.execution.snapshot.enabled }}
+        - name: init-snapshot
+          image: "{{ .Values.execution.snapshot.image.repository }}:{{ .Values.execution.snapshot.image.tag }}"
+          imagePullPolicy: {{ .Values.execution.snapshot.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command: ['/bin/sh', '/scripts/init-snapshot.sh']
+          volumeMounts:
+          {{- if .Values.sharedPersistence.enabled }}
+            - name: data
+              mountPath: /data
+          {{- else if .Values.execution.persistence.enabled }}
+            - name: data-execution
+              mountPath: /data/execution
+          {{- end }}
+            - name: scripts-init
+              mountPath: /scripts
+      {{- end }}
+        - name: init
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command: ['/bin/sh', '/scripts/init.sh']
+          volumeMounts:
+          {{- if .Values.sharedPersistence.enabled }}
+            - name: data
+              mountPath: /data
+          {{- else }}
+            {{- if .Values.execution.persistence.enabled }}
+            - name: data-execution
+              mountPath: /data/execution
+            {{- end }}
+            {{- if .Values.beacon.persistence.enabled }}
+            - name: data-beacon
+              mountPath: /data/beacon
+            {{- end }}
+          {{- end }}
+            - name: env-nodeport
+              mountPath: /env
+            - name: scripts-init
+              mountPath: /scripts
+        {{- if eq .Values.beacon.client "taiko" }}
+        - name: init-taiko
+          image: nethermind.jfrog.io/angkor-oci-remote-dockerhub/curlimages/curl:7.88.1
+          securityContext:
+            {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
+          command:
+            - sh
+            - -c
+            - |
+              curl -sSL {{ .Values.beacon.taikoChainspecURL }} -o /data/execution/chainspec.json
+              echo "Chainspec file downloaded and saved to /data/execution/chainspec.json"
+          {{- if .Values.execution.persistence.enabled }}
+          volumeMounts:
+            - name: data-execution
+              mountPath: /data/execution
+          {{- end }}
+        {{- end }}
+        {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
+        - name: init-nimbus
+          image: "{{ include "beacon.image" . }}"
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
+          command:
+            - sh
+            - -ac
+            - >
+              {{- if or (eq .Values.network "gnosis") (eq .Values.network "chiado") }}
+              exec /home/user/nimbus_beacon_node
+              {{- else }}
+              exec /home/user/nimbus-eth2/build/nimbus_beacon_node
+              {{- end }}
+              trustedNodeSync
+              --backfill=false
+              --network={{ .Values.network }}
+              --data-dir=/data/beacon
+              --trusted-node-url={{ .Values.beacon.checkPointSync.url }}
+          volumeMounts:
+            {{- if .Values.sharedPersistence.enabled }}
+            - name: data
+              mountPath: /data
+            {{- else if .Values.beacon.persistence.enabled }}
+            - name: data-beacon
+              mountPath: /data/beacon
+          {{- end }}
+        {{- end }}
+      containers:
+        {{/*
+        Container used for Execution clients: Nethermind, Geth, Besu, Erigon, Reth
+        */}}
+        - name: execution
+          image: "{{ include "execution.image" . }}"
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
+          {{- if or .Values.envFrom .Values.execution.envFrom }}
+          envFrom:
+          {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.execution.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          command:
+            - sh
+            - -ac
+            - >
+              {{- if .Values.p2pNodePort.enabled }}
+              . /env/init-nodeport;
+              {{- end }}
+          {{- if eq .Values.execution.client "nethermind" }}
+            {{- include "execution-args-nethermind" . | nindent 14 }}
+          {{- else if eq .Values.execution.client "geth" }}
+            {{- include "execution-args-geth" . | nindent 14 }}
+          {{- else if eq .Values.execution.client "besu" }}
+            {{- include "execution-args-besu" . | nindent 14 }}
+          {{- else if eq .Values.execution.client "erigon" }}
+            {{- include "execution-args-erigon" . | nindent 14 }}
+          {{- else if eq .Values.execution.client "reth" }}
+            {{- include "execution-args-reth" . | nindent 14 }}
+          {{- end }}
+            {{- range .Values.execution.extraFlags }}
+              {{ . }}
+            {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.execution.env }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            {{- if eq .Values.execution.client "erigon" }}
+            - name: grpc-exec
+              protocol: TCP
+              containerPort: {{ .Values.execution.jsonrpc.grpc.port }}
+            {{- end }}
+            {{- if .Values.execution.jsonrpc.enabled }}
+            - name: engine-exec
+              containerPort: {{ .Values.execution.jsonrpc.engine.port }}
+            - name: jsonrpc-exec
+              containerPort: {{ .Values.execution.jsonrpc.http.port }}
+            {{- if .Values.execution.jsonrpc.websocket.enabled }}
+            - name: ws-exec
+              containerPort: {{ .Values.execution.jsonrpc.websocket.port }}
+            {{- end }}
+            {{- end }}
+            {{- if and .Values.metrics.enabled .Values.execution.metrics.enabled }}
+            - name: metrics-exec
+              containerPort: {{ .Values.execution.metrics.port }}
+            {{- end }}
+            {{- if .Values.p2pNodePort.enabled }}
+            - name: p2p-tcp-exec
+              containerPort: {{ include "execution.p2pPort" . }}
+              protocol: TCP
+            - name: p2p-udp-exec
+              containerPort: {{ include "execution.p2pPort" . }}
+              protocol: UDP
+            {{- if and (eq .Values.execution.client "reth") .Values.execution.enableDiscoveryV5 }}
+            - name: discv5-udp-exec
+              containerPort: {{ add (include "execution.p2pPort" . | int) 2 }}
+              protocol: UDP
+            {{- end }}
+            {{- end }}
+          volumeMounts:
+          {{- if .Values.sharedPersistence.enabled }}
+            - name: data
+              mountPath: /data
+          {{- else if .Values.execution.persistence.enabled }}
+            - name: data-execution
+              mountPath: /data/execution
+          {{- end }}
+          {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+          {{- end }}
+            - name: env-nodeport
+              mountPath: /env
+          {{- with .Values.execution.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.execution.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{/*
+        Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar, Taiko
+        */}}
+        - name: beacon
+          image: "{{ include "beacon.image" . }}"
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
+          {{- if or .Values.envFrom .Values.beacon.envFrom }}
+          envFrom:
+          {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.beacon.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if eq .Values.beacon.client "prysm" }}
+          args:
+            {{- include "beacon-args-prysm" . | nindent 12 }}
+          {{- else if eq .Values.beacon.client "taiko" }}
+          args:
+            {{- include "beacon-args-taiko" . | nindent 12 }}
+          {{- else if eq .Values.beacon.client "teku" }}
+          command:
+            {{- include "beacon-command-teku" . | nindent 12 }}
+          {{- else if eq .Values.beacon.client "lighthouse" }}
+          command:
+            {{- include "beacon-command-lighthouse" . | nindent 12 }}
+          {{- else if eq .Values.beacon.client "nimbus" }}
+          command:
+            {{- include "beacon-command-nimbus" . | nindent 12 }}
+          {{- else if eq .Values.beacon.client "lodestar" }}
+          command:
+            {{- include "beacon-command-lodestar" . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.beacon.env }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+          {{- if and (eq .Values.beacon.client "prysm") .Values.beacon.grpc.enabled }}
+            - containerPort: {{ .Values.beacon.grpc.port }}
+              name: {{ .Values.beacon.grpc.portName }}-beacon
+              protocol: TCP
+          {{- end }}
+          {{- if .Values.p2pNodePort.enabled }}
+            - name: p2p-tcp-beacon
+              containerPort: {{ include "beacon.p2pPort" . }}
+              protocol: TCP
+            - name: p2p-udp-beacon
+              containerPort: {{ include "beacon.p2pPort" . }}
+              protocol: UDP
+          {{- end }}
+          {{- if .Values.beacon.restApi.enabled }}
+            - containerPort: {{ index .Values.beacon.restApi.portMap .Values.beacon.client }}
+              name: http-beacon
+              protocol: TCP
+          {{- end }}
+          {{- if and .Values.metrics.enabled .Values.beacon.metrics.enabled }}
+            - containerPort: {{ .Values.beacon.metrics.port }}
+              name: metrics-beacon
+              protocol: TCP
+          {{- end }}
+          volumeMounts:
+          {{- if .Values.sharedPersistence.enabled }}
+            - name: data
+              mountPath: /data
+          {{- else if .Values.beacon.persistence.enabled }}
+            - name: data-beacon
+              mountPath: /data/beacon
+          {{- end }}
+          {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+          {{- end }}
+            - name: env-nodeport
+              mountPath: /env
+          {{- with .Values.beacon.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.beacon.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- if and .Values.ethsider.enabled }}
+        - name: ethsider
+          image: "{{ .Values.ethsider.repository }}:{{ .Values.ethsider.tag }}"
+          imagePullPolicy: {{ .Values.ethsider.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
+          env:
+            - name: EXECUTION_ENDPOINT
+              value: "http://localhost:{{ .Values.execution.jsonrpc.http.port }}"
+            - name: BEACON_ENDPOINT
+              value: "http://localhost:{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
+            - name: BIND_ADDR
+              value: "{{ .Values.ethsider.bindAddr }}"
+          args:
+            - "--eth1-syncing-probe={{ if hasKey .Values.ethsider.probes "eth1Syncing" }}{{ .Values.ethsider.probes.eth1Syncing | toString | lower }}{{ else }}true{{ end }}"
+            - "--eth1-peers-probe={{ if hasKey .Values.ethsider.probes "eth1Peers" }}{{ .Values.ethsider.probes.eth1Peers | toString | lower }}{{ else }}true{{ end }}"
+            - "--eth2-syncing-probe={{ if hasKey .Values.ethsider.probes "eth2Syncing" }}{{ .Values.ethsider.probes.eth2Syncing | toString | lower }}{{ else }}true{{ end }}"
+            - "--eth2-peers-count-probe={{ if hasKey .Values.ethsider.probes "eth2PeersCount" }}{{ .Values.ethsider.probes.eth2PeersCount | toString | lower }}{{ else }}true{{ end }}"
+            - "--eth2-health-probe={{ if hasKey .Values.ethsider.probes "eth2Health" }}{{ .Values.ethsider.probes.eth2Health | toString | lower }}{{ else }}true{{ end }}"
+            {{- if .Values.ethsider.probes.eth1BlockSync.enabled }}
+            - "--block-sync-probe=true"
+            - "--block-sync-threshold={{ .Values.ethsider.probes.eth1BlockSync.threshold }}"
+            - "--reference-endpoint={{ .Values.ethsider.probes.eth1BlockSync.referenceEndpoint }}"
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.ethsider.bindAddr }}
+              name: sidecar
+              protocol: TCP
+        {{- if .Values.ethsider.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.ethsider.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.ethsider.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.ethsider.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.ethsider.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.ethsider.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.ethsider.livenessProbe.httpGet.path }}
+              port: {{ .Values.ethsider.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.ethsider.livenessProbe.httpGet.scheme }}
+        {{- end }}
+        {{- if .Values.ethsider.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.ethsider.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.ethsider.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.ethsider.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.ethsider.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.ethsider.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.ethsider.readinessProbe.httpGet.path }}
+              port: {{ .Values.ethsider.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.ethsider.readinessProbe.httpGet.scheme }}
+        {{- end }}
+      {{- end }}
+      volumes:
+        - name: scripts-init
+          configMap:
+            name: {{ include "common.names.fullname" . }}-scripts
+      {{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
+        - name: jwtsecret
+          secret:
+            {{- if .Values.JWTSecret }}
+            secretName: {{ include "common.names.fullname" . }}
+            {{- else if .Values.JWTSecretName }}
+            secretName: {{ .Values.JWTSecretName }}
+            items:
+              - key: {{ .Values.JWTSecretKey }}
+                path: jwtsecret
+            {{- else }}
+            secretName: {{ (index .Values.envFrom 0).secretRef.name }}
+            items:
+              - key: {{ .Values.JWTSecretKey }}
+                path: jwtsecret
+            {{- end }}
+      {{- end }}
+        - name: env-nodeport
+          emptyDir: {}
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    {{- if .Values.sharedPersistence.enabled }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.sharedPersistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.sharedPersistence.accessModes }}
+        storageClassName: {{ .Values.sharedPersistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.sharedPersistence.size | quote }}
+    {{- else }}
+    {{- if .Values.execution.persistence.enabled }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data-execution
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.execution.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.execution.persistence.accessModes }}
+        storageClassName: {{ .Values.execution.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.execution.persistence.size | quote }}
+    {{- end }}
+    {{- if .Values.beacon.persistence.enabled }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data-beacon
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.beacon.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.beacon.persistence.accessModes }}
+        storageClassName: {{ .Values.beacon.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.beacon.persistence.size | quote }}
+    {{- end }}
+    {{- end }}

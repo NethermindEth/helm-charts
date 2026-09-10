@@ -1,0 +1,234 @@
+{{/*
+Nethermind execution client arguments
+*/}}
+{{- define "execution-args-nethermind" -}}
+exec /nethermind/Nethermind.Runner
+--config={{ .Values.network }}
+--datadir=/data/execution
+{{- if .Values.execution.jsonrpc.enabled }}
+--JsonRpc.Enabled={{ .Values.execution.jsonrpc.enabled }}
+--JsonRpc.EnabledModules={{ .Values.execution.jsonrpc.namespaces.nethermind | join "," }}
+--JsonRpc.Host={{ .Values.execution.jsonrpc.host }}
+--JsonRpc.Port={{ .Values.execution.jsonrpc.http.port }}
+{{- if .Values.execution.healthchecks.enabled }}
+--HealthChecks.Enabled={{ .Values.execution.healthchecks.enabled }}
+--HealthChecks.Slug={{ .Values.execution.healthchecks.slug }}
+--HealthChecks.PollingInterval={{ .Values.execution.healthchecks.pollingInterval }}
+--HealthChecks.LowStorageSpaceShutdownThreshold={{ .Values.execution.healthchecks.lowStorageSpaceShutdownThreshold }}
+--HealthChecks.LowStorageSpaceWarningThreshold={{ .Values.execution.healthchecks.lowStorageSpaceWarningThreshold }}
+{{- if .Values.execution.jsonrpc.websocket.enabled }}
+--JsonRpc.WebSocketsPort={{ .Values.execution.jsonrpc.websocket.port }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
+--JsonRpc.JwtSecretFile=/secret/jwtsecret
+{{- end }}
+--JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
+--JsonRpc.EngineHost={{ .Values.execution.jsonrpc.host }}
+--JsonRpc.EngineEnabledModules={{ .Values.execution.jsonrpc.namespaces.nethermind | join "," }}
+{{- if and .Values.metrics.enabled .Values.execution.metrics.enabled }}
+--Metrics.Enabled={{ .Values.execution.metrics.enabled }}
+--Metrics.ExposePort={{ .Values.execution.metrics.port }}
+--Metrics.NodeName=$POD_NAME
+{{- end }}
+--Network.MaxActivePeers={{ .Values.execution.targetPeers }}
+{{- if .Values.p2pNodePort.enabled }}
+--Network.ExternalIp=$EXTERNAL_IP
+--Network.P2PPort=$EXTERNAL_EXECUTION_PORT
+--Network.DiscoveryPort=$EXTERNAL_EXECUTION_PORT
+{{- else }}
+--Network.ExternalIp=$POD_IP
+--Network.P2PPort={{ include "execution.p2pPort" . }}
+--Network.DiscoveryPort={{ include "execution.p2pPort" . }}
+{{- end }}
+{{- if .Values.execution.terminalTotalDifficulty }}
+--Merge.TerminalTotalDifficulty={{ .Values.execution.terminalTotalDifficulty }}
+{{- end }}
+{{- end }}
+
+{{/*
+Geth execution client arguments
+*/}}
+{{- define "execution-args-geth" -}}
+exec geth
+--syncmode=snap
+--datadir=/data/execution
+--ipcdisable
+--{{ .Values.network }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
+--authrpc.jwtsecret=/secret/jwtsecret
+{{- end }}
+--authrpc.addr={{ .Values.execution.jsonrpc.host }}
+--authrpc.port={{ .Values.execution.jsonrpc.engine.port }}
+--authrpc.vhosts={{ .Values.execution.jsonrpc.engine.hostAllowList | join "," }}
+{{- if .Values.execution.jsonrpc.enabled }}
+--http
+--http.addr={{ .Values.execution.jsonrpc.host }}
+--http.port={{ .Values.execution.jsonrpc.http.port }}
+--http.corsdomain={{ .Values.execution.jsonrpc.http.corsOrigins | join "," }}
+--http.vhosts={{ .Values.execution.jsonrpc.http.hostAllowList | join "," }}
+--http.api={{ .Values.execution.jsonrpc.namespaces.geth | join "," }}
+{{- if .Values.execution.jsonrpc.websocket.enabled }}
+--ws
+--ws.addr={{ .Values.execution.jsonrpc.host }}
+--ws.port={{ .Values.execution.jsonrpc.websocket.port }}
+--ws.origins={{ .Values.execution.jsonrpc.websocket.origins }}
+--ws.api={{ .Values.execution.jsonrpc.namespaces.geth | join "," }}
+{{- end }}
+{{- end }}
+--maxpeers={{ .Values.execution.targetPeers }}
+{{- if .Values.p2pNodePort.enabled }}
+--nat=extip:$EXTERNAL_IP
+--port=$EXTERNAL_EXECUTION_PORT
+{{- else }}
+--nat=extip:$POD_IP
+--port={{ include "execution.p2pPort" . }}
+{{- end }}
+{{- if .Values.execution.terminalTotalDifficulty }}
+--override.geth.terminaltotaldifficulty={{ .Values.execution.terminalTotalDifficulty }}
+{{- end }}
+{{- if and .Values.metrics.enabled .Values.execution.metrics.enabled }}
+--metrics
+--metrics.port={{ .Values.execution.metrics.port }}
+--metrics.addr={{ .Values.execution.metrics.host }}
+{{- end }}
+{{- end }}
+
+{{/*
+Besu execution client arguments
+*/}}
+{{- define "execution-args-besu" -}}
+exec /opt/besu/bin/besu
+--network={{ .Values.network }}
+--data-path=/data/execution
+--sync-mode=X_SNAP
+--p2p-enabled=true
+{{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
+--engine-jwt-secret=/secret/jwtsecret
+{{- end }}
+--engine-rpc-enabled=true
+--engine-host-allowlist={{ .Values.execution.jsonrpc.engine.hostAllowList | join "," }}
+--engine-rpc-port={{ .Values.execution.jsonrpc.engine.port }}
+{{- if .Values.execution.jsonrpc.enabled }}
+--rpc-http-enabled=true
+--rpc-http-host={{ .Values.execution.jsonrpc.host }}
+--rpc-http-port={{ .Values.execution.jsonrpc.http.port }}
+--rpc-http-cors-origins={{ .Values.execution.jsonrpc.http.corsOrigins | join "," }}
+--host-allowlist={{ .Values.execution.jsonrpc.http.hostAllowList | join "," }}
+{{- if .Values.execution.jsonrpc.websocket.enabled }}
+--rpc-ws-enabled=true
+--rpc-ws-host={{ .Values.execution.jsonrpc.host }}
+--rpc-ws-port={{ .Values.execution.jsonrpc.websocket.port }}
+{{- end }}
+{{- end }}
+--max-peers={{ .Values.execution.targetPeers }}
+{{- if .Values.p2pNodePort.enabled }}
+--nat-method=NONE
+--p2p-host=$EXTERNAL_IP
+--p2p-port=$EXTERNAL_EXECUTION_PORT
+{{- else }}
+--nat-method=NONE
+--p2p-host=$POD_IP
+--p2p-port={{ include "execution.p2pPort" . }}
+{{- end }}
+{{- if and .Values.metrics.enabled .Values.execution.metrics.enabled }}
+--metrics-enabled=true
+--metrics-host={{ .Values.execution.metrics.host }}
+--metrics-port={{ .Values.execution.metrics.port }}
+{{- end }}
+{{- end }}
+
+{{/*
+Erigon execution client arguments
+*/}}
+{{- define "execution-args-erigon" -}}
+exec erigon
+--datadir=/data/execution
+--private.api.addr={{ .Values.execution.privateApiAddr }}
+--chain={{ .Values.network }}
+--externalcl={{ .Values.execution.externalCl }}
+{{- if .Values.p2pNodePort.enabled }}
+--nat=extip:$EXTERNAL_IP
+--port=$EXTERNAL_EXECUTION_PORT
+{{- else }}
+--nat=extip:$POD_IP
+--port={{ include "execution.p2pPort" . }}
+{{- end }}
+{{- if .Values.execution.terminalTotalDifficulty }}
+--override.terminaltotaldifficulty={{ .Values.execution.terminalTotalDifficulty }}
+{{- end }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
+--authrpc.jwtsecret=/secret/jwtsecret
+{{- end }}
+--authrpc.addr={{ .Values.execution.jsonrpc.host }}
+--authrpc.port={{ .Values.execution.jsonrpc.engine.port }}
+--authrpc.vhosts={{ .Values.execution.jsonrpc.engine.hostAllowList | join "," }}
+{{- if .Values.execution.jsonrpc.enabled }}
+--http
+--http.addr={{ .Values.execution.jsonrpc.host }}
+--http.port={{ .Values.execution.jsonrpc.http.port }}
+--http.corsdomain={{ .Values.execution.jsonrpc.http.corsOrigins | join "," }}
+--http.vhosts={{ .Values.execution.jsonrpc.http.hostAllowList | join "," }}
+--http.api={{ .Values.execution.jsonrpc.namespaces.erigon | join "," }}
+{{- if .Values.execution.jsonrpc.websocket.enabled }}
+--ws
+{{- end }}
+{{- end }}
+{{- if and .Values.metrics.enabled .Values.execution.metrics.enabled }}
+--metrics
+--metrics.addr={{ .Values.execution.metrics.host }}
+--metrics.port={{ .Values.execution.metrics.port }}
+{{- end }}
+{{- end }}
+
+{{/*
+Reth execution client arguments
+*/}}
+{{- define "execution-args-reth" -}}
+exec reth node
+--datadir=/data/execution
+--log.file.directory=/data/execution/logs
+--ipcdisable
+--chain={{ .Values.network }}
+{{- if or .Values.JWTSecret .Values.JWTSecretName (and .Values.envFrom (index .Values.envFrom 0).secretRef) }}
+--authrpc.jwtsecret=/secret/jwtsecret
+{{- end }}
+--authrpc.addr={{ .Values.execution.jsonrpc.host }}
+--authrpc.port={{ .Values.execution.jsonrpc.engine.port }}
+{{- if .Values.execution.jsonrpc.enabled }}
+--http
+--http.addr={{ .Values.execution.jsonrpc.host }}
+--http.port={{ .Values.execution.jsonrpc.http.port }}
+--http.corsdomain={{ .Values.execution.jsonrpc.http.corsOrigins | join "," }}
+--http.api={{ .Values.execution.jsonrpc.namespaces.reth | join "," }}
+{{- if .Values.execution.jsonrpc.websocket.enabled }}
+--ws
+--ws.addr={{ .Values.execution.jsonrpc.host }}
+--ws.port={{ .Values.execution.jsonrpc.websocket.port }}
+--ws.origins={{ .Values.execution.jsonrpc.websocket.origins }}
+--ws.api={{ .Values.execution.jsonrpc.namespaces.reth | join "," }}
+{{- end }}
+{{- end }}
+--max-outbound-peers={{ .Values.execution.targetPeers }}
+{{- if .Values.p2pNodePort.enabled }}
+--nat=extip:$EXTERNAL_IP
+--port=$EXTERNAL_EXECUTION_PORT
+--discovery.port=$EXTERNAL_EXECUTION_PORT
+{{- else }}
+--nat=extip:$POD_IP
+--port={{ include "execution.p2pPort" . }}
+--discovery.port={{ include "execution.p2pPort" . }}
+{{- end }}
+{{- if .Values.execution.enableDiscoveryV5 }}
+--enable-discv5-discovery
+{{- if .Values.p2pNodePort.enabled }}
+--discovery.v5.port=$(($EXTERNAL_EXECUTION_PORT + 2))
+{{- else }}
+--discovery.v5.port={{ add (include "execution.p2pPort" . | int) 2 }}
+{{- end }}
+{{- end }}
+{{- if and .Values.metrics.enabled .Values.execution.metrics.enabled }}
+--metrics={{ .Values.execution.metrics.host }}:{{ .Values.execution.metrics.port }}
+{{- end }}
+{{- end }}
