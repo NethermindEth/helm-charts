@@ -5,6 +5,7 @@ metadata:
   name: {{ include "generic-app-p2p.fullname" . }}
   labels:
     {{- include "generic-app-p2p.labels" . | nindent 4 }}
+    {{- include "generic-app-p2p.mainServiceLabels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
