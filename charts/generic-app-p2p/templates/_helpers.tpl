@@ -47,6 +47,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Labels only the main Service carries, so the ServiceMonitor selects it alone
+rather than also scraping each pod through the per-replica and headless Services
+*/}}
+{{- define "generic-app-p2p.mainServiceLabels" -}}
+generic-app-p2p/service: main
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "generic-app-p2p.serviceAccountName" -}}

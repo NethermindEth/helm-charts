@@ -42,6 +42,7 @@ spec:
   selector:
     matchLabels:
       {{- include "generic-app-p2p.selectorLabels" . | nindent 6 }}
+      {{- include "generic-app-p2p.mainServiceLabels" . | nindent 6 }}
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}

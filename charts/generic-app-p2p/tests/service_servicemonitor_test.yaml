@@ -1,0 +1,48 @@
+suite: service and servicemonitor tests
+
+set:
+  fullnameOverride: some-full-name
+  replicaCount: 2
+  service:
+    ports:
+      - name: metrics
+        port: 9090
+        protocol: TCP
+  serviceMonitor:
+    enabled: true
+
+templates:
+  - service.yaml
+  - servicemonitor.yaml
+
+tests:
+  - it: given serviceMonitor enabled then the selector should include the main service label
+    template: servicemonitor.yaml
+    asserts:
+      - equal:
+          path: .spec.selector.matchLabels["generic-app-p2p/service"]
+          value: main
+  - it: given multiple replicas then only the main service should carry the main service label
+    template: service.yaml
+    asserts:
+      - equal:
+          path: .metadata.labels["generic-app-p2p/service"]
+          value: main
+        documentSelector:
+          path: metadata.name
+          value: some-full-name
+      - notExists:
+          path: .metadata.labels["generic-app-p2p/service"]
+        documentSelector:
+          path: metadata.name
+          value: some-full-name-headless
+      - notExists:
+          path: .metadata.labels["generic-app-p2p/service"]
+        documentSelector:
+          path: metadata.name
+          value: some-full-name-0
+      - notExists:
+          path: .metadata.labels["generic-app-p2p/service"]
+        documentSelector:
+          path: metadata.name
+          value: some-full-name-1
