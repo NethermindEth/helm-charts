@@ -668,6 +668,13 @@
         { "$ref": "#/definitions/probe" }
       ]
     },
+    "startupProbe": {
+      "description": "Startup probe configuration",
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/definitions/probe" }
+      ]
+    },
     "volumes": {
       "type": "array",
       "description": "Additional volumes",
