@@ -5,10 +5,14 @@
 nameOverride: ""
 fullnameOverride: ""
 
+# `latest` tracks the newest v* release. Those are the only images gated on the compose
+# smoke suite (.github/workflows/publish-dockerhub.yml in NethermindEth/pluto: pushes to
+# `main` publish ungated). `latest` is mutable, so pullPolicy is Always — otherwise two
+# replicas scheduled at different times can silently end up on different digests.
 image:
   repository: nethermindeth/pluto
-  pullPolicy: IfNotPresent
-  tag: ""   # defaults to .Chart.AppVersion
+  pullPolicy: Always
+  tag: "latest"
 
 # Init container image. Must be statically linked (musl) so its /bin/busybox can be copied
 # into /shared and used as `sh` by the main container (the Pluto image is distroless and
@@ -42,7 +46,27 @@ args: []
 
 # Static env vars baked into the env ConfigMap. Per-pod values (listen addresses, external hostname)
 # are exported by the init script into /shared/env which the container sources before exec.
+# Pluto reads CHARON_*-prefixed environment variables, matching Charon's prefix
+# (cmd/cmd.go). It briefly used PLUTO_* instead; NethermindEth/pluto#519 renamed all 19
+# bindings back to CHARON_* on 2026-07-07, and CHARON_DATA_DIR was always CHARON_*.
+#
+# Both prefixes are emitted for this release so that images from either side of #519 are
+# configured correctly during a rollout. Unrecognised variables are ignored by Pluto, so
+# carrying both is harmless. Drop the PLUTO_* half once every replica runs >= v1.0.0.
 config:
+  CHARON_HTTP_ADDRESS: "0.0.0.0:3640"
+  CHARON_MONITORING_ADDRESS: "0.0.0.0:3620"
+  CHARON_AUTO_P2PKEY: "true"
+  CHARON_LOG_FORMAT: "json"
+  CHARON_LOG_LEVEL: "info"
+  CHARON_P2P_MAX_CONNECTIONS: "16384"
+  CHARON_P2P_MAX_RESERVATIONS: "512"
+  CHARON_P2P_RELAY_LOGLEVEL: "info"
+  CHARON_P2P_ADVERTISE_PRIVATE_ADDRESSES: "false"
+  CHARON_DATA_DIR: "/data"
+
+  # DEPRECATED: only read by images predating NethermindEth/pluto#519. Remove once all
+  # replicas run >= v1.0.0.
   PLUTO_HTTP_ADDRESS: "0.0.0.0:3640"
   PLUTO_MONITORING_ADDRESS: "0.0.0.0:3620"
   PLUTO_AUTO_P2PKEY: "true"
@@ -52,8 +76,6 @@ config:
   PLUTO_P2P_MAX_RESERVATIONS: "512"
   PLUTO_P2P_RELAY_LOGLEVEL: "info"
   PLUTO_P2P_ADVERTISE_PRIVATE_ADDRESSES: "false"
-  # Pluto inherited the data-dir env var name from Charon.
-  CHARON_DATA_DIR: "/data"
 
 # Per-pod libp2p external hostname pattern. `{i}` is substituted with the replica index.
 # Used for two things:
@@ -102,11 +124,16 @@ initScript: |
   echo "P2P_PORT=${P2P_PORT}"
   echo "EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}"
 
+  # CHARON_* is what Pluto reads; the PLUTO_* duplicates are only for images predating
+  # NethermindEth/pluto#519 and should be dropped once all replicas run >= v1.0.0.
   {
     echo "export REPLICA_INDEX=${REPLICA_INDEX}"
+    echo "export CHARON_P2P_TCP_ADDRESS=0.0.0.0:${P2P_PORT}"
+    echo "export CHARON_P2P_UDP_ADDRESS=0.0.0.0:${P2P_PORT}"
     echo "export PLUTO_P2P_TCP_ADDRESS=0.0.0.0:${P2P_PORT}"
     echo "export PLUTO_P2P_UDP_ADDRESS=0.0.0.0:${P2P_PORT}"
     if [ -n "${EXTERNAL_HOSTNAME}" ]; then
+      echo "export CHARON_P2P_EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}"
       echo "export PLUTO_P2P_EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}"
     fi
   } >> /shared/env

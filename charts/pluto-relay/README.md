@@ -1,7 +1,7 @@
 
 # pluto-relay
 
-![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.2](https://img.shields.io/badge/AppVersion-0.1.2-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEth/pluto)
 
@@ -31,7 +31,16 @@ A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEt
 | args | list | `[]` |  |
 | command[0] | string | `"/app/bin/pluto"` |  |
 | command[1] | string | `"relay"` |  |
+| config.CHARON_AUTO_P2PKEY | string | `"true"` |  |
 | config.CHARON_DATA_DIR | string | `"/data"` |  |
+| config.CHARON_HTTP_ADDRESS | string | `"0.0.0.0:3640"` |  |
+| config.CHARON_LOG_FORMAT | string | `"json"` |  |
+| config.CHARON_LOG_LEVEL | string | `"info"` |  |
+| config.CHARON_MONITORING_ADDRESS | string | `"0.0.0.0:3620"` |  |
+| config.CHARON_P2P_ADVERTISE_PRIVATE_ADDRESSES | string | `"false"` |  |
+| config.CHARON_P2P_MAX_CONNECTIONS | string | `"16384"` |  |
+| config.CHARON_P2P_MAX_RESERVATIONS | string | `"512"` |  |
+| config.CHARON_P2P_RELAY_LOGLEVEL | string | `"info"` |  |
 | config.PLUTO_AUTO_P2PKEY | string | `"true"` |  |
 | config.PLUTO_HTTP_ADDRESS | string | `"0.0.0.0:3640"` |  |
 | config.PLUTO_LOG_FORMAT | string | `"json"` |  |
@@ -45,9 +54,9 @@ A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEt
 | extraInitScript | string | `"exit 0\n"` |  |
 | fullnameOverride | string | `""` |  |
 | hostnamePattern | string | `""` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"nethermindeth/pluto"` |  |
-| image.tag | string | `""` |  |
+| image.tag | string | `"latest"` |  |
 | imagePullSecrets | list | `[]` |  |
 | initContainerResources.limits.memory | string | `"32Mi"` |  |
 | initContainerResources.requests.cpu | string | `"10m"` |  |
@@ -62,7 +71,7 @@ A Helm chart for the Pluto libp2p circuit relay (https://github.com/NethermindEt
 | initImage.pullPolicy | string | `"IfNotPresent"` |  |
 | initImage.repository | string | `"busybox"` |  |
 | initImage.tag | string | `"1.37.0-musl"` |  |
-| initScript | string | `"#!/bin/sh\nset -eu\necho \"Init: pod=${POD_NAME}\"\n\n# Stage a static shell for the main container (Pluto image is distroless).\ncp /bin/busybox /shared/busybox\nln -sf busybox /shared/sh\nchmod +x /shared/busybox\n\ntouch /shared/env\n\nREPLICA_INDEX=$(echo \"${POD_NAME}\" | awk -F'-' '{print $NF}')\nP2P_PORT=$((BASE_PORT + REPLICA_INDEX))\n\nEXTERNAL_HOSTNAME=\"\"\nif [ -n \"${HOSTNAME_PATTERN:-}\" ]; then\n  EXTERNAL_HOSTNAME=$(echo \"${HOSTNAME_PATTERN}\" | sed \"s/{i}/${REPLICA_INDEX}/g\")\nfi\n\necho \"REPLICA_INDEX=${REPLICA_INDEX}\"\necho \"P2P_PORT=${P2P_PORT}\"\necho \"EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}\"\n\n{\n  echo \"export REPLICA_INDEX=${REPLICA_INDEX}\"\n  echo \"export PLUTO_P2P_TCP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  echo \"export PLUTO_P2P_UDP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  if [ -n \"${EXTERNAL_HOSTNAME}\" ]; then\n    echo \"export PLUTO_P2P_EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}\"\n  fi\n} >> /shared/env\n"` |  |
+| initScript | string | `"#!/bin/sh\nset -eu\necho \"Init: pod=${POD_NAME}\"\n\n# Stage a static shell for the main container (Pluto image is distroless).\ncp /bin/busybox /shared/busybox\nln -sf busybox /shared/sh\nchmod +x /shared/busybox\n\ntouch /shared/env\n\nREPLICA_INDEX=$(echo \"${POD_NAME}\" | awk -F'-' '{print $NF}')\nP2P_PORT=$((BASE_PORT + REPLICA_INDEX))\n\nEXTERNAL_HOSTNAME=\"\"\nif [ -n \"${HOSTNAME_PATTERN:-}\" ]; then\n  EXTERNAL_HOSTNAME=$(echo \"${HOSTNAME_PATTERN}\" | sed \"s/{i}/${REPLICA_INDEX}/g\")\nfi\n\necho \"REPLICA_INDEX=${REPLICA_INDEX}\"\necho \"P2P_PORT=${P2P_PORT}\"\necho \"EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}\"\n\n# CHARON_* is what Pluto reads; the PLUTO_* duplicates are only for images predating\n# NethermindEth/pluto#519 and should be dropped once all replicas run >= v1.0.0.\n{\n  echo \"export REPLICA_INDEX=${REPLICA_INDEX}\"\n  echo \"export CHARON_P2P_TCP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  echo \"export CHARON_P2P_UDP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  echo \"export PLUTO_P2P_TCP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  echo \"export PLUTO_P2P_UDP_ADDRESS=0.0.0.0:${P2P_PORT}\"\n  if [ -n \"${EXTERNAL_HOSTNAME}\" ]; then\n    echo \"export CHARON_P2P_EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}\"\n    echo \"export PLUTO_P2P_EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}\"\n  fi\n} >> /shared/env\n"` |  |
 | livenessProbe.failureThreshold | int | `5` |  |
 | livenessProbe.httpGet.path | string | `"/"` |  |
 | livenessProbe.httpGet.port | string | `"http"` |  |
