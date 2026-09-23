@@ -56,10 +56,14 @@ ServiceAccount name.
 {{- end }}
 
 {{/*
-Hash of env ConfigMap content — used to roll pods on config changes.
+Hash of both ConfigMaps' content — used to roll pods on config changes.
+
+Covers initScript/extraInitScript as well as config: the init script writes /shared/env
+into an emptyDir, whose lifetime is the pod, not the container. A changed init script
+therefore reaches a running pod only when that pod is recreated, so it has to roll them.
 */}}
 {{- define "pluto-relay.configHash" -}}
-{{- .Values.config | toJson | sha256sum }}
+{{- printf "%s|%s|%s" (.Values.config | toJson) (.Values.initScript | toString) (.Values.extraInitScript | toString) | sha256sum }}
 {{- end }}
 
 {{/*
