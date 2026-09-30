@@ -1,0 +1,15 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "cnpg-cluster.clusterName" . }}
+  {{- $labels := include "cnpg-cluster.labels" . | fromYaml }}
+  {{- $labels = merge $labels .Values.cluster.metadata.labels }}
+  labels:
+    {{- toYaml $labels | nindent 4 }}
+  {{- $annotations := merge (deepCopy .Values.commonAnnotations) .Values.cluster.metadata.annotations }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  {{- toYaml (omit .Values.cluster "metadata") | nindent 2 }}

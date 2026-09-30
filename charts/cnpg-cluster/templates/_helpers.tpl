@@ -40,6 +40,9 @@ helm.sh/chart: {{ include "cnpg-cluster.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{ with .Values.commonLabels -}}
+{{ toYaml . }}
+{{ end }}
 {{- end }}
 
 {{/*
@@ -48,6 +51,13 @@ Selector labels
 {{- define "cnpg-cluster.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "cnpg-cluster.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Create the name of the cluster resource.
+*/}}
+{{- define "cnpg-cluster.clusterName" -}}
+{{- default (include "cnpg-cluster.fullname" .) .Values.cluster.metadata.name -}}
 {{- end }}
 
 {{/*

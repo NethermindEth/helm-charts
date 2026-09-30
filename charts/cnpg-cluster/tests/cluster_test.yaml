@@ -1,0 +1,64 @@
+suite: cluster tests
+
+templates:
+  - cluster.yaml
+
+tests:
+  - it: given no name override then name defaults to the fullname
+    release:
+      name: foo
+    set:
+      cluster:
+        metadata:
+          name: ""
+    asserts:
+      - equal:
+          path: metadata.name
+          value: foo-cnpg-cluster
+
+  - it: given a cluster metadata name then it overrides the generated name
+    set:
+      cluster:
+        metadata:
+          name: pg
+    asserts:
+      - equal:
+          path: metadata.name
+          value: pg
+
+  - it: given common and cluster labels then both are rendered alongside the standard labels
+    set:
+      commonLabels:
+        team: db
+      cluster:
+        metadata:
+          labels:
+            foo: bar
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: cnpg-cluster
+      - equal:
+          path: metadata.labels.team
+          value: db
+      - equal:
+          path: metadata.labels.foo
+          value: bar
+
+  - it: given cluster values then everything except metadata is rendered as spec
+    set:
+      cluster:
+        metadata:
+          name: pg
+        instances: 3
+        storage:
+          size: 20Gi
+    asserts:
+      - equal:
+          path: spec.instances
+          value: 3
+      - equal:
+          path: spec.storage.size
+          value: 20Gi
+      - notExists:
+          path: spec.metadata
