@@ -523,6 +523,17 @@
                   },
                   "title": "connectors",
                   "type": "array"
+                },
+                "methods": {
+                  "additionalProperties": false,
+                  "description": "Per-upstream method overrides. See https://github.com/drpcorg/nodecore/blob/main/docs/nodecore/05-upstream-config.md#fields",
+                  "properties": {
+                    "enable": { "items": { "type": "string" }, "title": "enable", "type": "array" },
+                    "disable": { "items": { "type": "string" }, "title": "disable", "type": "array" },
+                    "ban-duration": { "title": "ban-duration", "type": "string" }
+                  },
+                  "title": "methods",
+                  "type": "object"
                 }
               },
               "required": ["id", "chain", "connectors"],
