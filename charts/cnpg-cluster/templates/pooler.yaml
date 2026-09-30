@@ -1,0 +1,23 @@
+{{- range $name, $spec := .Values.poolers }}
+{{- $md := $spec.metadata | default dict }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: {{ $md.name | default (printf "%s-%s" (include "cnpg-cluster.fullname" $) $name)  }}
+  {{- $labels := include "cnpg-cluster.labels" $ | fromYaml }}
+  {{- $labels = merge $labels ($md.labels | default dict) }}
+  labels:
+    {{- toYaml $labels | nindent 4 }}
+  {{- $annotations := merge (deepCopy $.Values.commonAnnotations) ($md.annotations | default dict) }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  cluster:
+    name: {{ include "cnpg-cluster.clusterName" $ }}
+  {{- with $rest := omit $spec "metadata" }}
+  {{- toYaml $rest | nindent 2 }}
+  {{- end }}
+{{- end }}
