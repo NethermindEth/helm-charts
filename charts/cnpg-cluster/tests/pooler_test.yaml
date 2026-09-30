@@ -1,0 +1,71 @@
+suite: pooler tests
+
+templates:
+  - pooler.yaml
+
+tests:
+  - it: given no name override then name defaults to the fullname and the pooler name
+    release:
+      name: foo
+    set:
+      poolers:
+        my-pool:
+          type: rw-pooling
+    asserts:
+      - equal:
+          path: metadata.name
+          value: foo-cnpg-cluster-my-pool
+
+  - it: given a pooler metadata name then it overrides the generated name
+    set:
+      poolers:
+        my-pool:
+          metadata:
+            name: pg
+          type: rw-pooling
+    asserts:
+      - equal:
+          path: metadata.name
+          value: pg
+
+  - it: given common and pooler labels then both are rendered alongside the standard labels
+    set:
+      commonLabels:
+        team: db
+      poolers:
+        my-pool:
+          metadata:
+            labels:
+              foo: bar
+          type: rw-pooling
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: cnpg-cluster
+      - equal:
+          path: metadata.labels.team
+          value: db
+      - equal:
+          path: metadata.labels.foo
+          value: bar
+
+  - it: given pooler values then everything except metadata is rendered as spec
+    release:
+      name: foo
+    set:
+      poolers:
+        my-pool:
+          type: rw-pooling
+          size: 10
+    asserts:
+      - equal:
+          path: spec.cluster.name
+          value: foo-cnpg-cluster
+      - equal:
+          path: spec.type
+          value: rw-pooling
+      - equal:
+          path: spec.size
+          value: 10
+      - notExists:
+          path: spec.metadata

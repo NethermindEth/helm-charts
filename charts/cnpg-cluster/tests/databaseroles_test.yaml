@@ -1,0 +1,70 @@
+suite: databaseroles tests
+
+templates:
+  - databaseroles.yaml
+
+tests:
+  - it: given no name override then name defaults to the fullname and the role name
+    release:
+      name: foo
+    set:
+      databaseRoles:
+        myuser:
+          comment: my fancy user
+    asserts:
+      - equal:
+          path: metadata.name
+          value: foo-cnpg-cluster-myuser
+
+  - it: given a database role metadata name then it overrides the generated name
+    set:
+      databaseRoles:
+        myuser:
+          metadata:
+            name: pg
+          comment: my fancy user
+    asserts:
+      - equal:
+          path: metadata.name
+          value: pg
+
+  - it: given common and role labels then both are rendered alongside the standard labels
+    set:
+      commonLabels:
+        team: db
+      databaseRoles:
+        myuser:
+          metadata:
+            labels:
+              foo: bar
+          comment: my fancy user
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: cnpg-cluster
+      - equal:
+          path: metadata.labels.team
+          value: db
+      - equal:
+          path: metadata.labels.foo
+          value: bar
+
+  - it: given database role values then everything except metadata is rendered as spec
+    release:
+      name: foo
+    set:
+      databaseRoles:
+        myuser:
+          comment: my fancy user
+    asserts:
+      - equal:
+          path: spec.name
+          value: myuser
+      - equal:
+          path: spec.cluster.name
+          value: foo-cnpg-cluster
+      - equal:
+          path: spec.comment
+          value: my fancy user
+      - notExists:
+          path: spec.metadata
