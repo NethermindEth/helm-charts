@@ -1,0 +1,244 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "labelMap": {
+      "additionalProperties": { "type": "string" },
+      "type": "object"
+    },
+    "metadata": {
+      "additionalProperties": false,
+      "description": "Resource metadata. name overrides the auto generated name, labels and annotations are merged into the rendered resource.\n",
+      "properties": {
+        "name": {
+          "description": "Overrides the auto generated resource name.\n",
+          "title": "name",
+          "type": "string"
+        },
+        "labels": {
+          "$ref": "#/definitions/labelMap",
+          "title": "labels"
+        },
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "title": "annotations"
+        }
+      },
+      "title": "metadata",
+      "type": "object"
+    },
+    "specWithMetadata": {
+      "additionalProperties": true,
+      "description": "Everything that is not metadata is passed directly to the CNPG resource spec.\n",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/metadata",
+          "title": "metadata"
+        }
+      },
+      "type": "object"
+    },
+    "prometheusDuration": {
+      "description": "Prometheus duration, e.g. '30s'. Empty uses the Prometheus default.\n",
+      "pattern": "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$",
+      "type": "string"
+    },
+    "relabelConfig": {
+      "additionalProperties": false,
+      "description": "ref: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config\n",
+      "properties": {
+        "action": {
+          "default": "replace",
+          "enum": [
+            "replace",
+            "Replace",
+            "keep",
+            "Keep",
+            "drop",
+            "Drop",
+            "hashmod",
+            "HashMod",
+            "labelmap",
+            "LabelMap",
+            "labeldrop",
+            "LabelDrop",
+            "labelkeep",
+            "LabelKeep",
+            "lowercase",
+            "Lowercase",
+            "uppercase",
+            "Uppercase",
+            "keepequal",
+            "KeepEqual",
+            "dropequal",
+            "DropEqual"
+          ],
+          "title": "action",
+          "type": "string"
+        },
+        "modulus": {
+          "title": "modulus",
+          "type": "integer"
+        },
+        "regex": {
+          "title": "regex",
+          "type": "string"
+        },
+        "replacement": {
+          "title": "replacement",
+          "type": "string"
+        },
+        "separator": {
+          "title": "separator",
+          "type": "string"
+        },
+        "sourceLabels": {
+          "items": { "type": "string" },
+          "title": "sourceLabels",
+          "type": "array"
+        },
+        "targetLabel": {
+          "title": "targetLabel",
+          "type": "string"
+        }
+      },
+      "title": "relabelConfig",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "nameOverride": {
+      "description": "This is to override the chart name.\n",
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "fullnameOverride": {
+      "description": "This is to override the full name of resources.\n",
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "commonLabels": {
+      "$ref": "#/definitions/labelMap",
+      "description": "Labels added to every resource rendered by this chart.\n",
+      "title": "commonLabels"
+    },
+    "commonAnnotations": {
+      "$ref": "#/definitions/labelMap",
+      "description": "Annotations added to every resource rendered by this chart.\n",
+      "title": "commonAnnotations"
+    },
+    "cluster": {
+      "additionalProperties": true,
+      "description": "CNPG Cluster definition. Everything that is not `metadata` is passed directly to the CNPG cluster spec.\nPrefer the dedicated values below for databases, roles and similar instead of the built-in ones.\nref: https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#cluster\n",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/metadata",
+          "title": "metadata"
+        }
+      },
+      "title": "cluster",
+      "type": "object"
+    },
+    "databases": {
+      "additionalProperties": { "$ref": "#/definitions/specWithMetadata" },
+      "description": "Databases to create in the cluster. Map: database name -> database spec.\nEverything that is not metadata is passed directly as database spec.\nref: https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#database\n",
+      "title": "databases",
+      "type": "object"
+    },
+    "databaseRoles": {
+      "additionalProperties": { "$ref": "#/definitions/specWithMetadata" },
+      "description": "Database roles to create in the cluster. Map: role name -> database role spec.\nEverything that is not metadata is passed directly as database role spec, and the cluster is filled out for you.\nref: https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#databaserolespec\n",
+      "title": "databaseRoles",
+      "type": "object"
+    },
+    "poolers": {
+      "additionalProperties": { "$ref": "#/definitions/specWithMetadata" },
+      "description": "Poolers to use in the front of the cluster. Map: pooler name -> pooler spec.\nEverything that is not metadata is passed directly as pooler spec, and the cluster is filled out for you.\nref: https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#pooler\n",
+      "title": "poolers",
+      "type": "object"
+    },
+    "scheduledBackups": {
+      "additionalProperties": { "$ref": "#/definitions/specWithMetadata" },
+      "description": "Scheduled backups. Map: backup name -> backup spec.\nEverything that is not metadata is passed directly as backup spec, and the cluster is filled out for you.\nref: https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#scheduledbackup\n",
+      "title": "scheduledBackups",
+      "type": "object"
+    },
+    "barman": {
+      "additionalProperties": true,
+      "description": "Barman-cloud backups. When enabled and at least one scheduled backup uses the barman-cloud plugin, the chart adds the plugin to the cluster and creates the ObjectStore it points at.\nEverything that is not `enabled` or `metadata` is passed directly as the ObjectStore spec.\nref: https://cloudnative-pg.io/plugin-barman-cloud/docs/plugin-barman-cloud.v1/#objectstore\n",
+      "properties": {
+        "enabled": {
+          "description": "Create the barman-cloud ObjectStore and add the plugin to the cluster.\n",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "metadata": {
+          "$ref": "#/definitions/metadata",
+          "title": "metadata"
+        }
+      },
+      "title": "barman",
+      "type": "object"
+    },
+    "podMonitor": {
+      "additionalProperties": false,
+      "description": "Prometheus PodMonitor for the cluster.\nref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#podmonitor\n",
+      "properties": {
+        "enabled": {
+          "description": "Create a PodMonitor for the cluster pods.\n",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "labels": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Additional labels for the PodMonitor.\n",
+          "title": "labels"
+        },
+        "annotations": {
+          "$ref": "#/definitions/labelMap",
+          "description": "Additional annotations for the PodMonitor.\n",
+          "title": "annotations"
+        },
+        "interval": {
+          "$ref": "#/definitions/prometheusDuration",
+          "description": "PodMonitor scrape interval, empty uses Prometheus' default.\n",
+          "title": "interval"
+        },
+        "scrapeTimeout": {
+          "$ref": "#/definitions/prometheusDuration",
+          "description": "PodMonitor scrape timeout, empty uses Prometheus' default.\n",
+          "title": "scrapeTimeout"
+        },
+        "relabelings": {
+          "description": "PodMonitor relabelings.\n",
+          "items": { "$ref": "#/definitions/relabelConfig" },
+          "title": "relabelings",
+          "type": "array"
+        },
+        "metricRelabelings": {
+          "description": "PodMonitor metricRelabelings.\n",
+          "items": { "$ref": "#/definitions/relabelConfig" },
+          "title": "metricRelabelings",
+          "type": "array"
+        }
+      },
+      "required": ["enabled", "labels", "annotations", "interval", "scrapeTimeout", "relabelings", "metricRelabelings"],
+      "title": "podMonitor",
+      "type": "object"
+    }
+  },
+  "required": [
+    "nameOverride",
+    "fullnameOverride",
+    "commonLabels",
+    "commonAnnotations",
+    "cluster",
+    "databases",
+    "databaseRoles",
+    "poolers",
+    "scheduledBackups",
+    "barman",
+    "podMonitor"
+  ],
+  "type": "object"
+}
