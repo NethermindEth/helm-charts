@@ -17,9 +17,9 @@ spec:
   {{- with .Values.cluster.plugins }}
   {{- $plugins = . }}
   {{- end }}
-  {{- if .Values.barman.enabled }}
-  {{- $barmman := (dict "name" "barman-cloud.cloudnative-pg.io" "isWALArchiver" true "parameters" (dict "barmanObjectName" (include "cnpg-cluster.barmanName" .))) }}
-  {{- $plugins = append $plugins $barmman }}
+  {{- if eq (include "cnpg-cluster.barmanEnabled" .) "true" }}
+  {{- $barman := (dict "name" "barman-cloud.cloudnative-pg.io" "isWALArchiver" true "parameters" (dict "barmanObjectName" (include "cnpg-cluster.barmanName" .))) }}
+  {{- $plugins = append $plugins $barman }}
   {{- end }}
   {{- if $plugins }}
   {{- $spec = merge $spec (dict "plugins" $plugins) }}

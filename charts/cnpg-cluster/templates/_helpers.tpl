@@ -68,6 +68,27 @@ Create the name of the barman ObjectStore
 {{- end }}
 
 {{/*
+Whether the barman-cloud plugin and ObjectStore are deployed: barman is
+enabled and at least one scheduled backup uses the barman-cloud plugin,
+either explicitly or via the method and pluginConfiguration defaults.
+*/}}
+{{- define "cnpg-cluster.barmanEnabled" -}}
+{{- $enabled := false -}}
+{{- if .Values.barman.enabled -}}
+{{- range $spec := .Values.scheduledBackups -}}
+{{- $method := get $spec "method" | default "plugin" -}}
+{{- if eq $method "plugin" -}}
+{{- $pluginName := get (get $spec "pluginConfiguration" | default dict) "name" | default "barman-cloud.cloudnative-pg.io" -}}
+{{- if eq $pluginName "barman-cloud.cloudnative-pg.io" -}}
+{{- $enabled = true -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- $enabled -}}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "cnpg-cluster.serviceAccountName" -}}

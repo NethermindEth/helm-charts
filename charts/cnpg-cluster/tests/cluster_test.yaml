@@ -45,12 +45,13 @@ tests:
           path: metadata.labels.foo
           value: bar
 
-  - it: given barman enabled then the barman cloud plugin is added to the cluster plugins
+  - it: given a scheduled backup that uses the barman cloud plugin by default then the barman cloud plugin is added to the cluster plugins
     release:
       name: foo
     set:
-      barman:
-        enabled: true
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
     asserts:
       - contains:
           path: spec.plugins
@@ -61,12 +62,67 @@ tests:
             parameters:
               barmanObjectName: foo-cnpg-cluster-backup
 
-  - it: given barman enabled and existing plugins then the barman cloud plugin is appended
+  - it: given a scheduled backup that explicitly uses the barman cloud plugin then the barman cloud plugin is added to the cluster plugins
     release:
       name: foo
     set:
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+          method: plugin
+          pluginConfiguration:
+            name: barman-cloud.cloudnative-pg.io
+    asserts:
+      - contains:
+          path: spec.plugins
+          any: true
+          content:
+            name: barman-cloud.cloudnative-pg.io
+            isWALArchiver: true
+            parameters:
+              barmanObjectName: foo-cnpg-cluster-backup
+
+  - it: given barman enabled but no scheduled backups then no barman cloud plugin is added
+    set:
       barman:
         enabled: true
+    asserts:
+      - notExists:
+          path: spec.plugins
+
+  - it: given scheduled backups that do not use the barman cloud plugin then no barman cloud plugin is added
+    set:
+      scheduledBackups:
+        snapshot:
+          schedule: "0 0 2 * * *"
+          method: volumeSnapshot
+        other:
+          schedule: "0 0 2 * * *"
+          method: plugin
+          pluginConfiguration:
+            name: other-plugin.example.com
+    asserts:
+      - notExists:
+          path: spec.plugins
+
+  - it: given barman disabled and a barman scheduled backup then no barman cloud plugin is added
+    set:
+      barman:
+        enabled: false
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+    asserts:
+      - notExists:
+          path: spec.plugins
+
+  - it: given a barman scheduled backup and existing plugins then the barman cloud plugin is appended
+    release:
+      name: foo
+    set:
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
       cluster:
         plugins:
           - name: my-plugin.example.com

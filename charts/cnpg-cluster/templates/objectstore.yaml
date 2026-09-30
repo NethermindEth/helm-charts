@@ -1,4 +1,4 @@
-{{- if .Values.barman.enabled }}
+{{- if eq (include "cnpg-cluster.barmanEnabled" .) "true" }}
 apiVersion: barmancloud.cnpg.io/v1
 kind: ObjectStore
 metadata:

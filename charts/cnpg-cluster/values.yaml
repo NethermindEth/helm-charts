@@ -53,6 +53,10 @@ cluster:
   #    cpu: 500m
   #    memory: 1Gi
 
+  # General cluster plugins
+  # Note that barman has first class support, see below
+  # plugins: []
+
 # Databases to create in the cluster
 # Map: database name -> database spec.
 # Everything that is not metadata is passed directly as database spec
@@ -95,6 +99,7 @@ poolers: {}
 # Scheduled backups
 # Map: backup name -> backup spec.
 # Everything that is not metadata is passed directly as backup spec, and the cluster is filled out for you
+# The default method, if omitted, is the barman plugin and it is auto injected in the cluster, see below
 # See https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#scheduledbackup
 scheduledBackups: {}
   # Cron schedule, unlike Unix crontab it has a seconds field first.
@@ -106,7 +111,8 @@ scheduledBackups: {}
   #     annotations: {}
 
 # Barman-cloud backups.
-# When enabled, the chart adds the barman-cloud plugin to the cluster and creates
+# When enabled (default) and at least one scheduled backup uses the barman-cloud
+# plugin, the chart adds the barman-cloud plugin to the cluster and creates
 # the ObjectStore it points at, which the scheduledBackups defaults use as well.
 # Everything that is not `enabled` or `metadata` is passed directly as the ObjectStore spec
 # See https://cloudnative-pg.io/plugin-barman-cloud/docs/plugin-barman-cloud.v1/#objectstore
