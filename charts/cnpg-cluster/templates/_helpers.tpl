@@ -87,14 +87,3 @@ either explicitly or via the method and pluginConfiguration defaults.
 {{- end -}}
 {{- $enabled -}}
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "cnpg-cluster.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "cnpg-cluster.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
