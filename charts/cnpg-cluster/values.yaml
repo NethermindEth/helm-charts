@@ -94,11 +94,12 @@ poolers: {}
 
 # Scheduled backups
 # Map: backup name -> backup spec.
-# Everything that is not metadata is passed directly as pooler spec, and the cluster is filled out for you
+# Everything that is not metadata is passed directly as backup spec, and the cluster is filled out for you
 # See https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#scheduledbackup
 scheduledBackups: {}
-  # nightly:
-  #   schedule: "0 2 * * *"
+  # Cron schedule, unlike Unix crontab it has a seconds field first.
+  #   nightly:
+  #     schedule: "0 0 2 * * *"
   #   metadata:
   #     name: ""  # Overrides the auto generated name
   #     labels: {}

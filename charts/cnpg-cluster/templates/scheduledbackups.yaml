@@ -1,0 +1,33 @@
+{{- range $name, $spec := .Values.scheduledBackups }}
+{{- $md := $spec.metadata | default dict }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: {{ $md.name | default (printf "%s-%s" (include "cnpg-cluster.fullname" $) $name)  }}
+  {{- $labels := include "cnpg-cluster.labels" $ | fromYaml }}
+  {{- $labels = merge $labels ($md.labels | default dict) }}
+  labels:
+    {{- toYaml $labels | nindent 4 }}
+  {{- $annotations := merge (deepCopy $.Values.commonAnnotations) ($md.annotations | default dict) }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  cluster:
+    name: {{ include "cnpg-cluster.clusterName" $ }}
+  {{- $rest := omit $spec "metadata" }}
+  {{- if $schedule := get $rest "schedule" }}
+  {{- $fields := splitList " " $schedule }}
+  {{- if ne (len $fields) 6 }}
+  {{- fail (printf "scheduledBackups.%s.schedule must have 6 space-separated fields (sec min hour dom mon dow), got %d: %s" $name (len $fields) $schedule) }}
+  {{- end }}
+  {{- end }}
+  {{- $method := get $rest "method" | default "plugin" }}
+  {{- $rest = merge $rest (dict "method" $method) }}
+  {{- if and (eq $method "plugin") (not (hasKey $rest "pluginConfiguration")) }}
+  {{- $rest = merge $rest (dict "pluginConfiguration" (dict "name" "barman-cloud.cloudnative-pg.io")) }}
+  {{- end }}
+  {{- toYaml $rest | nindent 2 }}
+{{- end }}
