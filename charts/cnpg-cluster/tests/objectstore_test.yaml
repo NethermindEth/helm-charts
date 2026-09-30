@@ -1,0 +1,54 @@
+suite: objectstore tests
+
+templates:
+  - objectstore.yaml
+
+tests:
+  - it: given barman disabled then no objectstore is rendered
+    set:
+      barman:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: given barman enabled then name defaults to the fullname and backup
+    release:
+      name: foo
+    set:
+      barman:
+        enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: foo-cnpg-cluster-backup
+
+  - it: given a barman metadata name then it overrides the generated name
+    set:
+      barman:
+        enabled: true
+        metadata:
+          name: backups
+    asserts:
+      - equal:
+          path: metadata.name
+          value: backups
+
+  - it: given barman values then everything except enabled and metadata is rendered as spec
+    set:
+      barman:
+        enabled: true
+        retentionPolicy: 7d
+        configuration:
+          destinationPath: s3://bucket/path
+    asserts:
+      - equal:
+          path: spec.retentionPolicy
+          value: 7d
+      - equal:
+          path: spec.configuration.destinationPath
+          value: s3://bucket/path
+      - notExists:
+          path: spec.metadata
+      - notExists:
+          path: spec.enabled

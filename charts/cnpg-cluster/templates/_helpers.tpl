@@ -61,6 +61,13 @@ Create the name of the cluster resource.
 {{- end }}
 
 {{/*
+Create the name of the barman ObjectStore
+*/}}
+{{- define "cnpg-cluster.barmanName" -}}
+{{- default (printf "%s-backup" (include "cnpg-cluster.fullname" .)) .Values.barman.metadata.name -}}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "cnpg-cluster.serviceAccountName" -}}

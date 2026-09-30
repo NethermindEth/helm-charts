@@ -45,6 +45,43 @@ tests:
           path: metadata.labels.foo
           value: bar
 
+  - it: given barman enabled then the barman cloud plugin is added to the cluster plugins
+    release:
+      name: foo
+    set:
+      barman:
+        enabled: true
+    asserts:
+      - contains:
+          path: spec.plugins
+          any: true
+          content:
+            name: barman-cloud.cloudnative-pg.io
+            isWALArchiver: true
+            parameters:
+              barmanObjectName: foo-cnpg-cluster-backup
+
+  - it: given barman enabled and existing plugins then the barman cloud plugin is appended
+    release:
+      name: foo
+    set:
+      barman:
+        enabled: true
+      cluster:
+        plugins:
+          - name: my-plugin.example.com
+    asserts:
+      - contains:
+          path: spec.plugins
+          any: true
+          content:
+            name: my-plugin.example.com
+      - contains:
+          path: spec.plugins
+          any: true
+          content:
+            name: barman-cloud.cloudnative-pg.io
+
   - it: given cluster values then everything except metadata is rendered as spec
     set:
       cluster:

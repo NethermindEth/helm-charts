@@ -12,4 +12,16 @@ metadata:
     {{- toYaml $annotations | nindent 4 }}
   {{- end }}
 spec:
-  {{- toYaml (omit .Values.cluster "metadata") | nindent 2 }}
+  {{- $spec := omit .Values.cluster "metadata" "plugins" }}
+  {{- $plugins := list }}
+  {{- with .Values.cluster.plugins }}
+  {{- $plugins = . }}
+  {{- end }}
+  {{- if .Values.barman.enabled }}
+  {{- $barmman := (dict "name" "barman-cloud.cloudnative-pg.io" "isWALArchiver" true "parameters" (dict "barmanObjectName" (include "cnpg-cluster.barmanName" .))) }}
+  {{- $plugins = append $plugins $barmman }}
+  {{- end }}
+  {{- if $plugins }}
+  {{- $spec = merge $spec (dict "plugins" $plugins) }}
+  {{- end }}
+  {{- toYaml $spec | nindent 2 }}

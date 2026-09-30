@@ -8,6 +8,12 @@ A Helm chart for generic CNPG cluster deployments
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| barman.configuration.destinationPath | string | `""` |  |
+| barman.enabled | bool | `false` |  |
+| barman.metadata.annotations | object | `{}` |  |
+| barman.metadata.labels | object | `{}` |  |
+| barman.metadata.name | string | `""` |  |
+| barman.retentionPolicy | string | `"30d"` |  |
 | cluster.bootstrap | object | `{}` |  |
 | cluster.imageName | string | `"ghcr.io/cloudnative-pg/postgresql:18"` |  |
 | cluster.instances | int | `1` |  |

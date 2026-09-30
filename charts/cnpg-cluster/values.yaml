@@ -105,6 +105,28 @@ scheduledBackups: {}
   #     labels: {}
   #     annotations: {}
 
+# Barman-cloud backups.
+# When enabled, the chart adds the barman-cloud plugin to the cluster and creates
+# the ObjectStore it points at, which the scheduledBackups defaults use as well.
+# Everything that is not `enabled` or `metadata` is passed directly as the ObjectStore spec
+# See https://cloudnative-pg.io/plugin-barman-cloud/docs/plugin-barman-cloud.v1/#objectstore
+barman:
+  enabled: true
+  metadata:
+    # Overrides the auto generated ObjectStore name, also used as the plugin barmanObjectName
+    name: ""
+    labels: {}
+    annotations: {}
+  retentionPolicy: 30d
+  configuration:
+    destinationPath: ""
+    # wal:
+    #   compression: gzip
+    # data:
+    #   compression: gzip
+    # s3Credentials:
+    #   inheritFromIAMRole: true
+
 # Prometheus PodMonitor for the cluster.
 podMonitor:
   enabled: true
