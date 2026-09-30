@@ -1,0 +1,23 @@
+suite: podmonitor tests
+
+templates:
+  - podmonitor.yaml
+
+tests:
+  - it: given common and podmonitor labels then both are rendered alongside the standard labels
+    set:
+      commonLabels:
+        team: db
+      podMonitor:
+        labels:
+          foo: bar
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: cnpg-cluster
+      - equal:
+          path: metadata.labels.team
+          value: db
+      - equal:
+          path: metadata.labels.foo
+          value: bar
