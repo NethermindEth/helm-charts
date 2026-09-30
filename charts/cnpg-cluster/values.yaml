@@ -1,0 +1,121 @@
+# This is to override the chart name.
+nameOverride: ""
+# This is to override the full name of resources.
+fullnameOverride: ""
+
+# Labels added to every resource rendered by this chart.
+commonLabels: {}
+
+# Annotations added to every resource rendered by this chart.
+commonAnnotations: {}
+
+# CNPG Cluster definition
+# Everything that is not `metadata` is passed directly to the CNPG cluster spec
+# Prefer the dedicated CRDs below for databases, roles and similar instead of the built-in ones
+# See https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#cluster
+cluster:
+  metadata:
+    # Generated from the release name, override if needed
+    name: ""
+
+    # Extra labels to add to the cluster
+    labels: {}
+
+    # Extra annotations to add to the cluster
+    annotations: {}
+
+  bootstrap: {}
+
+  # Number of PostgreSQL instances (replicas).
+  instances: 1
+  # PostgreSQL image.
+  imageName: ghcr.io/cloudnative-pg/postgresql:18
+  storage:
+    # Size of the data volume for each instance.
+    size: 10Gi
+    # StorageClass used for the data volumes.
+    storageClass: ""
+
+  # PostgreSQL settings (spec.postgresql.parameters), values must be strings.
+  postgresql:
+    # These default parameters are almost free-wins for SSDs, add more parameters as needed
+    parameters:
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+      checkpoint_completion_target: "0.9"
+      wal_compression: lz4
+
+  # Resources to assign to each replica
+  resources: {}
+  #  limits:
+  #    memory: 1Gi
+  #  requests:
+  #    cpu: 500m
+  #    memory: 1Gi
+
+# Databases to create in the cluster
+# Map: database name -> database spec.
+# Everything that is not metadata is passed directly as database spec
+# See https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#database
+databases: {}
+  # mydb:
+  #   metadata:
+  #     name: ""  # Overrides the auto generated resource name (not the DB name!)
+  #     labels: {}
+  #     annotations: {}
+  #   owner: myuser
+
+# Database Roles to create in the cluster
+# Map: database role name -> database role spec.
+# Everything that is not metadata is passed directly as database role spec, and the cluster is filled out for you
+# See https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#databaserolespec
+databaseRoles: {}
+  # myuser:
+  #   metadata:
+  #     name: ""  # Overrides the auto generated resource name (not the Role name!)
+  #     labels: {}
+  #     annotations: {}
+  #   comment: my fancy user
+  #   passwordSecret:
+  #     name: myuser-basic-auth
+
+# Poolers to use in the front of the cluster
+# Map: pooler name -> pooler spec.
+# Everything that is not metadata is passed directly as pooler spec, and the cluster is filled out for you
+# See https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#pooler
+poolers: {}
+  # my-pool:
+  #   metadata:
+  #     name: ""  # Overrides the auto generated name
+  #     labels: {}
+  #     annotations: {}
+  #   type: rw-pooling
+  #   size: 10
+
+# Scheduled backups
+# Map: backup name -> backup spec.
+# Everything that is not metadata is passed directly as pooler spec, and the cluster is filled out for you
+# See https://cloudnative-pg.io/docs/1.30/cloudnative-pg.v1#scheduledbackup
+scheduledBackups: {}
+  # nightly:
+  #   schedule: "0 2 * * *"
+  #   metadata:
+  #     name: ""  # Overrides the auto generated name
+  #     labels: {}
+  #     annotations: {}
+
+# Prometheus PodMonitor for the cluster.
+podMonitor:
+  enabled: true
+  # Additional labels for the PodMonitor.
+  labels: {}
+  # Additional annotations for the PodMonitor.
+  annotations: {}
+  # ServiceMonitor scrape interval, empty uses Prometheus' default
+  interval: ""
+  # PodMonitor scrape timeout, empty uses Prometheus' default
+  scrapeTimeout: ""
+  # PodMonitor relabelings
+  relabelings: []
+  #  PodMonitor metricRelabelings
+  metricRelabelings: []
