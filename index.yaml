@@ -659,6 +659,19 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/charon-0.3.6/charon-0.3.6.tgz
     version: 0.3.6
+  cnpg-cluster:
+  - apiVersion: v2
+    created: "2026-10-01T16:13:56.309961138Z"
+    description: A Helm chart for generic CNPG cluster deployments
+    digest: 30a62cc306dce7ad43999b36c1078e551b3fde14bd5adfa978fc822979a2d6fc
+    maintainers:
+    - email: role_angkor_bros@nethermind.io
+      name: BROs
+    name: cnpg-cluster
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/cnpg-cluster-0.1.0/cnpg-cluster-0.1.0.tgz
+    version: 0.1.0
   common:
   - apiVersion: v2
     appVersion: 1.0.0
@@ -5530,4 +5543,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-09-30T10:40:34.234390282Z"
+generated: "2026-10-01T16:13:56.310524339Z"
