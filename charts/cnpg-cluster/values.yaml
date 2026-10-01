@@ -125,6 +125,7 @@ barman:
     annotations: {}
   retentionPolicy: 30d
   configuration:
+    # Required when a barman backed scheduled backup exists
     destinationPath: ""
     # wal:
     #   compression: gzip

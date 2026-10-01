@@ -18,6 +18,11 @@ spec:
   {{- $plugins = . }}
   {{- end }}
   {{- if eq (include "cnpg-cluster.barmanEnabled" .) "true" }}
+  {{- range $plugin := $plugins }}
+  {{- if eq $plugin.name "barman-cloud.cloudnative-pg.io" }}
+  {{- fail "cluster.plugins must not contain barman-cloud.cloudnative-pg.io while it is injected by the chart, configure it through the barman values or set barman.enabled=false" }}
+  {{- end }}
+  {{- end }}
   {{- $barman := (dict "name" "barman-cloud.cloudnative-pg.io" "isWALArchiver" true "parameters" (dict "barmanObjectName" (include "cnpg-cluster.barmanName" .))) }}
   {{- $plugins = append $plugins $barman }}
   {{- end }}

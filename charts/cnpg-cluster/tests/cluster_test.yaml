@@ -138,6 +138,34 @@ tests:
           content:
             name: barman-cloud.cloudnative-pg.io
 
+  - it: given a barman scheduled backup and a user defined barman plugin then it fails
+    set:
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+      cluster:
+        plugins:
+          - name: barman-cloud.cloudnative-pg.io
+            isWALArchiver: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "cluster.plugins must not contain barman-cloud.cloudnative-pg.io while it is injected by the chart, configure it through the barman values or set barman.enabled=false"
+
+  - it: given barman disabled and a user defined barman plugin then the plugin is kept
+    set:
+      barman:
+        enabled: false
+      cluster:
+        plugins:
+          - name: barman-cloud.cloudnative-pg.io
+            isWALArchiver: true
+    asserts:
+      - contains:
+          path: spec.plugins
+          content:
+            name: barman-cloud.cloudnative-pg.io
+            isWALArchiver: true
+
   - it: given cluster values then everything except metadata is rendered as spec
     set:
       cluster:
