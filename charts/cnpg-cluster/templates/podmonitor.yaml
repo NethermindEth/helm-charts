@@ -22,10 +22,10 @@ spec:
   podMetricsEndpoints:
     - port: metrics
       {{- with .Values.podMonitor.interval }}
-      interval: {{ . }}
+      interval: {{ . | quote }}
       {{- end }}
       {{- with .Values.podMonitor.scrapeTimeout }}
-      scrapeTimeout: {{ . }}
+      scrapeTimeout: {{ . | quote }}
       {{- end }}
       {{- with .Values.podMonitor.relabelings }}
       relabelings:

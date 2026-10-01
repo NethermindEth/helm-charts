@@ -16,7 +16,7 @@ metadata:
   {{- end }}
 spec:
   cluster:
-    name: {{ include "cnpg-cluster.clusterName" $ }}
+    name: {{ include "cnpg-cluster.clusterName" $ | quote }}
   {{- with $rest := omit $spec "metadata" }}
   {{- toYaml $rest | nindent 2 }}
   {{- end }}

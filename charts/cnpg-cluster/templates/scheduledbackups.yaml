@@ -16,7 +16,7 @@ metadata:
   {{- end }}
 spec:
   cluster:
-    name: {{ include "cnpg-cluster.clusterName" $ }}
+    name: {{ include "cnpg-cluster.clusterName" $ | quote}}
   {{- $rest := omit $spec "metadata" }}
   {{- if $schedule := get $rest "schedule" }}
   {{- $fields := splitList " " $schedule }}
