@@ -3,3 +3,6 @@ name: cnpg-cluster
 description: A Helm chart for generic CNPG cluster deployments
 type: application
 version: 0.1.0
+maintainers:
+  - email: role_angkor_bros@nethermind.io
+    name: BROs
