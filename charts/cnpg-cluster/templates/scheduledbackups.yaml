@@ -4,7 +4,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: {{ $md.name | default (printf "%s-%s" (include "cnpg-cluster.fullname" $) $name)  }}
+  name: {{ include "cnpg-cluster.resourceName" (dict "root" $ "name" $name "metadata" $md) }}
   {{- $labels := include "cnpg-cluster.labels" $ | fromYaml }}
   {{- $labels = merge $labels ($md.labels | default dict) }}
   labels:

@@ -61,6 +61,14 @@ Create the name of the cluster resource.
 {{- end }}
 
 {{/*
+Create the name of a resource generated from a values map entry.
+Expects a dict with root context, entry name and entry metadata.
+*/}}
+{{- define "cnpg-cluster.resourceName" -}}
+{{- .metadata.name | default (printf "%s-%s" (include "cnpg-cluster.fullname" .root) .name) -}}
+{{- end }}
+
+{{/*
 Create the name of the barman ObjectStore
 */}}
 {{- define "cnpg-cluster.barmanName" -}}
