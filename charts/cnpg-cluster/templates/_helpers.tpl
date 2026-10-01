@@ -69,6 +69,19 @@ Expects a dict with root context, entry name and entry metadata.
 {{- end }}
 
 {{/*
+Fail when a spec sets fields that the chart fills out itself.
+Expects a dict with the values key, entry name, entry spec and the reserved field names.
+*/}}
+{{- define "cnpg-cluster.assertNoReservedFields" -}}
+{{- $ctx := . -}}
+{{- range $field := .reserved -}}
+{{- if hasKey $ctx.spec $field -}}
+{{- fail (printf "%s.%s.%s must not be set, it is managed by the chart" $ctx.key $ctx.name $field) -}}
+{{- end -}}
+{{- end -}}
+{{- end }}
+
+{{/*
 Create the name of the barman ObjectStore
 */}}
 {{- define "cnpg-cluster.barmanName" -}}

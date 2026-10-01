@@ -68,3 +68,23 @@ tests:
           value: my fancy user
       - notExists:
           path: spec.metadata
+
+  - it: given a cluster in the databaseRoles spec then it fails
+    set:
+      databaseRoles:
+        foo:
+          cluster:
+            name: other
+
+    asserts:
+      - failedTemplate:
+          errorMessage: "databaseRoles.foo.cluster must not be set, it is managed by the chart"
+
+  - it: given a name in the databaseRoles spec then it fails
+    set:
+      databaseRoles:
+        foo:
+          name: other
+    asserts:
+      - failedTemplate:
+          errorMessage: "databaseRoles.foo.name must not be set, it is managed by the chart"

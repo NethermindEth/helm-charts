@@ -1,5 +1,6 @@
 {{- range $name, $spec := .Values.scheduledBackups }}
 {{- $md := $spec.metadata | default dict }}
+{{- include "cnpg-cluster.assertNoReservedFields" (dict "key" "scheduledBackups" "name" $name "spec" $spec "reserved" (list "cluster")) }}
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup

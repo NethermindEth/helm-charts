@@ -104,3 +104,14 @@ tests:
           value: volumeSnapshot
       - notExists:
           path: spec.pluginConfiguration
+
+  - it: given a cluster in the scheduledBackups spec then it fails
+    set:
+      scheduledBackups:
+        foo:
+          cluster:
+            name: other
+
+    asserts:
+      - failedTemplate:
+          errorMessage: "scheduledBackups.foo.cluster must not be set, it is managed by the chart"

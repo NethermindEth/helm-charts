@@ -69,3 +69,14 @@ tests:
           value: 10
       - notExists:
           path: spec.metadata
+
+  - it: given a cluster in the pooler spec then it fails
+    set:
+      poolers:
+        my-pool:
+          cluster:
+            name: other
+          type: rw-pooling
+    asserts:
+      - failedTemplate:
+          errorMessage: "poolers.my-pool.cluster must not be set, it is managed by the chart"

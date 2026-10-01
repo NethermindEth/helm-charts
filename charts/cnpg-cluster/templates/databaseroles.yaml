@@ -1,5 +1,6 @@
 {{- range $name, $spec := .Values.databaseRoles }}
 {{- $md := $spec.metadata | default dict }}
+{{- include "cnpg-cluster.assertNoReservedFields" (dict "key" "databaseRoles" "name" $name "spec" $spec "reserved" (list "cluster" "name")) }}
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: DatabaseRole

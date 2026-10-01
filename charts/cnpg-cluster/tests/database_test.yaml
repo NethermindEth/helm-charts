@@ -70,3 +70,23 @@ tests:
           value: myuser
       - notExists:
           path: spec.metadata
+
+  - it: given a cluster in the databases spec then it fails
+    set:
+      databases:
+        foo:
+          cluster:
+            name: other
+
+    asserts:
+      - failedTemplate:
+          errorMessage: "databases.foo.cluster must not be set, it is managed by the chart"
+
+  - it: given a name in the databases spec then it fails
+    set:
+      databases:
+        foo:
+          name: other
+    asserts:
+      - failedTemplate:
+          errorMessage: "databases.foo.name must not be set, it is managed by the chart"
