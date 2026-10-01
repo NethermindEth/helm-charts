@@ -9,7 +9,7 @@ A Helm chart for generic CNPG cluster deployments
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | barman.configuration.destinationPath | string | `""` |  |
-| barman.enabled | bool | `false` |  |
+| barman.enabled | bool | `true` |  |
 | barman.metadata.annotations | object | `{}` |  |
 | barman.metadata.labels | object | `{}` |  |
 | barman.metadata.name | string | `""` |  |
@@ -26,7 +26,6 @@ A Helm chart for generic CNPG cluster deployments
 | cluster.postgresql.parameters.wal_compression | string | `"lz4"` |  |
 | cluster.resources | object | `{}` |  |
 | cluster.storage.size | string | `"10Gi"` |  |
-| cluster.storage.storageClass | string | `""` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | databaseRoles | object | `{}` |  |
