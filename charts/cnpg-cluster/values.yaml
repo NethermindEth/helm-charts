@@ -34,7 +34,7 @@ cluster:
     # Size of the data volume for each instance.
     size: 10Gi
     # StorageClass used for the data volumes.
-    storageClass: ""
+    # storageClass: ""
 
   # PostgreSQL settings (spec.postgresql.parameters), values must be strings.
   postgresql:
