@@ -1,0 +1,70 @@
+suite: objectstore tests
+
+templates:
+  - objectstore.yaml
+
+tests:
+  - it: given barman disabled and a barman scheduled backup then no objectstore is rendered
+    set:
+      barman:
+        enabled: false
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: given barman enabled and no scheduled backups then no objectstore is rendered
+    set:
+      barman:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: given a barman scheduled backup then name defaults to the fullname and backup
+    release:
+      name: foo
+    set:
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: foo-cnpg-cluster-backup
+
+  - it: given a barman metadata name then it overrides the generated name
+    set:
+      barman:
+        metadata:
+          name: backups
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: backups
+
+  - it: given barman values then everything except enabled and metadata is rendered as spec
+    set:
+      barman:
+        retentionPolicy: 7d
+        configuration:
+          destinationPath: s3://bucket/path
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+    asserts:
+      - equal:
+          path: spec.retentionPolicy
+          value: 7d
+      - equal:
+          path: spec.configuration.destinationPath
+          value: s3://bucket/path
+      - notExists:
+          path: spec.metadata
+      - notExists:
+          path: spec.enabled

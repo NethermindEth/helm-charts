@@ -1,0 +1,25 @@
+{{- range $name, $spec := .Values.databases }}
+{{- $md := $spec.metadata | default dict }}
+{{- include "cnpg-cluster.assertNoReservedFields" (dict "key" "databases" "name" $name "spec" $spec "reserved" (list "cluster" "name")) }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: {{ include "cnpg-cluster.resourceName" (dict "root" $ "name" $name "metadata" $md) }}
+  {{- $labels := include "cnpg-cluster.labels" $ | fromYaml }}
+  {{- $labels = merge $labels ($md.labels | default dict) }}
+  labels:
+    {{- toYaml $labels | nindent 4 }}
+  {{- $annotations := merge (deepCopy $.Values.commonAnnotations) ($md.annotations | default dict) }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  name: {{ $name | quote }}
+  cluster:
+    name: {{ include "cnpg-cluster.clusterName" $ | quote }}
+  {{- with $rest := omit $spec "metadata" }}
+  {{- toYaml $rest | nindent 2 }}
+  {{- end }}
+{{- end }}

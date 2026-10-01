@@ -1,0 +1,32 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "cnpg-cluster.clusterName" . }}
+  {{- $labels := include "cnpg-cluster.labels" . | fromYaml }}
+  {{- $labels = merge $labels .Values.cluster.metadata.labels }}
+  labels:
+    {{- toYaml $labels | nindent 4 }}
+  {{- $annotations := merge (deepCopy .Values.commonAnnotations) .Values.cluster.metadata.annotations }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  {{- $spec := omit .Values.cluster "metadata" "plugins" }}
+  {{- $plugins := list }}
+  {{- with .Values.cluster.plugins }}
+  {{- $plugins = . }}
+  {{- end }}
+  {{- if eq (include "cnpg-cluster.barmanEnabled" .) "true" }}
+  {{- range $plugin := $plugins }}
+  {{- if eq $plugin.name "barman-cloud.cloudnative-pg.io" }}
+  {{- fail "cluster.plugins must not contain barman-cloud.cloudnative-pg.io while it is injected by the chart, configure it through the barman values or set barman.enabled=false" }}
+  {{- end }}
+  {{- end }}
+  {{- $barman := (dict "name" "barman-cloud.cloudnative-pg.io" "isWALArchiver" true "parameters" (dict "barmanObjectName" (include "cnpg-cluster.barmanName" .))) }}
+  {{- $plugins = append $plugins $barman }}
+  {{- end }}
+  {{- if $plugins }}
+  {{- $spec = merge $spec (dict "plugins" $plugins) }}
+  {{- end }}
+  {{- toYaml $spec | nindent 2 }}

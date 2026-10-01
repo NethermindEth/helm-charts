@@ -1,0 +1,17 @@
+{{- if eq (include "cnpg-cluster.barmanEnabled" .) "true" }}
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: {{ include "cnpg-cluster.barmanName" . }}
+  {{- $labels := include "cnpg-cluster.labels" . | fromYaml }}
+  {{- $labels = merge $labels (.Values.barman.metadata.labels | default dict) }}
+  labels:
+    {{- toYaml $labels | nindent 4 }}
+  {{- $annotations := merge (deepCopy .Values.commonAnnotations) (.Values.barman.metadata.annotations | default dict) }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  {{- toYaml (omit .Values.barman "enabled" "metadata") | nindent 2 }}
+{{- end }}

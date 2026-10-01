@@ -1,0 +1,117 @@
+suite: scheduledBackups tests
+
+templates:
+  - scheduledbackups.yaml
+
+tests:
+  - it: given no name override then name defaults to the fullname and the backup name
+    release:
+      name: foo
+    set:
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: foo-cnpg-cluster-nightly
+
+  - it: given a backup metadata name then it overrides the generated name
+    set:
+      scheduledBackups:
+        nightly:
+          metadata:
+            name: pg
+          schedule: "0 0 2 * * *"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: pg
+
+  - it: given common and backup labels then both are rendered alongside the standard labels
+    set:
+      commonLabels:
+        team: db
+      scheduledBackups:
+        nightly:
+          metadata:
+            labels:
+              foo: bar
+          schedule: "0 0 2 * * *"
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: cnpg-cluster
+      - equal:
+          path: metadata.labels.team
+          value: db
+      - equal:
+          path: metadata.labels.foo
+          value: bar
+
+  - it: given a backup value then everything except metadata is rendered as spec
+    release:
+      name: foo
+    set:
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+    asserts:
+      - equal:
+          path: spec.cluster.name
+          value: foo-cnpg-cluster
+      - equal:
+          path: spec.schedule
+          value: "0 0 2 * * *"
+      - notExists:
+          path: spec.metadata
+
+  - it: given no method then the barman cloud plugin is used by default
+    release:
+      name: foo
+    set:
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+    asserts:
+      - equal:
+          path: spec.method
+          value: plugin
+      - equal:
+          path: spec.pluginConfiguration.name
+          value: barman-cloud.cloudnative-pg.io
+
+  - it: given a schedule without a seconds field then the template fails
+    set:
+      scheduledBackups:
+        nightly:
+          schedule: "0 2 * * *"
+    asserts:
+      - failedTemplate:
+          errorMessage: 'scheduledBackups.nightly.schedule must have 6 space-separated fields (sec min hour dom mon dow), got 5: 0 2 * * *'
+
+  - it: given a method and pluginConfiguration then the defaults are not applied
+    release:
+      name: foo
+    set:
+      scheduledBackups:
+        nightly:
+          schedule: "0 0 2 * * *"
+          method: volumeSnapshot
+    asserts:
+      - equal:
+          path: spec.method
+          value: volumeSnapshot
+      - notExists:
+          path: spec.pluginConfiguration
+
+  - it: given a cluster in the scheduledBackups spec then it fails
+    set:
+      scheduledBackups:
+        foo:
+          cluster:
+            name: other
+
+    asserts:
+      - failedTemplate:
+          errorMessage: "scheduledBackups.foo.cluster must not be set, it is managed by the chart"
