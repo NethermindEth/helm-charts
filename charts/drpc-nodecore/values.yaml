@@ -68,6 +68,17 @@ defaults:
   tolerations: []
   affinity: {}
 
+  # -- Spread the pods of each project across nodes. If a constraint has no `labelSelector`, the chart uses the selector labels of that project. Set to `[]` in a project to disable.
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+
+  # -- PodDisruptionBudget for each project. Set either `minAvailable` or `maxUnavailable`, not both. To use `minAvailable` here, also set `maxUnavailable: null`.
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+
   podSecurityContext:
     fsGroup: 1000
     runAsNonRoot: true
@@ -177,6 +188,11 @@ projects: {}
   #       enabled: true
   #       minReplicas: 2
   #       maxReplicas: 8
+  #
+  #   # Optional per-project overrides (replace defaults.topologySpreadConstraints / defaults.podDisruptionBudget)
+  #   topologySpreadConstraints: []
+  #   podDisruptionBudget:
+  #     enabled: false
   #
   #   # Optional per-project cache override (replaces defaults.appStorages / defaults.cache)
   #   appStorages:
