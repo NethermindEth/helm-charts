@@ -1,7 +1,6 @@
-
 # cnpg-cluster
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for generic CNPG cluster deployments
 
@@ -21,7 +20,6 @@ A Helm chart for generic CNPG cluster deployments
 | barman.metadata.labels | object | `{}` |  |
 | barman.metadata.name | string | `""` |  |
 | barman.retentionPolicy | string | `"30d"` |  |
-| cluster.bootstrap | object | `{}` |  |
 | cluster.imageName | string | `"ghcr.io/cloudnative-pg/postgresql:18"` |  |
 | cluster.instances | int | `1` |  |
 | cluster.metadata.annotations | object | `{}` |  |
