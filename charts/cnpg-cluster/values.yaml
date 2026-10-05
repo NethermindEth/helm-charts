@@ -24,7 +24,14 @@ cluster:
     # Extra annotations to add to the cluster
     annotations: {}
 
-  bootstrap: {}
+  # Bootstrap the cluster, see https://cloudnative-pg.io/docs/1.30/bootstrap
+  # By default, CNPG will create an "app" role and database
+  # bootstrap:
+  #   initdb:
+  #     database: app
+  #     owner: app
+  #     secret:
+  #       name: app-secret
 
   # Number of PostgreSQL instances (replicas).
   instances: 1
