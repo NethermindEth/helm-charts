@@ -68,11 +68,19 @@ defaults:
   tolerations: []
   affinity: {}
 
-  # -- Spread the pods of each project across nodes. If a constraint has no `labelSelector`, the chart uses the selector labels of that project. Set to `[]` in a project to disable.
+  # -- Spread the pods of each project across nodes (required) and zones (preferred). If a constraint has no `labelSelector`, the chart uses the selector labels of that project. `nodeTaintsPolicy: Honor` ignores nodes the pods cannot use, such as tainted control-plane nodes. `matchLabelKeys: [pod-template-hash]` counts only pods of the same revision, so old pods do not count during a rollout. Set to `[]` in a project to disable.
   topologySpreadConstraints:
     - maxSkew: 1
       topologyKey: kubernetes.io/hostname
       whenUnsatisfiable: DoNotSchedule
+      nodeTaintsPolicy: Honor
+      matchLabelKeys:
+        - pod-template-hash
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      matchLabelKeys:
+        - pod-template-hash
 
   # -- PodDisruptionBudget for each project. Set either `minAvailable` or `maxUnavailable`, not both. To use `minAvailable` here, also set `maxUnavailable: null`.
   podDisruptionBudget:

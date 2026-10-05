@@ -1,6 +1,6 @@
 # drpc-nodecore
 
-![Version: 2.4.0](https://img.shields.io/badge/Version-2.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.14.0](https://img.shields.io/badge/AppVersion-1.14.0-informational?style=flat-square)
+![Version: 2.5.0](https://img.shields.io/badge/Version-2.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.14.0](https://img.shields.io/badge/AppVersion-1.14.0-informational?style=flat-square)
 
 A Helm chart for dRPC nodeCore application
 
@@ -65,7 +65,7 @@ A Helm chart for dRPC nodeCore application
 | defaults.serviceMonitor.interval | string | `"30s"` |  |
 | defaults.terminationGracePeriodSeconds | int | `30` |  |
 | defaults.tolerations | list | `[]` |  |
-| defaults.topologySpreadConstraints | list | `[{"maxSkew":1,"topologyKey":"kubernetes.io/hostname","whenUnsatisfiable":"DoNotSchedule"}]` | Spread the pods of each project across nodes. If a constraint has no `labelSelector`, the chart uses the selector labels of that project. Set to `[]` in a project to disable. |
+| defaults.topologySpreadConstraints | list | `[{"matchLabelKeys":["pod-template-hash"],"maxSkew":1,"nodeTaintsPolicy":"Honor","topologyKey":"kubernetes.io/hostname","whenUnsatisfiable":"DoNotSchedule"},{"matchLabelKeys":["pod-template-hash"],"maxSkew":1,"topologyKey":"topology.kubernetes.io/zone","whenUnsatisfiable":"ScheduleAnyway"}]` | Spread the pods of each project across nodes (required) and zones (preferred). If a constraint has no `labelSelector`, the chart uses the selector labels of that project. `nodeTaintsPolicy: Honor` ignores nodes the pods cannot use, such as tainted control-plane nodes. `matchLabelKeys: [pod-template-hash]` counts only pods of the same revision, so old pods do not count during a rollout. Set to `[]` in a project to disable. |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"drpcorg/nodecore"` |  |

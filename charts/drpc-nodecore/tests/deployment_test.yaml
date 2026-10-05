@@ -14,7 +14,7 @@ set:
               url: https://ethereum-rpc.publicnode.com
 
 tests:
-  - it: spreads the pods of a project across nodes by default
+  - it: spreads the pods of a project across nodes and zones by default
     asserts:
       - equal:
           path: spec.template.spec.topologySpreadConstraints
@@ -22,6 +22,19 @@ tests:
             - maxSkew: 1
               topologyKey: kubernetes.io/hostname
               whenUnsatisfiable: DoNotSchedule
+              nodeTaintsPolicy: Honor
+              matchLabelKeys:
+                - pod-template-hash
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: drpc-nodecore
+                  app.kubernetes.io/instance: RELEASE-NAME
+                  drpc-nodecore/project: demo
+            - maxSkew: 1
+              topologyKey: topology.kubernetes.io/zone
+              whenUnsatisfiable: ScheduleAnyway
+              matchLabelKeys:
+                - pod-template-hash
               labelSelector:
                 matchLabels:
                   app.kubernetes.io/name: drpc-nodecore
