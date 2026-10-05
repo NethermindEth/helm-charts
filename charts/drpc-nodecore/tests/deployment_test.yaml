@@ -1,0 +1,63 @@
+suite: deployment topology spread tests
+
+templates:
+  - deployment.yaml
+
+set:
+  projects:
+    demo:
+      upstreams:
+        - id: public-eth
+          chain: ethereum
+          connectors:
+            - type: json-rpc
+              url: https://ethereum-rpc.publicnode.com
+
+tests:
+  - it: spreads the pods of a project across nodes by default
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints
+          value:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: drpc-nodecore
+                  app.kubernetes.io/instance: RELEASE-NAME
+                  drpc-nodecore/project: demo
+
+  - it: keeps a labelSelector that the project sets
+    set:
+      projects.demo.topologySpreadConstraints:
+        - maxSkew: 2
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              custom: label
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints
+          value:
+            - maxSkew: 2
+              topologyKey: topology.kubernetes.io/zone
+              whenUnsatisfiable: ScheduleAnyway
+              labelSelector:
+                matchLabels:
+                  custom: label
+
+  - it: does not set constraints when the project disables them
+    set:
+      projects.demo.topologySpreadConstraints: []
+    asserts:
+      - notExists:
+          path: spec.template.spec.topologySpreadConstraints
+
+  - it: does not set constraints when the defaults are empty
+    set:
+      defaults.topologySpreadConstraints: []
+    asserts:
+      - notExists:
+          path: spec.template.spec.topologySpreadConstraints

@@ -114,6 +114,21 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- $topologySpreadConstraints := $defaults.topologySpreadConstraints }}
+      {{- if hasKey $projectConfig "topologySpreadConstraints" }}
+      {{- $topologySpreadConstraints = $projectConfig.topologySpreadConstraints }}
+      {{- end }}
+      {{- with $topologySpreadConstraints }}
+      {{- $defaultLabelSelector := dict "matchLabels" (include "drpc-nodecore.projectSelectorLabels" $ctx | fromYaml) }}
+      topologySpreadConstraints:
+        {{- range . }}
+        {{- $constraint := deepCopy . }}
+        {{- if not (hasKey $constraint "labelSelector") }}
+        {{- $_ := set $constraint "labelSelector" $defaultLabelSelector }}
+        {{- end }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+        {{- end }}
+      {{- end }}
       {{- with $projectConfig.tolerations | default $defaults.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

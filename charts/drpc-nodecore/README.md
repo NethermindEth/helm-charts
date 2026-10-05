@@ -1,6 +1,6 @@
 # drpc-nodecore
 
-![Version: 2.3.0](https://img.shields.io/badge/Version-2.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.14.0](https://img.shields.io/badge/AppVersion-1.14.0-informational?style=flat-square)
+![Version: 2.4.0](https://img.shields.io/badge/Version-2.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.14.0](https://img.shields.io/badge/AppVersion-1.14.0-informational?style=flat-square)
 
 A Helm chart for dRPC nodeCore application
 
@@ -39,6 +39,7 @@ A Helm chart for dRPC nodeCore application
 | defaults.livenessProbe.tcpSocket.port | int | `9090` |  |
 | defaults.livenessProbe.timeoutSeconds | int | `1` |  |
 | defaults.nodeSelector | object | `{}` |  |
+| defaults.podDisruptionBudget | object | `{"enabled":true,"maxUnavailable":1}` | PodDisruptionBudget for each project. Set either `minAvailable` or `maxUnavailable`, not both. To use `minAvailable` here, also set `maxUnavailable: null`. |
 | defaults.podSecurityContext.fsGroup | int | `1000` |  |
 | defaults.podSecurityContext.runAsGroup | int | `1000` |  |
 | defaults.podSecurityContext.runAsNonRoot | bool | `true` |  |
@@ -64,6 +65,7 @@ A Helm chart for dRPC nodeCore application
 | defaults.serviceMonitor.interval | string | `"30s"` |  |
 | defaults.terminationGracePeriodSeconds | int | `30` |  |
 | defaults.tolerations | list | `[]` |  |
+| defaults.topologySpreadConstraints | list | `[{"maxSkew":1,"topologyKey":"kubernetes.io/hostname","whenUnsatisfiable":"DoNotSchedule"}]` | Spread the pods of each project across nodes. If a constraint has no `labelSelector`, the chart uses the selector labels of that project. Set to `[]` in a project to disable. |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"drpcorg/nodecore"` |  |

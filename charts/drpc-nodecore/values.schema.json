@@ -167,6 +167,35 @@
       },
       "type": "object"
     },
+    "topologySpreadConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "maxSkew": { "minimum": 1, "type": "integer" },
+        "topologyKey": { "type": "string" },
+        "whenUnsatisfiable": { "enum": ["DoNotSchedule", "ScheduleAnyway"], "type": "string" },
+        "labelSelector": { "$ref": "#/definitions/labelSelector" },
+        "matchLabelKeys": { "items": { "type": "string" }, "type": "array" },
+        "minDomains": { "minimum": 1, "type": "integer" },
+        "nodeAffinityPolicy": { "enum": ["Honor", "Ignore"], "type": "string" },
+        "nodeTaintsPolicy": { "enum": ["Honor", "Ignore"], "type": "string" }
+      },
+      "required": ["maxSkew", "topologyKey", "whenUnsatisfiable"],
+      "type": "object"
+    },
+    "topologySpreadConstraints": {
+      "items": { "$ref": "#/definitions/topologySpreadConstraint" },
+      "type": "array"
+    },
+    "podDisruptionBudget": {
+      "additionalProperties": false,
+      "not": { "required": ["minAvailable", "maxUnavailable"] },
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "minAvailable": { "oneOf": [{ "minimum": 0, "type": "integer" }, { "pattern": "^[0-9]+%$", "type": "string" }] },
+        "maxUnavailable": { "oneOf": [{ "minimum": 1, "type": "integer" }, { "pattern": "^[1-9][0-9]*%$", "type": "string" }] }
+      },
+      "type": "object"
+    },
     "autoscaling": {
       "additionalProperties": false,
       "properties": {
@@ -345,6 +374,7 @@
           "$ref": "#/definitions/labelMap",
           "title": "nodeSelector"
         },
+        "podDisruptionBudget": { "$ref": "#/definitions/podDisruptionBudget", "title": "podDisruptionBudget" },
         "podSecurityContext": {
           "additionalProperties": false,
           "properties": {
@@ -415,6 +445,7 @@
           "title": "serviceMonitor"
         },
         "terminationGracePeriodSeconds": { "default": 30, "minimum": 0, "title": "terminationGracePeriodSeconds", "type": "integer" },
+        "topologySpreadConstraints": { "$ref": "#/definitions/topologySpreadConstraints", "title": "topologySpreadConstraints" },
         "tolerations": {
           "items": { "$ref": "#/definitions/toleration" },
           "title": "tolerations",
@@ -490,6 +521,8 @@
           "nodeSelector": { "$ref": "#/definitions/labelMap", "title": "nodeSelector" },
           "tolerations": { "items": { "$ref": "#/definitions/toleration" }, "title": "tolerations", "type": "array" },
           "affinity": { "$ref": "#/definitions/affinity", "title": "affinity" },
+          "topologySpreadConstraints": { "$ref": "#/definitions/topologySpreadConstraints", "title": "topologySpreadConstraints" },
+          "podDisruptionBudget": { "$ref": "#/definitions/podDisruptionBudget", "title": "podDisruptionBudget" },
           "deployment": {
             "additionalProperties": false,
             "properties": {

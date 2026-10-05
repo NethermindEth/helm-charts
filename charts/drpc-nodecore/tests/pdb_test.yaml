@@ -1,0 +1,62 @@
+suite: pdb tests
+
+templates:
+  - pdb.yaml
+
+set:
+  projects:
+    demo:
+      upstreams:
+        - id: public-eth
+          chain: ethereum
+          connectors:
+            - type: json-rpc
+              url: https://ethereum-rpc.publicnode.com
+
+tests:
+  - it: creates a PDB for each project by default
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-drpc-nodecore-demo
+      - equal:
+          path: spec.maxUnavailable
+          value: 1
+      - notExists:
+          path: spec.minAvailable
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: drpc-nodecore
+            app.kubernetes.io/instance: RELEASE-NAME
+            drpc-nodecore/project: demo
+
+  - it: uses the PDB that the project sets
+    set:
+      projects.demo.podDisruptionBudget:
+        minAvailable: 1
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 1
+      - notExists:
+          path: spec.maxUnavailable
+
+  - it: does not create a PDB when the project disables it
+    set:
+      projects.demo.podDisruptionBudget:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: does not create a PDB when the defaults disable it
+    set:
+      defaults.podDisruptionBudget.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

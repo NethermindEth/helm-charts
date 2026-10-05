@@ -1,0 +1,28 @@
+{{- range $projectName, $projectConfig := .Values.projects }}
+{{- $ctx := dict "root" $ "projectName" $projectName }}
+{{- $defaults := $.Values.defaults }}
+{{- $deployment := $projectConfig.deployment | default $defaults.deployment }}
+{{- $pdb := $projectConfig.podDisruptionBudget | default $defaults.podDisruptionBudget }}
+{{- $pdbEnabled := ternary $pdb.enabled true (hasKey $pdb "enabled") }}
+{{- if and ($deployment.enabled | default $defaults.deployment.enabled) $pdbEnabled }}
+{{- if and (hasKey $pdb "minAvailable") (hasKey $pdb "maxUnavailable") }}
+{{- fail (printf "podDisruptionBudget of project %s cannot set both minAvailable and maxUnavailable" $projectName) }}
+{{- end }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "drpc-nodecore.projectName" $ctx }}
+  labels:
+    {{- include "drpc-nodecore.projectLabels" $ctx | nindent 4 }}
+spec:
+  {{- if hasKey $pdb "minAvailable" }}
+  minAvailable: {{ $pdb.minAvailable }}
+  {{- else }}
+  maxUnavailable: {{ $pdb.maxUnavailable | default 1 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "drpc-nodecore.projectSelectorLabels" $ctx | nindent 6 }}
+{{- end }}
+{{- end }}
