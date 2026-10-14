@@ -131,7 +131,7 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-# Extra annotations for the workload (Deployment or StatefulSet
+# Extra annotations for the workload (Deployment or StatefulSet)
 annotations: {}
 # Extra labels for the workload (Deployment or StatefulSet)
 labels: {}
