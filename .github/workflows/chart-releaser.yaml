@@ -10,6 +10,7 @@ jobs:
   helm-chart-release:
     permissions:
       contents: write
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,10 +54,22 @@ jobs:
           CR_SKIP_EXISTING: true
           CR_GENERATE_RELEASE_NOTES: true
 
+      - name: Set up JFrog CLI
+        id: jfrog
+        uses: jfrog/setup-jfrog-cli@1e584506871998c267b7c100c02628a5b9c81db6 # v5.3.0
+        env:
+          JF_URL: https://nethermind.jfrog.io
+        with:
+          oidc-provider-name: github-nethermindeth
+
       - name: Publish to JFrog Artifactory
         shell: bash
+        env:
+          JF_USER: ${{ steps.jfrog.outputs.oidc-user }}
+          JF_TOKEN: ${{ steps.jfrog.outputs.oidc-token }}
         run: |
-          helm registry login nethermind.jfrog.io --username ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }} --password ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
+          set -e
+          echo "$JF_TOKEN" | helm registry login nethermind.jfrog.io --username "$JF_USER" --password-stdin
           for chart in .cr-release-packages/*.tgz; do
             if [ -f "$chart" ]; then
               helm push "$chart" oci://nethermind.jfrog.io/angkor-helmoci-local
