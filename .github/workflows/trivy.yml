@@ -7,6 +7,7 @@ on:
 permissions:
   contents: read
   security-events: write
+  id-token: write
 jobs:
   scan:
     name: Security Scan
@@ -15,12 +16,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 #v4.2.1
 
+      - name: Set up JFrog CLI
+        id: jfrog
+        uses: jfrog/setup-jfrog-cli@1e584506871998c267b7c100c02628a5b9c81db6 # v5.3.0
+        env:
+          JF_URL: https://nethermind.jfrog.io
+        with:
+          oidc-provider-name: github-nethermindeth
+
       - name: JFrog Login
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 #v3.3.0
         with:
           registry: nethermind.jfrog.io
-          username: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
-          password: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
+          username: ${{ steps.jfrog.outputs.oidc-user }}
+          password: ${{ steps.jfrog.outputs.oidc-token }}
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
@@ -69,8 +78,8 @@ jobs:
           severity: "CRITICAL,HIGH,MEDIUM,LOW"
           trivy-config: ".trivy.yaml"
         env:
-          TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
-          TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
+          TRIVY_USERNAME: ${{ steps.jfrog.outputs.oidc-user }}
+          TRIVY_PASSWORD: ${{ steps.jfrog.outputs.oidc-token }}
           TRIVY_DB_REPOSITORY: mirror.gcr.io/aquasec/trivy-db:2
           TRIVY_CHECKS_BUNDLE_REPOSITORY: nethermind.jfrog.io/angkor-oci-local-staging/trivy-checks:latest
           TRIVY_DEBUG: true
@@ -96,8 +105,8 @@ jobs:
           skip-setup-trivy: true
           trivy-config: ".trivy.yaml"
         env:
-          TRIVY_USERNAME: ${{ secrets.ARTIFACTORY_ANGKOR_USERNAME }}
-          TRIVY_PASSWORD: ${{ secrets.ARTIFACTORY_ANGKOR_TOKEN_DEVELOPER }}
+          TRIVY_USERNAME: ${{ steps.jfrog.outputs.oidc-user }}
+          TRIVY_PASSWORD: ${{ steps.jfrog.outputs.oidc-token }}
           TRIVY_DB_REPOSITORY: mirror.gcr.io/aquasec/trivy-db:2
           TRIVY_CHECKS_BUNDLE_REPOSITORY: nethermind.jfrog.io/angkor-oci-local-staging/trivy-checks:latest
           TRIVY_DEBUG: true
