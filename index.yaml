@@ -3434,6 +3434,18 @@ entries:
     version: 1.0.0
   generic-app:
   - apiVersion: v2
+    created: "2026-10-14T13:31:55.62038656Z"
+    description: A Helm chart for Kubernetes generic app
+    digest: 05389e4ce69b8921cf0828cf3202f0dade9d9e5d9fe6907461afb6cfec497560
+    maintainers:
+    - name: 0xDones
+    - name: gehlotanish
+    name: generic-app
+    type: application
+    urls:
+    - https://github.com/NethermindEth/helm-charts/releases/download/generic-app-4.2.0/generic-app-4.2.0.tgz
+    version: 4.2.0
+  - apiVersion: v2
     created: "2026-09-22T08:04:47.140956885Z"
     description: A Helm chart for Kubernetes generic app
     digest: 2e59f4853e9cf621da666f3e1968d840e8c1a1ad72c577c8fbb80d640b460d37
@@ -5581,4 +5593,4 @@ entries:
     urls:
     - https://github.com/NethermindEth/helm-charts/releases/download/web3signer-1.0.0/web3signer-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-05T19:06:46.826052301Z"
+generated: "2026-10-14T13:31:55.62147113Z"
