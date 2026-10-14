@@ -382,6 +382,14 @@
         }
       }
     },
+    "annotations": {
+      "type": "object",
+      "description": "Extra annotations for the workload (Deployment or StatefulSet)"
+    },
+    "labels": {
+      "type": "object",
+      "description": "Extra labels for the workload (Deployment or StatefulSet)"
+    },
     "podAnnotations": {
       "type": "object",
       "description": "Annotations to add to pods"

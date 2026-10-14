@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 4.1.0](https://img.shields.io/badge/Version-4.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 4.2.0](https://img.shields.io/badge/Version-4.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -209,6 +209,7 @@ statefulSet:
 | TCPRoutes.annotations | object | `{}` |  |
 | TCPRoutes.routes | object | `{}` |  |
 | affinity | object | `{}` |  |
+| annotations | object | `{}` |  |
 | antiAffinityPreset | string | `""` |  |
 | args | list | `[]` |  |
 | command | list | `[]` | Command and args for the container |
@@ -234,6 +235,7 @@ statefulSet:
 | initContainerSecurityContext.runAsUser | int | `1000` |  |
 | initContainerSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | initContainers | list | `[]` | Init containers |
+| labels | object | `{}` |  |
 | livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
