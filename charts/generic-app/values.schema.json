@@ -906,6 +906,24 @@
           "items": {
             "type": "object"
           }
+        },
+        "fallbackScrapeProtocol": {
+          "description": "Protocol Prometheus uses when the target sends a missing or unknown Content-Type",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "enum": [
+                "PrometheusProto",
+                "OpenMetricsText0.0.1",
+                "OpenMetricsText1.0.0",
+                "PrometheusText0.0.4",
+                "PrometheusText1.0.0"
+              ]
+            }
+          ]
         }
       }
     },
