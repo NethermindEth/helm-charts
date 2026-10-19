@@ -17,6 +17,9 @@ metadata:
   {{ toYaml .Values.serviceMonitor.annotations | nindent 4 }}
   {{- end }}
 spec:
+  {{- with .Values.serviceMonitor.fallbackScrapeProtocol }}
+  fallbackScrapeProtocol: {{ . }}
+  {{- end }}
   endpoints:
   - interval: {{ .Values.serviceMonitor.interval }}
     {{- if .Values.serviceMonitor.scrapeTimeout }}

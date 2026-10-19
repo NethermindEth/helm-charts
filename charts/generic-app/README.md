@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 4.2.0](https://img.shields.io/badge/Version-4.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 4.3.0](https://img.shields.io/badge/Version-4.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -273,6 +273,7 @@ statefulSet:
 | serviceAccount.name | string | `""` |  |
 | serviceMonitor.annotations | object | `{}` | Additional ServiceMonitor annotations |
 | serviceMonitor.enabled | bool | `false` | If true, a ServiceMonitor CRD is created for a prometheus operator. https://github.com/coreos/prometheus-operator |
+| serviceMonitor.fallbackScrapeProtocol | string | `nil` | Protocol Prometheus uses when the target sends a missing or unknown Content-Type (e.g. PrometheusText0.0.4) |
 | serviceMonitor.interval | string | `"1m"` | ServiceMonitor scrape interval |
 | serviceMonitor.labels | object | `{}` | Additional ServiceMonitor labels |
 | serviceMonitor.metricRelabelings | list | `[]` | ServiceMonitor metricRelabelings |

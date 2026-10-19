@@ -366,6 +366,8 @@ serviceMonitor:
   relabelings: []
   # -- ServiceMonitor metricRelabelings
   metricRelabelings: []
+  # -- Protocol Prometheus uses when the target sends a missing or unknown Content-Type (e.g. PrometheusText0.0.4)
+  fallbackScrapeProtocol: null
 
 # Default security settings for the pod
 podSecurityContext:

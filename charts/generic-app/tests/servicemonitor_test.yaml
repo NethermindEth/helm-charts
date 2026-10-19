@@ -1,0 +1,30 @@
+suite: servicemonitor tests
+
+templates:
+  - servicemonitor.yaml
+
+set:
+  serviceMonitor:
+    enabled: true
+
+tests:
+  - it: should not set fallbackScrapeProtocol by default
+    asserts:
+      - notExists:
+          path: spec.fallbackScrapeProtocol
+
+  - it: should set fallbackScrapeProtocol when configured
+    set:
+      serviceMonitor:
+        fallbackScrapeProtocol: PrometheusText0.0.4
+    asserts:
+      - equal:
+          path: spec.fallbackScrapeProtocol
+          value: PrometheusText0.0.4
+
+  - it: should reject an unknown fallbackScrapeProtocol
+    set:
+      serviceMonitor:
+        fallbackScrapeProtocol: txt
+    asserts:
+      - failedTemplate: {}
