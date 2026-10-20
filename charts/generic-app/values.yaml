@@ -369,6 +369,27 @@ serviceMonitor:
   # -- Protocol Prometheus uses when the target sends a missing or unknown Content-Type (e.g. PrometheusText0.0.4)
   fallbackScrapeProtocol: null
 
+networkPolicy:
+  # -- If true, create a NetworkPolicy that selects this release's pods and allows only the ingress listed below.
+  # It does not deny anything on its own for other pods; pair it with a namespace default-deny-ingress policy.
+  enabled: false
+  # -- NetworkPolicy ingress rules. Each rule needs a non-empty `from`. A rule without `ports` allows the container
+  # ports of `service.ports`. An empty list denies all ingress to the pods.
+  ingress: []
+  # - from:
+  #     - podSelector:
+  #         matchLabels:
+  #           app.kubernetes.io/name: web
+  #     - namespaceSelector:
+  #         matchLabels:
+  #           kubernetes.io/metadata.name: istio-ingress
+  #       podSelector:
+  #         matchLabels:
+  #           gateway.networking.k8s.io/gateway-name: gateway-internal
+  #   ports:
+  #     - port: 8080
+  #       protocol: TCP
+
 # Default security settings for the pod
 podSecurityContext:
   fsGroup: 1000

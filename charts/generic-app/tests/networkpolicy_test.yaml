@@ -1,0 +1,104 @@
+suite: networkpolicy tests
+
+templates:
+  - networkpolicy.yaml
+
+release:
+  name: api
+
+set:
+  nameOverride: api
+  networkPolicy:
+    enabled: true
+
+tests:
+  - it: given no ingress rules then should deny all ingress
+    asserts:
+      - equal:
+          path: spec.ingress
+          value: []
+
+  - it: given a rule without ports then should default to the container ports of service.ports
+    set:
+      service:
+        ports:
+          - name: http
+            port: 80
+            containerPort: 3000
+            protocol: TCP
+          - name: metrics
+            port: 9090
+            protocol: TCP
+      networkPolicy:
+        ingress:
+          - from:
+              - podSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: web
+    asserts:
+      - equal:
+          path: spec.ingress[0].ports
+          value:
+            - port: 3000
+              protocol: TCP
+            - port: 9090
+              protocol: TCP
+
+  - it: given a rule with ports then should keep them
+    set:
+      networkPolicy:
+        ingress:
+          - from:
+              - podSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: web
+            ports:
+              - port: 9000
+                protocol: TCP
+    asserts:
+      - equal:
+          path: spec.ingress[0].ports
+          value:
+            - port: 9000
+              protocol: TCP
+
+  - it: given a rule without ports and no service ports then should fail
+    set:
+      service:
+        ports: []
+      networkPolicy:
+        ingress:
+          - from:
+              - podSelector: {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "a rule without ports needs service.ports"
+
+  - it: given a rule without from then should fail rather than allow every source
+    set:
+      networkPolicy:
+        ingress:
+          - ports:
+              - port: 8080
+    asserts:
+      - failedTemplate:
+          errorPattern: "missing property 'from'"
+
+  - it: given a rule with an empty from then should fail rather than allow every source
+    set:
+      networkPolicy:
+        ingress:
+          - from: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "minItems"
+
+  - it: given an empty peer then should fail rather than match every pod
+    set:
+      networkPolicy:
+        ingress:
+          - from:
+              - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "minProperties"
