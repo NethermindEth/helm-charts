@@ -15,6 +15,11 @@ description: Guides using helm-unittest for Helm charts. Use when writing unit t
   - It's easy to over-test Helm Charts, avoid it
   - Do not test "setters" or "basic enables": "given I set value foo to bar then foo is configured to bar" is a bad test
   - Test complex logic: "given no configured match patterns then should default to a catch-all" is a good test
+  - Also bad, even though they look like logic:
+    - "given enabled=false then no document renders": the `if .Values.x.enabled` guard is a basic enable
+    - "given the release then the selector uses the release labels": that only re-checks a shared helper
+  - Before writing each test, name the rule in one sentence. If the sentence restates a value or a guard, drop the test
+  - Fewer tests is the default: a new value or template does not need any
 - Individual test files should test individual templates
   - All tests should be associated with a template file that (optionally) actually renders a document
   - The exception is when testing integration between multiple templates, this should go into its own file
