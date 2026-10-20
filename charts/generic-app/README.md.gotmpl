@@ -116,6 +116,27 @@ serviceMonitor:
   path: /some/path/to/metrics
 ```
 
+### Network Policy
+
+`networkPolicy.enabled` creates an ingress NetworkPolicy that selects this release's pods and allows only the listed
+peers. A rule without `ports` allows the container ports of `service.ports`.
+
+```yaml
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: istio-ingress
+          podSelector:
+            matchLabels:
+              gateway.networking.k8s.io/gateway-name: gateway-internal
+```
+
+The policy only restricts the pods it selects. Traffic to other pods in the namespace stays open until the namespace
+has a default-deny-ingress policy, which this chart does not create.
+
 ### Application Configuration
 
 #### Environment Variables

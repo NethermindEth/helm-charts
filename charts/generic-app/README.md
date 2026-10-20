@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 4.3.0](https://img.shields.io/badge/Version-4.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 4.4.0](https://img.shields.io/badge/Version-4.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -117,6 +117,27 @@ serviceMonitor:
   port: bar
   path: /some/path/to/metrics
 ```
+
+### Network Policy
+
+`networkPolicy.enabled` creates an ingress NetworkPolicy that selects this release's pods and allows only the listed
+peers. A rule without `ports` allows the container ports of `service.ports`.
+
+```yaml
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: istio-ingress
+          podSelector:
+            matchLabels:
+              gateway.networking.k8s.io/gateway-name: gateway-internal
+```
+
+The policy only restricts the pods it selects. Traffic to other pods in the namespace stays open until the namespace
+has a default-deny-ingress policy, which this chart does not create.
 
 ### Application Configuration
 
@@ -238,6 +259,8 @@ statefulSet:
 | labels | object | `{}` |  |
 | livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
+| networkPolicy.enabled | bool | `false` | If true, create a NetworkPolicy that selects this release's pods and allows only the ingress listed below. It does not deny anything on its own for other pods; pair it with a namespace default-deny-ingress policy. |
+| networkPolicy.ingress | list | `[]` | NetworkPolicy ingress rules. Each rule needs a non-empty `from`. A rule without `ports` allows the container ports of `service.ports`. An empty list denies all ingress to the pods. |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
 | podDisruptionBudget | object | `{"enabled":false,"minAvailable":1}` | PodDisruptionBudget configuration |

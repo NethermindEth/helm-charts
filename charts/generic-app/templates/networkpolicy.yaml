@@ -1,0 +1,35 @@
+{{- if .Values.networkPolicy.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "generic-app.fullname" . }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "generic-app.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  {{- if .Values.networkPolicy.ingress }}
+  ingress:
+    {{- range $rule := .Values.networkPolicy.ingress }}
+    - from:
+        {{- toYaml $rule.from | nindent 8 }}
+      ports:
+        {{- if $rule.ports }}
+        {{- toYaml $rule.ports | nindent 8 }}
+        {{- else if $.Values.service.ports }}
+        {{- range $port := $.Values.service.ports }}
+        - port: {{ $port.containerPort | default $port.port }}
+          protocol: {{ $port.protocol }}
+        {{- end }}
+        {{- else }}
+        {{- fail "networkPolicy.ingress: a rule without ports needs service.ports to default to" }}
+        {{- end }}
+    {{- end }}
+  {{- else }}
+  ingress: []
+  {{- end }}
+{{- end }}
