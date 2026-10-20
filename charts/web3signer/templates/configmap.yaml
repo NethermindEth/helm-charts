@@ -19,7 +19,6 @@ data:
     metrics-host: "0.0.0.0"
     metrics-port: {{ .Values.metricsPort }}
     metrics-host-allowlist: ["*"]
-    swagger-ui-enabled: true
     http-cors-origins: ["*"]
     http-listen-host: "0.0.0.0"
     http-listen-port: {{ .Values.httpPort }}
