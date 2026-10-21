@@ -567,6 +567,12 @@
                   },
                   "title": "methods",
                   "type": "object"
+                },
+                "group-labels": {
+                  "description": "Priority group labels for label-balancing. See https://github.com/drpcorg/nodecore/blob/main/docs/nodecore/05-upstream-config.md#label-balancing",
+                  "items": { "type": "string" },
+                  "title": "group-labels",
+                  "type": "array"
                 }
               },
               "required": ["id", "chain", "connectors"],
