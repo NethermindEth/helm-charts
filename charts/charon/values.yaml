@@ -60,6 +60,9 @@ containerSecurityContext: {}
 rbac:
   # -- Specifies whether RBAC resources are to be created
   enabled: true
+  clusterRole:
+    # -- Set to false to skip only the ClusterRole and ClusterRoleBinding (e.g. when they are managed elsewhere under the same name); the Role and RoleBinding stay
+    create: true
   # -- The name of the cluster role to use. If not set and create is true, a name is generated using the fullname template
   name: ""
   # -- Required ClusterRole rules

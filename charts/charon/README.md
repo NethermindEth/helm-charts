@@ -3,7 +3,7 @@
 Charon
 ===========
 
-![Version: 0.5.1](https://img.shields.io/badge/Version-0.5.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.8.2](https://img.shields.io/badge/AppVersion-1.8.2-informational?style=flat-square)
+![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.8.2](https://img.shields.io/badge/AppVersion-1.8.2-informational?style=flat-square)
 
 Charon is an open-source Ethereum Distributed validator middleware written in golang.
 
@@ -78,7 +78,8 @@ Charon is an open-source Ethereum Distributed validator middleware written in go
 | podAnnotations | object | `{}` | Pod annotations |
 | podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":1}` | Enable and configure pod disruption budget # ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb |
 | priorityClassName | string | `""` | Used to assign priority to pods # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/ |
-| rbac | object | `{"clusterRules":[{"apiGroups":[""],"resources":["nodes"],"verbs":["get","list","watch"]}],"enabled":true,"name":"","rules":[{"apiGroups":[""],"resources":["services"],"verbs":["get","list","watch"]}]}` | RBAC configuration. # ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/ |
+| rbac | object | `{"clusterRole":{"create":true},"clusterRules":[{"apiGroups":[""],"resources":["nodes"],"verbs":["get","list","watch"]}],"enabled":true,"name":"","rules":[{"apiGroups":[""],"resources":["services"],"verbs":["get","list","watch"]}]}` | RBAC configuration. # ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/ |
+| rbac.clusterRole.create | bool | `true` | Set to false to skip only the ClusterRole and ClusterRoleBinding (e.g. when they are managed elsewhere under the same name); the Role and RoleBinding stay |
 | rbac.clusterRules | list | `[{"apiGroups":[""],"resources":["nodes"],"verbs":["get","list","watch"]}]` | Required ClusterRole rules |
 | rbac.clusterRules[0] | object | `{"apiGroups":[""],"resources":["nodes"],"verbs":["get","list","watch"]}` | Required to obtain the nodes external IP |
 | rbac.enabled | bool | `true` | Specifies whether RBAC resources are to be created |
