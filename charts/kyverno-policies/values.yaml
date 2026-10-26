@@ -26,6 +26,10 @@ validatingPolicies:
             apiVersions: [v1]
             operations: [CREATE, UPDATE]
             resources: [pods]
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [UPDATE]
+            resources: [pods/ephemeralcontainers]
       variables:
         - name: allContainers
           expression: |
@@ -126,6 +130,10 @@ validatingPolicies:
             apiVersions: [v1]
             operations: [CREATE, UPDATE]
             resources: [pods]
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [UPDATE]
+            resources: [pods/ephemeralcontainers]
       variables:
         - name: allContainers
           expression: |
@@ -207,6 +215,10 @@ validatingPolicies:
             apiVersions: [v1]
             operations: [CREATE, UPDATE]
             resources: [pods]
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [UPDATE]
+            resources: [pods/ephemeralcontainers]
       variables:
         - name: allContainers
           expression: |
