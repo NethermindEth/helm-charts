@@ -370,7 +370,7 @@
         },
         "automount": {
           "type": "boolean",
-          "description": "Automount service account API credentials"
+          "description": "Mount Kubernetes API credentials in the pod, including with an existing service account"
         },
         "annotations": {
           "type": "object",

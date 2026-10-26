@@ -24,6 +24,13 @@ Always use the `nameOverride` to set the name of the resources.
 nameOverride: "my-app"
 ```
 
+### Service account token mounting
+
+`serviceAccount.automount` controls token mounting on both Deployments and StatefulSets,
+including when `serviceAccount.create` is `false`. It defaults to `false`.
+When upgrading, workloads using an existing account that need Kubernetes API credentials
+must explicitly set `serviceAccount.automount: true`.
+
 ### Init Containers or Sidecars
 
 ```yaml

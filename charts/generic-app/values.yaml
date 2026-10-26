@@ -122,8 +122,8 @@ extraObjects: []
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
-  # Automatically mount a ServiceAccount's API credentials? Off by default: the mounted token is a
-  # live cluster credential, and most apps never call the Kubernetes API. Set true only if yours does.
+  # -- Mount Kubernetes API credentials in the pod, including when using an existing service account.
+  # Off by default. Set true only for workloads that need Kubernetes API access.
   automount: false
   # Annotations to add to the service account
   annotations: {}
