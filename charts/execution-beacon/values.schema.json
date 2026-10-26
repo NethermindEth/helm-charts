@@ -3113,6 +3113,19 @@
       "additionalProperties": false,
       "description": "# RBAC configuration.\n# ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/\n#",
       "properties": {
+        "clusterRole": {
+          "additionalProperties": false,
+          "description": "Set to false to skip only the ClusterRole and ClusterRoleBinding (e.g. when they are managed elsewhere under the same name); the Role and RoleBinding stay",
+          "properties": {
+            "create": {
+              "default": true,
+              "title": "create",
+              "type": "boolean"
+            }
+          },
+          "title": "clusterRole",
+          "type": "object"
+        },
         "clusterRules": {
           "description": "# Required ClusterRole rules\n#",
           "items": {
