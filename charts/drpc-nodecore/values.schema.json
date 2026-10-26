@@ -535,6 +535,14 @@
           "cache": { "$ref": "#/definitions/cache", "title": "cache" },
           "nodecoreConfig": {
             "additionalProperties": true,
+            "properties": {
+              "mode": {
+                "description": "Upstream operating profile. See https://github.com/drpcorg/nodecore/blob/main/docs/nodecore/05-upstream-config.md#mode",
+                "enum": ["default", "strict"],
+                "title": "mode",
+                "type": "string"
+              }
+            },
             "title": "nodecoreConfig",
             "type": "object"
           },

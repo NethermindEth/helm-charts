@@ -32,6 +32,9 @@ data:
     {{- end }}
     upstream-config:
       {{- with $projectConfig.nodecoreConfig }}
+      {{- with .mode }}
+      mode: {{ . }}
+      {{- end }}
       {{- with .integrity }}
       integrity:
         {{- toYaml . | nindent 8 }}

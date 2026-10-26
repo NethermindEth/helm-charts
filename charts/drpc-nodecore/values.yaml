@@ -222,8 +222,10 @@ projects: {}
   #         finalization-type: finalized
   #         ttl: 10m
   #
-  #   # Optional NodeCore config sections (integrity, failsafe, chain-defaults, scoring)
+  #   # Optional NodeCore config sections (mode, integrity, failsafe, chain-defaults, scoring)
   #   nodecoreConfig:
+  #     # "default" or "strict". Strict mode turns on all validators and turns off integrity.
+  #     mode: default
   #     integrity:
   #       enabled: true
   #     failsafe-config:
