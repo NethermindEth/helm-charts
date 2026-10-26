@@ -28,6 +28,7 @@
   {{- $kind := include "kyverno-policies.kindFromKey" $policyKey }}
   {{- $isNamespaced := eq (include "kyverno-policies.isNamespaced" $policyKey) "true" }}
   {{- range $name, $policy := $policies }}
+  {{- if or (not (hasKey $policy "enabled")) $policy.enabled }}
 ---
 apiVersion: policies.kyverno.io/v1
 kind: {{ $kind }}
@@ -42,6 +43,7 @@ metadata:
     {{- include "kyverno-policies.policyAnnotations" (dict "name" $name "policy" $policy) | nindent 4 }}
 spec:
   {{- toYaml $policy.spec | nindent 2 }}
+  {{- end }}
   {{- end }}
 {{- end }}
 {{- end }}

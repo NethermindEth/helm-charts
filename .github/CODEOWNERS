@@ -11,3 +11,5 @@
 * @NethermindEth/role_angkor_admin
 
 /charts/ @NethermindEth/role_angkor_devops
+
+/charts/kyverno-policies/ @NethermindEth/role_angkor_platform_devops

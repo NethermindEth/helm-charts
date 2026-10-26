@@ -47,6 +47,22 @@ namespacedValidatingPolicies:
 
 See the values file or section for more options.
 
+## Default policies
+
+The chart ships the platform baseline policies as default values. A cluster values file only holds its overrides.
+Maps deep-merge, so a single field can be overridden without copying the policy; lists (`validations`, `variables`,
+`validationActions`, ...) replace wholesale. Policies marked `enabled: false` in the defaults are not rendered until a
+cluster sets `enabled: true`:
+
+```yaml
+validatingPolicies:
+  restrict-escalating-roles:
+    spec:
+      validationActions: [Deny]
+  require-pod-controller:
+    enabled: true
+```
+
 ## Updating the values schema
 
 `values.schema.json` is generated from the [datreeio/CRDs-catalog](https://github.com/datreeio/CRDs-catalog) community

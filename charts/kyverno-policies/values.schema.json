@@ -2162,6 +2162,9 @@
         },
         "spec": {
           "$ref": "#/definitions/validatingPolicySpec"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -2196,6 +2199,9 @@
         },
         "spec": {
           "$ref": "#/definitions/mutatingPolicySpec"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -2230,6 +2236,9 @@
         },
         "spec": {
           "$ref": "#/definitions/generatingPolicySpec"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -2264,6 +2273,9 @@
         },
         "spec": {
           "$ref": "#/definitions/deletingPolicySpec"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -2298,6 +2310,9 @@
         },
         "spec": {
           "$ref": "#/definitions/imageValidatingPolicySpec"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -2335,6 +2350,9 @@
         },
         "namespace": {
           "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -2372,6 +2390,9 @@
         },
         "namespace": {
           "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -2409,6 +2430,9 @@
         },
         "namespace": {
           "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -2446,6 +2470,9 @@
         },
         "namespace": {
           "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },
@@ -2483,6 +2510,9 @@
         },
         "namespace": {
           "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
         }
       }
     },

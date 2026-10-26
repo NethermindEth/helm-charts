@@ -70,8 +70,21 @@ tests:
                     has(c.resources.limits.memory))
                 message: CPU and memory limits are required for all containers
     asserts:
-      - hasDocuments:
-          count: 3
+      - isKind:
+          of: ValidatingPolicy
+        documentSelector:
+          path: metadata.name
+          value: disallow-privileged-containers
+      - isKind:
+          of: MutatingPolicy
+        documentSelector:
+          path: metadata.name
+          value: add-default-labels
+      - isKind:
+          of: NamespacedValidatingPolicy
+        documentSelector:
+          path: metadata.name
+          value: require-resource-limits
 
   - it: given valid policy then annotations are rendered correctly
     set:
@@ -86,15 +99,27 @@ tests:
       - equal:
           path: metadata.annotations["policies.kyverno.io/title"]
           value: Test Policy
+        documentSelector:
+          path: metadata.name
+          value: test-policy
       - equal:
           path: metadata.annotations["policies.kyverno.io/description"]
           value: A test policy
+        documentSelector:
+          path: metadata.name
+          value: test-policy
       - equal:
           path: metadata.annotations["policies.kyverno.io/severity"]
           value: high
+        documentSelector:
+          path: metadata.name
+          value: test-policy
       - equal:
           path: metadata.annotations["policies.kyverno.io/category"]
           value: Security
+        documentSelector:
+          path: metadata.name
+          value: test-policy
 
   - it: given namespacedValidatingPolicy with explicit namespace then that namespace is used
     set:
@@ -110,3 +135,22 @@ tests:
       - equal:
           path: metadata.namespace
           value: custom-ns
+        documentSelector:
+          path: metadata.name
+          value: test-policy
+
+  - it: given a default policy with only validationActions overridden then the rest of the policy is kept
+    set:
+      validatingPolicies:
+        restrict-escalating-roles:
+          spec:
+            validationActions: [Deny]
+    documentSelector:
+      path: metadata.name
+      value: restrict-escalating-roles
+    asserts:
+      - equal:
+          path: spec.validationActions
+          value: [Deny]
+      - isNotEmpty:
+          path: spec.validations

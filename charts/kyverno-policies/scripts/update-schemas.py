@@ -120,6 +120,7 @@ def policy_entry_def(spec_def_name: str, namespaced: bool = False) -> dict:
     }
     if namespaced:
         props["namespace"] = {"type": "string"}
+    props["enabled"] = {"type": "boolean"}
     return {
         "type": "object",
         "additionalProperties": False,

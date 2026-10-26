@@ -3,7 +3,778 @@ nameOverride: ""
 
 # -- Cluster-scoped ValidatingPolicy resources.
 # Each key is the policy name; value must include title, description, severity, category, and spec.
-validatingPolicies: {}
+# Set `enabled: false` on a policy to skip rendering it. Maps deep-merge across values files, lists replace wholesale.
+# @default -- the platform baseline policies, see values.yaml
+validatingPolicies:
+  require-resources:
+    title: Require Requests and Limits
+    description: >-
+      All containers must have requests with CPU and memory, and limits with at least memory configured. Properly sizing
+      containers ensures better application stability, cluster stability and reduced costs. Pod-level resources are
+      preferred, if available. CPU limits are not required, as merely imposing a limit introduces a performance penalty.
+    severity: medium
+    category: Best Practices
+    spec:
+      validationActions:
+        - Audit
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [pods]
+      variables:
+        - name: allContainers
+          expression: |
+            object.spec.containers +
+            object.spec.?initContainers.orValue([]) +
+            object.spec.?ephemeralContainers.orValue([])
+      validations:
+        - message: CPU and memory resource requests and memory limits are required for the pod or all containers.
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            (
+              has(object.spec.resources) &&
+              has(object.spec.resources.requests) &&
+                has(object.spec.resources.requests.memory) && object.spec.resources.requests.memory != '' &&
+                has(object.spec.resources.requests.cpu) && object.spec.resources.requests.cpu != '' &&
+              has(object.spec.resources.limits) &&
+                has(object.spec.resources.limits.memory) && object.spec.resources.limits.memory != ''
+            ) ||
+            (
+              variables.allContainers.all(c,
+                has(c.resources) &&
+                has(c.resources.requests) &&
+                  has(c.resources.requests.memory) && c.resources.requests.memory != '' &&
+                  has(c.resources.requests.cpu) && c.resources.requests.cpu != '' &&
+                has(c.resources.limits) &&
+                  has(c.resources.limits.memory) && c.resources.limits.memory != ''
+              )
+            )
+
+  require-readiness-probe:
+    title: Require Readiness Probes
+    description: >-
+      All containers must have a readinessProbe configured. Without it, pods may receive
+      traffic before they're ready, rollouts happen without proper tracking, and troubleshooting becomes harder.
+    severity: medium
+    category: Best Practices
+    spec:
+      validationActions:
+        - Audit
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [pods]
+      validations:
+        - message: A readinessProbe is required for all containers.
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            object.spec.containers.all(c, has(c.readinessProbe))
+
+  require-namespace-project-code:
+    title: Require ProjectCode Label on Namespaces
+    description: >-
+      All namespaces must have a ProjectCode label for cost attribution and ownership tracking.
+    severity: medium
+    category: Governance
+    spec:
+      validationActions:
+        - Audit
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [namespaces]
+      validations:
+        - message: Namespaces must have a ProjectCode label.
+          expression: |
+            has(object.metadata.labels.ProjectCode) && object.metadata.labels.ProjectCode != ''
+
+  require-artifactory-images:
+    title: Require images to be from our JFrog Artifactory
+    description: >-
+      All images on the cluster must come from our JFrog Artifactory instance. This protects us from downtime in
+      external registries and supply chain attacks where images we are running are replaced by malicious versions.
+      For external images, proxy registries are available.
+    severity: medium
+    category: Reliability
+    spec:
+      autogen:
+        podControllers:
+          controllers: []
+      validationActions:
+        - Audit
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [pods]
+      variables:
+        - name: allContainers
+          expression: |
+            object.spec.containers +
+            object.spec.?initContainers.orValue([]) +
+            object.spec.?ephemeralContainers.orValue([])
+      validations:
+        - message: Images must come from our JFrog Artifactory instance, either pushed directly or proxied.
+          expression: |
+            variables.allContainers.all(c, c.image.startsWith('nethermind.jfrog.io/'))
+
+  restrict-privileged-role-bindings:
+    title: Restrict Bindings to Powerful ClusterRoles
+    description: >-
+      RoleBindings and ClusterRoleBindings must not grant the cluster-admin, admin or edit ClusterRoles, or any
+      ClusterRole that allows all verbs on all resources, unless a PolicyException in kyverno-exceptions covers the
+      binding. Bindings in kube-system are exempt.
+    severity: high
+    category: Security
+    spec:
+      failurePolicy: Ignore
+      validationActions:
+        - Audit
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: kubernetes.io/metadata.name
+              operator: NotIn
+              values: ["kube-system"]
+        resourceRules:
+          - apiGroups: ["rbac.authorization.k8s.io"]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [rolebindings, clusterrolebindings]
+      variables:
+        - name: roleRules
+          expression: |
+            dyn(resource.Get('rbac.authorization.k8s.io/v1', 'clusterroles', '', object.roleRef.name).?rules.orValue([]))
+        - name: powerful
+          expression: |
+            object.roleRef.kind == 'ClusterRole' && (
+              object.roleRef.name in ['cluster-admin', 'admin', 'edit'] ||
+              (
+                variables.roleRules != null &&
+                variables.roleRules.exists(r,
+                  dyn(r.?verbs.orValue([])).exists(v, v == '*') && dyn(r.?resources.orValue([])).exists(x, x == '*')
+                )
+              )
+            )
+      validations:
+        - messageExpression: >-
+            'Binding to ClusterRole ' + object.roleRef.name + ' is not allowed.'
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            !variables.powerful
+
+  disallow-privileged-pods:
+    title: Disallow Privileged Pods
+    description: >-
+      Pods must not use privileged containers, hostPath volumes, hostNetwork, hostPID, hostIPC, or add the SYS_ADMIN,
+      NET_ADMIN or ALL capabilities. Workloads that need node access are covered by PolicyExceptions in kyverno-exceptions.
+    severity: high
+    category: Security
+    spec:
+      autogen:
+        podControllers:
+          controllers: []
+      validationActions:
+        - Deny
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [pods]
+      variables:
+        - name: allContainers
+          expression: |
+            object.spec.containers +
+            object.spec.?initContainers.orValue([]) +
+            object.spec.?ephemeralContainers.orValue([])
+      validations:
+        - message: >-
+            Privileged containers, hostPath volumes, host namespaces and the SYS_ADMIN, NET_ADMIN or ALL
+            capabilities are not allowed.
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            (
+              !object.spec.?hostNetwork.orValue(false) &&
+              !object.spec.?hostPID.orValue(false) &&
+              !object.spec.?hostIPC.orValue(false) &&
+              !object.spec.?volumes.orValue([]).exists(v, has(v.hostPath)) &&
+              variables.allContainers.all(c,
+                !c.?securityContext.?privileged.orValue(false) &&
+                !c.?securityContext.?capabilities.?add.orValue([]).exists(a,
+                  a.upperAscii() in ['SYS_ADMIN', 'NET_ADMIN', 'ALL', 'CAP_SYS_ADMIN', 'CAP_NET_ADMIN', 'CAP_ALL']
+                )
+              )
+            )
+
+  disallow-platform-audience-tokens:
+    title: Disallow Platform-Audience ServiceAccount Tokens
+    description: >-
+      Pods must not mount projected ServiceAccount tokens whose audience is infisical or a Google IAM workload identity
+      audience. Only workloads covered by a PolicyException in kyverno-exceptions are allowed to.
+    severity: high
+    category: Security
+    spec:
+      autogen:
+        podControllers:
+          controllers: []
+      validationActions:
+        - Deny
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [pods]
+      variables:
+        - name: platformAudiences
+          expression: |
+            object.spec.?volumes.orValue([]).map(v, v.?projected.?sources.orValue([])).flatten()
+              .map(s, s.?serviceAccountToken.?audience.orValue('').lowerAscii())
+              .filter(a, a == 'infisical' || a.startsWith('//iam.googleapis.com/') || a.startsWith('https://iam.googleapis.com/'))
+      validations:
+        - message: >-
+            Projected ServiceAccount tokens with the infisical or Google IAM audiences are not allowed.
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            size(variables.platformAudiences) == 0
+
+  protect-admission-policies:
+    title: Protect Admission Policies From Tampering
+    description: >-
+      Only the ArgoCD application controller, kube-system service accounts and the Kyverno controllers may update or
+      delete admission policies, policy bindings, Kyverno policies and admission webhook configurations. Creating
+      Kyverno policy exceptions is restricted the same way. Request
+      identity is not available to background scans, so this policy only evaluates admission requests.
+    severity: high
+    category: Security
+    spec:
+      failurePolicy: Ignore
+      validationActions:
+        - Deny
+      evaluation:
+        background:
+          enabled: false
+      matchConstraints:
+        resourceRules:
+          - apiGroups: ["admissionregistration.k8s.io"]
+            apiVersions: ["*"]
+            operations: [UPDATE, DELETE]
+            resources:
+              - validatingadmissionpolicies
+              - validatingadmissionpolicybindings
+              - mutatingadmissionpolicies
+              - mutatingadmissionpolicybindings
+              - validatingwebhookconfigurations
+              - mutatingwebhookconfigurations
+          - apiGroups: ["policies.kyverno.io"]
+            apiVersions: ["*"]
+            operations: [UPDATE, DELETE]
+            resources: ["*"]
+          - apiGroups: ["kyverno.io"]
+            apiVersions: ["*"]
+            operations: [UPDATE, DELETE]
+            resources: [clusterpolicies, policies, policyexceptions, cleanuppolicies, clustercleanuppolicies]
+          - apiGroups: ["policies.kyverno.io", "kyverno.io"]
+            apiVersions: ["*"]
+            operations: [CREATE]
+            resources: [policyexceptions]
+      variables:
+        - name: allowedUsers
+          expression: |
+            ['system:serviceaccount:kyverno:kyverno-admission-controller', 'system:serviceaccount:kyverno:kyverno-cleanup-controller']
+      validations:
+        - messageExpression: >-
+            'User ' + request.userInfo.username + ' may not ' + request.operation.lowerAscii() + ' ' +
+            request.resource.resource + '.'
+          expression: |
+            request.userInfo.username in variables.allowedUsers ||
+            request.userInfo.username.startsWith('arn:aws:sts::992382367123:assumed-role/rol-angproj81-apps-angkor-platform-argocd-prod/') ||
+            'system:serviceaccounts:kube-system' in request.userInfo.groups
+
+  bros-pvcs-must-have-autoresizer:
+    title: BROs StatefulSets must enroll PVCs in pvc-autoresizer
+    description: >-
+      All StatefulSet volumeClaimTemplates in BROs namespaces must have the resize.topolvm.io/storage_limit annotation
+      so that pvc-autoresizer can automatically expand disks before they fill up. Without this, the chances of a page
+      for a full disk increases dramatically.
+    severity: medium
+    category: Reliability
+    spec:
+      validationActions:
+        - Audit
+        - Warn
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: "nethermind.io/team"
+              operator: In
+              values: [angkor-bros]
+        resourceRules:
+          - apiGroups: ["apps"]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [statefulsets]
+      matchConditions:
+        - name: has-volume-claim-templates
+          expression: "has(object.spec.volumeClaimTemplates) && object.spec.volumeClaimTemplates.size() > 0"
+      validations:
+        - message: All volumeClaimTemplates must have the resize.topolvm.io/storage_limit annotation to enroll in pvc-autoresizer
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            object.spec.volumeClaimTemplates.all(pvc,
+              has(pvc.metadata) &&
+              has(pvc.metadata.annotations) &&
+              "resize.topolvm.io/storage_limit" in pvc.metadata.annotations &&
+              pvc.metadata.annotations["resize.topolvm.io/storage_limit"] != ''
+            )
+
+  bros-cnpg-must-have-autoresizer:
+    title: BROs CNPG Clusters must enroll PVCs in pvc-autoresizer
+    description: >-
+      All CNPG Cluster resources in BROs namespaces must propagate the resize.topolvm.io/storage_limit annotation to
+      their PVCs via spec.inheritedMetadata.annotations. Without this, the chances of a page for a full disk increases
+      dramatically.
+    severity: medium
+    category: Reliability
+    spec:
+      validationActions:
+        - Audit
+        - Warn
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: "nethermind.io/team"
+              operator: In
+              values: [angkor-bros]
+        resourceRules:
+          - apiGroups: ["postgresql.cnpg.io"]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [clusters]
+      validations:
+        - message: CNPG Clusters must set spec.inheritedMetadata.annotations["resize.topolvm.io/storage_limit"] to enroll PVCs in pvc-autoresizer
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            (
+              has(object.spec.inheritedMetadata) &&
+              has(object.spec.inheritedMetadata.annotations) &&
+              "resize.topolvm.io/storage_limit" in object.spec.inheritedMetadata.annotations &&
+              object.spec.inheritedMetadata.annotations["resize.topolvm.io/storage_limit"] != ''
+            )
+
+  bros-bare-pvcs-must-have-autoresizer:
+    title: BROs bare PVCs must be enrolled in pvc-autoresizer
+    description: >-
+      All standalone PVCs in BROs namespaces must have the resize.topolvm.io/storage_limit annotation
+      so that pvc-autoresizer can automatically expand disks before they fill up. Without this, the chances of a page
+      for a full disk increases dramatically.
+    severity: medium
+    category: Reliability
+    spec:
+      validationActions:
+        - Audit
+        - Warn
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: "nethermind.io/team"
+              operator: In
+              values: [angkor-bros]
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [persistentvolumeclaims]
+      validations:
+        - message: PVCs must have the resize.topolvm.io/storage_limit annotation to enroll in pvc-autoresizer
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            (
+              has(object.metadata.annotations) &&
+              "resize.topolvm.io/storage_limit" in object.metadata.annotations &&
+              object.metadata.annotations["resize.topolvm.io/storage_limit"] != ''
+            )
+
+  bros-alerts-must-have-runbooks:
+    title: BROs PrometheusRules Critical Alerts must have runbooks
+    description: >-
+      Runbooks are critical for proper oncall responses to any project. Without then, the oncall responder is left
+      guessing, and may either have to resort to "giving up" the alert, or paging the project lead outside of their
+      oncall hours. All BROs critical alerts must have a runbook URL attached
+    severity: medium
+    category: Best Practices
+    spec:
+      validationActions:
+        - Audit
+        - Deny
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: "nethermind.io/team"
+              operator: In
+              values: [angkor-bros]
+        resourceRules:
+          - apiGroups: ["monitoring.coreos.com"]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [prometheusrules]
+      validations:
+        - message: All alert rules must have the runbook_url annotation set to a runbook in Notion
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            object.spec.groups.all(g,
+              g.rules.filter(r,
+                has(r.alert) &&
+                r.alert != '' &&
+                r.labels.severity.orValue('') == 'critical'
+              ).all(r,
+                (
+                  has(r.annotations) &&
+                  has(r.annotations.runbook_url) &&
+                  r.annotations.runbook_url.contains('notion')
+                ) ||
+                (
+                  has(r.annotations) &&
+                  has(r.annotations.runbook_url_internal) &&
+                  r.annotations.runbook_url_internal.contains('notion')
+                )
+              )
+            )
+
+  restrict-escalating-roles:
+    title: Restrict Roles That Escalate Privileges
+    description: >-
+      Roles in tenant namespaces must not grant the escalate, bind or impersonate verbs, or all verbs on RBAC kinds or
+      on users, groups and serviceaccounts. Any of these lets the holder grant itself more access than the Role gives.
+      Platform namespaces are exempt.
+    severity: high
+    category: Security
+    spec:
+      failurePolicy: Ignore
+      validationActions:
+        - Audit
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: kubernetes.io/metadata.name
+              operator: NotIn
+              values:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - kyverno
+                - kyverno-exceptions
+                - external-secrets
+                - infisical
+        resourceRules:
+          - apiGroups: ["rbac.authorization.k8s.io"]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [roles]
+      variables:
+        - name: escalating
+          expression: |
+            dyn(object.?rules.orValue([])).exists(r,
+              dyn(r.?verbs.orValue([])).exists(v, v in ['escalate', 'bind', 'impersonate']) ||
+              (
+                dyn(r.?verbs.orValue([])).exists(v, v == '*') && (
+                  (
+                    dyn(r.?apiGroups.orValue([])).exists(g, g in ['rbac.authorization.k8s.io', '*']) &&
+                    dyn(r.?resources.orValue([])).exists(x, x in ['*', 'roles', 'clusterroles', 'rolebindings', 'clusterrolebindings'])
+                  ) || (
+                    dyn(r.?apiGroups.orValue([])).exists(g, g in ['', '*']) &&
+                    dyn(r.?resources.orValue([])).exists(x, x in ['*', 'users', 'groups', 'serviceaccounts'])
+                  )
+                )
+              )
+            )
+      validations:
+        - messageExpression: >-
+            'Role ' + object.metadata.name + ' must not grant escalate, bind, impersonate or all verbs on RBAC or identities.'
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            !variables.escalating
+
+  require-pod-controller:
+    enabled: false
+    title: Require Pods to be Owned by a Controller
+    description: >-
+      All pods must be created by a controller (Deployment, StatefulSet, DaemonSet, Job, CNPG Cluster, etc.) instead of
+      applied directly. Bare pods are not restarted on node failure, are invisible to rollouts and ArgoCD, and usually
+      indicate a manual `kubectl run`/`kubectl apply` that was never cleaned up.
+    severity: medium
+    category: Governance
+    spec:
+      autogen:
+        podControllers:
+          controllers: []
+      validationActions:
+        - Audit
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [pods]
+      validations:
+        - message: Pods must have an ownerReference with controller=true. Create them through a workload controller.
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            (
+              has(object.metadata.ownerReferences) &&
+              object.metadata.ownerReferences.exists(o, has(o.controller) && o.controller)
+            )
+
+  require-argocd-tracking:
+    enabled: false
+    title: Require Top-Level Workloads to be Managed by ArgoCD
+    description: >-
+      Deployments, StatefulSets, DaemonSets, ReplicaSets, Jobs and CronJobs that are not owned by another resource must
+      carry the argocd.argoproj.io/tracking-id annotation, which ArgoCD sets on everything it applies. A missing
+      annotation means the workload was created by hand or by a tool outside GitOps and will drift from the repository.
+      kube-system (EKS managed addons) and Tailscale operator proxies are excluded because they are legitimately managed
+      outside ArgoCD.
+    severity: medium
+    category: Governance
+    spec:
+      validationActions:
+        - Audit
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: kubernetes.io/metadata.name
+              operator: NotIn
+              values: [kube-system]
+        objectSelector:
+          matchExpressions:
+            - key: tailscale.com/managed
+              operator: DoesNotExist
+        resourceRules:
+          - apiGroups: [apps]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [deployments, statefulsets, daemonsets, replicasets]
+          - apiGroups: [batch]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [jobs, cronjobs]
+      matchConditions:
+        - name: is-top-level
+          expression: "!has(object.metadata.ownerReferences) || object.metadata.ownerReferences.size() == 0"
+      validations:
+        - message: Top-level workloads must be applied by ArgoCD (argocd.argoproj.io/tracking-id annotation is missing).
+          expression: |
+            has(object.metadata.deletionTimestamp) ||
+            (
+              has(object.metadata.annotations) &&
+              "argocd.argoproj.io/tracking-id" in object.metadata.annotations &&
+              object.metadata.annotations["argocd.argoproj.io/tracking-id"] != ''
+            )
+
+  eso-externalsecret-guardrails:
+    enabled: false
+    title: Restrict ExternalSecrets To Namespaced SecretStores
+    description: >-
+      Tenant ExternalSecrets must read from a SecretStore in their own namespace. ClusterSecretStore references,
+      dataFrom find, generatorRef and sourceRef to a ClusterSecretStore are denied. Platform namespaces are exempt.
+    severity: high
+    category: Security
+    spec:
+      validationActions:
+        - Deny
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: kubernetes.io/metadata.name
+              operator: NotIn
+              values:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - kyverno
+                - kyverno-exceptions
+                - external-secrets
+                - infisical
+        resourceRules:
+          - apiGroups: [external-secrets.io]
+            apiVersions: ["*"]
+            operations: [CREATE, UPDATE]
+            resources: [externalsecrets]
+      variables:
+        - name: sources
+          expression: |
+            object.?spec.?dataFrom.orValue([]) + object.?spec.?data.orValue([])
+      validations:
+        - message: >-
+            ExternalSecret spec.secretStoreRef.kind must be SecretStore. ClusterSecretStore is not allowed in tenant
+            namespaces.
+          expression: |
+            object.?spec.?secretStoreRef.?kind.orValue('SecretStore') == 'SecretStore'
+        - message: >-
+            ExternalSecret dataFrom[].sourceRef.storeRef.kind and data[].sourceRef.storeRef.kind must be SecretStore.
+            ClusterSecretStore is not allowed in tenant namespaces.
+          expression: |
+            variables.sources.all(d, d.?sourceRef.?storeRef.?kind.orValue('SecretStore') == 'SecretStore')
+        - message: ExternalSecret dataFrom[].find is not allowed. List every secret key explicitly.
+          expression: |
+            !object.?spec.?dataFrom.orValue([]).exists(d, has(d.find))
+        - message: ExternalSecret dataFrom[].sourceRef.generatorRef is not allowed. Generators are platform-only.
+          expression: |
+            !variables.sources.exists(d, has(d.sourceRef) && has(d.sourceRef.generatorRef))
+
+  eso-secretstore-guardrails:
+    enabled: false
+    title: Pin SecretStore ServiceAccounts To Their Own Namespace
+    description: >-
+      A tenant SecretStore must not set a namespace on any serviceAccountRef or serviceAccount under
+      spec.provider, so it
+      cannot borrow a ServiceAccount identity from another namespace. Platform namespaces are exempt.
+    severity: high
+    category: Security
+    spec:
+      validationActions:
+        - Deny
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: kubernetes.io/metadata.name
+              operator: NotIn
+              values:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - kyverno
+                - kyverno-exceptions
+                - external-secrets
+                - infisical
+        resourceRules:
+          - apiGroups: [external-secrets.io]
+            apiVersions: ["*"]
+            operations: [CREATE, UPDATE]
+            resources: [secretstores]
+      variables:
+        - name: l0
+          expression: |
+            object.?spec.?provider.orValue({}).map(k, dyn(object.spec.provider[k])).filter(v, type(v) == map)
+        - name: l1
+          expression: |
+            variables.l0.map(m, m.map(k, dyn(m[k]))).flatten().filter(v, type(v) == map)
+        - name: l2
+          expression: |
+            variables.l1.map(m, m.map(k, dyn(m[k]))).flatten().filter(v, type(v) == map)
+      validations:
+        - message: >-
+            SecretStore serviceAccountRef.namespace and serviceAccount.namespace are not allowed anywhere under
+            spec.provider. The ServiceAccount is always the store's own namespace.
+          expression: |
+            !(variables.l0 + variables.l1 + variables.l2).exists(m,
+              dyn(m).?serviceAccountRef.?namespace.hasValue() || dyn(m).?serviceAccount.?namespace.hasValue()
+            )
+
+  eso-deny-platform-kinds:
+    enabled: false
+    title: Deny Platform-Only External Secrets Kinds
+    description: >-
+      PushSecret, ClusterSecretStore, ClusterExternalSecret, ClusterPushSecret and every generators.external-secrets.io
+      kind (including ClusterGenerator) are platform-only. Cluster-scoped objects carry no namespace, and the ArgoCD
+      identity is shared by every project, so they are denied for everyone. A platform ClusterSecretStore needs a
+      PolicyException in kyverno-exceptions.
+    severity: high
+    category: Security
+    spec:
+      validationActions:
+        - Deny
+      evaluation:
+        background:
+          enabled: true
+      matchConstraints:
+        namespaceSelector:
+          matchExpressions:
+            - key: kubernetes.io/metadata.name
+              operator: NotIn
+              values:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - kyverno
+                - kyverno-exceptions
+                - external-secrets
+                - infisical
+        resourceRules:
+          - apiGroups: [external-secrets.io]
+            apiVersions: ["*"]
+            operations: [CREATE, UPDATE]
+            resources: [pushsecrets, clustersecretstores, clusterexternalsecrets, clusterpushsecrets]
+          - apiGroups: [generators.external-secrets.io]
+            apiVersions: ["*"]
+            operations: [CREATE, UPDATE]
+            resources: ["*"]
+      validations:
+        - messageExpression: >-
+            object.kind + ' is not allowed. PushSecret, cluster-scoped External Secrets kinds and generators are
+            platform-only.'
+          expression: |
+            false
 # Example:
 #   disallow-capabilities:
 #     title: Disallow Capabilities
@@ -14,7 +785,152 @@ validatingPolicies: {}
 #       rules: []
 
 # -- Cluster-scoped MutatingPolicy resources.
-mutatingPolicies: {}
+# Same keys as validatingPolicies, including `enabled`.
+# @default -- the platform baseline policies, see values.yaml
+mutatingPolicies:
+  proxy-registry:
+    title: Proxy All Images Through JFrog Artifactory
+    description: >-
+      Replaces the image registry in all images with our own JFrog proxies. The original images are injected as the
+      nethermind.io/original-images annotation for reference.
+    severity: medium
+    category: Governance
+    spec:
+      autogen:
+        podControllers:
+          controllers: []
+      # Workaround for https://github.com/kyverno/kyverno/issues/16141
+      matchConditions:
+        - name: always-true
+          expression: "true"
+      matchConstraints:
+        objectSelector:
+          matchExpressions:
+            - key: cnpg.io/cluster
+              operator: DoesNotExist
+        resourceRules:
+          - apiGroups: [""]
+            apiVersions: ["v1"]
+            resources: ["pods"]
+            operations: ["CREATE"]
+      mutations:
+        - patchType: ApplyConfiguration
+          applyConfiguration:
+            expression: |
+              Object{
+                metadata: Object.metadata{
+                  annotations: {
+                    "nethermind.io/original-images": (
+                      object.spec.containers.map(c, c.name + "=" + c.image) +
+                      (has(object.spec.initContainers) ? object.spec.initContainers.map(c, c.name + "=" + c.image) : [])
+                    ).join(",")
+                  }
+                }
+              }
+        - patchType: ApplyConfiguration
+          applyConfiguration:
+            expression: |
+              Object{
+                spec: Object.spec{
+                  containers: object.spec.containers.map(c,
+                    Object.spec.containers{
+                      name: c.name,
+                      image: (
+                        // DockerHub explicit prefixes
+                        c.image.startsWith('docker.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-dockerhub/' + c.image.substring('docker.io/'.size()) :
+                        c.image.startsWith('index.docker.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-dockerhub/' + c.image.substring('index.docker.io/'.size()) :
+                        c.image.startsWith('registry-1.docker.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-dockerhub/' + c.image.substring('registry-1.docker.io/'.size()) :
+                        // DockerHub bare or short images (no hostname)
+                        (!c.image.contains('/') || !c.image.split('/')[0].contains('.')) ? 'nethermind.jfrog.io/angkor-oci-remote-dockerhub/' + c.image :
+                        // GitHub Container Registry
+                        c.image.startsWith('ghcr.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-ghcr/' + c.image.substring('ghcr.io/'.size()) :
+                        // Quay
+                        c.image.startsWith('quay.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-quay/' + c.image.substring('quay.io/'.size()) :
+                        // Google Container Registry
+                        c.image.startsWith('gcr.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-gcr/' + c.image.substring('gcr.io/'.size()) :
+                        // Google Artifact Registry
+                        c.image.startsWith('us-docker.pkg.dev/') ? 'nethermind.jfrog.io/angkor-oci-remote-us-pkgdev/' + c.image.substring('us-docker.pkg.dev/'.size()) :
+                        c.image.startsWith('europe-docker.pkg.dev/') ? 'nethermind.jfrog.io/angkor-oci-remote-eu-pkgdev/' + c.image.substring('europe-docker.pkg.dev/'.size()) :
+                        c.image.startsWith('us-east1-docker.pkg.dev/') ? 'nethermind.jfrog.io/angkor-oci-remote-us-east1-pkgdev/' + c.image.substring('us-east1-docker.pkg.dev/'.size()) :
+                        // k8s
+                        c.image.startsWith('registry.k8s.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-k8s/' + c.image.substring('registry.k8s.io/'.size()) :
+                        // AWS ECR public
+                        c.image.startsWith('public.ecr.aws/') ? 'nethermind.jfrog.io/angkor-oci-remote-ecr-public/' + c.image.substring('public.ecr.aws/'.size()) :
+                        // Nvidia NGC Container Registry
+                        c.image.startsWith('nvcr.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-nvcr/' + c.image.substring('nvcr.io/'.size()) :
+                        // Suse Registry
+                        c.image.startsWith('registry.suse.com/') ? 'nethermind.jfrog.io/angkor-oci-remote-suse/' + c.image.substring('registry.suse.com/'.size()) :
+                        // Everything else: leave as-is
+                        c.image
+                      )
+                    }
+                  ),
+                  initContainers: has(object.spec.initContainers) ?
+                    object.spec.initContainers.map(c,
+                      Object.spec.initContainers{
+                        name: c.name,
+                        image: (
+                          c.image.startsWith('docker.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-dockerhub/' + c.image.substring('docker.io/'.size()) :
+                          c.image.startsWith('index.docker.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-dockerhub/' + c.image.substring('index.docker.io/'.size()) :
+                          c.image.startsWith('registry-1.docker.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-dockerhub/' + c.image.substring('registry-1.docker.io/'.size()) :
+                          (!c.image.contains('/') || !c.image.split('/')[0].contains('.')) ? 'nethermind.jfrog.io/angkor-oci-remote-dockerhub/' + c.image :
+                          c.image.startsWith('ghcr.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-ghcr/' + c.image.substring('ghcr.io/'.size()) :
+                          c.image.startsWith('quay.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-quay/' + c.image.substring('quay.io/'.size()) :
+                          c.image.startsWith('gcr.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-gcr/' + c.image.substring('gcr.io/'.size()) :
+                          c.image.startsWith('us-docker.pkg.dev/') ? 'nethermind.jfrog.io/angkor-oci-remote-us-pkgdev/' + c.image.substring('us-docker.pkg.dev/'.size()) :
+                          c.image.startsWith('europe-docker.pkg.dev/') ? 'nethermind.jfrog.io/angkor-oci-remote-eu-pkgdev/' + c.image.substring('europe-docker.pkg.dev/'.size()) :
+                          c.image.startsWith('us-east1-docker.pkg.dev/') ? 'nethermind.jfrog.io/angkor-oci-remote-us-east1-pkgdev/' + c.image.substring('us-east1-docker.pkg.dev/'.size()) :
+                          c.image.startsWith('registry.k8s.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-k8s/' + c.image.substring('registry.k8s.io/'.size()) :
+                          c.image.startsWith('public.ecr.aws/') ? 'nethermind.jfrog.io/angkor-oci-remote-ecr-public/' + c.image.substring('public.ecr.aws/'.size()) :
+                          c.image.startsWith('nvcr.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-nvcr/' + c.image.substring('nvcr.io/'.size()) :
+                          c.image.startsWith('registry.suse.com/') ? 'nethermind.jfrog.io/angkor-oci-remote-suse/' + c.image.substring('registry.suse.com/'.size()) :
+                          c.image
+                        )
+                      }
+                    ) : []
+                }
+              }
+
+  proxy-registry-cnpg:
+    title: Proxy CNPG Cluster Images Through JFrog Artifactory
+    description: >-
+      Replaces the imageName registry in CNPG Cluster resources with our own JFrog proxies. CNPG manages
+      its own pod lifecycle using the Cluster spec's imageName field, so this policy targets the Cluster
+      resource directly rather than the pods it creates.
+    severity: medium
+    category: Governance
+    spec:
+      matchConditions:
+        - name: has-image-name
+          expression: "has(object.spec.imageName)"
+      matchConstraints:
+        resourceRules:
+          - apiGroups: ["postgresql.cnpg.io"]
+            apiVersions: ["v1"]
+            resources: ["clusters"]
+            operations: ["CREATE", "UPDATE"]
+      mutations:
+        - patchType: ApplyConfiguration
+          applyConfiguration:
+            expression: |
+              Object{
+                metadata: Object.metadata{
+                  annotations: {
+                    "nethermind.io/original-images": "imageName=" + object.spec.imageName
+                  }
+                }
+              }
+        - patchType: ApplyConfiguration
+          applyConfiguration:
+            expression: |
+              Object{
+                spec: Object.spec{
+                  imageName: (
+                    object.spec.imageName.startsWith('ghcr.io/') ? 'nethermind.jfrog.io/angkor-oci-remote-ghcr/' + object.spec.imageName.substring('ghcr.io/'.size()) :
+                    object.spec.imageName
+                  )
+                }
+              }
 
 # -- Cluster-scoped GeneratingPolicy resources.
 generatingPolicies: {}
