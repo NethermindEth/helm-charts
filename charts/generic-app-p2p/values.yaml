@@ -163,6 +163,9 @@ p2p:
   enabled: false
   serviceType: NodePort
   port: 30300
+  clusterRole:
+    # -- Set to false to skip only the ClusterRole and ClusterRoleBinding (e.g. when they are managed elsewhere under the same name); the p2p services stay
+    create: true
   # -- Set the nodePort to a specific value, otherwise it will be randomly assigned (only works when using single replica)
   # nodePort: 30300
 

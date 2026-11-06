@@ -314,6 +314,16 @@
           "description": "Explicit nodePort (only works with single replica)",
           "minimum": 1,
           "maximum": 65535
+        },
+        "clusterRole": {
+          "type": "object",
+          "description": "Set to false to skip only the ClusterRole and ClusterRoleBinding (e.g. when they are managed elsewhere under the same name); the p2p services stay",
+          "additionalProperties": false,
+          "properties": {
+            "create": {
+              "type": "boolean"
+            }
+          }
         }
       }
     },

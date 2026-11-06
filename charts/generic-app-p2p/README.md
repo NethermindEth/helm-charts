@@ -1,6 +1,6 @@
 # generic-app-p2p
 
-![Version: 2.1.1](https://img.shields.io/badge/Version-2.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic apps (P2P)
 
@@ -218,6 +218,7 @@ persistence:
 | livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
+| p2p.clusterRole.create | bool | `true` | Set to false to skip only the ClusterRole and ClusterRoleBinding (e.g. when they are managed elsewhere under the same name); the p2p services stay |
 | p2p.enabled | bool | `false` |  |
 | p2p.port | int | `30300` |  |
 | p2p.serviceType | string | `"NodePort"` |  |
