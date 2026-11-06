@@ -36,7 +36,7 @@ metadata:
   name: {{ include "generic-app.fullname" . }}-headless
   labels:
     {{- include "generic-app.labels" . | nindent 4 }}
-  {{- with .Values.service.annotations }}
+  {{- with .Values.statefulSet.headlessService.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}

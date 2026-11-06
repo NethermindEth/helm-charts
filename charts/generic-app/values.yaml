@@ -47,6 +47,9 @@ statefulSet:
     annotations: {}
   # If true, the container will be restarted when the values.yaml file changes.
   restartOnChanges: false
+  headlessService:
+    # -- Annotations for the headless Service. Not inherited from `service.annotations`
+    annotations: {}
 
 # -- Command and args for the container
 command: []
