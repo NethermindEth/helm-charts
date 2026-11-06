@@ -1,6 +1,6 @@
 # generic-app
 
-![Version: 4.4.0](https://img.shields.io/badge/Version-4.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 5.0.0](https://img.shields.io/badge/Version-5.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for Kubernetes generic app
 
@@ -308,7 +308,8 @@ statefulSet:
 | serviceMonitor.scrapeTimeout | string | `"30s"` | ServiceMonitor scrape timeout |
 | serviceMonitor.tlsConfig | object | `{}` | ServiceMonitor TLS configuration |
 | startupProbe | string | `nil` |  |
-| statefulSet | object | `{"enabled":false,"persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""},"restartOnChanges":false}` | Enable StatefulSet |
+| statefulSet | object | `{"enabled":false,"headlessService":{"annotations":{}},"persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""},"restartOnChanges":false}` | Enable StatefulSet |
+| statefulSet.headlessService.annotations | object | `{}` | Annotations for the headless Service. Not inherited from `service.annotations` |
 | statefulSet.persistence | object | `{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"mountPath":"/data","size":"10Gi","storageClassName":""}` | Enable PVC for StatefulSet |
 | terminationGracePeriodSeconds | int | `30` | Default termination grace period for the pod |
 | tolerations | list | `[]` |  |

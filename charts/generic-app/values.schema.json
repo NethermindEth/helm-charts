@@ -249,6 +249,20 @@
         "restartOnChanges": {
           "type": "boolean",
           "description": "Restart pods when values change"
+        },
+        "headlessService": {
+          "type": "object",
+          "description": "Headless Service configuration",
+          "additionalProperties": false,
+          "properties": {
+            "annotations": {
+              "type": "object",
+              "description": "Annotations for the headless Service",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
