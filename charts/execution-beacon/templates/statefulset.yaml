@@ -228,6 +228,11 @@ spec:
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if eq .Values.execution.client "besu" }}
+            # Mitigate CVE-2026-114938 in the besu JVM.
+            - name: JDK_JAVA_OPTIONS
+              value: "-XX:+UnlockDiagnosticVMOptions -XX:-UseBASE64Intrinsics"
+          {{- end }}
           {{- with .Values.execution.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -340,6 +345,11 @@ spec:
                   fieldPath: spec.nodeName
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if eq .Values.beacon.client "teku" }}
+            # Mitigate CVE-2026-114938 in the teku JVM.
+            - name: JDK_JAVA_OPTIONS
+              value: "-XX:+UnlockDiagnosticVMOptions -XX:-UseBASE64Intrinsics"
           {{- end }}
           {{- with .Values.beacon.env }}
             {{- toYaml . | nindent 12 }}
