@@ -146,6 +146,12 @@ spec:
             {{- include "validator-args-nimbus" (dict "Values" $root.Values "rpcEndpoints" $rpcEndpoints) | nindent 12 }}
             {{- end }}
           {{- end }}
+          {{- if eq $root.Values.type "teku" }}
+          env:
+            # Mitigate CVE-2026-114938 in the Teku JVM.
+            - name: JDK_JAVA_OPTIONS
+              value: "-XX:+UnlockDiagnosticVMOptions -XX:-UseBASE64Intrinsics"
+          {{- end }}
           {{- if $root.Values.metrics.enabled }}
           ports:
             - containerPort: {{ $root.Values.metrics.port }}
