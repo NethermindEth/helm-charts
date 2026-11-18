@@ -83,7 +83,13 @@ spec:
             {{- end }}
             - migrate
           envFrom: {{- tpl (toYaml .Values.envFrom) $ | nindent 12 }}
-          env: {{- toYaml .Values.env | nindent 12 }}
+          env:
+            # Mitigate CVE-2026-114938 in the Flyway JVM.
+            - name: JDK_JAVA_OPTIONS
+              value: "-XX:+UnlockDiagnosticVMOptions -XX:-UseBASE64Intrinsics"
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: migrations
               mountPath: /flyway/sql
@@ -118,6 +124,9 @@ spec:
             - --slashing-protection-db-username=$(DB_USERNAME)
             - --slashing-protection-db-password=$(DB_PASSWORD)
           env:
+            # Mitigate CVE-2026-114938 in the signer JVM.
+            - name: JDK_JAVA_OPTIONS
+              value: "-XX:+UnlockDiagnosticVMOptions -XX:-UseBASE64Intrinsics"
             - name: JAVA_OPTS
               value: {{ .Values.web3signerJavaOpts | quote }}
             {{- with .Values.env }}
