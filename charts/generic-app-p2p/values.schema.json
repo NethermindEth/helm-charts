@@ -751,6 +751,10 @@
     "initContainerSecurityContext": {
       "type": "object",
       "description": "Security context applied to all init containers"
+    },
+    "initContainerResources": {
+      "type": "object",
+      "description": "Default resources for init containers that do not set their own resources"
     }
   }
 }

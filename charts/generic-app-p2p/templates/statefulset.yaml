@@ -39,6 +39,10 @@ spec:
         {{- range $container := .Values.initContainers }}
         - securityContext:
             {{- toYaml $.Values.initContainerSecurityContext | nindent 12 }}
+          {{- if and $.Values.initContainerResources (not $container.resources) }}
+          resources:
+            {{- toYaml $.Values.initContainerResources | nindent 12 }}
+          {{- end }}
           {{- with $container }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
