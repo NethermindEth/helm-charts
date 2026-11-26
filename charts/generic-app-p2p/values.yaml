@@ -405,3 +405,12 @@ initContainerSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
   allowPrivilegeEscalation: false
+
+# -- Default resources for init containers that do not set their own `resources`.
+# Set to `{}` to leave init containers without resources.
+initContainerResources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 128Mi

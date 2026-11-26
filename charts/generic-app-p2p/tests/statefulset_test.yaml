@@ -102,3 +102,34 @@ tests:
     asserts:
       - notExists:
           path: spec.template.spec.topologySpreadConstraints
+
+  - it: given init containers then only those without resources get the default init container resources
+    set:
+      initContainerResources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          memory: 32Mi
+      initContainers:
+        - name: no-resources
+          image: busybox
+        - name: own-resources
+          image: busybox
+          resources:
+            requests:
+              cpu: 500m
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].resources
+          value:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 32Mi
+      - equal:
+          path: spec.template.spec.initContainers[1].resources
+          value:
+            requests:
+              cpu: 500m
