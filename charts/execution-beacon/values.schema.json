@@ -2008,6 +2008,12 @@
           "title": "repository",
           "type": "string"
         },
+        "resources": {
+          "$ref": "#/definitions/containerResources",
+          "description": "Resources for the ethsider sidecar container",
+          "title": "resources",
+          "type": "object"
+        },
         "tag": {
           "default": "v2.2.0",
           "title": "tag",
@@ -2887,6 +2893,12 @@
           "default": "bitnamilegacy/kubectl",
           "title": "repository",
           "type": "string"
+        },
+        "resources": {
+          "$ref": "#/definitions/containerResources",
+          "description": "Resources for the init container that uses this image",
+          "title": "resources",
+          "type": "object"
         },
         "tag": {
           "default": "1.33.4",

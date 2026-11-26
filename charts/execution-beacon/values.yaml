@@ -205,6 +205,14 @@ ethsider:
   tag: "v2.2.0"
   pullPolicy: IfNotPresent
   bindAddr: 3000
+  ## Resources for the ethsider sidecar container
+  ##
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      memory: 64Mi
   ## Configure ethsider probe flags
   ## ref: https://github.com/NethermindEth/ethsider
   ##
@@ -334,6 +342,14 @@ initImage:
   repository: "bitnamilegacy/kubectl"
   tag: "1.33.4"
   pullPolicy: IfNotPresent
+  ## Resources for the init container that uses this image
+  ##
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      memory: 256Mi
 
 ## Monitoring
 ##
