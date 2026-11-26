@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 4.3.0](https://img.shields.io/badge/Version-4.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 4.4.0](https://img.shields.io/badge/Version-4.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -127,6 +127,9 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | ethsider.readinessProbe.successThreshold | int | `3` |  |
 | ethsider.readinessProbe.timeoutSeconds | int | `3` |  |
 | ethsider.repository | string | `"nethermindeth/ethsider"` |  |
+| ethsider.resources.limits.memory | string | `"64Mi"` |  |
+| ethsider.resources.requests.cpu | string | `"10m"` |  |
+| ethsider.resources.requests.memory | string | `"64Mi"` |  |
 | ethsider.tag | string | `"v2.2.0"` |  |
 | execution.archive | bool | `false` |  |
 | execution.client | string | `"nethermind"` |  |
@@ -219,6 +222,9 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | imagePullSecrets | list | `[]` |  |
 | initImage.pullPolicy | string | `"IfNotPresent"` |  |
 | initImage.repository | string | `"bitnamilegacy/kubectl"` |  |
+| initImage.resources.limits.memory | string | `"256Mi"` |  |
+| initImage.resources.requests.cpu | string | `"50m"` |  |
+| initImage.resources.requests.memory | string | `"256Mi"` |  |
 | initImage.tag | string | `"1.33.4"` |  |
 | metrics.annotations | object | `{}` |  |
 | metrics.enabled | bool | `true` |  |

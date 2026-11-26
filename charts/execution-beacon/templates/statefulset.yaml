@@ -91,6 +91,10 @@ spec:
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             {{- toYaml .Values.global.initContainerSecurityContext | nindent 12 }}
+          {{- with .Values.initImage.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: POD_IP
               valueFrom:
@@ -399,6 +403,10 @@ spec:
           imagePullPolicy: {{ .Values.ethsider.pullPolicy }}
           securityContext:
             {{- toYaml .Values.global.securityContext | nindent 12 }}
+          {{- with .Values.ethsider.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: EXECUTION_ENDPOINT
               value: "http://localhost:{{ .Values.execution.jsonrpc.http.port }}"
