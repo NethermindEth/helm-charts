@@ -1,0 +1,169 @@
+suite: StatefulSet service account token mounting
+release:
+  name: token-test
+set:
+  deployment.enabled: false
+  statefulSet.enabled: true
+  fullnameOverride: token-test
+templates:
+  - statefulset.yaml
+  - serviceaccount.yaml
+tests:
+  - it: disables pod token mounting by default
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+        template: statefulset.yaml
+  - it: respects automount false with create true and default name
+    set:
+      serviceAccount.create: true
+      serviceAccount.name: ''
+      serviceAccount.automount: false
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+        template: statefulset.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: token-test
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 1
+        template: serviceaccount.yaml
+      - equal:
+          path: automountServiceAccountToken
+          value: false
+        template: serviceaccount.yaml
+  - it: respects automount true with create true and default name
+    set:
+      serviceAccount.create: true
+      serviceAccount.name: ''
+      serviceAccount.automount: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+        template: statefulset.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: token-test
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 1
+        template: serviceaccount.yaml
+      - equal:
+          path: automountServiceAccountToken
+          value: true
+        template: serviceaccount.yaml
+  - it: respects automount false with create true and named account
+    set:
+      serviceAccount.create: true
+      serviceAccount.name: existing-account
+      serviceAccount.automount: false
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+        template: statefulset.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: existing-account
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 1
+        template: serviceaccount.yaml
+      - equal:
+          path: automountServiceAccountToken
+          value: false
+        template: serviceaccount.yaml
+  - it: respects automount true with create true and named account
+    set:
+      serviceAccount.create: true
+      serviceAccount.name: existing-account
+      serviceAccount.automount: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+        template: statefulset.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: existing-account
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 1
+        template: serviceaccount.yaml
+      - equal:
+          path: automountServiceAccountToken
+          value: true
+        template: serviceaccount.yaml
+  - it: respects automount false with create false and default name
+    set:
+      serviceAccount.create: false
+      serviceAccount.name: ''
+      serviceAccount.automount: false
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+        template: statefulset.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: default
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+  - it: respects automount true with create false and default name
+    set:
+      serviceAccount.create: false
+      serviceAccount.name: ''
+      serviceAccount.automount: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+        template: statefulset.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: default
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+  - it: respects automount false with create false and named account
+    set:
+      serviceAccount.create: false
+      serviceAccount.name: existing-account
+      serviceAccount.automount: false
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+        template: statefulset.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: existing-account
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
+  - it: respects automount true with create false and named account
+    set:
+      serviceAccount.create: false
+      serviceAccount.name: existing-account
+      serviceAccount.automount: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+        template: statefulset.yaml
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: existing-account
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 0
+        template: serviceaccount.yaml
