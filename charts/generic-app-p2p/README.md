@@ -219,6 +219,7 @@ persistence:
 | livenessProbe | string | `nil` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
+| p2p.clusterRole.create | bool | `true` | Set to false to skip only the ClusterRole and ClusterRoleBinding (e.g. when they are managed elsewhere under the same name); the p2p services stay |
 | p2p.enabled | bool | `false` |  |
 | p2p.port | int | `30300` |  |
 | p2p.serviceType | string | `"NodePort"` |  |
