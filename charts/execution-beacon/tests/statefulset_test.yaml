@@ -123,3 +123,32 @@ tests:
     asserts:
       - notExists:
           path: spec.template.spec.topologySpreadConstraints
+
+  - it: given a custom execution readiness handler then it replaces the default TCP check
+    template: statefulset.yaml
+    set:
+      execution.readinessProbe.httpGet:
+        path: /health
+        port: jsonrpc-exec
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[?(@.name == "execution")].readinessProbe.tcpSocket
+      - equal:
+          path: spec.template.spec.containers[?(@.name == "execution")].readinessProbe.httpGet.path
+          value: /health
+
+  - it: given execution JSON-RPC is disabled then the execution container has no readiness probe
+    template: statefulset.yaml
+    set:
+      execution.jsonrpc.enabled: false
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[?(@.name == "execution")].readinessProbe
+
+  - it: given the beacon REST API is disabled then the beacon container has no readiness probe
+    template: statefulset.yaml
+    set:
+      beacon.restApi.enabled: false
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[?(@.name == "beacon")].readinessProbe

@@ -1,4 +1,21 @@
 {{/*
+Readiness probe for the execution container.
+Without a configured handler, opens a TCP connection to the JSON-RPC HTTP port.
+Renders nothing when the probe is disabled or there is no handler to use.
+*/}}
+{{- define "execution.readinessProbe" -}}
+{{- if .Values.execution.readinessProbe.enabled -}}
+{{- $probe := omit .Values.execution.readinessProbe "enabled" -}}
+{{- if and (not (or $probe.httpGet $probe.tcpSocket $probe.grpc $probe.exec)) .Values.execution.jsonrpc.enabled -}}
+{{- $_ := set $probe "tcpSocket" (dict "port" "jsonrpc-exec") -}}
+{{- end -}}
+{{- if or $probe.httpGet $probe.tcpSocket $probe.grpc $probe.exec -}}
+{{- toYaml $probe -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Nethermind execution client arguments
 */}}
 {{- define "execution-args-nethermind" -}}
