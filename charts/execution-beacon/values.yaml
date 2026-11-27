@@ -583,6 +583,19 @@ execution:
   extraFlags: []
   resources: {}
 
+  ## Readiness probe for the execution container
+  ## With no httpGet, tcpSocket, grpc or exec handler set, opens a TCP connection to the
+  ## JSON-RPC HTTP port (jsonrpc-exec). Not rendered when execution.jsonrpc.enabled is false.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+
   ## Additional volumes to mount into the execution container
   ##
   volumeMounts: []
@@ -727,6 +740,20 @@ beacon:
   ##
   extraFlags: []
   resources: {}
+
+  ## Readiness probe for the beacon container
+  ## With no httpGet, tcpSocket, grpc or exec handler set, calls GET /eth/v1/node/health on the
+  ## Beacon REST API port (http-beacon). It returns 206 while syncing, which counts as ready.
+  ## Not rendered when beacon.restApi.enabled is false or beacon.restApi.portMap has no entry for the client.
+  ## ref: https://ethereum.github.io/beacon-APIs/#/Node/getHealth
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
 
   ## Additional volumes to mount into the beacon container
   ##

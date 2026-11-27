@@ -293,6 +293,10 @@ spec:
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
+        {{- with include "execution.readinessProbe" . }}
+          readinessProbe:
+            {{- . | nindent 12 }}
+        {{- end }}
         {{/*
         Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar, Taiko
         */}}
@@ -396,6 +400,10 @@ spec:
         {{- with .Values.beacon.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with include "beacon.readinessProbe" . }}
+          readinessProbe:
+            {{- . | nindent 12 }}
         {{- end }}
         {{- if and .Values.ethsider.enabled }}
         - name: ethsider

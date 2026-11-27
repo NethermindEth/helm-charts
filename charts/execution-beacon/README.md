@@ -1,7 +1,7 @@
 
 # execution-beacon
 
-![Version: 4.4.0](https://img.shields.io/badge/Version-4.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 4.5.0](https://img.shields.io/badge/Version-4.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Helm chart for deploying Ethereum execution and consensus clients
 
@@ -77,6 +77,12 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | beacon.persistence.storageClassName | string | `""` |  |
 | beacon.preExecScript | string | `""` |  |
 | beacon.proposerOnly | bool | `false` |  |
+| beacon.readinessProbe.enabled | bool | `true` |  |
+| beacon.readinessProbe.failureThreshold | int | `3` |  |
+| beacon.readinessProbe.initialDelaySeconds | int | `10` |  |
+| beacon.readinessProbe.periodSeconds | int | `10` |  |
+| beacon.readinessProbe.successThreshold | int | `1` |  |
+| beacon.readinessProbe.timeoutSeconds | int | `5` |  |
 | beacon.resources | object | `{}` |  |
 | beacon.restApi.corsOrigins[0] | string | `"*"` |  |
 | beacon.restApi.enabled | bool | `true` |  |
@@ -183,6 +189,12 @@ A Helm chart for deploying Ethereum execution and consensus clients
 | execution.persistence.size | string | `"100Gi"` |  |
 | execution.persistence.storageClassName | string | `""` |  |
 | execution.privateApiAddr | string | `"127.0.0.1:9090"` |  |
+| execution.readinessProbe.enabled | bool | `true` |  |
+| execution.readinessProbe.failureThreshold | int | `3` |  |
+| execution.readinessProbe.initialDelaySeconds | int | `10` |  |
+| execution.readinessProbe.periodSeconds | int | `10` |  |
+| execution.readinessProbe.successThreshold | int | `1` |  |
+| execution.readinessProbe.timeoutSeconds | int | `5` |  |
 | execution.resources | object | `{}` |  |
 | execution.snapshot.enabled | bool | `false` |  |
 | execution.snapshot.extraFlags | list | `[]` |  |

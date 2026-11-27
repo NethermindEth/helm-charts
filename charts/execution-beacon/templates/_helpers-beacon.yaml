@@ -1,4 +1,21 @@
 {{/*
+Readiness probe for the beacon container.
+Without a configured handler, calls the standard Beacon API health endpoint on the REST API port.
+Renders nothing when the probe is disabled or there is no handler to use.
+*/}}
+{{- define "beacon.readinessProbe" -}}
+{{- if .Values.beacon.readinessProbe.enabled -}}
+{{- $probe := omit .Values.beacon.readinessProbe "enabled" -}}
+{{- if and (not (or $probe.httpGet $probe.tcpSocket $probe.grpc $probe.exec)) .Values.beacon.restApi.enabled (hasKey .Values.beacon.restApi.portMap .Values.beacon.client) -}}
+{{- $_ := set $probe "httpGet" (dict "path" "/eth/v1/node/health" "port" "http-beacon") -}}
+{{- end -}}
+{{- if or $probe.httpGet $probe.tcpSocket $probe.grpc $probe.exec -}}
+{{- toYaml $probe -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Prysm beacon client arguments
 */}}
 {{- define "beacon-args-prysm" -}}
